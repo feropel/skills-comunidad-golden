@@ -1,0 +1,36 @@
+{
+    "_fuente": "Límites REALES de Chatea Pro. FUENTE ÚNICA: build_config.py y valida_producto.py leen de aquí; si la plataforma cambia, re-verificar en vivo y actualizar SOLO este archivo. capa1/capa2 = límites por campo de la UI de Entrenar (2026-07-08). bot_fields = tope del Bot Field MEDIDO POR API contra un workspace real el 2026-07-25 (no leído del modal): depende del TIPO de campo.",
+    "_regla_de_oro": "El tope de 20000 NO es de la plataforma, es del TIPO de campo. Tipo JSON (var_type text o array) = 20000. Tipo LONG JSON (var_type longtext) = 500000, o sea 25x, con integridad byte a byte verificada. TODO campo de configuración NUEVO se crea LONG JSON. Un campo que ya exista como JSON no se convierte por API: borrar y recrear cambia el var_ns y ROMPE las referencias del flujo, así que el tipo se cambia en la UI.",
+    "_truncada_silenciosa": "CRÍTICO: pasarse del tope NO da error. La API responde HTTP 200 {status:ok} y guarda el contenido CORTADO. Por eso todo push debe releer y comparar longitud (push_config.py ya lo hace). Verificado el 2026-07-25.",
+    "bot_fields": {
+        "max_por_campo": 500000,
+        "max_long_json": 500000,
+        "max_json_legacy": 20000,
+        "tipo_recomendado": "LONG JSON",
+        "_nota": "max_por_campo = el tope con el que validan los scripts; vale 500000 porque los campos se crean LONG JSON. Si un campo concreto sigue siendo tipo JSON, su tope real es max_json_legacy."
+    },
+    "capa1": {
+        "rol_general": 2000,
+        "restricciones_generales": 2000,
+        "prompt_analisis": 2000,
+        "reglas_estructura": 4000,
+        "prompt_maestro": 13000,
+        "mensaje_libre": 400
+    },
+    "capa2": {
+        "nombre": 100,
+        "precio_digitos": 10,
+        "id_dropi_digitos": 8,
+        "mensaje_inicial": 1000,
+        "pregunta_entrada": 1000,
+        "prompt_personalizado": 12000,
+        "recordatorio": 800,
+        "instruccion_remarketing": 1000,
+        "pixel_ids": 150,
+        "upsell_titulo": 80,
+        "upsell_descripcion": 80,
+        "upsell_boton": 20
+    },
+    "_nota_prompt_libre": "prompt_personalizado (12000) es el tope de la PANTALLA 'Prompt del producto' de la UI. Por Bot Field LONG JSON el prompt puede ser mayor (un producto real = 14125). El validador NO rechaza >12000: avisa que ese producto se edita SOLO por Bot Field, porque la UI v2 lo corta a 12000 y su 'Guardar asistente' sobrescribe con la versión cortada (verificado 2026-07-12).",
+    "_nota_capas": "capa1 y capa2 son los límites de los CAMPOS DE LA UI de Entrenar, no del Bot Field. Siguen vigentes: si el texto también se va a pegar a mano por la UI, hay que respetarlos. Si la carga es solo por API o Bot Field, el único tope es el del tipo de campo."
+}

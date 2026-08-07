@@ -1,0 +1,9 @@
+{
+  "name": "golden-chatea-pro-config-ventas-wp",
+  "version": "3.3.0",
+  "description": "Configura el asistente de ventas por WhatsApp de Chatea Pro: Bot Fields JSON nativos, configuracion general del negocio y ficha por producto, con validadores de limites reales.",
+  "author": { "name": "Comunidad Golden" },
+  "license": "MIT",
+  "keywords": ["chatea-pro", "whatsapp", "ventas", "cod", "claude-code-skill"],
+  "skills": ["./skills/golden-chatea-pro-config-ventas-wp/"]
+}

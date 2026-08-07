@@ -1,0 +1,11 @@
+🎉 Nueva venta realizada!
+
+Tu asistente virtual ha procesado exitosamente una nueva venta. Aquí están los detalles:
+
+📦 Producto: {nombre_producto}
+💰 Valor: {valor_venta}
+👤 Cliente: {nombre_cliente}
+📞 Teléfono: {telefono_cliente}
+📊 Tasa de entrega del cliente: {porcentaje_entrega}
+
+Sigue así! 🚀

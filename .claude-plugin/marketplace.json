@@ -1,0 +1,17 @@
+{
+  "name": "skills-comunidad-golden",
+  "owner": { "name": "Comunidad Golden" },
+  "metadata": {
+    "description": "Skills de la Comunidad Golden para Claude Code.",
+    "version": "1.0.0"
+  },
+  "plugins": [
+    {
+      "name": "golden-chatea-pro-config-ventas-wp",
+      "source": "./golden-chatea-pro-config-ventas-wp",
+      "description": "Configura el asistente de ventas por WhatsApp de Chatea Pro: genera los Bot Fields JSON nativos (configuracion general + por producto) listos para copiar y pegar.",
+      "version": "3.3.0",
+      "category": "marketing"
+    }
+  ]
+}

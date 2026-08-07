@@ -1,0 +1,11 @@
+{
+    "_bot_field": "[Ventas Wp] Disparador de productos Extendido · Tipo LONG JSON · máx 500.000 caracteres · UNO por workspace",
+    "_uso": "Es el ÍNDICE de productos: un array donde cada objeto enlaza la palabra clave y los IDs de anuncio con su campo [Producto Ventas Wp] N. Al montar un producto nuevo se AÑADE esta entrada al array existente (nunca se reemplaza el array completo sin conservar los demás productos). keyW e idAd = strings de 7 slots separados por comas.",
+    "entrada_nueva": {
+        "producto": "{{NOMBRE_PRODUCTO}}",
+        "name": "[Producto Ventas Wp] {{N}}",
+        "keyW": "{{PALABRA_CLAVE}},,,,,,",
+        "idAd": "{{IDS_ANUNCIO_O_VACIO}},,,,,,",
+        "estado": "activo"
+    }
+}

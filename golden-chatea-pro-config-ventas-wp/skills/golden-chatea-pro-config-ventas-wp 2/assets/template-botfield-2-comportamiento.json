@@ -1,0 +1,16 @@
+{
+    "_bot_field": "[Ventas Wp] Configuracion general 2 · Tipo LONG JSON · máx 500000 caracteres",
+    "_uso": "Segundo Bot Field NATIVO (verificado contra workspace real 2026-07-09). Mismas reglas que el campo 1: pegar completo en su Bot Field, no renombrar claves. analizar_palabra.activar es boolean (true), no string. division.limite = 2 SIEMPRE (validado en campo 2026-07-12: con límite 3 la IA responde en ráfagas de 3 burbujas triviales que se sienten robot; 2 permite el caso legítimo imagen-URL + texto y mata las ráfagas).",
+    "comportamiento_ia": {
+        "division": {
+            "cantidad": "varios",
+            "limite": "2"
+        },
+        "rol": "<INYECTADO:rol-general.txt>",
+        "restricciones": "<INYECTADO:restricciones.txt>",
+        "analizar_palabra": {
+            "activar": true,
+            "prompt": "<INYECTADO:analisis-palabra-clave.txt con {{URL_TIENDA}}>"
+        }
+    }
+}

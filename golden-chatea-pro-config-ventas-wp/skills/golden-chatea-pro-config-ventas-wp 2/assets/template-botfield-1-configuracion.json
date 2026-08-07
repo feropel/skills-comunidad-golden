@@ -1,0 +1,40 @@
+{
+    "_bot_field": "[Ventas Wp] Configuracion general · Tipo LONG JSON · máx 500000 caracteres",
+    "_uso": "Bot Field NATIVO de Chatea Pro (verificado contra workspace real 2026-07-09). Se pega el JSON completo en Bot Fields → carpeta del agente de ventas → Edit Bot Field → Valor. NO renombrar claves: el flujo del bot las lee por nombre. Convenciones: si/no en minúscula, pais en minúscula, números como string. Las claves _meta las elimina build_config.py en la salida.",
+    "conexion_con_dropi": {
+        "conectar": "{{DROPI_SI_NO}}",
+        "pais": "{{PAIS_MINUSCULA}}"
+    },
+    "acciones_especiales": {
+        "validaciones_orden": {
+            "subida_automatica": "si",
+            "validar_entregas": {
+                "esta_activo": "si",
+                "porcentaje_minimo": "60",
+                "minimo_de_ordenes": "3"
+            },
+            "validar_flete": {
+                "esta_activo": "si",
+                "flete_minimo": "{{FLETE_MAXIMO}}",
+                "moneda": "{{MONEDA}}"
+            }
+        }
+    },
+    "producto_segundos": {
+        "prompt_datos": "<INYECTADO:reglas-estructura-producto.txt>",
+        "prompt_prompt": "{{PROMPT_MAESTRO}}"
+    },
+    "notificaciones": {
+        "notificacion_1": {
+            "activa": "si",
+            "evento": "venta-realizada",
+            "whatsapp": "{{WHATSAPP_NOTIFICACIONES}}",
+            "mensaje": "<INYECTADO:notificacion-venta-realizada.txt>",
+            "plantilla": {
+                "lang": "",
+                "name": "",
+                "namespace": ""
+            }
+        }
+    }
+}

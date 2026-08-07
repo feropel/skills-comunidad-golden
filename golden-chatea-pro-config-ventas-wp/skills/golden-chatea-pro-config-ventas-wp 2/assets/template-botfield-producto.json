@@ -1,0 +1,119 @@
+{
+    "_bot_field": "[Producto Ventas Wp] N · Tipo LONG JSON · máx 500000 caracteres · 1 campo por producto",
+    "_uso": "Esquema NATIVO verificado contra producto real (2026-07-09). Se pega completo en su Bot Field. NO renombrar claves. Los textos de venta ({{MENSAJE_INICIAL}}, {{PREGUNTA_ENTRADA}}, {{PROMPT_VENTA}}, recordatorios y remarketing) los genera golden-chatea-pro-prompt-ventas. Al montar el producto TAMBIÉN se añade su entrada en el campo Disparador (ver template-registro-disparador.json). Las claves _meta las quita el validador al copiar (o se borran a mano).",
+    "informacion_de_producto": {
+        "id": "{{ID_DROPI}}",
+        "nombre": "{{NOMBRE_PRODUCTO}}",
+        "precio": "{{PRECIO_SOLO_DIGITOS}}",
+        "moneda": "{{MONEDA}}",
+        "id_dropi": "{{ID_DROPI}}",
+        "tipo": "físico",
+        "variable": "{{SIMPLE_O_VARIABLE}}",
+        "imagen": "{{URL_IMAGEN_PORTADA}}",
+        "estado": "activo",
+        "dta_prompt": ""
+    },
+    "embudo_de_ventas": {
+        "mensaje_inicial": "{{MENSAJE_INICIAL}}",
+        "multimedia": [
+            "{{URL_VIDEO_O_IMAGEN_1}}",
+            "{{URL_IMAGEN_2}}"
+        ],
+        "pregunta_de_entrada": "{{PREGUNTA_ENTRADA}}"
+    },
+    "prompt": {
+        "tipo_de_prompt": "libre",
+        "prompt_libre": "{{PROMPT_VENTA}}",
+        "prompt_guiado_contextualizacion": "",
+        "prompt_guiado_ficha_tecnica": "",
+        "prompt_guiado_guion_conversacional": "",
+        "prompt_guiado_posibles_situaciones": "",
+        "prompt_guiado_reglas": ""
+    },
+    "voz_con_ia": {
+        "proveedor": "chatea_pro",
+        "id": "{{ID_VOZ_O_VACIO}}",
+        "api_key": "{{API_KEY_ELEVENLABS_O_VACIO}}",
+        "estabilidad": 0.3,
+        "similaridad": 0.7,
+        "estilo": 0.5,
+        "velocidad": 1,
+        "speaker_boost": false,
+        "habilitar": "{{VOZ_SI_NO}}",
+        "reglas": {
+            "responderAudioConAudio": "si",
+            "cantidadMaximaDeAudio": "5",
+            "probabilidadRespuestaAudio": "100"
+        }
+    },
+    "recordatorios": {
+        "_nota": "mensaje_N = PROMPT-instrucción para la IA (formato 'EVENTO: ... MÍNIMO 35 PALABRAS.' + ejemplo de mensaje), no texto literal",
+        "activar_1": "si",
+        "tiempo_1": "30 minutos",
+        "mensaje_1": "{{RECORDATORIO_1}}",
+        "activar_2": "si",
+        "tiempo_2": "2 horas",
+        "mensaje_2": "{{RECORDATORIO_2}}",
+        "activar_rango": "si",
+        "hora_min": "06:00",
+        "hora_max": "22:00"
+    },
+    "remarketing": {
+        "_nota": "prompt_N = rol de la IA por fase (1 reactivación suave · 2 último llamado con urgencia); plantilla name 'no enviar plantilla' si no hay plantilla Meta aprobada",
+        "activar_1": "si",
+        "activar_2": "si",
+        "prompt_1": "{{PROMPT_REMARKETING_1}}",
+        "prompt_2": "{{PROMPT_REMARKETING_2}}",
+        "tiempo_1": "3 horas",
+        "plantilla_1": {
+            "namespace": "",
+            "name": "{{PLANTILLA_1_O_NO_ENVIAR}}",
+            "lang": "es"
+        },
+        "tiempo_2": "23 horas",
+        "plantilla_2": {
+            "namespace": "",
+            "name": "{{PLANTILLA_2_O_NO_ENVIAR}}",
+            "lang": "es"
+        },
+        "hora_min": "06:00",
+        "hora_max": "22:00"
+    },
+    "activadores_del_flujo": {
+        "_nota": "strings de 7 slots separados por comas; los vacíos quedan como comas",
+        "palabras_clave": "{{PALABRA_CLAVE}},,,,,,",
+        "ids_de_anuncio": "{{IDS_ANUNCIO_O_VACIO}},,,,,,"
+    },
+    "meta_conversion": {
+        "habilitado": true,
+        "por_defecto": true,
+        "id": "",
+        "aud_id": ""
+    },
+    "upsells": {
+        "1": {
+            "activo": "no",
+            "imagen": "",
+            "titulo": "",
+            "descripcion": "",
+            "boton": "",
+            "momento": "personalizado",
+            "nombre": "",
+            "precio": "",
+            "id_dropi": "",
+            "variaciones": "SIMPLE"
+        },
+        "2": {
+            "activo": "no",
+            "imagen": "",
+            "titulo": "",
+            "descripcion": "",
+            "boton": "",
+            "momento": "personalizado",
+            "nombre": "",
+            "precio": "",
+            "id_dropi": "",
+            "variaciones": "SIMPLE"
+        }
+    }
+}

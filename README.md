@@ -1,23 +1,48 @@
-# Skills de la Comunidad Golden
+# Skills de la Comunidad Golden · Familia Chatea Pro
 
-La familia completa de **Chatea Pro** para **Claude Code**. Instala la que necesites y tu
-Claude arma solo la configuración de tus asistentes de venta por WhatsApp.
-
-Ninguna skill contiene datos privados: cada una te pide tus datos cuando la usas.
+Habilidades para **Claude Code** que arman, solas y sin errores, la configuración de tus
+asistentes de venta por WhatsApp en **Chatea Pro**. Instala la que necesites; cada una te
+pide tus datos cuando la usas (ninguna guarda datos privados).
 
 ---
 
-## Skills disponibles (familia Chatea Pro)
+## Cómo se organiza la familia (2 niveles)
 
-| Skill | Para qué sirve |
+**Nivel 1 — Los 4 asistentes** (se configuran una vez por tienda):
+
+| Asistente | Skill | Qué hace |
+|---|---|---|
+| Ventas WhatsApp | `golden-chatea-pro-config-ventas-wp` | El bot que vende por WhatsApp (Bot Fields nativos). |
+| Comentarios | `golden-chatea-pro-config-comentarios` | Modera y responde comentarios de tus anuncios y los mete al chat a comprar. |
+| Logístico | `golden-chatea-pro-config-logistico` | Valida la dirección antes de despachar (baja devoluciones). |
+| Carritos | `golden-chatea-pro-config-carritos` | Recupera por WhatsApp los carritos abandonados. |
+
+**El orquestador** (arma los 4 de una sola vez, coherentes entre sí):
+
+| Skill | Qué hace |
 |---|---|
-| **golden-chatea-pro-full-configuracion** | Orquesta los 4 asistentes en una sola configuración coordinada. |
-| **golden-chatea-pro-config-ventas-wp** | Configura el asistente de ventas por WhatsApp (Bot Fields nativos). |
-| **golden-chatea-pro-prompt-ventas** | Crea el paquete de venta por producto (prompt, recordatorios, remarketing). |
-| **golden-chatea-pro-config-comentarios** | Asistente que responde comentarios de anuncios y los convierte en ventas. |
-| **golden-chatea-pro-config-logistico** | Asistente logístico: valida direcciones y coordina la entrega. |
-| **golden-chatea-pro-validacion-direcciones** | Valida y corrige direcciones en la conversación (hija del logístico). |
-| **golden-chatea-pro-config-carritos** | Recupera carritos abandonados por WhatsApp. |
+| `golden-chatea-pro-full-configuracion` | Configura TODO Chatea Pro llamando a los 4 asistentes. |
+
+**Nivel 2 — Piezas que alimentan a un asistente:**
+
+| Pieza | Alimenta a | Qué es |
+|---|---|---|
+| `golden-chatea-pro-prompt-ventas` | Ventas WhatsApp | El guion de venta **de cada producto**. |
+| `golden-chatea-pro-validacion-direcciones` | Logístico | El prompt que lee y corrige direcciones (packs por país). |
+
+---
+
+## Cuándo llamar cada una
+
+| Lo que quieres | Usa |
+|---|---|
+| Montar TODO Chatea Pro de una | `full-configuracion` |
+| Solo el asistente de ventas por WhatsApp | `config-ventas-wp` |
+| El guion de venta de un producto nuevo | `prompt-ventas` |
+| Solo el asistente de comentarios | `config-comentarios` |
+| Solo el asistente logístico completo | `config-logistico` |
+| Solo validar/corregir direcciones | `validacion-direcciones` |
+| Solo recuperar carritos abandonados | `config-carritos` |
 
 ---
 
@@ -29,13 +54,13 @@ Dentro de Claude Code, conecta esta tienda de skills una sola vez:
 /plugin marketplace add feropel/skills-comunidad-golden
 ```
 
-Y luego instala la que quieras (o varias):
+Luego instala la que quieras (o varias, una por su nombre):
 
 ```
 /plugin install golden-chatea-pro-config-ventas-wp
 ```
 
-Para tener toda la familia, instala cada una por su nombre. Actualiza todo con:
+Actualiza todo con:
 
 ```
 /plugin marketplace update skills-comunidad-golden
@@ -43,15 +68,15 @@ Para tener toda la familia, instala cada una por su nombre. Actualiza todo con:
 
 ## Cómo instalar — Manera 2: descargar el ZIP
 
-Cada skill tiene su `.zip` en la carpeta **descargas/**. Descárgalo, descomprímelo y en la
-app **Terminal** de tu Mac pega (cambia el nombre por el de la skill):
+Cada skill tiene su `.zip` en **descargas/**. Descárgalo, descomprímelo y en la app
+**Terminal** de tu Mac pega (cambia el nombre por el de la skill):
 
 ```
 mkdir -p ~/.claude/skills && cp -R ~/Desktop/NOMBRE-DE-LA-SKILL ~/.claude/skills/ && echo "LISTO"
 ```
 
-La guía **GUIA-INSTALAR-Configurador-Ventas-WhatsApp.pdf** explica el método manual paso a
-paso, como para principiantes.
+La guía **GUIA-INSTALAR-Configurador-Ventas-WhatsApp.pdf** (y **MAPA-FAMILIA-CHATEA-PRO.pdf**)
+explican todo paso a paso, como para principiantes.
 
 ---
 

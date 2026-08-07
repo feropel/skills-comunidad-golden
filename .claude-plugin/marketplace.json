@@ -19,14 +19,14 @@
       "name": "golden-chatea-pro-config-ventas-wp",
       "source": "./golden-chatea-pro-config-ventas-wp",
       "description": "Configura el asistente de ventas por WhatsApp de Chatea Pro: Bot Fields JSON nativos, configuracion general y ficha por producto, con validadores de limites reales.",
-      "version": "1.0.0",
+      "version": "3.3.0",
       "category": "marketing"
     },
     {
       "name": "golden-chatea-pro-prompt-ventas",
       "source": "./golden-chatea-pro-prompt-ventas",
       "description": "Crea el paquete de venta por producto para Chatea Pro: saludo, multimedia, pregunta de entrada, prompt de venta, recordatorios y remarketing.",
-      "version": "1.0.0",
+      "version": "3.9.1",
       "category": "marketing"
     },
     {
@@ -54,7 +54,7 @@
       "name": "golden-chatea-pro-config-carritos",
       "source": "./golden-chatea-pro-config-carritos",
       "description": "Configura el asistente de carritos abandonados de Chatea Pro: recupera por WhatsApp los checkouts que el cliente dejo a medias.",
-      "version": "1.0.0",
+      "version": "1.1.0",
       "category": "marketing"
     }
   ]

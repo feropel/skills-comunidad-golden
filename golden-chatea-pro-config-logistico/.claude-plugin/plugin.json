@@ -1,0 +1,19 @@
+{
+  "name": "golden-chatea-pro-config-logistico",
+  "version": "1.0.0",
+  "description": "Configura el asistente logistico de Chatea Pro: valida direcciones y coordina la entrega antes de generar la guia.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "chatea-pro",
+    "whatsapp",
+    "ventas",
+    "cod",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-chatea-pro-config-logistico/"
+  ]
+}

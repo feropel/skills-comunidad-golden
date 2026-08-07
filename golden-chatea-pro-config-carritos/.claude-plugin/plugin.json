@@ -1,0 +1,19 @@
+{
+  "name": "golden-chatea-pro-config-carritos",
+  "version": "1.0.0",
+  "description": "Configura el asistente de carritos abandonados de Chatea Pro: recupera por WhatsApp los checkouts que el cliente dejo a medias.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "chatea-pro",
+    "whatsapp",
+    "ventas",
+    "cod",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-chatea-pro-config-carritos/"
+  ]
+}

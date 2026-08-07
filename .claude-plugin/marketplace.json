@@ -1,16 +1,60 @@
 {
   "name": "skills-comunidad-golden",
-  "owner": { "name": "Comunidad Golden" },
+  "owner": {
+    "name": "Comunidad Golden"
+  },
   "metadata": {
-    "description": "Skills de la Comunidad Golden para Claude Code.",
+    "description": "Skills de la Comunidad Golden para Claude Code — familia Chatea Pro.",
     "version": "1.0.0"
   },
   "plugins": [
     {
+      "name": "golden-chatea-pro-full-configuracion",
+      "source": "./golden-chatea-pro-full-configuracion",
+      "description": "Orquesta los 4 asistentes de Chatea Pro (ventas WhatsApp, comentarios, logistico, carritos) en una sola configuracion coordinada.",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
       "name": "golden-chatea-pro-config-ventas-wp",
       "source": "./golden-chatea-pro-config-ventas-wp",
-      "description": "Configura el asistente de ventas por WhatsApp de Chatea Pro: genera los Bot Fields JSON nativos (configuracion general + por producto) listos para copiar y pegar.",
-      "version": "3.3.0",
+      "description": "Configura el asistente de ventas por WhatsApp de Chatea Pro: Bot Fields JSON nativos, configuracion general y ficha por producto, con validadores de limites reales.",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-chatea-pro-prompt-ventas",
+      "source": "./golden-chatea-pro-prompt-ventas",
+      "description": "Crea el paquete de venta por producto para Chatea Pro: saludo, multimedia, pregunta de entrada, prompt de venta, recordatorios y remarketing.",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-chatea-pro-config-comentarios",
+      "source": "./golden-chatea-pro-config-comentarios",
+      "description": "Configura el asistente de comentarios de Chatea Pro: responde y convierte comentarios de anuncios en ventas por mensaje directo.",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-chatea-pro-config-logistico",
+      "source": "./golden-chatea-pro-config-logistico",
+      "description": "Configura el asistente logistico de Chatea Pro: valida direcciones y coordina la entrega antes de generar la guia.",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-chatea-pro-validacion-direcciones",
+      "source": "./golden-chatea-pro-validacion-direcciones",
+      "description": "Valida y corrige direcciones de entrega en la conversacion de WhatsApp para bajar devoluciones (hija del asistente logistico).",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-chatea-pro-config-carritos",
+      "source": "./golden-chatea-pro-config-carritos",
+      "description": "Configura el asistente de carritos abandonados de Chatea Pro: recupera por WhatsApp los checkouts que el cliente dejo a medias.",
+      "version": "1.0.0",
       "category": "marketing"
     }
   ]

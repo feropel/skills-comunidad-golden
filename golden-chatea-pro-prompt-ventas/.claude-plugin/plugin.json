@@ -1,0 +1,19 @@
+{
+  "name": "golden-chatea-pro-prompt-ventas",
+  "version": "1.0.0",
+  "description": "Crea el paquete de venta por producto para Chatea Pro: saludo, multimedia, pregunta de entrada, prompt de venta, recordatorios y remarketing.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "chatea-pro",
+    "whatsapp",
+    "ventas",
+    "cod",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-chatea-pro-prompt-ventas/"
+  ]
+}

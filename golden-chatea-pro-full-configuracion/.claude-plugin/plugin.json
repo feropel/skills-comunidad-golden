@@ -1,0 +1,19 @@
+{
+  "name": "golden-chatea-pro-full-configuracion",
+  "version": "1.0.0",
+  "description": "Orquesta los 4 asistentes de Chatea Pro (ventas WhatsApp, comentarios, logistico, carritos) en una sola configuracion coordinada.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "chatea-pro",
+    "whatsapp",
+    "ventas",
+    "cod",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-chatea-pro-full-configuracion/"
+  ]
+}

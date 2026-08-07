@@ -1,36 +1,41 @@
 # Skills de la Comunidad Golden
 
-Habilidades listas para instalar en **Claude Code**. Instálalas y tu Claude sabe hacer
-tareas nuevas por ti. Ninguna contiene datos privados: cada skill te pide tus datos cuando
-la usas.
+La familia completa de **Chatea Pro** para **Claude Code**. Instala la que necesites y tu
+Claude arma solo la configuración de tus asistentes de venta por WhatsApp.
+
+Ninguna skill contiene datos privados: cada una te pide tus datos cuando la usas.
 
 ---
 
-## Skills disponibles
+## Skills disponibles (familia Chatea Pro)
 
-### Configurador del Asistente de Ventas WhatsApp (Chatea Pro)
-Arma sola, y sin errores, toda la configuración del asistente de ventas por WhatsApp de
-Chatea Pro. Le das los datos de tu negocio y te entrega los Bot Fields listos para pegar.
-- Nombre para instalar: **golden-chatea-pro-config-ventas-wp**
-- Guía paso a paso: **GUIA-INSTALAR-Configurador-Ventas-WhatsApp.pdf**
+| Skill | Para qué sirve |
+|---|---|
+| **golden-chatea-pro-full-configuracion** | Orquesta los 4 asistentes en una sola configuración coordinada. |
+| **golden-chatea-pro-config-ventas-wp** | Configura el asistente de ventas por WhatsApp (Bot Fields nativos). |
+| **golden-chatea-pro-prompt-ventas** | Crea el paquete de venta por producto (prompt, recordatorios, remarketing). |
+| **golden-chatea-pro-config-comentarios** | Asistente que responde comentarios de anuncios y los convierte en ventas. |
+| **golden-chatea-pro-config-logistico** | Asistente logístico: valida direcciones y coordina la entrega. |
+| **golden-chatea-pro-validacion-direcciones** | Valida y corrige direcciones en la conversación (hija del logístico). |
+| **golden-chatea-pro-config-carritos** | Recupera carritos abandonados por WhatsApp. |
 
 ---
 
 ## Cómo instalar — Manera 1: con un comando (recomendada)
 
-Dentro de Claude Code, escribe una sola vez para conectar esta tienda de skills:
+Dentro de Claude Code, conecta esta tienda de skills una sola vez:
 
 ```
 /plugin marketplace add feropel/skills-comunidad-golden
 ```
 
-Y luego instala la que quieras:
+Y luego instala la que quieras (o varias):
 
 ```
 /plugin install golden-chatea-pro-config-ventas-wp
 ```
 
-Claude la descarga e instala solo. Cuando saquemos mejoras, actualizas con:
+Para tener toda la familia, instala cada una por su nombre. Actualiza todo con:
 
 ```
 /plugin marketplace update skills-comunidad-golden
@@ -38,17 +43,15 @@ Claude la descarga e instala solo. Cuando saquemos mejoras, actualizas con:
 
 ## Cómo instalar — Manera 2: descargar el ZIP
 
-Para quien prefiere hacerlo a mano (lo explica el PDF con lujo de detalle):
-
-1. Descarga **descargas/golden-chatea-pro-config-ventas-wp.zip**.
-2. Descomprímelo (doble clic).
-3. Abre la app **Terminal** de tu Mac y pega:
+Cada skill tiene su `.zip` en la carpeta **descargas/**. Descárgalo, descomprímelo y en la
+app **Terminal** de tu Mac pega (cambia el nombre por el de la skill):
 
 ```
-mkdir -p ~/.claude/skills && cp -R ~/Desktop/golden-chatea-pro-config-ventas-wp ~/.claude/skills/ && echo "LISTO"
+mkdir -p ~/.claude/skills && cp -R ~/Desktop/NOMBRE-DE-LA-SKILL ~/.claude/skills/ && echo "LISTO"
 ```
 
-4. Abre Claude Code y escribe `/golden-chatea-pro-config-ventas-wp` para comprobar.
+La guía **GUIA-INSTALAR-Configurador-Ventas-WhatsApp.pdf** explica el método manual paso a
+paso, como para principiantes.
 
 ---
 

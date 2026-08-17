@@ -18,7 +18,7 @@ El skill APRENDE de campo con esto. Cada vez que entregas un prompt, agrega una 
 |---|---|---|---|---|---|---|---|---|---|---|
 | _ej: FreshKlin_ | v1 | 2026-06-23 | base | — | — | — | — | — | — | pendiente de datos |
 | _ej: FreshKlin_ | v2 | 2026-07-01 | precio más temprano + garantía reforzada | 62% | 34% | 88% | 71% | precio en msg 2 vs msg 4 | SÍ (msg 2) | dar precio antes sube cierre ~6pts |
-| Fibra capilar (CO) | v3 | 2026-07-12 | prioridad de intención de compra + memoria del pedido + URLs blindadas + única confirmación | — | — | — | — | — | — | Test de campo con cliente simulado: los 5 asesinos de venta fueron (1) re-preguntar datos ya dados, (2) re-preguntar tras "quiero comprar", (3) URL equivocada tomada del historial, (4) resumen con campos (Pendiente)/inventados, (5) confirmaciones múltiples. Todos entraron como reglas fijas a plantilla-prompt.md. División de mensajes de la plataforma: límite 2, no 3 (con 3 la IA hace ráfagas robot). |
+| producto capilar (CO) | v3 | 2026-07-12 | prioridad de intención de compra + memoria del pedido + URLs blindadas + única confirmación | — | — | — | — | — | — | Test de campo con cliente simulado: los 5 asesinos de venta fueron (1) re-preguntar datos ya dados, (2) re-preguntar tras "quiero comprar", (3) URL equivocada tomada del historial, (4) resumen con campos (Pendiente)/inventados, (5) confirmaciones múltiples. Todos entraron como reglas fijas a plantilla-prompt.md. División de mensajes de la plataforma: límite 2, no 3 (con 3 la IA hace ráfagas robot). |
 
 ## Regla de oro del ledger
 Una sola variable por versión. Si cambias 3 cosas y sube el cierre, no sabes cuál sirvió. El ledger solo vale si el A/B es limpio.

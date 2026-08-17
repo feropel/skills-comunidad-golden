@@ -41,13 +41,15 @@ Hay DOS tipos de audiovisuales y van en lugares distintos:
 
 Por eso el prompt siempre debe incluir las URLs conversacionales adentro. La multimedia inicial se sube aparte.
 
-## Activador de flujo (palabra clave)
+## Activador de flujo (NORMA DE DOS ACTIVADORES por producto)
 
-- UNA sola palabra clave, y es la **frase completa del mensaje del anuncio/botón** (con el nombre del producto). Esa frase entera ES la palabra clave:
+- **Activador 1 — la frase completa del botón** (para canales con mensaje precargado): idéntica, palabra por palabra, con el nombre del producto:
   ```
   Hola quiero información y precio de [PRODUCTO]
   ```
-- NO agregues palabras sueltas extra como `información` o `precio` por separado: con varios productos se cruzan y disparan el bot equivocado. La frase completa (única, con el nombre del producto) va idéntica como palabra clave Y como mensaje del botón.
+- **Activador 2 — UNA palabra corta ÚNICA del producto** (para TikTok, estados y comentarios donde nadie precarga el mensaje; ej. estilo SONRISA). Verifícala contra TODAS las palabras clave de los demás productos del bot para que no se cruce.
+- JAMÁS palabras genéricas sueltas (`información`, `precio`, `hola`): con varios productos disparan el bot equivocado.
+- ⛔ SIN EMOJIS ni caracteres de 4 bytes en NINGÚN activador: la base de Chatea los corrompe a `�` y el bot no arranca nunca (incidente real 2026-07-26). Validación: corre `bash scripts/validar.sh --activador <archivo-con-el-activador>` y exige el veredicto `ACTIVADOR VÁLIDO` (lista permitida: solo letras, números y puntuación básica — bloquea cualquier emoji o símbolo, de 3 o 4 bytes, y el BOM). No valides a mano: la fórmula de 4 bytes sola deja pasar ✨ ✅ ‼ y vecinos.
 
 ## Tiempos (fijos)
 

@@ -5,14 +5,17 @@ del asistente de ventas WhatsApp de Chatea Pro, ANTES de pegarlo.
 
 Recibe el JSON del producto ya lleno (copiado de
 assets/template-botfield-producto.json, esquema nativo verificado 2026-07-09)
-y verifica contra assets/limites.json:
+y verifica los DOS techos contra assets/limites.json:
 
     - que no queden {{PLACEHOLDERS}} sin llenar
-    - total del campo < 500000 caracteres (tope del Bot Field tipo LONG JSON;
-      si el campo aún es tipo JSON el tope real es 20000 — ver limites.json)
-    - nombre ≤ 100 · precio solo dígitos (≤10) · id/id_dropi solo dígitos (≤8)
-    - mensaje_inicial y pregunta_de_entrada ≤ 1000 · prompt_libre ≤ 12000
-    - recordatorios ≤ 800 c/u · prompts de remarketing ≤ 1000 c/u
+    - TECHO A (bot field): total ESCAPADO = len(json.dumps(valor)[1:-1]) sobre el
+      valor compacto. ≤19000 cabe en cualquier campo; >19000 avisa (solo LONG JSON);
+      ≥500000 falla. NUNCA se mide en crudo.
+    - TECHO B (topes nativos del formulario): nombre ≤100 · precio/id_dropi dígitos ·
+      mensaje_inicial y pregunta_de_entrada ≤1000 · prompt_libre ≤12000 (avisa, no
+      rechaza: por Bot Field puede ser mayor) · recordatorios ≤800 · remarketing ≤1000 ·
+      upsells (si activos) título/desc/botón
+    - el trigger (palabras_clave) SIN caracteres de 4 bytes (emoji): corrompen el bot
     - que el precio aparezca dentro del prompt_libre (la IA lo cita de ahí)
     - palabras_clave/ids_de_anuncio con formato de 7 slots por comas
     - sin ¿ ¡ en textos que ve el cliente (estándar Golden)
@@ -49,8 +52,14 @@ def sin_meta(nodo):
     return nodo
 
 
+def u16(texto):
+    """Longitud en unidades UTF-16, como cuenta el formulario del panel (JS .length):
+    cada emoji astral vale 2. Los topes nativos (Techo B) se miden así."""
+    return len((texto or "").encode("utf-16-le")) // 2
+
+
 def check_len(nombre, texto, limite):
-    n = len(texto or "")
+    n = u16(texto)
     estado = "OK" if n <= limite else f"EXCEDE por {n - limite}"
     print(f"  {nombre}: {n} / {limite}  {estado}")
     if n > limite:
@@ -77,6 +86,22 @@ def check_apertura(nombre, texto):
         errores.append(f"{nombre} contiene ¿ o ¡ (estándar Golden: solo signo de cierre)")
 
 
+def escapado(valor_str):
+    """Caracteres ESCAPADOS del valor, como los cuenta el flujo (tilde 6, emoji 12)."""
+    return len(json.dumps(valor_str)[1:-1])
+
+
+def check_cuatro_bytes(nombre, texto):
+    """El trigger (palabra clave) NO admite caracteres de 4 bytes (emoji fuera del
+    BMP): corrompen el activador y el bot NO arranca. Se marca como error."""
+    malos = [c for c in (texto or "") if ord(c) >= 0x10000]
+    if malos:
+        errores.append(
+            f"{nombre} tiene {len(malos)} caracter(es) de 4 bytes (emoji: {' '.join(malos)}) — "
+            "el trigger no los admite y el bot no arranca. Quítalos de la palabra clave."
+        )
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--in", dest="entrada", required=True, help="JSON del Bot Field de producto lleno")
@@ -85,15 +110,29 @@ def main():
 
     with open(LIMITES_PATH, encoding="utf-8") as f:
         _lim = json.load(f)
-    lim = _lim["capa2"]
-    max_campo = _lim["bot_fields"]["max_por_campo"]
+    lim = _lim["capa_nativa"]
+    BOT = _lim["bot_field"]
 
     with open(a.entrada, encoding="utf-8") as f:
         prod = sin_meta(json.load(f))
 
-    pendientes = sorted(set(re.findall(r"\{\{[A-Z0-9_]+\}\}", json.dumps(prod, ensure_ascii=False))))
+    # Regex reparado (verificador 2026-08-08): [A-Z0-9_]+ dejaba pasar {{Hueco}},
+    # {{hueco}}, {{ X }}, {{X-2}}, {{X 3}} y slots simples sin llenar {URL_TIENDA}.
+    # Dobles: cualquier contenido. Simples: whitelist de las runtime de Chatea
+    # (las de notificacion-venta-realizada.txt); todo lo demas es un slot colado.
+    RUNTIME_LEGITIMAS = {"nombre_cliente", "nombre_producto", "porcentaje_entrega",
+                         "telefono_cliente", "valor_venta"}
+    texto_prod = json.dumps(prod, ensure_ascii=False)
+    pendientes = sorted(set(re.findall(r"\{\{[^{}]*\}\}", texto_prod)))
     if pendientes:
         errores.append(f"Placeholders sin llenar: {', '.join(pendientes)}")
+    simples = sorted({m for m in re.findall(
+        r"(?<!\{)\{([A-Za-z0-9_][A-Za-z0-9_ .\-]*)\}(?!\})", texto_prod)
+        if m not in RUNTIME_LEGITIMAS})
+    if simples:
+        errores.append(
+            "Llave simple sin llenar o desconocida: " + ", ".join("{%s}" % s for s in simples)
+            + " (runtime legitimas: " + ", ".join("{%s}" % s for s in sorted(RUNTIME_LEGITIMAS)) + ")")
 
     info = prod.get("informacion_de_producto", {})
     emb = prod.get("embudo_de_ventas", {})
@@ -103,10 +142,20 @@ def main():
     act = prod.get("activadores_del_flujo", {})
     ups = prod.get("upsells", {})
 
-    print("Límites por campo:")
+    meta = prod.get("meta_conversion", {})
+
+    print("Límites por campo (Techo B, medidos en UTF-16 como el panel):")
     check_len("nombre", info.get("nombre"), lim["nombre"])
     check_digitos("precio", info.get("precio"), lim["precio_digitos"])
     check_digitos("id_dropi", info.get("id_dropi"), lim["id_dropi_digitos"])
+    # descripción del producto = informacion_de_producto.dta_prompt (tope nativo 500);
+    # si se pasa, el panel la corta al guardar (Techo B) y nadie más lo atrapa.
+    if (info.get("dta_prompt") or ""):
+        check_len("dta_prompt (descripción)", info.get("dta_prompt"), lim["descripcion_producto"])
+    # pixel: meta_conversion.id / aud_id (tope nativo pixel_ids)
+    for campo_px in ("id", "aud_id"):
+        if (meta.get(campo_px) or ""):
+            check_len(f"meta_conversion.{campo_px}", meta.get(campo_px), lim["pixel_ids"])
     check_len("mensaje_inicial", emb.get("mensaje_inicial"), lim["mensaje_inicial"])
     check_len("pregunta_de_entrada", emb.get("pregunta_de_entrada"), lim["pregunta_entrada"])
     # prompt_libre: el tope 12000 es de la PANTALLA de la UI, no del Bot Field. Por Bot Field
@@ -132,11 +181,20 @@ def main():
             if not str(u.get("id_dropi") or "").isdigit():
                 errores.append(f"upsell {n}: id_dropi debe ser numérico si la tarjeta está activa")
 
-    total = len(json.dumps(prod, ensure_ascii=False, indent=2))
-    estado = "OK" if total < max_campo else f"EXCEDE por {total - max_campo + 1}"
-    print(f"\nTotal del Bot Field: {total} / <{max_campo}  {estado}")
-    if total >= max_campo:
-        errores.append(f"El campo completo supera los {max_campo} caracteres")
+    # TECHO A — bot field medido ESCAPADO (tilde 6, emoji 12), sobre el valor COMPACTO
+    compacto = json.dumps(prod, ensure_ascii=False, separators=(",", ":"))
+    esc = escapado(compacto)
+    if esc <= BOT["seguro_escapado"]:
+        print(f"\nTECHO A (escapado): {esc} / {len(compacto)} crudos — OK (cabe en cualquier tipo de campo)")
+    elif esc < BOT["longtext_escapado"]:
+        print(f"\nTECHO A (escapado): {esc} / {len(compacto)} crudos")
+        avisos.append(
+            f"El bot field escapado tiene {esc} > {BOT['seguro_escapado']}: SOLO cabe si el campo es LONG JSON. "
+            f"Si es JSON legacy se corta a {BOT['legacy_json_escapado']} escapados y el bot muere en silencio."
+        )
+    else:
+        print(f"\nTECHO A (escapado): {esc} / {len(compacto)} crudos")
+        errores.append(f"El bot field escapado ({esc}) supera el máximo de LONG JSON ({BOT['longtext_escapado']})")
 
     precio = str(info.get("precio") or "")
     if precio and precio not in (prompt.get("prompt_libre") or ""):
@@ -144,6 +202,8 @@ def main():
 
     check_slots("palabras_clave", act.get("palabras_clave"))
     check_slots("ids_de_anuncio", act.get("ids_de_anuncio"))
+    # El trigger (palabra clave) no admite emojis de 4 bytes: corrompen el activador
+    check_cuatro_bytes("palabras_clave", act.get("palabras_clave"))
 
     for nombre, texto in [
         ("mensaje_inicial", emb.get("mensaje_inicial")),
@@ -169,6 +229,7 @@ def main():
         if kw_prod and kw_reg and kw_prod != kw_reg:
             errores.append("La palabra clave del registro NO coincide con la del producto")
         check_slots("registro.keyW", reg.get("keyW"))
+        check_cuatro_bytes("registro.keyW", reg.get("keyW"))
         print(f"  producto={reg.get('producto')} · name={reg.get('name')} · estado={reg.get('estado')}")
 
     if avisos:

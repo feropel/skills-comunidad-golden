@@ -46,7 +46,7 @@ Como bajarlo, todo dentro del alcance del asistente:
 - **Recordatorio de los beneficios del producto** — re-vender lo ya vendido, atacando directo el arrepentimiento
 - **Humanizar el mensaje**: que el cliente sienta que alguien cuida su pedido
 
-**Por que importa tanto:** en el modelo COD de referencia (precio 60 USD, producto 9, fletes 8 ida / 6,5 retorno, CPA 10), cada devolucion convertida en entrega vale **+57,50 USD**. Bajar devoluciones de 32,5% a 25% sube la utilidad ~30% sin tocar la pauta. **Los recordatorios post-confirmacion no son cortesia: son la linea de utilidad mas rentable del embudo.**
+(dato operativo del negocio de origen retirado — usa los números del negocio para el que construyes)
 
 Consecuencia para el paquete de venta: la seccion de recordatorios y confirmacion merece el mismo cuidado de redaccion que el prompt de venta. Suele tratarse como relleno.
 
@@ -65,4 +65,4 @@ El material asume que el lead llega por **Click to WhatsApp** (Facebook/TikTok/I
 Si el lead viene de una ficha Shopify + Releasit, el prompt puede ir mas rapido al cierre. **El origen del trafico cambia el prompt.** Vale la pena preguntarlo en el intake.
 
 Fuente completa:
-`Desktop/MASTER/IA/CLAUDE/PROYECTOS/PANAMA - OPERACION/`
+(dato operativo del negocio de origen retirado — usa los números del negocio para el que construyes)

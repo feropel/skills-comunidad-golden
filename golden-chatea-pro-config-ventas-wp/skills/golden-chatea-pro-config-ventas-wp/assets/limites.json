@@ -1,36 +1,44 @@
 {
-    "_fuente": "Límites REALES de Chatea Pro. FUENTE ÚNICA: build_config.py y valida_producto.py leen de aquí; si la plataforma cambia, re-verificar en vivo y actualizar SOLO este archivo. capa1/capa2 = límites por campo de la UI de Entrenar (2026-07-08). bot_fields = tope del Bot Field MEDIDO POR API contra un workspace real el 2026-07-25 (no leído del modal): depende del TIPO de campo.",
-    "_regla_de_oro": "El tope de 20000 NO es de la plataforma, es del TIPO de campo. Tipo JSON (var_type text o array) = 20000. Tipo LONG JSON (var_type longtext) = 500000, o sea 25x, con integridad byte a byte verificada. TODO campo de configuración NUEVO se crea LONG JSON. Un campo que ya exista como JSON no se convierte por API: borrar y recrear cambia el var_ns y ROMPE las referencias del flujo, así que el tipo se cambia en la UI.",
-    "_truncada_silenciosa": "CRÍTICO: pasarse del tope NO da error. La API responde HTTP 200 {status:ok} y guarda el contenido CORTADO. Por eso todo push debe releer y comparar longitud (push_config.py ya lo hace). Verificado el 2026-07-25.",
-    "bot_fields": {
-        "max_por_campo": 500000,
-        "max_long_json": 500000,
-        "max_json_legacy": 20000,
-        "tipo_recomendado": "LONG JSON",
-        "_nota": "max_por_campo = el tope con el que validan los scripts; vale 500000 porque los campos se crean LONG JSON. Si un campo concreto sigue siendo tipo JSON, su tope real es max_json_legacy."
+    "_fuente": "Límites REALES de Chatea Pro. FUENTE ÚNICA: los scripts leen de aquí. capa_nativa = topes del FORMULARIO del panel, extraídos del CÓDIGO de la app el 2026-08-07 y verificados en vivo contra dos workspaces reales. bot_field = techo del JSON completo, medido ESCAPADO. Detalle: PROYECTOS/CHATEA-PRO-ASISTENTES-MAPA/TOPES-NATIVOS-POR-CAMPO.md",
+    "_DOS_TECHOS": "Hay que respetar los DOS. (A) El del BOT FIELD: el JSON completo se guarda ESCAPADO — cada tilde ocupa 6 y cada emoji 12 — así que se mide con len(json.dumps(valor)[1:-1]), NUNCA en crudo. Pasarse responde 200 ok y guarda CORTADO, el bot muere en silencio (solo se ve en Panel→Registros de errores). (B) El del CAMPO NATIVO del formulario: escribir por API por encima funciona, pero el día que alguien abra ese formulario en el panel y guarde, el campo se CORTA. Por eso cada texto respeta su tope nativo Y el JSON total respeta el techo escapado.",
+    "bot_field": {
+        "medir": "ESCAPADO: len(json.dumps(valor)[1:-1]). El valor se serializa compacto (ensure_ascii=False, separators=(',',':')); otro formato infla el conteo sin cambiar el contenido.",
+        "seguro_escapado": 19000,
+        "legacy_json_escapado": 20000,
+        "longtext_escapado": 500000,
+        "_tipos": "Tipo JSON (var_type text/array) = 20000 escapados (~17000 crudos). Tipo LONG JSON (var_type longtext) = 500000. TODO campo NUEVO se crea LONG JSON. Un campo existente NO se convierte por API (borrar+recrear cambia el var_ns y rompe el flujo): el tipo se cambia en la UI.",
+        "_regla": "Si el JSON escapado ≤ 19000 funciona en cualquier tipo de campo. Entre 19000 y 500000 SOLO cabe si el campo es LONG JSON (si es legacy se corta a 20000 y el bot muere). ≥ 500000 no cabe ni en LONG JSON."
     },
-    "capa1": {
+    "capa_nativa": {
+        "_comentario": "Topes del formulario del panel (Techo B) para VENTAS WHATSAPP. TODOS los de este bloque LOS APLICA un script (build_config o valida_producto), medidos en unidades UTF-16 (como cuenta el panel: cada emoji astral vale 2). Si un cap no tiene campo donde caer, vive en _referencia_sin_campo, no aquí.",
         "rol_general": 2000,
         "restricciones_generales": 2000,
         "prompt_analisis": 2000,
         "reglas_estructura": 4000,
-        "prompt_maestro": 13000,
-        "mensaje_libre": 400
-    },
-    "capa2": {
+        "mensaje_libre": 400,
+        "descripcion_producto": 500,
+        "prompt_personalizado": 12000,
+        "mensaje_inicial": 1000,
+        "pregunta_entrada": 1000,
+        "instruccion_remarketing": 1000,
+        "upsell_descripcion": 200,
+        "upsell_titulo": 80,
+        "upsell_boton": 20,
+        "recordatorio": 800,
         "nombre": 100,
         "precio_digitos": 10,
         "id_dropi_digitos": 8,
-        "mensaje_inicial": 1000,
-        "pregunta_entrada": 1000,
-        "prompt_personalizado": 12000,
-        "recordatorio": 800,
-        "instruccion_remarketing": 1000,
         "pixel_ids": 150,
-        "upsell_titulo": 80,
-        "upsell_descripcion": 80,
-        "upsell_boton": 20
+        "_nota_recordatorio": "recordatorio=800 viene del mapa de la UI de Entrenar; no está en el chunk de código, se mantiene el valor observado. descripcion_producto=500 se aplica sobre informacion_de_producto.dta_prompt (único campo libre de descripción del producto). pixel_ids=150 se aplica sobre meta_conversion.id y aud_id. upsell título/botón (80/20) salen de captura en vivo 2026-07-12; upsell_descripcion=200 del código."
     },
-    "_nota_prompt_libre": "prompt_personalizado (12000) es el tope de la PANTALLA 'Prompt del producto' de la UI. Por Bot Field LONG JSON el prompt puede ser mayor (un producto real = 14125). El validador NO rechaza >12000: avisa que ese producto se edita SOLO por Bot Field, porque la UI v2 lo corta a 12000 y su 'Guardar asistente' sobrescribe con la versión cortada (verificado 2026-07-12).",
-    "_nota_capas": "capa1 y capa2 son los límites de los CAMPOS DE LA UI de Entrenar, no del Bot Field. Siguen vigentes: si el texto también se va a pegar a mano por la UI, hay que respetarlos. Si la carga es solo por API o Bot Field, el único tope es el del tipo de campo."
+    "_referencia_sin_campo": {
+        "_nota": "Topes REALES del panel (del código) que esta skill NO valida porque el campo NO existe en sus templates: viven en OTRO Bot Field o en un formulario que esta skill no genera. Documentados para no aparentar cobertura falsa.",
+        "token_proveedor_dropi": 1200,
+        "_donde_token": "El token de proveedor de Dropi vive en [Integraciones] Datos de integracion, no en la config de ventas-wp; se vacía al clonar (ver 'no se hereda').",
+        "upsell_mensaje_inicial": 200,
+        "_donde_upsell_msg": "El objeto upsell de esta skill tiene titulo/descripcion/boton, no 'mensaje inicial'; ese campo es de otra variante del formulario de upsell."
+    },
+    "paises_validos": ["COLOMBIA", "ECUADOR", "CHILE", "MEXICO", "PANAMA", "PERU", "PARAGUAY"],
+    "_paises": "La plataforma SOLO acepta esos 7 (mayúscula, sin acentos, campo [Comentarios IA] País). No hay Guatemala, Argentina, Bolivia ni Costa Rica. En el JSON de ventas-wp, conexion_con_dropi.pais va en minúscula (ej: colombia), pero DEBE ser uno de los 7. Lo que cambia por país (división geográfica, código postal, oficina, zonificación, regulador, vocabulario) está en references/paises.md.",
+    "_nota_prompt_libre": "prompt_personalizado (12000) es el tope del FORMULARIO 'Prompt del producto'. Por Bot Field LONG JSON el prompt puede ser mayor (un producto real = 14125). El validador NO rechaza >12000: avisa que ese producto se edita SOLO por Bot Field, porque la UI corta a 12000 y su 'Guardar asistente' sobrescribe con la versión cortada (verificado 2026-07-12)."
 }

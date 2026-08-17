@@ -5,11 +5,74 @@ description: Golden Group — Configura el asistente de CARRITOS ABANDONADOS de 
 
 # Golden · Chatea Pro — Asistente de Carritos Abandonados
 
+<!-- skill v1.3.1 · 2026-08-08 (centro de mando, chat otro espacio de Chatea 2026-08-08 (2ª ronda: 5ª categoría + prosa libre)) · QUINTA CATEGORÍA VETADA en la ley: claims y cifras de negocio (años en el mercado, clientes atendidos, porcentajes de entrega, premios) — no rompen nada técnico ni los caza un barrido de llaves, pero el bot termina mintiendo con datos de otra empresa (caso real: "Más de 100.000 clientes atendidos en Colombia" a punto de heredarse). Y regla operativa LA MARCA VIVE TAMBIÉN EN PROSA LIBRE: al barrido se añade grep -i por el nombre de la marca origen sobre todo el texto a escribir (cazó 10 menciones en 3 campos que el mapeo de llaves no vio). -->
+<!-- skill v1.3 · 2026-08-08 (centro de mando, chat otro espacio de Chatea 2026-08-08) · horneada la LEY "NUNCA HEREDAR DATOS ENTRE ESPACIOS": al basarse en una cuenta guía se hereda estructura/prompts/config, JAMÁS datos (APIs, plantillas de WhatsApp, teléfonos, correos, dominios, marca, productos y disparadores); única excepción Le'côterra como producto-ejemplo; método de barrido obligatorio antes y después de escribir en espacio ajeno. Origen: incidente Golden → otra marca 2026-08-08 (se colaron una credencial, teléfono, plantilla de notificación y firmas de la marca origen; revertido el mismo día). La ley entra como PREVENCIÓN, no reparación: línea base pre-horneado verificada por verificador externo — 8/8 skills sin credenciales (CRITICA=0); únicos hallazgos 3 teléfonos de relleno legítimos (+57 300 de ejemplo) que se conservan. ADEMÁS (chat otro espacio de Chatea 2026-08-08, retractación pixel): regla CAMPOS [Meta] = VALORES CALIENTES — los eventos de pixel los mueve el flujo en vivo, prohibido diagnosticar con una lectura suelta. -->
+<!-- skill v1.2 · 2026-08-07 (centro de mando, briefing BRIEFING-PARA-SKILLS.md de CHATEA-PRO-ASISTENTES-MAPA, cosecha del chat CONFIG CHATEA KEVIN MX): confirmado desde el código de la app que el módulo Carritos (CartsPage) NO tiene topes nativos salvo los campos de correo — cierra parte del pendiente "verificar en vivo"; añadido el techo del bot field (20.000 ESCAPADOS ~ 17.000 crudos, corte silencioso con 200 ok); países limitados a los 7 que acepta la plataforma; higiene al clonar ([Carritos IA] Información de productos #N no se hereda) y regla de escribir y RELEER. -->
 <!-- skill v1.1 · auditada con golden-skill-auditor 893→ORO: corregida la regla real de la ventana de 24h (contacto frío = plantilla en el primer toque), etiquetas unificadas (REACTIVACIÓN N), paso de QA + checklist de "terminado", modelo de plataforma marcado "verificar en vivo", changelog añadido -->
+
+## LEY: NUNCA HEREDAR DATOS ENTRE ESPACIOS (FER 2026-08-08)
+
+Al basarse en una cuenta guía (Golden o cualquier otra) se hereda **estructura, prompts y
+configuración de asistentes** — JAMÁS datos, en ninguna dirección, ni entre marcas propias:
+
+- **APIs y tokens** de cualquier tipo: ElevenLabs, OpenAI, Dropi, Shopify, el token del propio bot.
+- **Plantillas de WhatsApp**: `name`, `namespace`, `lang` y `status` van atados al WABA de cada
+  espacio; copiarlas rompe el destino (llama plantillas que su WABA no tiene o que Meta no aprobó).
+- **Datos personales y de marca**: teléfonos, correos, dominios, nombre de la empresa, firmas en
+  mensajes al cliente.
+- **Productos** y sus disparadores.
+- **Claims y cifras de negocio**: años en el mercado, número de clientes, porcentajes de
+  entrega, premios. Heredarlos no rompe nada técnico — ningún barrido de llaves los detecta —
+  pero ponen al bot a MENTIRLE al cliente con datos de otra empresa. Caso real (2026-08-08): la
+  plantilla maestra clonada traía "Más de 100.000 clientes atendidos en Colombia" (dato de
+  Golden) a punto de quedar en boca del bot de otro espacio.
+
+**Única excepción autorizada:** Le'côterra como producto-ejemplo en los espacios de trabajo
+(asistente de WhatsApp y de comentarios), para que la gente vea cómo se configura un producto.
+
+**La guía tampoco puede llevar nada de eso adentro**: un material de referencia con una llave o un
+dato personal ya está mal, aunque nadie lo copie.
+
+**Método obligatorio al escribir en un espacio ajeno** — ANTES de escribir, barrer lo que se va a
+escribir buscando `sk_`, `shpat_`, `eyJ`, teléfonos, correos, dominios, nombres de plantilla y de
+marca del origen; si aparece algo, NO se escribe. DESPUÉS de escribir: releer del servidor y barrer
+otra vez. Herramienta encadenable del barrido:
+`PROYECTOS/STACK-GOLDEN/barrido-datos-ajenos.py` (correrla ANTES de escribir y DESPUÉS releyendo del
+servidor; sale con código 3 si encuentra algo CRITICA).
+
+**LA MARCA VIVE TAMBIÉN EN PROSA LIBRE, no solo en campos estructurados.** Preservar las
+llaves de identidad del destino NO basta: el nombre de la marca de origen viaja escondido dentro
+de ganchos posventa, agradecimientos y plantillas de prompt. Al método de barrido se le añade el
+paso `grep -i` por el NOMBRE de la marca de origen sobre TODO el texto que se va a escribir —
+así se cazaron 10 menciones de la marca origen en 3 campos del destino que el mapeo de llaves
+no vio.
+
+Origen: 2026-08-08, al clonar la config de Golden a otro espacio se colaron la llave de ElevenLabs,
+el teléfono, la plantilla de notificación y agradecimientos firmados con la marca del origen.
+Revertido el mismo día desde respaldo.
+
+Cómo clonar sin romper el destino (qué se copia, qué se preserva del destino, por qué las plantillas jamás viajan): memoria `reference_chatea_clonar_config_entre_espacios`.
+
+### CAMPOS [Meta] = VALORES CALIENTES, NO INTERRUPTORES
+
+Los bot fields `[Meta] Ver Contenido`, `[Meta] Agregar al carrito` y demás eventos de pixel los
+**MUEVE EL FLUJO en tiempo real** mientras corren contactos — no son configuración estable. Caso
+real (2026-08-08): se leyeron como "apagados" y cambiaron solos minutos después sin escritura de
+nadie; la conclusión "el evento Comprar está apagado" tuvo que retractarse. **PROHIBIDO sacar
+conclusiones de pauta o diagnóstico de una lectura suelta de esos campos**: se observan en ventana
+(varias lecturas separadas en el tiempo) o se diagnostica el pixel en Meta directamente. Detalle:
+memoria `reference_chatea_clonar_config_entre_espacios`.
 
 Configura el asistente que **recupera carritos/checkouts abandonados** por WhatsApp: el cliente empezó a comprar en la tienda (dejó producto, a veces nombre y teléfono) y no terminó. Este asistente lo reengancha con una secuencia corta, humana y con un ángulo distinto por mensaje, hasta cerrar la venta o agotar los intentos.
 
 > **Regla de Chatea Pro:** 1 espacio de trabajo = 1 país. Usa el mismo país, oferta, tono y datos de pago que el **asistente de ventas** del workspace, para no contradecirlo. Si algo no coincide, manda lo que ya generó `golden-chatea-pro-config-ventas-wp`.
+> **La plataforma solo acepta 7 países** (campo `[Comentarios IA] País`, MAYÚSCULA y sin acentos): COLOMBIA, ECUADOR, CHILE, MEXICO, PANAMA, PERU, PARAGUAY.
+
+## Techos de caracteres (confirmado desde el código de la app, 2026-08-07)
+
+- **Techo nativo del módulo Carritos (`CartsPage`): NO hay `maxLength`** en sus campos de texto. Solo los campos de **correo** (asunto y contenido) validan longitud, contra una tabla de un módulo compartido. Fuente: `TOPES-NATIVOS-POR-CAMPO.md` de CHATEA-PRO-ASISTENTES-MAPA.
+- **Techo del bot field: 20.000 ESCAPADOS, no crudos** (~17.000 crudos: cada tilde ocupa 6 caracteres y cada emoji 12). Pasarse NO da error — la API responde `200 ok`, guarda cortado y el asistente muere en silencio; el error solo aparece en Panel → Registros de errores. Medir: `len(json.dumps(valor)[1:-1])` bajo 19.000. Tras escribir por API, **releer y comparar** siempre.
+- **Al clonar un workspace a otro cliente:** vaciar `[Carritos IA] Información de productos #N` (son productos reales cacheados por el bot del dueño anterior) y jamás arrastrar `[Integraciones] Datos de integracion`.
 
 ## Qué es esto y qué NO es (límite con Ventas)
 
@@ -39,6 +102,8 @@ Chatea Pro reutiliza su **motor de reactivación** en todo el producto, así que
 - **Dato del carrito para personalizar:** producto, nombre y teléfono suelen venir; el link de pago/checkout a veces. No asumas que traes todos: escribe cada mensaje para que funcione aunque solo tengas el producto.
 
 ⚠️ **Pendiente que solo el dueño puede cerrar (verificar en vivo la 1.ª vez y guardar como nota):** los **nombres/etiquetas exactos del módulo Carritos**, **cuántos pasos** admite y **dónde vive** (en cuentas de referencia no aparece como ítem suelto del menú v1: revisar dentro del flujo del bot o en "Chatea PRO v2"). Si el módulo difiere de este modelo, ajústalo y **no inventes** campos ni límites. La regla de 24 h de arriba sí es fija.
+
+**Lo que YA quedó confirmado (2026-08-07, del código de la app):** el módulo existe como `CartsPage` y sus campos de texto **no tienen tope nativo** (solo los de correo validan longitud) — ver la sección de techos arriba. El pendiente que queda es el de etiquetas, pasos y ubicación en el menú.
 
 ## Intake del negocio (pregunta 1 a la vez)
 

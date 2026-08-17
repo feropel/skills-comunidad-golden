@@ -1,6 +1,6 @@
 {
   "name": "golden-chatea-pro-validacion-direcciones",
-  "version": "1.0.0",
+  "version": "2.1.1",
   "description": "Valida y corrige direcciones de entrega en la conversacion de WhatsApp para bajar devoluciones (hija del asistente logistico).",
   "author": {
     "name": "Comunidad Golden"

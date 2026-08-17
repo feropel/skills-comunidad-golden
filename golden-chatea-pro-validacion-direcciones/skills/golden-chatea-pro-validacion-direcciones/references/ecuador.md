@@ -1,4 +1,5 @@
-<!-- NOTA (no copiar al bot): Domicilio: Veloces, Gintracom (preferida), Laarcourier, Servientrega, Urbano. OJO: Servientrega SÍ habilitada en Ecuador (no banear). PENDIENTE confirmar: hay recogida en agencia? Construido asumiendo que SÍ con couriers de agencia; si es 100% domicilio, eliminar la sección de agencia. Registro de salida: usted cordial. -->
+<!-- NOTA (no copiar al bot): Domicilio: Veloces, Gintracom (preferida), Laarcourier, Servientrega, Urbano. OJO: Servientrega SÍ habilitada en Ecuador (no banear — el veto a Servientrega es criterio de COLOMBIA, no clonarlo aquí). [PENDIENTE] confirmar: hay recogida en agencia? Construido asumiendo que SÍ con couriers de agencia; si es 100% domicilio, eliminar la sección de agencia. Registro de salida: usted cordial. -->
+<!-- Revisión anti-clon 2026-08-07 (briefing BRIEFING-PARA-SKILLS.md): "no pedir código postal" en Ecuador es criterio LOCAL VÁLIDO (el CP ecuatoriano casi no se usa en última milla; mandan intersección, ciudadela y referencia), no clon de Colombia. -->
 
 🎯 VALIDACIÓN DE DIRECCIONES · ECUADOR
 

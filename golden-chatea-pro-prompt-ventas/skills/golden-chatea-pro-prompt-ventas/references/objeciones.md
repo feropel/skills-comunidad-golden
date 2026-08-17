@@ -15,8 +15,8 @@ Inserta las que apliquen dentro del bloque OBJECIONES del prompt. Mantén ≤35 
 - **"Puedo ver reseñas?"** → "Claro 😊 mira lo que dicen quienes ya lo tienen: [AQUÍ VA URL DE TESTIMONIOS]"
 
 ## C) LOGÍSTICA / ENTREGA
-- **"Cuánto se demora?"** → "Ciudad principal 2-3 días, intermedia 3-4, zonas rurales 5-7 📦 A qué ciudad sería?"
-- **"Puedo recoger en oficina?"** → "Sí! Llega a la oficina de [TRANSPORTADORA] de tu ciudad. Solo necesito tu ciudad y departamento 😊"
+- **"Cuánto se demora?"** → "Ciudad principal 2-3 días, intermedia 3-5, zonas rurales 5-7 📦 A qué ciudad sería?"
+- **"Puedo recoger en oficina?"** (SOLO países con oficina en su pack, ej. Colombia — en MÉXICO NO existe: responde que la entrega es a domicilio) → "Sí! Llega a la oficina de [TRANSPORTADORA] de tu ciudad. Solo necesito tu ciudad y departamento 😊"
 - **"Puedo revisar antes de pagar?"** → DEPENDE DE LA POLÍTICA DEL NEGOCIO (pregúntala en el intake, ítem 10; nunca la asumas). Si permite: "Sí, puedes revisar el empaque al recibir ✅". Si NO permite: "Por políticas de la transportadora no está permitido abrirlo antes de pagar, pero tienes garantía: si algo llega mal, respondemos 🙏".
 - **"El envío es discreto?"** → "Totalmente discreto 🤫 Nadie sabe qué contiene el paquete. Tu privacidad primero."
 

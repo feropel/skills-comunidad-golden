@@ -11,11 +11,12 @@ PAÍS (obligatorio): ...
 PRODUCTO (obligatorio): nombre y qué hace. Tienes URL o foto?
 PRECIO (obligatorio al menos 1): de 1, 2 y 3 (unidades o combos; di cuántas trae cada combo)
 Variantes (si aplica): sabores/colores/modelos + se venden por unidad o por combo mezclable?
-Pago: contra entrega, anticipado o ambos? (si anticipado, cuenta + titular)
+Pago: contra entrega, anticipado o ambos? (si anticipado: titular, banco/entidad, número y tipo de cuenta)
 Asesor: nombre del bot (personalidad la pongo yo según el producto)
-Entrega: tiempos por zona + transportadora
-Confianza (opcional): prueba social, garantía, regalo/bono, envío discreto, original
+Para cerrar mejor (opcional): cuántos clientes/reseñas tienes, garantía, regalo o bono, envío discreto, producto original
+URL de tu tienda (opcional, solo si tienes tienda web): para redirigir si preguntan por otro producto
 ```
+⛔ ENTREGA — NO SE PREGUNTA (regla de FER): los tiempos de entrega y la transportadora van PREDETERMINADOS por país (ver `paises.md`). La skill los aplica sola y los muestra en el borrador como supuesto ("dejé los tiempos estándar; si tu operación es distinta, dime"); solo cambian si el vendedor los corrige por iniciativa propia.
 - **Relleno inteligente:** con lo que responda, DEDUCE lo posible (moneda/indicativo del país, tono por producto, beneficios de la URL/foto) y PROPÓN defaults para lo que falte, marcándolos como supuestos. Solo REPREGUNTA si falta un OBLIGATORIO (precio de 1, país, producto). El resto no bloquea.
 - **Alternativa por bloques** (solo si el cliente lo prefiere o parece abrumado): 3 tandas — 1) producto · 2) precio y oferta · 3) operación y negocio. El "uno por uno" es último recurso, no default.
 
@@ -25,9 +26,9 @@ Confianza (opcional): prueba social, garantía, regalo/bono, envío discreto, or
 3. **Producto**: tienes URL, foto, o ninguna? (ver "Fuentes de producto").
 3b. **URL de la tienda / catálogo** (si tiene): sirve para dos cosas — (a) que la skill lea el catálogo si hace falta, y (b) que el bot pueda redirigir al cliente a la tienda cuando pregunte por OTRO producto. Pregúntala. Si no tiene tienda web, el bot mantiene foco en el único producto.
 4. **Modelo de pago** (gate): "Vas a solicitar **pago anticipado**?"
-   - Si **SÍ** → pídele los datos: Nequi / Daviplata / Bancolombia + titular + número/llave.
+   - Si **SÍ** → pídele los datos completos: **titular + banco/entidad (Nequi/Daviplata/Bancolombia/etc.) + número/llave + TIPO de cuenta** (ahorros/corriente/billetera).
    - Si **NO** → NO pidas nada de anticipado; el prompt queda solo contra entrega.
-5. **Tiempos de entrega** reales por zona y **transportadora(s)** (y si excluye alguna, ej. Servientrega).
+5. ~~Tiempos de entrega y transportadora~~ → **NO SE PREGUNTAN** (regla de FER): default por país en `paises.md`, mostrados como supuesto en el borrador; se ajustan solo si el vendedor los corrige solo.
 
 ## Preguntas CONDICIONALES (solo si aplican — no preguntes de más)
 - **Variantes/colores/sabores** → solo si el producto los tiene. Si no, ni se menciona (no hay "color"). Si las tiene, pregunta ADEMÁS si se vende por unidad o por **combo de cantidad fija con variantes mezclables** (ej. docena de 12 a elegir sabores) — cambia la captura, el upsell y el resumen (ver `plantilla-prompt.md`).

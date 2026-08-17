@@ -5,6 +5,15 @@ description: Crea el paquete completo de venta para un asistente de WhatsApp en 
 
 # Constructor de Prompts de Venta para Chatea PRO v2
 
+<!-- skill v3.14.1 · 2026-08-08 (centro de mando, chat otro espacio de Chatea 2026-08-08 (2ª ronda: 5ª categoría + prosa libre)) · QUINTA CATEGORÍA VETADA en la ley: claims y cifras de negocio (años en el mercado, clientes atendidos, porcentajes de entrega, premios) — no rompen nada técnico ni los caza un barrido de llaves, pero el bot termina mintiendo con datos de otra empresa (caso real: "Más de 100.000 clientes atendidos en Colombia" a punto de heredarse). Y regla operativa LA MARCA VIVE TAMBIÉN EN PROSA LIBRE: al barrido se añade grep -i por el nombre de la marca origen sobre todo el texto a escribir (cazó 10 menciones en 3 campos que el mapeo de llaves no vio). -->
+<!-- skill v3.14 · 2026-08-08 (centro de mando, chat otro espacio de Chatea 2026-08-08) · horneada la LEY "NUNCA HEREDAR DATOS ENTRE ESPACIOS": al basarse en una cuenta guía se hereda estructura/prompts/config, JAMÁS datos (APIs, plantillas de WhatsApp, teléfonos, correos, dominios, marca, productos y disparadores); única excepción Le'côterra como producto-ejemplo; método de barrido obligatorio antes y después de escribir en espacio ajeno. Origen: incidente Golden → otra marca 2026-08-08 (se colaron una credencial, teléfono, plantilla de notificación y firmas de la marca origen; revertido el mismo día). La ley entra como PREVENCIÓN, no reparación: línea base pre-horneado verificada por verificador externo — 8/8 skills sin credenciales (CRITICA=0); únicos hallazgos 3 teléfonos de relleno legítimos (+57 300 de ejemplo) que se conservan. ADEMÁS (chat otro espacio de Chatea 2026-08-08, retractación pixel): regla CAMPOS [Meta] = VALORES CALIENTES — los eventos de pixel los mueve el flujo en vivo, prohibido diagnosticar con una lectura suelta. -->
+<!-- skill v3.13.2 · 2026-08-07 · TERCERA RONDA del verificador: el activador pasa de lista-de-emojis a LISTA PERMITIDA (whitelist: letras, números y puntuación básica) — cierra la CLASE entera (caza ‼ ⁉ ℹ keycaps ㊗ que el rango manual dejaba pasar) y elimina el falso positivo de ≤ → en prompts (el contador 3B por rango se retiró del modo prompt); checklist del prompt ya NO se imprime en modo activador; doc corregida en los 3 sitios que enseñaban la fórmula de 4 bytes como "la validación" (es parcial: el script es la validación); id de workspace de tercero retirado del changelog. DECISIÓN DELIBERADA: las marcas propias de la casa en changelogs históricos (productos públicos de la tienda) se conservan como trazabilidad de lecciones de campo; no son datos de terceros. ABIERTO (requiere plataforma viva): probar si la base tolera emojis de 3 bytes en el trigger, y los pares 19.895/23.266 con escritura+relectura en un producto desechable -->
+<!-- skill v3.13.1 · 2026-08-07 · SEGUNDA RONDA del verificador adversarial (9/11 resistían, cazó huecos nuevos): validar.sh ahora también bloquea EMOJIS DE 3 BYTES en el activador (✨⛔✅❤☕⭐ pasaban el filtro de 4 bytes — la regla es SIN emojis, no solo sin 4B), BOM invisible (rompe el match del trigger; utf-8-sig detectado y bloqueado en activador), archivo de solo-espacios, y argumentos inválidos con mensaje de uso. DOC SINCRONIZADA con el script real: eliminadas las 3 menciones a wc -m que autorizaban el método defectuoso, modo --activador ahora descubrible en PASO 7 + VALIDADOR + estructura-disparo + guía. ejemplo-completo: encabezado y RM2 alineados a envío prioritario, upsell con totales explícitos. Packs PA/PY completados (transportadoras default + vocabulario, sin inventar operadores). Privacidad: economía real y ruta de disco retiradas de referencia-externa; ledger des-marcado. NOTA ABIERTA: si la base de Chatea tolera o no emojis de 3 bytes en el trigger NO está probado contra la plataforma (la hermana usa el mismo filtro de 4B); el default seguro es 0 emojis de cualquier tipo -->
+<!-- skill v3.13 · 2026-08-07 · REPARACIÓN TRAS golden-verificador (11 clases de fallo cazadas): validar.sh REESCRITO — ahora BLOQUEA (exit!=0) en vez de imprimir: conteo por python (wc -m contaba BYTES bajo locale C, +22% fantasma), techo escapado ENFORCED <19.000 con la fórmula del briefing (ensure_ascii default), archivo vacío=fallo, no-UTF8=fallo con aviso (antes degradaba en silencio), modo --activador que exige 0 caracteres de 4 bytes, rúbrica-suma eliminada del script (quedaba viva contra la norma holística), default 12.000 alineado. "Garantía Golden" DESMARCADA de la plantilla (viajaba al bot de terceros). guia-configuracion-chatea.md actualizada a la NORMA DE DOS ACTIVADORES + validación 4 bytes (se había quedado en la norma vieja: clase de fallo "changelog que no enumeró todos los archivos"). ejemplo-completo.md alineado (saludo sin pregunta, multimedia sin pregunta, envío nunca cobrado, tiempos 3-5, dos activadores). Guardas de país en OFICINA (México no existe) en plantilla/objeciones/compuerta. Intake 18 = garantía de CAMBIO. Tope recordatorio 800 añadido. Matiz LONG JSON 500k vs legacy 20k. Lecciones de campo des-marcadas (otra marca → lección de campo). SKILL.md refs = 7 países -->
+<!-- skill v3.12 · 2026-08-07 (tarea Centro de Mando aprobada por FER, briefing CHATEA-PRO-ASISTENTES-MAPA/BRIEFING-PARA-SKILLS.md leído completo) · (1) TOPES NATIVOS confirmados y completados: prompt_libre 12.000 ✓ + vecinos que faltaban (mensaje inicial 1.000, pregunta de entrada 1.000, instrucción remarketing 1.000 c/u, prompt_datos 4.000, notificaciones 400; escribir por API sobre el tope no falla pero el panel CORTA al guardar); tabla completa en TOPES-NATIVOS-POR-CAMPO.md. (2) SEGUNDO TECHO: el bot field guarda ESCAPADO (tilde=6, emoji=12) → 20.000 escapados ≈ ~17.000 crudos; probado 19.895 dispara / 23.266 muere SIN error; medir len(json.dumps(v)[1:-1])<19.000 — validar.sh ahora lo calcula + cuenta 4-bytes. (3) PAÍSES: solo los 7 de la plataforma (COLOMBIA/ECUADOR/CHILE/MEXICO/PANAMA/PERU/PARAGUAY); Guatemala ELIMINADO de paises.md; packs Panamá y Paraguay añadidos; México enriquecido (CP REQUERIDO define zona de reparto, NO existe oficina, zonificación metropolitana/interior/alejadas, PROFECO, vocabulario paquetería/pedido/dinero/repartidor). (4) Trigger: fórmula dura de validación 4 bytes en estructura-disparo §6. (5) "DOMICILIO": en CO es el pedido, en MX es la casa — vocabulario por país en paises.md. Referencia viva: prompt Le'côterra 11.985/12.000 verificado por SHA256 contra el workspace plantilla externo (id en la memoria del ecosistema, no aquí) -->
+<!-- skill v3.11 · 2026-08-07 (centro de mando, cosecha del chat un estudio de producto) · (1) NORMA DE DOS ACTIVADORES por producto, APROBADA por el Centro de Mando: frase completa del botón (canales con mensaje precargado) + UNA palabra corta ÚNICA del producto (TikTok/estados/comentarios donde nadie precarga; ej. estilo SONRISA/HONGOS), verificada contra TODAS las demás del bot para no cruzarse y JAMÁS genérica ("información"/"precio"); actualizados el paso 7 del SKILL.md y estructura-disparo.md §6. Misma familia del bug Libido UP ("escribe RITUAL" y el activador era otro). (2) Bloque "LÍMITE ÉTICO Y LEGAL" obligatorio dentro del prompt para verticales de SALUD (plantilla-prompt.md + cumplimiento.md): qué jamás afirma el bot + respuesta honesta ya redactada a la pregunta crítica ("me tapa la caries?" → "No. Si ya hay un hoyo, eso lo repara el dentista; esto cuida el esmalte"); evita devolución COD y reclamo, y en salud vende más que prometer. -->
+<!-- skill v3.10 · 2026-08-07 · INTAKE APROBADO POR FER ítem por ítem: País/Producto/Precio/Asesor SÍ · Pago gate SÍ con datos COMPLETOS si anticipado (titular + banco/entidad + número/llave + TIPO de cuenta) · ENTREGA NO SE PREGUNTA (tiempos y transportadora = default por país en paises.md, mostrados como supuesto en el borrador, solo cambian si el vendedor corrige solo) · "Confianza" renombrada "Para cerrar mejor" (opcional, no bloquea) · URL de tienda marcada opcional (solo si tiene tienda). Formulario, PASO 1 y paises.md sincronizados -->
+<!-- skill v3.9.1 · 2026-08-07 · pasada golden-skill-auditor: referencia-externa-embudo-whatsapp-cod.md registrada en Archivos de referencia (era huérfana: existía desde 2026-07-30 —masterclass COD de terceros, OPCIONAL no-regla, backup en _backups/2026-07-30-masterclass-panama— pero nada la mencionaba y ningún Claude la leería); CHANGELOG.md suelto fusionado aquí y eliminado (estándar: changelog en comentarios del SKILL.md; era material intruso de cara al marketplace) -->
 <!-- skill v3.9 · 2026-08-01 (centro de mando) · La verificación de v3.8 (title vacío) solo cazaba 1 de 3 modos de fallo: Temu falla con title POBLADO (redirige y devuelve 72 categorias de ropa) y Amazon con title poblado Y sin redireccion (muro anti-bot, sin campo json). Ahora son 4 checks, y el que caza los tres es "el dato responde a lo que pedi?". Aqui el riesgo es el mas directo del ecosistema: el dato falso se lo dice el BOT AL CLIENTE en WhatsApp -->
 <!-- skill v3.8 · 2026-07-31 (centro de mando) · SCRAPING QUE MIENTE: firecrawl_scrape con formats:["json"] sobre una página que no carga NO falla — el extractor ALUCINA producto, precio y reseñas y los entrega con statusCode 200 (medido 2026-07-31: devolvió "Smart TV 55\" 4K LED, $499.99, 150 reseñas" para una página de removedor de verrugas). Aquí es especialmente grave: un precio o un "4.5 estrellas" falso se lo dice el BOT AL CLIENTE REAL por WhatsApp. Verificación obligatoria: metadata.title no vacío, o pedirle los datos al vendedor. Manual: golden-investigacion-mercado/references/scraping-firecrawl.md -->
 <!-- skill v3.7 · 2026-07-29 (centro de mando) · GARANTÍA: la plantilla enseñaba 'te devolvemos tu dinero' → corregida a garantía de CAMBIO; orden de FER: la política de Shopify manda, nunca devolución de dinero en ninguna pieza. -->
@@ -19,6 +28,57 @@ description: Crea el paquete completo de venta para un asistente de WhatsApp en 
 <!-- skill v3.2 · Modo MEJORA como servicio completo: dispara con "ya tengo un prompt, mejóralo" (description ampliado), extrae datos del prompt viejo sin hacer repetir al usuario, reconstruye POR DEFECTO y entrega comparación nota vieja vs nueva -->
 <!-- v3.1 · auditada con golden-skill-auditor: modo auditoría alineado a evaluación holística (/100 + /1000), residuos de la rúbrica de pesos eliminados -->
 <!-- v3.0 · validador + medición/ledger + objeciones + packs por país + cumplimiento + ejemplo horneado + intake conversacional + plantilla Meta remarketing + conexiones/privacidad -->
+
+## LEY: NUNCA HEREDAR DATOS ENTRE ESPACIOS (FER 2026-08-08)
+
+Al basarse en una cuenta guía (Golden o cualquier otra) se hereda **estructura, prompts y
+configuración de asistentes** — JAMÁS datos, en ninguna dirección, ni entre marcas propias:
+
+- **APIs y tokens** de cualquier tipo: ElevenLabs, OpenAI, Dropi, Shopify, el token del propio bot.
+- **Plantillas de WhatsApp**: `name`, `namespace`, `lang` y `status` van atados al WABA de cada
+  espacio; copiarlas rompe el destino (llama plantillas que su WABA no tiene o que Meta no aprobó).
+- **Datos personales y de marca**: teléfonos, correos, dominios, nombre de la empresa, firmas en
+  mensajes al cliente.
+- **Productos** y sus disparadores.
+- **Claims y cifras de negocio**: años en el mercado, número de clientes, porcentajes de
+  entrega, premios. Heredarlos no rompe nada técnico — ningún barrido de llaves los detecta —
+  pero ponen al bot a MENTIRLE al cliente con datos de otra empresa. Caso real (2026-08-08): la
+  plantilla maestra clonada traía "Más de 100.000 clientes atendidos en Colombia" (dato de
+  Golden) a punto de quedar en boca del bot de otro espacio.
+
+**Única excepción autorizada:** Le'côterra como producto-ejemplo en los espacios de trabajo
+(asistente de WhatsApp y de comentarios), para que la gente vea cómo se configura un producto.
+
+**La guía tampoco puede llevar nada de eso adentro**: un material de referencia con una llave o un
+dato personal ya está mal, aunque nadie lo copie.
+
+**Método obligatorio al escribir en un espacio ajeno** — ANTES de escribir, barrer lo que se va a
+escribir buscando `sk_`, `shpat_`, `eyJ`, teléfonos, correos, dominios, nombres de plantilla y de
+marca del origen; si aparece algo, NO se escribe. DESPUÉS de escribir: releer del servidor y barrer
+otra vez. Herramienta encadenable del barrido:
+`PROYECTOS/STACK-GOLDEN/barrido-datos-ajenos.py` (correrla ANTES de escribir y DESPUÉS releyendo del
+servidor; sale con código 3 si encuentra algo CRITICA).
+
+**LA MARCA VIVE TAMBIÉN EN PROSA LIBRE, no solo en campos estructurados.** Preservar las
+llaves de identidad del destino NO basta: el nombre de la marca de origen viaja escondido dentro
+de ganchos posventa, agradecimientos y plantillas de prompt. Al método de barrido se le añade el
+paso `grep -i` por el NOMBRE de la marca de origen sobre TODO el texto que se va a escribir —
+así se cazaron 10 menciones de la marca origen en 3 campos del destino que el mapeo de llaves
+no vio.
+
+Origen: 2026-08-08, al clonar la config de Golden a otro espacio se colaron la llave de ElevenLabs,
+el teléfono, la plantilla de notificación y agradecimientos firmados con la marca del origen.
+Revertido el mismo día desde respaldo.
+
+### CAMPOS [Meta] = VALORES CALIENTES, NO INTERRUPTORES
+
+Los bot fields `[Meta] Ver Contenido`, `[Meta] Agregar al carrito` y demás eventos de pixel los
+**MUEVE EL FLUJO en tiempo real** mientras corren contactos — no son configuración estable. Caso
+real (2026-08-08): se leyeron como "apagados" y cambiaron solos minutos después sin escritura de
+nadie; la conclusión "el evento Comprar está apagado" tuvo que retractarse. **PROHIBIDO sacar
+conclusiones de pauta o diagnóstico de una lectura suelta de esos campos**: se observan en ventana
+(varias lecturas separadas en el tiempo) o se diagnostica el pixel en Meta directamente. Detalle:
+memoria `reference_chatea_clonar_config_entre_espacios`.
 
 
 Este skill convierte cualquier producto en un paquete de venta completo y listo para pegar en Chatea PRO v2, siguiendo una estructura probada en campo (referencias con 50+ ventas/día). El objetivo siempre es el mismo: **convertir conversaciones de WhatsApp en ventas confirmadas.**
@@ -58,7 +118,9 @@ El campo de prompt acepta hasta **12.000 caracteres**. NO es un límite a evitar
 - **NUNCA comprimas ni resumas contenido que vende** para "acortar". Concisión ≠ brevedad: la meta es que cada frase aporte, no que el prompt sea corto.
 - **NUNCA metas relleno ni repetición** solo para llegar a un número: eso diluye a la IA y la vuelve inconsistente. Cada carácter debe ganar su lugar (objeción, educación, empatía, prueba social, manejo de escenario).
 - Regla práctica: si un prompt te queda en 4.000–6.000, casi seguro te FALTA sustancia (FAQ, objeciones, escenarios). Revisa qué venta te dejaste por fuera antes de entregar.
-- SIEMPRE mide el prompt final con `scripts/validar.sh` (o `wc -m`) y repórtalo. Techo duro: 12.000.
+- SIEMPRE mide el prompt final con `scripts/validar.sh` y repórtalo (JAMÁS con `wc -m`: cuenta bytes según el locale y miente). Techo duro del campo: 12.000.
+- **EL SEGUNDO TECHO (el que mata en silencio): el bot field guarda el valor ESCAPADO.** El campo JSON aguanta 20.000 caracteres ESCAPADOS, no crudos: cada tilde ocupa 6 y cada emoji 12, así que el techo práctico ronda ~17.000 crudos para el bot field completo (probado en vivo: 16.882 crudo/19.895 escapado dispara; 19.922/23.266 NO — y el producto muere sin error visible, el fallo solo sale en Panel → Registros de errores). Un prompt de 11.000 lleno de tildes y emojis puede reventar el campo aunque quepa en 12.000. Mide el escapado con `len(json.dumps(valor)[1:-1])` y déjalo bajo 19.000 (validar.sh lo calcula). MATIZ del techo escapado: el tope de 20.000 escapados aplica a los bot fields legacy tipo JSON; los campos LONG JSON aguantan 500.000 (todo campo NUEVO se crea LONG JSON) — pero el tope NATIVO del formulario (12.000 el prompt) rige igual porque el panel corta al guardar. Tabla completa de topes por campo: `CHATEA-PRO-ASISTENTES-MAPA/TOPES-NATIVOS-POR-CAMPO.md` (referencia interna del ecosistema Golden; los topes operativos ya están reproducidos aquí).
+- **Topes de los campos vecinos** (no solo el prompt): mensaje inicial (saludo) 1.000 · pregunta de entrada 1.000 · instrucción de remarketing 1.000 c/u · recordatorio 800 · prompt_datos del Producto en Segundos 4.000 · notificaciones 400. Escribir por API sobre el tope no da error, pero el día que alguien abra el formulario en el panel y guarde, el campo SE CORTA.
 
 ## PASO 0 — Intake inteligente (recolecta e investiga; ver `references/intake-inteligente.md`)
 
@@ -91,10 +153,10 @@ REGLA DE DATOS POR NEGOCIO (CRÍTICA — este skill es genérico y se comparte c
 
 **Sobre la operación:**
 8. Modelo de pago: contra entrega, anticipado o ambos?
-9. Si hay anticipado: datos de la cuenta (Nequi/Daviplata/banco + titular)
-10. Transportadora(s) y si permite revisar antes de pagar
+9. Si hay anticipado: datos completos de la cuenta (titular + banco/entidad + número/llave + TIPO de cuenta)
+10. Si permite revisar el paquete antes de pagar (política del negocio). La TRANSPORTADORA no se pregunta: default del país (paises.md), solo se registra si el vendedor la nombra o excluye por su cuenta
 11. País y nomenclatura de dirección (Colombia: barrio/ciudad/departamento · México: colonia/municipio/estado/CP · etc.)
-12. Tiempos de entrega por zona
+12. ~~Tiempos de entrega~~ — NO SE PREGUNTAN (regla de FER): default por país en paises.md, mostrados como supuesto en el borrador
 12b. (OPCIONAL) **ID del producto en Dropi** (solo números) y si el producto **tiene variaciones**. Son para la sección "Información del producto" y se pueden agregar después; NO son necesarios para generar el prompt.
 
 REGLA DE OBLIGATORIOS Y NO BLOQUEO:
@@ -110,7 +172,7 @@ REGLA DE OBLIGATORIOS Y NO BLOQUEO:
 
 **Sobre confianza (clave para cerrar):**
 17. El envío es discreto? (vital en productos íntimos o sensibles)
-18. Hay garantía de satisfacción / devolución de dinero?
+18. Hay garantía de CAMBIO? (JAMÁS devolución de dinero — regla v3.7: la política de la tienda manda)
 19. Hay algún regalo o bono por la compra?
 20. Es producto original (anti-réplica)?
 
@@ -126,7 +188,11 @@ Genera SIEMPRE estas piezas, en este orden. Usa `references/plantilla-prompt.md`
 4. **Prompt completo** (estructura ganadora, bajo el límite de caracteres)
 5. **Recordatorio 1 (1h) y 2 (2h)** — suaves, SIN plantilla ni instrucción de IA (solo el mensaje; van dentro de la ventana de 24h).
 6. **Remarketing 1 (3h) y 2 (6h)** — cada uno con ángulo nuevo. En Chatea cada remarketing tiene 3 campos: **Tiempo** (3h/6h), **Plantilla Mensaje** (desplegable: se elige una plantilla de Meta aprobada o "No enviar plantilla"), e **Instrucción especial del remarketing** (un campo ≤1000 caracteres con el MENSAJE + la [Instrucción IA] juntos). La skill entrega los tres: el texto del campo de instrucción (copy-paste) + la plantilla de Meta completa para crear/seleccionar (nombre_minúsculas, categoría Marketing, español, imagen, cuerpo con {{1}}=nombre, pie, botón mapeado como "botón de remarketing"). Ver `estructura-disparo.md`.
-7. **Activador**: **UNA sola palabra clave = la FRASE COMPLETA del anuncio/botón** (ej. "Hola quiero información y precio de [PRODUCTO]"), con el nombre del producto. **SIN NINGÚN EMOJI en el activador** (los emojis son 4 bytes → la base de Chatea los vuelve `�` y el trigger no coincide jamás; validación: `[c for c in texto if ord(c) >= 0x10000]` debe salir vacío) y sin punto final. NO agregues palabras sueltas extra ("información"/"precio" solas): con varios productos se cruzarían. Texto crudo para copiar y pegar, sin prefijos ni comillas.
+7. **Activador — NORMA DE DOS ACTIVADORES por producto** (aprobada por el Centro de Mando 2026-08-07, chat dental Chile): se registran **DOS** palabras clave por producto:
+   - **(1) La FRASE COMPLETA del anuncio/botón** (ej. "Hola quiero información y precio de [PRODUCTO]"), con el nombre del producto. Cubre los canales donde el enlace **precarga** el mensaje (botón de la página, CTA de WhatsApp en Meta).
+   - **(2) UNA palabra corta ÚNICA y propia del producto** (ej. estilo "SONRISA" para gotas dentales, "HONGOS" para antihongos). Cubre **TikTok, estados de WhatsApp y comentarios**, donde NADA precarga y el cliente escribe a mano: sin ella el bot no dispara y la venta se pierde en silencio. Esa palabra corta se usa en **todo CTA escrito** ("escribe SONRISA").
+   - **VERIFICACIÓN obligatoria de la palabra corta**: compararla contra TODAS las palabras clave de los demás productos del bot para que no se cruce. **JAMÁS palabras genéricas** ("información", "precio", "promo"): con varios productos disparan el bot equivocado.
+   - **SIN NINGÚN EMOJI ni símbolo raro en ningún activador** — los de 4 bytes están PROBADOS: la base de Chatea los vuelve `�` y el trigger no coincide jamás (incidente 2026-07-26); los de 3 bytes (✨ ✅ ‼ ⁉ ℹ) no están probados contra la base, así que el default seguro es CERO. Y sin punto final. Texto crudo para copiar y pegar, sin prefijos ni comillas. **LA validación es `bash scripts/validar.sh --activador <archivo>`** (lista permitida: solo letras, números y puntuación básica; bloquea cualquier emoji de 3 o 4 bytes y el BOM) — la fórmula manual de 4 bytes NO basta, deja pasar ✨ y vecinos.
 
 IMPORTANTE — DÓNDE VA CADA PIEZA: el paquete NO va todo en un solo campo. Cada pieza va en una sección distinta de Chatea. Entrega SIEMPRE el mapa de ubicación al usuario (ver `references/guia-configuracion-chatea.md`) y etiqueta cada pieza con la sección donde va, para que cualquier persona lo configure sin enredarse. No presentes la numeración como un orden secuencial dentro de un solo campo.
 
@@ -143,7 +209,7 @@ REGLA DE MULTIMEDIA (crítica): hay dos tipos de audiovisuales y van en lugares 
 
 SISTEMA DE IMÁGENES (ver `references/recursos-visuales.md`): además del prompt, entrega SIEMPRE un **MANIFIESTO DE IMÁGENES debajo del prompt** (nunca dentro). Por cada imagen conversacional (IMAGEN 1, 2, 3…): pregunta al cliente si tiene la URL; si la tiene, la pegas en el prompt; si NO la tiene, (a) **intenta generarla tú** si hay herramienta de imágenes conectada (Higgsfield/Soul, Nano Banana, Magic, Gemini, Stitch), o (b) entrégale un **prompt de imagen profesional** listo para pegar en cualquier IA; luego explícale que la suba a Chatea PRO para obtener la URL y te la pase, y tú finalizas el prompt con el enlace puesto. La skill intenta hacerlo todo; si no puede, dice exactamente cómo.
 
-DATOS DE PAGO ANTICIPADO: si el negocio cobra anticipado, PREGÚNTALE al cliente (durante el desarrollo) los datos de la cuenta — Nequi / Daviplata / Bancolombia + titular + número/llave — y colócalos en la sección de anticipado del prompt. Nunca los inventes ni los dejes en blanco: si no los tiene a mano, deja el marcador `[AQUÍ VAN LOS DATOS DE PAGO ANTICIPADO]` y avísale que hay que completarlo.
+DATOS DE PAGO ANTICIPADO: si el negocio cobra anticipado, PREGÚNTALE al cliente (durante el desarrollo) los datos completos de la cuenta — titular + banco/entidad (Nequi/Daviplata/Bancolombia/etc.) + número/llave + TIPO de cuenta — y colócalos en la sección de anticipado del prompt. Nunca los inventes ni los dejes en blanco: si no los tiene a mano, deja el marcador `[AQUÍ VAN LOS DATOS DE PAGO ANTICIPADO]` y avísale que hay que completarlo.
 
 ## PASO 2.5 — Entregable PDF (recomendado; ver `references/entrega-pdf.md`)
 
@@ -179,7 +245,7 @@ REGLA DE ENTREGA: si la nota /100 no es sobresaliente, corrige lo que falle, vue
 
 Después del /100, evalúa también **del 1 al 1000** y di explícitamente **qué le harías para llegar a 1000**. La escala /1000 es más exigente: mide qué tan cerca está del mejor prompt posible para ESE producto (profundidad de objeciones y FAQ, riqueza persuasiva, ángulos de la competencia, prueba social concreta, manejo de todos los escenarios de entrada, unit economics del upsell, etc.). Entrega el número /1000 + la lista concreta de mejoras que lo subirían.
 
-VALIDADOR AUTOMÁTICO: guarda el bloque del prompt en un archivo y córrelo con `bash scripts/validar.sh <archivo.txt> [límite]`. El script cuenta los caracteres reales (`wc -m`), avisa si excede el techo y despliega la checklist de apoyo para tu juicio. El conteo de caracteres es objetivo; úsalo siempre, no lo estimes a ojo.
+VALIDADOR AUTOMÁTICO: guarda el bloque del prompt en un archivo y córrelo con `bash scripts/validar.sh <archivo.txt> [límite]`. El script mide con python (crudos + escapados + emojis + BOM) y BLOQUEA con exit distinto de 0 si excede un techo, está vacío o no es UTF-8 — no es informativo, es una compuerta. Además corre `bash scripts/validar.sh --activador <archivo>` sobre CADA activador: ahí exige 0 emojis de cualquier tipo y sin BOM. No estimes a ojo ni uses `wc -m`.
 
 CUMPLIMIENTO OBLIGATORIO: antes de entregar, pasa también el checklist de `references/cumplimiento.md` (claims de salud, política de WhatsApp, datos personales). Un claim prohibido invalida la entrega aunque la nota sea 100.
 
@@ -268,10 +334,11 @@ Esta skill se comparte. NUNCA hornees datos de un negocio real en sus archivos: 
 - `references/estructura-disparo.md` — Plantillas de saludo, multimedia, pregunta de entrada, recordatorios, remarketing y activador.
 - `references/checklist-multimedia.md` — Lista de las URLs/imágenes que conviene pedir al usuario y dónde se usan.
 - `references/objeciones.md` — **Librería de objeciones** por categoría (precio, confianza, logística, salud/legal, decisión). Elige las que apliquen e insértalas en el bloque OBJECIONES.
-- `references/paises.md` — **Packs por país** (CO/MX/PE/CL/EC/GT): nomenclatura de dirección, transportadoras, medios de pago y tono. Usa el del país del negocio.
+- `references/paises.md` — **Packs por país** (los 7 de la plataforma: CO/MX/PE/CL/EC/PA/PY): nomenclatura de dirección, transportadoras, medios de pago y tono. Usa el del país del negocio.
 - `references/cumplimiento.md` — **Guardarraíles legales/plataforma**. Checklist obligatorio antes de entregar.
 - `references/resultados-ledger.md` — **Registro de resultados** para medir versiones y componer aprendizaje (PASO 4).
 - `references/recursos-visuales.md` — **Sistema de imágenes/URLs**: cómo listar las imágenes conversacionales, generarlas (o dar el prompt de imagen), y el manifiesto que se entrega DEBAJO del prompt. En el prompt solo va la URL.
 - `references/intake-inteligente.md` — **Intake inteligente (PASO 0)**: el FORMULARIO de una vez (país 1º, obligatorio vs opcional, relleno inteligente), el gate de anticipado, y cómo tomar el producto por URL (scrape), foto (visión) o investigándolo (competencia/web).
 - `references/entrega-pdf.md` — **Entregable PDF (PASO 2.5)**: cómo generar el paquete como PDF con `golden-pdf-check`, con el prompt partido en tarjetas atómicas "Parte N de N" que van seguidas en el mismo campo.
-- `scripts/validar.sh` — **Validador**: cuenta caracteres (`wc -m`) y despliega la checklist de apoyo. Córrelo antes de entregar.
+- `references/referencia-externa-embudo-whatsapp-cod.md` — **REFERENCIA OPCIONAL, NO REGLA** (masterclass de terceros sobre embudo COD por WhatsApp). Consúltala solo para contrastar o enriquecer ángulos; JAMÁS sustituye la estructura obligatoria de esta skill ni el método FER. En conflicto, manda la skill.
+- `scripts/validar.sh` — **Validador-compuerta**: mide crudos, escapados, emojis y BOM con python y BLOQUEA (exit != 0) si algo excede; modo `--activador` exige 0 emojis. Córrelo antes de entregar, también sobre cada activador.

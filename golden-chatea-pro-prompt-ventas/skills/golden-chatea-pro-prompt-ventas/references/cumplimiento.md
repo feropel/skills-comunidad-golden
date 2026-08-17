@@ -7,6 +7,11 @@ Pasa este checklist ANTES de entregar. Un claim prohibido puede tumbarte la cuen
 - ✅ SÍ: beneficios de categoría — "ayuda a", "contribuye a", "muchas personas notan", "sensación de".
 - Si el producto NO es medicamento, dilo claro cuando pregunten por salud, y remite al médico para condiciones.
 - Antes/después: preséntalos como experiencias de clientes, no como resultado garantizado.
+- **Vertical SALUD → el prompt lleva el bloque "LÍMITE ÉTICO Y LEGAL" (obligatorio)**: qué jamás
+  afirma el bot + la respuesta honesta YA redactada a la pregunta crítica del vertical (ej. dental:
+  "me tapa la caries?" → "No. Si ya hay un hoyo, eso lo repara el dentista; esto cuida el
+  esmalte"). Ver `plantilla-prompt.md`. Probado en campo (Chile 2026-08-07): evita la devolución
+  COD y el reclamo, y vende más que prometer.
 
 ## 2) Política de WhatsApp Business
 - El bot NUNCA dice que es bot/IA (regla de negocio) — pero tampoco suplanta a una entidad oficial (banco, gobierno, salud pública).

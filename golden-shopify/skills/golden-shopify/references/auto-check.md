@@ -115,7 +115,7 @@ if "ignition" in allcl.lower() or "gfs-ign" in allcl.lower():
 # 21) G4.2 — OBLIGATORIO: TOPE SHOPIFY DE 50 KB POR SETTING custom_liquid (bytes UTF-8, NO caracteres).
 #     Aplica a TODOS los temas. Shopify rechaza el guardado del template con:
 #     "Setting 'custom_liquid' is invalid. ['Liquid file size cannot exceed 50 kilobytes.']"
-#     (FileSaveError descubierto en tienda real, chat Insulinum 2026-08-07.)
+#     (FileSaveError descubierto en tienda real, chat otro producto 2026-08-07.)
 #     Se mide CADA valor por separado (jamás el total concatenado) y en BYTES UTF-8: los acentos,
 #     emojis y símbolos ocupan más de 1 byte, así que len(texto) en caracteres MIENTE.
 for skey, s in d["sections"].items():

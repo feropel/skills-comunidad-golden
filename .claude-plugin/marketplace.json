@@ -238,6 +238,13 @@
       "description": "Convierte una idea suelta en un prompt que la IA obedece.",
       "version": "1.0.0",
       "category": "education"
+    },
+    {
+      "name": "golden-chatea-pro-producto-comentarios",
+      "source": "./golden-chatea-pro-producto-comentarios",
+      "description": "Carga un producto en el asistente de comentarios con los disparadores para que el bot sepa de cuál hablan.",
+      "version": "1.0.0",
+      "category": "marketing"
     }
   ]
 }

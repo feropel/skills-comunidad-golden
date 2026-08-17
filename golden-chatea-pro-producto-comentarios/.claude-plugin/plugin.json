@@ -1,0 +1,17 @@
+{
+  "name": "golden-chatea-pro-producto-comentarios",
+  "version": "1.0.0",
+  "description": "Carga un producto en el asistente de comentarios con los disparadores para que el bot sepa de cuál hablan.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "comentarios",
+    "producto",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-chatea-pro-producto-comentarios/"
+  ]
+}

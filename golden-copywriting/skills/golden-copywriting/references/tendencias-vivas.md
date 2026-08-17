@@ -29,7 +29,7 @@ títulos únicos por página, 4 cuerpos completos leídos por firecrawl.
 
 La corrida pasada solo Tag Recede (uñas, vertical con restricción de claims) rompía la regla de
 meter el argumento de venta en los primeros 125 caracteres. Esta corrida se leyeron los 5
-anuncios de mayor volumen de tres cuentas distintas — Le'côterra, Tag Recede y **Dolce por
+anuncios de mayor volumen de tres cuentas distintas — Le'côterra, Tag Recede y **otra marca por
 primera vez** — y **ninguno de los cinco cumple la regla, y los cinco venden**:
 
 | Anuncio | Cuenta | Largo | Compras (30d) | CPA | Argumento en 125 |
@@ -37,10 +37,10 @@ primera vez** — y **ninguno de los cinco cumple la regla, y los cinco venden**
 | V6 · 15 copys | Le'côterra CP2 | 332 | 3 | 15.030 COP | NO |
 | V6 Bergamot | Le'côterra CP2 | 221 | 14 | 40.765 COP | NO |
 | VIDEO 8 | Tag Recede BLUE CP1 | 185 | 31 | 24.381 COP | NO |
-| Anuncio 3 | Dolce CP1 | 361 | 35 | 24.496 COP | NO |
-| Anuncio 3 Drive | Dolce CP1 | 485 | 9 | 16.569 COP | NO |
+| Anuncio 3 | otra marca CP1 | 361 | 35 | 24.496 COP | NO |
+| Anuncio 3 Drive | otra marca CP1 | 485 | 9 | 16.569 COP | NO |
 
-Le'côterra y Dolce **no tienen restricción de claims de salud** — el escudo que protegía la
+Le'côterra y otra marca **no tienen restricción de claims de salud** — el escudo que protegía la
 excepción de Tag Recede ya no aplica. **Actualizado `estandar-meta-medido.md`** con este dato:
 la regla de los 125 sigue siendo el consejo por defecto (y el artículo oficial de Meta la
 respalda: *"el texto principal debe ocupar 1 a 3 líneas"*), pero **ya no se sostiene como ley
@@ -62,9 +62,9 @@ compras/CPA 40.765. El nuevo gana 63% más barato, **pero sobre 3 compras — mu
 chica para veredicto.** Sigue sin poder probarse el estándar de verdad mientras los "cortos"
 no salgan al aire.
 
-### Hallazgo nuevo, en copy PROPIO no de mercado: dos fallos de higiene en Dolce CP1
+### Hallazgo nuevo, en copy PROPIO no de mercado: dos fallos de higiene en otra marca CP1
 
-Al leer el cuerpo del segundo mayor vendedor de Dolce (Anuncio 3, 35 compras) apareció:
+Al leer el cuerpo del segundo mayor vendedor de otra marca (Anuncio 3, 35 compras) apareció:
 - **64 caracteres en negrita Unicode falsa** (`𝐔𝐬𝐚 𝐭𝐮 𝐜𝐞𝐥𝐮𝐥𝐚𝐫...`, rango Mathematical Bold,
   caracteres de 4 bytes) — rompe copiar y pegar, lectores de pantalla, y búsqueda de texto.
 - El creativo "Anuncio 3 Drive" (9 compras, CPA 16.569) lleva `**asteriscos**` de Markdown
@@ -230,7 +230,7 @@ no se está haciendo (ver arriba). `estandar-meta-medido.md` no necesita correcc
   `{{product.name}}` y ningún `body`. El texto vive en el catálogo, no en el creativo.
 - **No se pudo confirmar si algún anuncio lleva múltiples textos** (opciones por campo): la API
   de creativos expone un solo `body` y no el `asset_feed_spec`.
-- **Dolce CP 1** (5.349.836 COP, el segundo mayor gasto) usa nombres genéricos "Anuncio 1..22
+- **otra marca CP 1** (5.349.836 COP, el segundo mayor gasto) usa nombres genéricos "Anuncio 1..22
   Drive" y no se le cruzó el copy contra el resultado. Queda para la próxima corrida.
 - Las cuentas **GOLDEN CP2 y CP4 (UNSETTLED)** y 10 más DISABLED no son consultables: 13 de 75
   quedaron fuera por completo.

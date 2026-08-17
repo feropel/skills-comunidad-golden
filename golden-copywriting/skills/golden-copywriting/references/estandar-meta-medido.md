@@ -90,12 +90,12 @@ Lo que sí obliga: **cuando el producto no puede prometer, la regla no aplica; n
 oferta al copy solo para cumplirla.**
 
 **Actualizado 2026-08-16, ya no es un caso aislado.** Se leyeron los 5 anuncios de mayor
-volumen de tres cuentas distintas —Le'côterra CP2, Tag Recede BLUE CP1 y Dolce CP1 (por
+volumen de tres cuentas distintas —Le'côterra CP2, Tag Recede BLUE CP1 y otra marca CP1 (por
 primera vez cruzado)— y **ninguno de los cinco mete el argumento de venta en los primeros
 125 caracteres, y los cinco venden**: V6·15 copys (332 car., 3 compras, CPA 15.030), V6
 Bergamot (221 car., 14 compras, CPA 40.765), Tag Recede VIDEO 8 (185 car., 31 compras, CPA
-24.381), Dolce Anuncio 3 (361 car., 35 compras, CPA 24.496) y Dolce Anuncio 3 Drive (485
-car., 9 compras, CPA 16.569). **Le'côterra y Dolce no tienen restricción de claims de salud**
+24.381), otra marca Anuncio 3 (361 car., 35 compras, CPA 24.496) y otra marca Anuncio 3 Drive (485
+car., 9 compras, CPA 16.569). **Le'côterra y otra marca no tienen restricción de claims de salud**
 — el escudo que protegía la excepción de Tag Recede ya no aplica a los otros dos. La regla
 sigue siendo el consejo por defecto (y Meta la respalda en el artículo oficial), pero **deja
 de tratarse como ley dura sin excepción: se sostiene en 0 de 5 de los mayores vendedores

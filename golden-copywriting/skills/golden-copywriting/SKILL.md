@@ -182,11 +182,11 @@ lo señala.
   inventariadas, 36 revisadas (excluida BACK UP), 17 con gasto en 30 días (sube de 14); mercado:
   3 términos, 150 anuncios, 46 páginas, 60 títulos únicos, 4 cuerpos completos. Hallazgo mayor:
   **la regla de los 125 caracteres deja de ser ley dura** — 0 de 5 mayores vendedores medidos
-  (Le'côterra, Tag Recede, Dolce por primera vez cruzada) meten el argumento en la ventana
+  (Le'côterra, Tag Recede, otra marca por primera vez cruzada) meten el argumento en la ventana
   visible, y ya no es solo un vertical con restricción de claims. Actualizado
   `estandar-meta-medido.md` §3 con el número y la fuente. También: la skill se encontró
   **desblindada** al empezar esta corrida (sin forcejeo detectado); dos fallos de higiene
-  hallados en copy PROPIO de Dolce (negrita Unicode falsa, asteriscos Markdown sin renderizar)
+  hallados en copy PROPIO de otra marca (negrita Unicode falsa, asteriscos Markdown sin renderizar)
   reportados a la bandeja del CdM por estar fuera de mi dominio ejecutarlos. El reparto
   2 cortos + 3 largos sigue sin poder verificarse (van 2 corridas: la API no expone
   `asset_feed_spec`). Nueva entrada en `tendencias-vivas.md`. Respaldo previo:

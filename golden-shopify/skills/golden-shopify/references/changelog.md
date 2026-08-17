@@ -801,8 +801,8 @@ faltaba eran las **secciones de persuasión narrativa** y la **estrategia de cop
 ## G4.1b — 2026-07-29 — Media: tema+descripción, poster obligatorio, GIF→MP4 (lección chat TOPPIK, parche 23,5→3,3 MB)
 ## G4.1c — 2026-07-29 — REGLA #3 con matiz PAUTA: display propio se queda; porcentajes-estudio, testimonios en imagen y atribución a terceros jamás (gaceta 4f p.3).
 
-## G4.2 — 2026-08-07 — Límites duros de Shopify + receta Horizon/Pitch + fallback del CTA (fuente: chat INSULINUM/Nuut)
-Paquete de hallazgos horneado por el Centro de Mando desde la entrada del chat Insulinum en la bandeja
+## G4.2 — 2026-08-07 — Límites duros de Shopify + receta Horizon/Pitch + fallback del CTA (fuente: chat otro producto/otro producto)
+Paquete de hallazgos horneado por el Centro de Mando desde la entrada del chat otro producto en la bandeja
 (3 `FileSaveError` consecutivos en tienda real descubrieron límites que no están en la documentación oficial).
 - **TOPE 50 KB por setting `custom_liquid` (aplica a TODOS los temas):** el guardado del template revienta
   con *"Setting 'custom_liquid' is invalid. ['Liquid file size cannot exceed 50 kilobytes.']"*. Entró como
@@ -823,7 +823,7 @@ Paquete de hallazgos horneado por el Centro de Mando desde la entrada del chat I
   el orden de 17 secciones vs las 24 del embudo canónico G4.0 — pendiente de sesión dedicada. Hasta
   regenerarlo, el ORDEN canónico es la tabla del SKILL.md, no el base.
 
-## G4.3 — 2026-08-07 — Componente "LO QUE ESTE PRODUCTO NO HACE" (cosecha del chat ESTUDIO 360 DENTAL CAVITY HEALING, Chile)
+## G4.3 — 2026-08-07 — Componente "LO QUE ESTE PRODUCTO NO HACE" (cosecha del chat un estudio de producto, Chile)
 Repartido por el Centro de Mando desde la bandeja (orden de FER: "sin omitir detalle"). Invención del
 estudio dental y probablemente lo más valioso que salió de él:
 - **Componente estándar para verticales de SALUD**, descrito en el SKILL.md junto a `sec-disclaimer` /

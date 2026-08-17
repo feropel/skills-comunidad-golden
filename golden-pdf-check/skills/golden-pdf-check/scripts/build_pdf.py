@@ -586,7 +586,7 @@ def main():
     html_str, cards = build_html(meta, body, with_index=not args.no_index,
                                  logo_path=args.logo, theme_css=args.css)
 
-    # v5.8 · AVISO DE LÍNEAS LARGAS EN TARJETAS (chat dental Chile, 2026-08-07):
+    # v5.8 · AVISO DE LÍNEAS LARGAS EN TARJETAS (un chat de producto, 2026-08-07):
     # dentro de una tarjeta monoespaciada, una línea de más de ~76 caracteres se
     # ENVUELVE al renderizar y la compuerta verbatim la reporta como
     # "espaciado/orden alterado" (pasó con dos prompts de imagen; se resolvió

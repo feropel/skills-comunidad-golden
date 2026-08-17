@@ -1,0 +1,47 @@
+{% comment %} === COMPONENTE: Pirámide olfativa 3D (perfumes) === {% endcomment %}
+{% comment %} Extraído de Producto Demo.json. Tilt 3D escalonado en desktop. Alternativa perfume a sec-como-actua. {% endcomment %}
+
+{%- comment -%}
+═══════════════════════════════════════════════════
+  📝 EDITAR AQUI — PIRAMIDE OLFATIVA (3D escalonada + copy emocional)
+═══════════════════════════════════════════════════
+{%- endcomment -%}
+
+{% assign TITLE    = "El Viaje de tu Fragancia" %}
+{% assign SUBTITLE = "Tres capítulos de una misma historia" %}
+{% assign LEVEL1_LABEL = "El Primer Encuentro" %}
+{% assign LEVEL1_NOTES = "Almendra · Café · Bergamota" %}
+{% assign LEVEL1_ICON  = "🍃" %}
+{% assign LEVEL2_LABEL = "Tu Esencia" %}
+{% assign LEVEL2_NOTES = "Tuberosa · Jazmín · Rosa" %}
+{% assign LEVEL2_ICON  = "🌸" %}
+{% assign LEVEL3_LABEL = "La Huella que Queda" %}
+{% assign LEVEL3_NOTES = "Haba Tonka · Cacao · Vainilla" %}
+{% assign LEVEL3_ICON  = "🤎" %}
+{% assign ACCENT_COLOR = "#0F6F5C" %}
+
+{%- comment -%}
+═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══
+{%- endcomment -%}
+
+<style>
+.pe-pyramid{max-width:560px;margin:8px auto;box-sizing:border-box;padding:0 14px;}
+.pe-pyramid__title{text-align:center;font-size:23px;font-weight:800;color:#1a1a1a;letter-spacing:.4px;margin:0 0 4px;font-family:'Playfair Display',Georgia,serif;}
+.pe-pyramid__sub{text-align:center;font-size:14px;color:#6b6b6b;margin:0 0 22px;font-style:italic;}
+.pe-pyramid__grid{display:flex;flex-direction:column;gap:12px;perspective:1200px;perspective-origin:center top;}
+.pe-note{display:flex;align-items:center;gap:14px;background:rgba(238,246,243,.65);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border:1px solid rgba(15,111,92,.2);border-left:5px solid {{ ACCENT_COLOR }};border-radius:14px;padding:14px 16px;box-shadow:0 8px 24px rgba(15,111,92,.1),inset 0 1px 0 rgba(255,255,255,.5);}
+.pe-note__icon{flex:0 0 46px;width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,{{ ACCENT_COLOR }},#0B5345);display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(15,111,92,.4),inset 0 1px 0 rgba(255,255,255,.25);}
+.pe-note__body{text-align:left;}
+.pe-note__label{font-size:13px;font-weight:800;color:{{ ACCENT_COLOR }};text-transform:uppercase;letter-spacing:.6px;margin:0 0 3px;}
+.pe-note__items{font-size:15px;font-weight:600;color:#1a1a1a;margin:0;}
+@media(min-width:990px){.pe-pyramid{max-width:960px;}.pe-pyramid__title{font-size:30px;}.pe-pyramid__grid{flex-direction:row;align-items:stretch;gap:20px;transform-style:preserve-3d;}.pe-pyramid__grid .pe-note{flex:1;flex-direction:column;text-align:center;gap:14px;border-left:none;border-top:5px solid {{ ACCENT_COLOR }};padding:28px 18px;transform-style:preserve-3d;}.pe-pyramid__grid .pe-note:nth-child(1){transform:rotateY(12deg) translateZ(-30px) translateY(20px);transform-origin:right center;}.pe-pyramid__grid .pe-note:nth-child(2){transform:translateZ(20px);z-index:3;box-shadow:0 16px 40px rgba(15,111,92,.18),inset 0 1px 0 rgba(255,255,255,.6);}.pe-pyramid__grid .pe-note:nth-child(3){transform:rotateY(-12deg) translateZ(-30px) translateY(20px);transform-origin:left center;}.pe-pyramid__grid .pe-note:hover{transform:translateZ(40px) translateY(-8px) rotateY(0);z-index:5;}.pe-pyramid__grid .pe-note__body{text-align:center;}.pe-pyramid__grid .pe-note__icon{width:54px;height:54px;flex:0 0 54px;font-size:26px;}}
+</style>
+<div class="pe-pyramid">
+  <p class="pe-pyramid__title">{{ TITLE }}</p>
+  <p class="pe-pyramid__sub">{{ SUBTITLE }}</p>
+  <div class="pe-pyramid__grid">
+    <div class="pe-note"><div class="pe-note__icon">{{ LEVEL1_ICON }}</div><div class="pe-note__body"><p class="pe-note__label">{{ LEVEL1_LABEL }}</p><p class="pe-note__items">{{ LEVEL1_NOTES }}</p></div></div>
+    <div class="pe-note"><div class="pe-note__icon">{{ LEVEL2_ICON }}</div><div class="pe-note__body"><p class="pe-note__label">{{ LEVEL2_LABEL }}</p><p class="pe-note__items">{{ LEVEL2_NOTES }}</p></div></div>
+    <div class="pe-note"><div class="pe-note__icon">{{ LEVEL3_ICON }}</div><div class="pe-note__body"><p class="pe-note__label">{{ LEVEL3_LABEL }}</p><p class="pe-note__items">{{ LEVEL3_NOTES }}</p></div></div>
+  </div>
+</div>

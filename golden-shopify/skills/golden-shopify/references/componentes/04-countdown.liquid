@@ -1,0 +1,31 @@
+{% comment %} === COMPONENTE: Countdown (oculto por defecto) === {% endcomment %}
+{% comment %} Extraído de un product.json real y probado. Pegar como bloque custom_liquid. {% endcomment %}
+
+{% comment %}
+========================
+TEXTOS EDITABLES
+========================
+{% endcomment %}
+{% assign LABEL_TEXT = "⏰ La oferta termina en" %}
+{% assign DURATION_MINUTES = 10 %}
+
+{% comment %}
+========================
+COLORES
+========================
+{% endcomment %}
+{% assign ACCENT_COLOR = "var(--brand-primary)" %}
+{% assign DARK_ACCENT = "var(--brand-dark)" %}
+{% assign BG_COLOR = "var(--brand-light)" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.gfs-cd{display:flex;align-items:center;justify-content:center;gap:8px;max-width:520px;margin:10px auto 0;padding:9px 14px;background:{{ BG_COLOR }};border:1px dashed {{ ACCENT_COLOR }};border-radius:10px;box-sizing:border-box;}
+.gfs-cd__label{font-size:14px;font-weight:600;color:#1a1a1a;}
+.gfs-cd__time{display:inline-block;min-width:54px;text-align:center;font-size:18px;font-weight:800;color:#fff;background:linear-gradient(135deg,{{ ACCENT_COLOR }},{{ DARK_ACCENT }});padding:4px 12px;border-radius:6px;letter-spacing:.5px;box-shadow:0 3px 10px rgba(var(--brand-primary-rgb),.4),inset 0 1px 0 rgba(255,255,255,.22);animation:gfsCdPulse 1.6s ease-in-out infinite;font-variant-numeric:tabular-nums;}
+@keyframes gfsCdPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.06)}}
+</style>
+<div class="gfs-cd"><span class="gfs-cd__label">{{ LABEL_TEXT }}</span><span class="gfs-cd__time" id="gfs-cd-time">{{ DURATION_MINUTES }}:00</span></div>
+<script>
+(function(){var D={{ DURATION_MINUTES }}*60*1000;var K='gfs_cd_end';var el=document.getElementById('gfs-cd-time');if(!el)return;var end=parseInt(localStorage.getItem(K)||'0',10);if(!end||end<Date.now()){end=Date.now()+D;localStorage.setItem(K,end);}function t(){var d=end-Date.now();if(d<=0){end=Date.now()+D;localStorage.setItem(K,end);d=D;}var m=Math.floor(d/60000);var s=Math.floor((d%60000)/1000);el.textContent=(m<10?'0':'')+m+':'+(s<10?'0':'')+s;}t();setInterval(t,1000);})();
+</script>

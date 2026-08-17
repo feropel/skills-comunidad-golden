@@ -1,0 +1,17 @@
+{
+  "name": "golden-video-teardown",
+  "version": "1.0.0",
+  "description": "Desarma un anuncio segundo por segundo: texto en pantalla, locución y ritmo.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "video",
+    "análisis",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-video-teardown/"
+  ]
+}

@@ -1,0 +1,39 @@
+{% comment %} === COMPONENTE: FONDO CINEMATOGRÁFICO (parallax ambiental) === {% endcomment %}
+{% comment %} Fusión "GOLDEN FULL" → gfs- tokenizado (G3.2). Capa de fondo fija con orbes de color de marca + {% endcomment %}
+{% comment %} textura de puntos que se mueven suave con scroll y mouse. Da sensación premium a TODA la página. {% endcomment %}
+{% comment %} Va de los primeros en el order (es position:fixed, no afecta layout). Apagable con ENABLE=false. {% endcomment %}
+{% comment %} Rinde bien: solo anima transform/opacity; se DESACTIVA en móvil y con prefers-reduced-motion. {% endcomment %}
+
+{% comment %} 📝 EDITAR AQUI {% endcomment %}
+{% assign ENABLE = true %}
+{% assign DOT_OPACITY = 0.05 %}
+{% assign DEPTH = 0.6 %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+{% if ENABLE %}
+<style>
+#gfs-bg{position:fixed;inset:0;z-index:-2;pointer-events:none;background:#fff;overflow:hidden;}
+#gfs-bg::before{content:"";position:absolute;inset:-5%;background-image:radial-gradient(rgba(var(--brand-dark-rgb),{{ DOT_OPACITY }}) 1px,transparent 1px);background-size:26px 26px;transform:translate3d(0,calc(var(--gfs-sy,0) * -0.018px),0);}
+#gfs-bg::after{content:"";position:absolute;inset:0;background:radial-gradient(60vmax 60vmax at 50% -10%,rgba(var(--brand-bright-rgb),.06),transparent 60%);}
+.gfs-depth{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden;}
+.gfs-orb{position:absolute;border-radius:50%;filter:blur(44px);will-change:transform;}
+.gfs-orb--a{width:48vmax;height:48vmax;left:-12vmax;top:-10vmax;background:radial-gradient(closest-side,rgba(var(--brand-primary-rgb),.16),transparent 70%);transform:translate3d(calc(var(--gfs-mx,0) * 20px),calc(var(--gfs-sy,0) * -0.09px * {{ DEPTH }} + var(--gfs-my,0) * 20px),0);}
+.gfs-orb--b{width:40vmax;height:40vmax;right:-12vmax;top:6vmax;background:radial-gradient(closest-side,rgba(var(--brand-bright-rgb),.14),transparent 70%);transform:translate3d(calc(var(--gfs-mx,0) * -28px),calc(var(--gfs-sy,0) * -0.17px * {{ DEPTH }} + var(--gfs-my,0) * -16px),0);}
+.gfs-orb--c{width:54vmax;height:54vmax;right:-16vmax;bottom:-18vmax;background:radial-gradient(closest-side,rgba(var(--brand-primary-rgb),.12),transparent 70%);transform:translate3d(calc(var(--gfs-mx,0) * 16px),calc(var(--gfs-sy,0) * 0.07px * {{ DEPTH }} + var(--gfs-my,0) * 12px),0);}
+.gfs-orb--d{width:34vmax;height:34vmax;left:8vmax;bottom:-6vmax;background:radial-gradient(closest-side,rgba(var(--brand-bright-rgb),.10),transparent 70%);transform:translate3d(calc(var(--gfs-mx,0) * -14px),calc(var(--gfs-sy,0) * -0.05px * {{ DEPTH }} + var(--gfs-my,0) * -10px),0);}
+@media(prefers-reduced-motion:reduce){.gfs-orb,#gfs-bg::before{transform:none !important;}}
+@media(max-width:749px){.gfs-depth{display:none !important;}}
+</style>
+<div id="gfs-bg" aria-hidden="true"></div>
+<div class="gfs-depth" aria-hidden="true"><div class="gfs-orb gfs-orb--a"></div><div class="gfs-orb gfs-orb--b"></div><div class="gfs-orb gfs-orb--c"></div><div class="gfs-orb gfs-orb--d"></div></div>
+<script>
+(function(){
+  var root=document.documentElement,sy=0,mx=0,my=0,tick=false;
+  function apply(){root.style.setProperty('--gfs-sy',sy);root.style.setProperty('--gfs-mx',mx.toFixed(3));root.style.setProperty('--gfs-my',my.toFixed(3));tick=false;}
+  function req(){if(!tick){tick=true;requestAnimationFrame(apply);}}
+  window.addEventListener('scroll',function(){sy=window.scrollY||window.pageYOffset||0;req();},{passive:true});
+  if(window.matchMedia&&window.matchMedia('(pointer:fine)').matches){window.addEventListener('pointermove',function(e){mx=(e.clientX/window.innerWidth-0.5);my=(e.clientY/window.innerHeight-0.5);req();},{passive:true});}
+  apply();
+})();
+</script>
+{% endif %}

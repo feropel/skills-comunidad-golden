@@ -1,0 +1,18 @@
+{
+  "name": "golden-dropi-analisis",
+  "version": "1.0.0",
+  "description": "Convierte tus informes de Dropi en dos maestros: logística y base de clientes.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "dropi",
+    "entregas",
+    "clientes",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-dropi-analisis/"
+  ]
+}

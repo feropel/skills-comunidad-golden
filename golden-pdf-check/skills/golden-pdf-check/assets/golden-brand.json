@@ -1,0 +1,49 @@
+{
+  "brand": "Comunidad Golden",
+  "owner": "Golden Group",
+  "source_of_truth": "PROYECTOS/GASTO-GOLDEN/app/globals.css (paleta interna pulida)",
+  "note": "Estos son los tokens horneados en la skill. Para cambiar la identidad (p.ej. usar el naranja del logo comunidad), edita este archivo y assets/golden-print.css.",
+  "print_palette_light": {
+    "page_bg": "#faf9f5",
+    "surface": "#ffffff",
+    "surface_soft": "#f6f5f1",
+    "ink": "#17140d",
+    "muted": "#6b7280",
+    "line": "#e7e4dc",
+    "gold": "#b8912a",
+    "gold_strong": "#d4af37",
+    "gold_soft": "#e7c65a",
+    "gold_tint_bg": "#fbf5e2",
+    "gold_line": "#ecd79a",
+    "on_gold": "#1a1508"
+  },
+  "accent_status": {
+    "green": "#15a34a",
+    "red": "#dc2626",
+    "blue": "#2563eb"
+  },
+  "gold_gradient": "linear-gradient(145deg, #f4d67a, #d4af37 55%, #9a7b1e)",
+  "typography": {
+    "family": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+    "mono": "\"SF Mono\", \"JetBrains Mono\", \"Fira Code\", ui-monospace, Menlo, Consolas, monospace",
+    "kicker": { "transform": "uppercase", "letter_spacing": "0.14em", "color": "gold", "weight": 600 }
+  },
+  "geometry": {
+    "page": "A4",
+    "margin_mm": 15,
+    "footer_reserve_mm": 16,
+    "radius_px": 16,
+    "card_max_mm": 250
+  },
+  "allowed_hex_for_audit": [
+    "#faf9f5", "#ffffff", "#f6f5f1", "#17140d", "#6b7280", "#e7e4dc",
+    "#b8912a", "#d4af37", "#e7c65a", "#fbf5e2", "#ecd79a", "#1a1508",
+    "#f4d67a", "#9a7b1e", "#15a34a", "#dc2626", "#2563eb",
+    "#000000", "#333333", "#111111"
+  ],
+  "logo": {
+    "primary": "assets/logo-golden.svg",
+    "primary_note": "Emblema oficial Golden Group Community (PNG incrustado en SVG).",
+    "community_orange_original": "PROYECTOS/SKOOL/logo-comunidad-golden.svg"
+  }
+}

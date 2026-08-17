@@ -1,0 +1,57 @@
+{% comment %} === COMPONENTE: CTA SUELTO reutilizable (G4.0) === {% endcomment %}
+{% comment %}
+  El botón verde que se repite a lo largo del embudo (puertas 2, 3 y 4). Absorbido de una
+  página real. Reemplaza al `sec-cta-mid.liquid` anterior, que solo servía para la mitad.
+
+  CLAVES:
+  - Dispara `#custom-releasit-btn` (el botón principal), NO el de Releasit directo: así no
+    pide doble clic ni abre dos veces el formulario.
+  - **Fallback:** si el botón principal no existe (bloque apagado, otra plantilla), hace
+    scroll suave hasta el precio en vez de no hacer nada. Un CTA que no responde es peor
+    que no tenerlo.
+  - El listener es UNO solo, delegado en document, para todos los CTA de la página.
+  - El verde va HARDCODEADO: no puede depender de que un token cargue primero.
+  - Nunca se oculta por el revelado (ver `efx-reveal-seguro.liquid`).
+{% endcomment %}
+
+{% assign BTN_TEXTO = "PEDIR AHORA 🔥" %}
+{% assign SUBTEXTO  = "Envío gratis · Pagas al recibir" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<div class="gfs-cta-wrap">
+  <button class="gfs-cta" type="button" data-cod><span>{{ BTN_TEXTO }}</span></button>
+  {% if SUBTEXTO != blank %}<span class="gfs-cta__s">{{ SUBTEXTO }}</span>{% endif %}
+</div>
+<style>
+.gfs-cta-wrap{max-width:560px;margin:6px auto 2px;padding:0 14px;box-sizing:border-box;text-align:center;}
+.gfs-cta{display:block;width:100%;border:0;cursor:pointer;border-radius:18px;padding:17px 18px;
+  font-family:var(--gfs-sans,inherit);font-weight:900;font-size:19.5px;color:#fff;letter-spacing:.2px;
+  background:linear-gradient(180deg,#1D9E06,#157A04);box-shadow:0 14px 30px rgba(29,158,6,.36);
+  position:relative;overflow:hidden;
+  transition:transform .18s cubic-bezier(.16,1,.3,1),box-shadow .18s;}
+.gfs-cta:hover{transform:translateY(-3px);box-shadow:0 20px 38px rgba(29,158,6,.44);}
+.gfs-cta:active{transform:scale(.975);}
+.gfs-cta span{position:relative;z-index:2;}
+.gfs-cta::after{content:"";position:absolute;top:0;left:-60%;width:40%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);
+  animation:gfsCtaSh 3.4s infinite;pointer-events:none;}
+@keyframes gfsCtaSh{0%{left:-60%}55%{left:130%}100%{left:130%}}
+.gfs-cta__s{display:block;margin-top:11px;font-size:13.5px;color:var(--brand-dark);font-weight:600;}
+@media(prefers-reduced-motion:reduce){.gfs-cta::after{animation:none;}}
+</style>
+<script>
+(function(){
+  if(window.__gfsCta)return;window.__gfsCta=1;
+  document.addEventListener('click',function(e){
+    var b=e.target.closest&&e.target.closest('.gfs-cta');
+    if(!b)return;
+    e.preventDefault();
+    var main=document.getElementById('custom-releasit-btn');
+    if(main){main.click();return;}
+    if(window.gfsFireCOD){window.gfsFireCOD();return;}
+    /* Fallback: sube al precio en vez de quedarse mudo */
+    var t=document.querySelector('.custom-price-section, .gfs-price, #custom-releasit-btn')||document.body;
+    t.scrollIntoView({behavior:'smooth',block:'center'});
+  });
+})();
+</script>

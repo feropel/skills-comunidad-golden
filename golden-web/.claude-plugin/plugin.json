@@ -1,0 +1,17 @@
+{
+  "name": "golden-web",
+  "version": "1.0.0",
+  "description": "Sitios y landings de alta conversión por perfil de cliente.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "web",
+    "landing",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-web/"
+  ]
+}

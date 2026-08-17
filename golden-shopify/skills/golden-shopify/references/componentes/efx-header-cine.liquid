@@ -1,0 +1,74 @@
+{% comment %} === COMPONENTE: Efecto header cinematográfico === {% endcomment %}
+{% comment %} Animación dramática del header (partículas+entrada). Independiente y apagable. {% endcomment %}
+{% comment %} BLOQUE INDEPENDIENTE: se apaga/prende solo desde el editor de Shopify (ojo del bloque). {% endcomment %}
+
+{% comment %}
+═══════════════════════════════════════════════════
+  📝 EDITAR AQUI — HEADER CINEMATOGRAFICO HOLLYWOOD (entrada dramatica)
+  Si NO te gusta, BORRA desde este comentario hasta el cierre de etiqueta
+  style de mas abajo (lo marca "FIN HEADER CINEMATOGRAFICO").
+═══════════════════════════════════════════════════
+{% endcomment %}
+{% assign HDR_ACCENT = "var(--brand-primary)" %}
+{% assign HDR_ACCENT_LIGHT = "var(--brand-bright)" %}
+{% assign HDR_GLOW_INTENSITY = "30px" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+/* ── HEADER WRAPPER: posicionamiento para pseudo-elementos ── */
+.shopify-section-group-header-group,
+header.shopify-section-header,
+.shopify-section-header{position:relative !important;overflow:visible !important;z-index:50;}
+
+/* ── PARTÍCULAS ROJAS FLOTANTES en el header ── */
+.shopify-section-group-header-group::before{content:"";position:absolute;inset:0;pointer-events:none;z-index:1;background:radial-gradient(2px 2px at 8% 30%,rgba(var(--brand-primary-rgb),.85),transparent),radial-gradient(1.5px 1.5px at 18% 65%,rgba(255,90,80,.7),transparent),radial-gradient(2px 2px at 32% 40%,rgba(var(--brand-primary-rgb),.75),transparent),radial-gradient(1.5px 1.5px at 45% 75%,rgba(255,90,80,.6),transparent),radial-gradient(2px 2px at 58% 35%,rgba(var(--brand-primary-rgb),.8),transparent),radial-gradient(1.5px 1.5px at 72% 60%,rgba(var(--brand-primary-rgb),.7),transparent),radial-gradient(2px 2px at 86% 40%,rgba(255,90,80,.75),transparent),radial-gradient(1.5px 1.5px at 95% 70%,rgba(var(--brand-primary-rgb),.6),transparent);animation:gfsHdrParticles 4s ease-in-out infinite;}
+
+/* ── LÍNEA ROJA BRILLANTE que crece desde el centro ── */
+.shopify-section-group-header-group::after{content:"";position:absolute;left:50%;bottom:0;width:0;height:3px;transform:translateX(-50%);background:linear-gradient(90deg,transparent 0%,{{ HDR_ACCENT }} 25%,{{ HDR_ACCENT_LIGHT }} 50%,{{ HDR_ACCENT }} 75%,transparent 100%);animation:gfsHdrLineGrow 2s .4s cubic-bezier(.16,1,.3,1) forwards;box-shadow:0 0 25px {{ HDR_ACCENT }},0 0 50px rgba(var(--brand-primary-rgb),.5);z-index:99;}
+
+/* ── LOGO: entrada zoom + blur + glow rojo ── */
+.header__heading,.header__heading-link,.header__logo{position:relative !important;z-index:10 !important;animation:gfsHdrLogoEntrance 1.4s cubic-bezier(.16,1,.3,1) backwards !important;}
+.header__heading img,.header__heading-link img,.header__logo img,.header__heading-logo{transition:transform .4s ease !important;}
+.header__heading:hover img,.header__heading-link:hover img{transform:scale(1.04);}
+
+/* ── MENÚ + ICONOS: fade-in escalonado ── */
+.header__menu,nav.header__inline-menu,.header__icons{animation:gfsHdrFadeIn 1s 1s cubic-bezier(.16,1,.3,1) backwards !important;position:relative;z-index:5;}
+.header__icon:nth-child(1){animation:gfsHdrFadeIn 1s 1.0s cubic-bezier(.16,1,.3,1) backwards !important;}
+.header__icon:nth-child(2){animation:gfsHdrFadeIn 1s 1.15s cubic-bezier(.16,1,.3,1) backwards !important;}
+.header__icon:nth-child(3){animation:gfsHdrFadeIn 1s 1.3s cubic-bezier(.16,1,.3,1) backwards !important;}
+.header__menu-item{animation:gfsHdrFadeIn 1s 1.05s cubic-bezier(.16,1,.3,1) backwards !important;}
+.header__menu-item:nth-child(2){animation-delay:1.15s !important;}
+.header__menu-item:nth-child(3){animation-delay:1.25s !important;}
+
+/* ── KEYFRAMES ── */
+@keyframes gfsHdrLogoEntrance{
+  0%{opacity:0;transform:scale(.7) translateY(-20px);filter:blur(8px);}
+  60%{opacity:1;transform:scale(1.05);filter:blur(0);}
+  100%{opacity:1;transform:scale(1);filter:none;}
+}
+@keyframes gfsHdrLineGrow{
+  0%{width:0;opacity:0;}
+  35%{width:30%;opacity:1;}
+  100%{width:88%;opacity:1;}
+}
+@keyframes gfsHdrFadeIn{
+  0%{opacity:0;transform:translateY(-12px);filter:blur(6px);}
+  100%{opacity:1;transform:translateY(0);filter:blur(0);}
+}
+@keyframes gfsHdrParticles{
+  0%,100%{opacity:.5;transform:translateY(0);}
+  50%{opacity:.9;transform:translateY(-4px);}
+}
+
+/* ── Mobile: ajustes para que se vea bien también ── */
+@media(max-width:749px){
+  .shopify-section-group-header-group::after{animation-duration:1.6s;height:2px;}
+  @keyframes gfsHdrLogoEntrance{
+    0%{opacity:0;transform:scale(.6) translateY(-20px);filter:blur(10px);}
+    40%{opacity:1;transform:scale(1.1);filter:blur(0) drop-shadow(0 0 40px rgba(var(--brand-primary-rgb),1));}
+    100%{opacity:1;transform:scale(1);filter:drop-shadow(0 0 12px rgba(var(--brand-primary-rgb),.5));}
+  }
+}
+</style>
+{% comment %} ═══ ↑ FIN HEADER CINEMATOGRÁFICO ↑ ═══ {% endcomment %}
+

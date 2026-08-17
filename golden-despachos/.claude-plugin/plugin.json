@@ -1,0 +1,19 @@
+{
+  "name": "golden-despachos",
+  "version": "1.0.0",
+  "description": "Califica cada pedido ANTES de despachar: duplicados, dirección, huella del cliente y la mejor transportadora por efectividad real.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "dropi",
+    "despachos",
+    "transportadora",
+    "cod",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-despachos/"
+  ]
+}

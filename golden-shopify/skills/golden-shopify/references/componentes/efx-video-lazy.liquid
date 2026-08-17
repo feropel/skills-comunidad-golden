@@ -1,0 +1,66 @@
+{% comment %} === COMPONENTE: VIDEO LAZY con poster (G4.0) === {% endcomment %}
+{% comment %}
+  Absorbido de una página real. Es la forma correcta de meter demostración en video sin
+  destruir la velocidad de carga.
+
+  CÓMO FUNCIONA: el <video> nace SIN src (va en `data-src`) y con `preload="none"`. Solo
+  cuando se acerca al viewport se le asigna el src y arranca. Mientras tanto se ve el
+  poster en WebP, que pesa nada.
+
+  POR QUÉ IMPORTA: un MP4 con src directo se empieza a descargar aunque esté al final de
+  la página. En móvil con datos eso es la diferencia entre cargar en 2 s o en 9 s.
+
+  REGLAS:
+  - SIEMPRE `muted loop playsinline` — sin `muted` + `playsinline` iOS no reproduce solo.
+  - SIEMPRE `width`/`height` o `aspect-ratio` — si no, la página salta cuando carga (CLS).
+  - El poster va en WebP y pesa menos de 80 KB.
+  - Si el video es el que VENDE (demostración del producto), va en la mitad alta del embudo.
+{% endcomment %}
+
+{% assign VIDEO_URL  = "" %}
+{% assign POSTER_URL = "" %}
+{% assign RATIO      = "540/304" %}
+{% assign FORMA      = "h" %}
+{% assign CAPTION    = "" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+{% if VIDEO_URL != blank %}
+<div class="gfs-vid gfs-media">
+  <video class="gfs-vid__v gfs-vid__v--{{ FORMA }}"
+         style="aspect-ratio:{{ RATIO }}"
+         data-src="{{ VIDEO_URL }}"
+         {% if POSTER_URL != blank %}poster="{{ POSTER_URL }}?width=550"{% endif %}
+         muted loop playsinline preload="none"></video>
+  {% if CAPTION != blank %}<p class="gfs-vid__cap">{{ CAPTION }}</p>{% endif %}
+</div>
+<style>
+.gfs-vid__v{display:block;width:100%;height:auto;object-fit:cover;border-radius:22px;
+  box-shadow:0 18px 38px rgba(var(--brand-primary-rgb),.14);
+  background:linear-gradient(160deg,var(--brand-light),#fff);}
+.gfs-vid__v--v{max-width:320px;margin:0 auto;}
+.gfs-vid__v--h{max-width:520px;margin:0 auto;}
+.gfs-vid__cap{text-align:center;font-size:14.5px;color:var(--brand-primary);font-weight:800;
+  margin:13px 0 4px;letter-spacing:.3px;}
+@media(min-width:900px){.gfs-vid__v--v,.gfs-vid__v--h{max-width:100%;}.gfs-vid__cap{text-align:left;}}
+</style>
+<script>
+(function(){
+  if(window.__gfsVid)return;window.__gfsVid=1;
+  if(!('IntersectionObserver' in window)){
+    document.querySelectorAll('video[data-src]').forEach(function(v){v.src=v.dataset.src;});
+    return;
+  }
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){
+      if(!e.isIntersecting)return;
+      var v=e.target;
+      if(v.dataset.src&&!v.src){v.src=v.dataset.src;v.play().catch(function(){});}
+      io.unobserve(v);
+    });
+  },{rootMargin:'400px 0px'});
+  function scan(){document.querySelectorAll('video[data-src]').forEach(function(v){io.observe(v);});}
+  scan();[400,1200,2500].forEach(function(t){setTimeout(scan,t);});
+  window.addEventListener('load',scan);
+})();
+</script>
+{% endif %}

@@ -1,0 +1,24 @@
+{% comment %} === COMPONENTE: Doble CTA a media página (dispara el mismo botón Releasit) === {% endcomment %}
+{% comment %} Absorbido del build tienda-demo / producto-demo (v1.25). Refuerza el impulso de compra: {% endcomment %}
+{% comment %} repite el CTA tras la escalera/descripción, además del CTA del hero y el sticky. {% endcomment %}
+{% comment %} ⚠️ Verde ganador (REGLA #2). SIN sombra dura "0 6px 0" (escalón) — solo sombra suave. {% endcomment %}
+
+{% comment %}
+========================
+TEXTO EDITABLE
+========================
+{% endcomment %}
+{% assign BTN_TEXT = "PEDIR AHORA 🔥" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.gfs-mid-cta{max-width:480px;margin:6px auto 4px;padding:0 16px;box-sizing:border-box;text-align:center;}
+#gfs-cta-mid{position:relative;overflow:hidden;display:inline-flex;align-items:center;justify-content:center;width:100%;min-height:56px;padding:14px 20px;border:1px solid #fff;border-radius:16px;background:linear-gradient(180deg,var(--cta),var(--cta-dark));color:#fff;font-size:17px;font-weight:800;letter-spacing:.5px;cursor:pointer;box-shadow:0 10px 24px rgba(var(--cta-rgb),.4);animation:gfsMidPulse 1.9s infinite;}
+#gfs-cta-mid span{position:relative;z-index:2;}
+#gfs-cta-mid::before{content:"";position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.4),transparent);animation:gfsMidShine 3.5s infinite;pointer-events:none;z-index:1;}
+#gfs-cta-mid:active{transform:scale(.98);}
+@keyframes gfsMidShine{0%{left:-100%;}40%{left:140%;}100%{left:140%;}}
+@keyframes gfsMidPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.03)}}
+</style>
+<div class="gfs-mid-cta"><button id="gfs-cta-mid" type="button"><span>{{ BTN_TEXT }}</span></button></div>
+<script>(function(){var b=document.getElementById('gfs-cta-mid');if(!b)return;b.addEventListener('click',function(){var m=document.getElementById('custom-releasit-btn');if(m)m.click();});})();</script>

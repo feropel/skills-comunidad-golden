@@ -1,0 +1,107 @@
+{% comment %} === COMPONENTE: Escalera de venta (storytelling alternado imagen + texto) === {% endcomment %}
+{% comment %} Absorbido de las páginas ganadoras de la tienda real (sérum facial, cubre-rayones, espejo LED). {% endcomment %}
+{% comment %} Es el MOTOR de persuasión que separa una landing que vende de una ficha de producto. {% endcomment %}
+{% comment %} Cada panel = 1 beneficio que resuelve 1 objeción (o 1 pregunta-dolor que re-cierra). {% endcomment %}
+{% comment %} Las imágenes alternan lado (izq/der) en desktop; en móvil van arriba del texto. {% endcomment %}
+{% comment %} Pega 3–9 paneles. NUNCA inventes resultados ni claims (REGLA #3): usa copy real. {% endcomment %}
+
+{% comment %}
+═══════════════════════════════════════════════════
+  📝 EDITAR AQUI — ESCALERA DE VENTA
+  · KICKER = pregunta-dolor o gancho corto (opcional, déjalo "" para ocultarlo)
+  · TITLE  = promesa/beneficio del panel
+  · TEXT   = desarrollo (1–2 frases, beneficio + objeción resuelta)
+  · IMG    = URL de la imagen o GIF demostrativo del panel
+  Para usar menos paneles, deja IMG en "" y ese panel no se renderiza.
+  ⚠️ Los textos de abajo son un EJEMPLO genérico (REGLA #3: nunca en blanco) — reemplázalos por
+     el copy real del producto, con las palabras del cliente. Las imágenes caen a la galería del
+     producto si dejas IMG en "" (fallback G2.4).
+═══════════════════════════════════════════════════
+{% endcomment %}
+{% assign SECTION_TITLE = "" %}{% comment %} título general opcional encima de la escalera {% endcomment %}
+
+{% assign P1_KICKER = "Te suena familiar?" %}
+{% assign P1_TITLE  = "El problema que cargas todos los días" %}
+{% assign P1_TEXT   = "Sabes que algo no está funcionando como debería, y cada día que pasa el problema sigue ahí — recordándote que necesitas una solución de verdad, no otro parche." %}
+{% assign P1_IMG    = "" %}
+
+{% assign P2_KICKER = "La solución" %}
+{% assign P2_TITLE  = "Resultado visible, sin complicaciones" %}
+{% assign P2_TEXT   = "Por eso lo hicimos simple: lo usas, ves el resultado y te olvidas del problema. Sin curva de aprendizaje ni pasos raros — funciona desde el primer día." %}
+{% assign P2_IMG    = "" %}
+
+{% assign P3_KICKER = "" %}
+{% assign P3_TITLE  = "Hecho para tu día a día" %}
+{% assign P3_TEXT   = "Encaja en tu rutina sin esfuerzo, así que de verdad lo vas a usar y no va a terminar guardado en un cajón. Esa es la diferencia entre comprar y resolver." %}
+{% assign P3_IMG    = "" %}
+
+{% assign P4_KICKER = "" %}
+{% assign P4_TITLE  = "" %}
+{% assign P4_TEXT   = "" %}
+{% assign P4_IMG    = "" %}
+
+{% assign P5_KICKER = "" %}
+{% assign P5_TITLE  = "" %}
+{% assign P5_TEXT   = "" %}
+{% assign P5_IMG    = "" %}
+
+{% assign P6_KICKER = "" %}
+{% assign P6_TITLE  = "" %}
+{% assign P6_TEXT   = "" %}
+{% assign P6_IMG    = "" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.gfs-lad{max-width:820px;margin:24px auto;box-sizing:border-box;padding:0 14px;}
+.gfs-lad__h{text-align:center;font-size:22px;font-weight:800;color:#1a1a1a;letter-spacing:.3px;margin:0 0 18px;text-transform:uppercase;}
+.gfs-lad__row{display:flex;flex-direction:column;align-items:stretch;gap:14px;background:linear-gradient(135deg,var(--brand-light) 0%,#fff 100%);border:1px solid rgba(var(--brand-primary-rgb),.14);border-radius:18px;overflow:hidden;box-shadow:0 10px 30px rgba(var(--brand-primary-rgb),.07);margin-bottom:16px;opacity:0;transform:translateY(22px);transition:opacity .6s ease,transform .6s cubic-bezier(.16,1,.3,1);}
+.gfs-lad__row.gfs-in{opacity:1;transform:none;}
+.gfs-lad__media{position:relative;width:100%;aspect-ratio:16/10;background:rgba(var(--brand-primary-rgb),.06);}
+.gfs-lad__media img{width:100%;height:100%;object-fit:cover;display:block;}
+.gfs-lad__body{padding:16px 18px 20px;}
+.gfs-lad__kicker{display:inline-block;font-size:12px;font-weight:800;letter-spacing:.5px;text-transform:uppercase;color:var(--brand-dark);background:rgba(var(--brand-primary-rgb),.12);padding:4px 10px;border-radius:20px;margin:0 0 8px;}
+.gfs-lad__t{font-size:18px;font-weight:800;color:#1a1a1a;line-height:1.25;margin:0 0 6px;}
+.gfs-lad__p{font-size:14px;color:#444;line-height:1.55;margin:0;}
+@media(min-width:750px){
+  .gfs-lad__row{flex-direction:row;align-items:center;gap:0;}
+  .gfs-lad__row:nth-child(even){flex-direction:row-reverse;}
+  .gfs-lad__media{flex:0 0 46%;aspect-ratio:4/3;align-self:stretch;}
+  .gfs-lad__body{flex:1 1 auto;padding:26px 30px;}
+  .gfs-lad__h{font-size:28px;margin-bottom:26px;}
+  .gfs-lad__t{font-size:22px;}
+  .gfs-lad__p{font-size:15.5px;}
+}
+.gfs-lad__row--noimg .gfs-lad__media{display:none;}
+.gfs-lad__row--noimg .gfs-lad__body{flex-basis:100%;text-align:center;}
+</style>
+<div class="gfs-lad">
+  {% if SECTION_TITLE != "" %}<p class="gfs-lad__h">{{ SECTION_TITLE }}</p>{% endif %}
+  {% assign K = P1_KICKER | append: '||' | append: P2_KICKER | append: '||' | append: P3_KICKER | append: '||' | append: P4_KICKER | append: '||' | append: P5_KICKER | append: '||' | append: P6_KICKER | split: '||' %}
+  {% assign T = P1_TITLE  | append: '||' | append: P2_TITLE  | append: '||' | append: P3_TITLE  | append: '||' | append: P4_TITLE  | append: '||' | append: P5_TITLE  | append: '||' | append: P6_TITLE  | split: '||' %}
+  {% assign X = P1_TEXT   | append: '||' | append: P2_TEXT   | append: '||' | append: P3_TEXT   | append: '||' | append: P4_TEXT   | append: '||' | append: P5_TEXT   | append: '||' | append: P6_TEXT   | split: '||' %}
+  {% assign M = P1_IMG    | append: '||' | append: P2_IMG    | append: '||' | append: P3_IMG    | append: '||' | append: P4_IMG    | append: '||' | append: P5_IMG    | append: '||' | append: P6_IMG    | split: '||' %}
+  {% for t in T %}
+    {% assign kick = K[forloop.index0] %}{% assign txt = X[forloop.index0] %}{% assign img = M[forloop.index0] %}
+    {% comment %} G3.3: NO se jalan imágenes de la galería/descripción del producto (muchas tiendas usan
+       INFOGRAFÍAS ahí y se duplicarían). Si un panel no trae P#_IMG propia, queda como tarjeta de solo
+       texto (limpia). Para poner imágenes, pon URLs NUEVAS (no las de la galería) en P#_IMG. {% endcomment %}
+    {% if t != blank or txt != blank %}
+      <div class="gfs-lad__row{% if img == blank %} gfs-lad__row--noimg{% endif %}">
+        <div class="gfs-lad__media">{% if img != blank %}<img src="{{ img }}" alt="{{ t | escape }}" loading="lazy" decoding="async">{% endif %}</div>
+        <div class="gfs-lad__body">
+          {% if kick != blank %}<span class="gfs-lad__kicker">{{ kick }}</span>{% endif %}
+          {% if t != blank %}<h3 class="gfs-lad__t">{{ t }}</h3>{% endif %}
+          {% if txt != blank %}<p class="gfs-lad__p">{{ txt }}</p>{% endif %}
+        </div>
+      </div>
+    {% endif %}
+  {% endfor %}
+</div>
+<script>
+(function(){
+  var rows=document.querySelectorAll('.gfs-lad__row');
+  if(!('IntersectionObserver' in window)){rows.forEach(function(r){r.classList.add('gfs-in');});return;}
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('gfs-in');io.unobserve(e.target);}});},{threshold:.15});
+  rows.forEach(function(r){io.observe(r);});
+})();
+</script>

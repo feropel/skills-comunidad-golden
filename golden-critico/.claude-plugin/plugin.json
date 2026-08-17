@@ -1,0 +1,17 @@
+{
+  "name": "golden-critico",
+  "version": "1.0.0",
+  "description": "El abogado del diablo: crítica honesta de tu plan, oferta o campaña.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "crítica",
+    "riesgos",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-critico/"
+  ]
+}

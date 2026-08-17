@@ -1,0 +1,48 @@
+{% comment %} === COMPONENTE: YA LO INTENTASTE (demoledor de objeciones) === {% endcomment %}
+{% comment %} Fusión "GOLDEN FULL" → gfs- tokenizado y accesible (G3.2). {% endcomment %}
+{% comment %} Reconoce las alternativas que el cliente ya probó (con una X roja animada sobre cada una) y remata {% endcomment %}
+{% comment %} con el porqué fallaron + un CTA. Poderoso en verticales donde "ya probé de todo". CTA opcional {% endcomment %}
+{% comment %} dispara Releasit vía data-cod (motor COD del config center). {% endcomment %}
+
+{% comment %} 📝 EDITAR AQUI {% endcomment %}
+{% assign TITLE = "Ya lo intentaste casi todo…" %}
+{% assign IT1 = "Cremas de farmacia" %}
+{% assign IT2 = "Remedios caseros" %}
+{% assign IT3 = "Procedimientos costosos" %}
+{% assign IT4 = "Y el problema vuelve" %}
+{% assign PUNCH1 = "Y aun así… sigue ahí." %}
+{% assign PUNCH2 = "El problema es que nunca lo atacaste desde la raíz." %}
+{% assign CTA_TEXT = "Quiero solucionarlo" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.gfs-try{max-width:600px;margin:0 auto;padding:0 20px;text-align:center;box-sizing:border-box;}
+.gfs-try__title{font-weight:800;font-size:24px;color:#1a1a1a;margin:0 0 22px;opacity:0;transform:translateY(16px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1);}
+.gfs-try.gfs-go .gfs-try__title{opacity:1;transform:none;}
+.gfs-try__list{display:inline-flex;flex-direction:column;gap:13px;max-width:90%;margin:0 auto 30px;text-align:left;}
+.gfs-try__item{display:flex;align-items:center;gap:13px;font-weight:700;font-size:17px;color:#555;opacity:0;transform:translateY(18px);transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1),color .4s ease;}
+.gfs-try__item.gfs-on{opacity:1;transform:none;color:#a0a0a0;}
+.gfs-try__x{flex:0 0 28px;width:28px;height:28px;border-radius:50%;background:#e0533f;color:#fff;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:900;transform:scale(0) rotate(-40deg);transition:transform .5s cubic-bezier(.34,1.56,.64,1);box-shadow:0 5px 14px rgba(224,83,63,.4);}
+.gfs-try__item.gfs-on .gfs-try__x{transform:scale(1) rotate(0);}
+.gfs-try__p1{font-weight:700;font-size:20px;color:#1a1a1a;margin:0 0 4px;opacity:0;transform:translateY(14px);transition:opacity .7s cubic-bezier(.16,1,.3,1),transform .7s cubic-bezier(.16,1,.3,1);}
+.gfs-try__p2{font-weight:900;font-size:25px;line-height:1.25;margin:0;color:var(--brand-dark,#8e1c19);opacity:0;transform:translateY(14px);transition:opacity .7s .12s cubic-bezier(.16,1,.3,1),transform .7s .12s cubic-bezier(.16,1,.3,1);}
+.gfs-try__btn{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;gap:6px;margin-top:22px;cursor:pointer;font-weight:800;font-size:14px;letter-spacing:.5px;text-transform:uppercase;color:#fff;background:linear-gradient(135deg,var(--cta,#1D9E06),var(--cta-dark,#157A04));padding:14px 28px;border-radius:999px;opacity:0;transform:translateY(10px);transition:opacity .8s .3s,transform .8s .3s,filter .2s;box-shadow:0 10px 24px -6px rgba(var(--cta-rgb,29,158,6),.5),inset 0 1px 0 rgba(255,255,255,.3);}
+.gfs-try__btn:hover{filter:brightness(1.04);}
+.gfs-try__btn:focus-visible{outline:3px solid var(--brand-dark,#8e1c19);outline-offset:3px;}
+.gfs-try.gfs-go .gfs-try__p1,.gfs-try.gfs-go .gfs-try__p2,.gfs-try.gfs-go .gfs-try__btn{opacity:1;transform:none;}
+@media(min-width:990px){.gfs-try{max-width:760px;}.gfs-try__title{font-size:30px;}.gfs-try__list{display:grid;grid-template-columns:1fr 1fr;gap:14px 28px;max-width:680px;}.gfs-try__item{font-size:18px;}.gfs-try__p2{font-size:31px;}}
+@media(prefers-reduced-motion:reduce){.gfs-try *{transition:none !important;opacity:1 !important;transform:none !important;}}
+</style>
+<div class="gfs-try">
+  <p class="gfs-try__title">{{ TITLE }}</p>
+  <div class="gfs-try__list">
+    <div class="gfs-try__item"><span class="gfs-try__x" aria-hidden="true">✕</span><span>{{ IT1 }}</span></div>
+    <div class="gfs-try__item"><span class="gfs-try__x" aria-hidden="true">✕</span><span>{{ IT2 }}</span></div>
+    <div class="gfs-try__item"><span class="gfs-try__x" aria-hidden="true">✕</span><span>{{ IT3 }}</span></div>
+    <div class="gfs-try__item"><span class="gfs-try__x" aria-hidden="true">✕</span><span>{{ IT4 }}</span></div>
+  </div>
+  <p class="gfs-try__p1">{{ PUNCH1 }}</p>
+  <p class="gfs-try__p2">{{ PUNCH2 }}</p>
+  {% if CTA_TEXT != blank %}<button class="gfs-try__btn" type="button" data-cod="1">{{ CTA_TEXT }} →</button>{% endif %}
+</div>
+<script>(function(){var s=document.querySelector('.gfs-try');if(!s)return;var items=s.querySelectorAll('.gfs-try__item');if(!('IntersectionObserver' in window)){s.classList.add('gfs-go');items.forEach(function(it){it.classList.add('gfs-on');});return;}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){s.classList.add('gfs-go');items.forEach(function(it,i){setTimeout(function(){it.classList.add('gfs-on');},300*(i+1));});io.unobserve(s);}});},{threshold:.3});io.observe(s);})();</script>

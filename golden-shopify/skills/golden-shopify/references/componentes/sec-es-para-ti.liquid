@@ -1,0 +1,56 @@
+{% comment %} === COMPONENTE: ES PARA TI? (calificación + seguridad/contraindicaciones) === {% endcomment %}
+{% comment %} Absorbido de la línea "GOLDEN FULL", reconstruido en gfs- tokenizado y accesible (G3.1). {% endcomment %}
+{% comment %} Doble función: (1) CALIFICA al cliente ("sí, esto es para ti") subiendo la intención de compra; {% endcomment %}
+{% comment %} (2) PROTEGE legalmente listando cuándo NO usarlo / consultar antes (embarazo, piel irritada, etc.). {% endcomment %}
+{% comment %} Recomendado (casi obligatorio) en vertical SALUD/estética. Los "consulta antes" son datos de {% endcomment %}
+{% comment %} seguridad REALES del producto — no se inventan (REGLA #3). {% endcomment %}
+
+{% comment %} 📝 EDITAR AQUI {% endcomment %}
+{% assign TITLE = "Es para ti?" %}
+{% assign YES_TITLE = "SÍ, si…" %}
+{% assign Y1 = "Buscas una solución cómoda para usar en casa." %}
+{% assign Y2 = "Ya probaste otras cosas y no funcionaron." %}
+{% assign Y3 = "Quieres una opción natural y sin dolor." %}
+{% assign Y4 = "Prefieres pagar al recibir, sin riesgo." %}
+{% assign NO_TITLE = "Mejor consulta antes si…" %}
+{% assign N1 = "Estás embarazada o en lactancia." %}
+{% assign N2 = "Tienes la piel muy sensible o irritada en la zona." %}
+{% assign N3 = "La lesión cambia de color, sangra o crece (ve a un profesional)." %}
+{% assign N4 = "Quieres tratar una zona no indicada (rostro, mucosas, lunares)." %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.gfs-fit{max-width:760px;margin:8px auto;padding:0 14px;box-sizing:border-box;}
+.gfs-fit__title{text-align:center;font-size:24px;font-weight:800;color:#1a1a1a;margin:0 0 18px;}
+.gfs-fit__cols{display:grid;grid-template-columns:1fr;gap:12px;}
+.gfs-fit__col{border-radius:16px;padding:18px 16px;box-sizing:border-box;}
+.gfs-fit__col--y{background:linear-gradient(180deg,var(--brand-light,#fff5f5),#fff);border:1px solid rgba(var(--brand-primary-rgb),.5);box-shadow:0 10px 26px rgba(var(--brand-primary-rgb),.12);}
+.gfs-fit__col--n{background:#f5f5f5;border:1px solid #e5e5e5;}
+.gfs-fit__h{font-weight:900;font-size:14.5px;margin:0 0 12px;}
+.gfs-fit__col--y .gfs-fit__h{color:var(--brand-dark,#8e1c19);}
+.gfs-fit__col--n .gfs-fit__h{color:#8a8a8a;}
+.gfs-fit__li{display:flex;align-items:flex-start;gap:8px;font-size:14px;line-height:1.45;margin-bottom:9px;}
+.gfs-fit__col--y .gfs-fit__li{color:#333;font-weight:700;}
+.gfs-fit__col--n .gfs-fit__li{color:#777;}
+.gfs-fit__ic{flex:0 0 auto;}
+@media(min-width:760px){.gfs-fit__cols{grid-template-columns:1fr 1fr;}}
+</style>
+<div class="gfs-fit">
+  <p class="gfs-fit__title">{{ TITLE }}</p>
+  <div class="gfs-fit__cols">
+    <div class="gfs-fit__col gfs-fit__col--y">
+      <p class="gfs-fit__h">{{ YES_TITLE }}</p>
+      <div class="gfs-fit__li"><span class="gfs-fit__ic" aria-hidden="true">✅</span><span>{{ Y1 }}</span></div>
+      <div class="gfs-fit__li"><span class="gfs-fit__ic" aria-hidden="true">✅</span><span>{{ Y2 }}</span></div>
+      <div class="gfs-fit__li"><span class="gfs-fit__ic" aria-hidden="true">✅</span><span>{{ Y3 }}</span></div>
+      <div class="gfs-fit__li"><span class="gfs-fit__ic" aria-hidden="true">✅</span><span>{{ Y4 }}</span></div>
+    </div>
+    <div class="gfs-fit__col gfs-fit__col--n">
+      <p class="gfs-fit__h">{{ NO_TITLE }}</p>
+      <div class="gfs-fit__li"><span class="gfs-fit__ic" aria-hidden="true">⚠️</span><span>{{ N1 }}</span></div>
+      <div class="gfs-fit__li"><span class="gfs-fit__ic" aria-hidden="true">⚠️</span><span>{{ N2 }}</span></div>
+      <div class="gfs-fit__li"><span class="gfs-fit__ic" aria-hidden="true">⚠️</span><span>{{ N3 }}</span></div>
+      <div class="gfs-fit__li"><span class="gfs-fit__ic" aria-hidden="true">⚠️</span><span>{{ N4 }}</span></div>
+    </div>
+  </div>
+</div>

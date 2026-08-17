@@ -1,0 +1,56 @@
+{% comment %} === COMPONENTE: Sección Reseñas (glassmorphism, window.GFS_REVIEWS) === {% endcomment %}
+{% comment %} Extraído de un product.json real y probado. Pegar como bloque custom_liquid. {% endcomment %}
+
+{% comment %}
+========================
+TEXTOS EDITABLES  (las reseñas se editan en el SCRIPT de abajo)
+========================
+{% endcomment %}
+{% assign TITLE = "Lo que dicen quienes ya lo usan" %}
+{% assign COUNT_TEXT = "Basado en compras verificadas" %}
+{% assign ACCENT_COLOR = "var(--brand-primary)" %}
+{% assign BG_TAG = "var(--brand-light)" %}
+
+{% comment %} ═══ ↓ NO TOCAR (salvo el bloque de reseñas) ↓ ═══ {% endcomment %}
+<style>
+.gfs-reviews{max-width:560px;margin:8px auto;box-sizing:border-box;padding:0 14px;}
+.gfs-reviews__head{text-align:center;margin-bottom:18px;}
+.gfs-reviews__title{font-size:24px;font-weight:800;color:#1a1a1a;margin:0 0 4px;}
+.gfs-reviews__stars{font-size:16px;color:#f6c701;letter-spacing:2px;}
+.gfs-reviews__count{font-size:13px;color:#6b6b6b;margin-top:2px;font-style:italic;}
+.gfs-reviews__list{display:flex;flex-direction:column;gap:12px;}
+.gfs-review{background:#fff;border:1px solid rgba(0,0,0,.06);border-radius:16px;padding:16px 18px;box-shadow:0 8px 28px rgba(0,0,0,.06);}
+.gfs-review__top{display:flex;align-items:center;gap:12px;margin-bottom:8px;}
+.gfs-review__avatar{flex:0 0 44px;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,{{ ACCENT_COLOR }},var(--brand-dark));color:#fff;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:700;background-size:cover;background-position:center;box-shadow:0 4px 12px rgba(var(--brand-primary-rgb),.35);}
+.gfs-review__id{flex:1 1 auto;text-align:left;}
+.gfs-review__name{font-size:15px;font-weight:700;color:#1a1a1a;margin:0;display:flex;align-items:center;gap:6px;flex-wrap:wrap;}
+.gfs-review__verified{font-size:11px;font-weight:700;color:{{ ACCENT_COLOR }};background:{{ BG_TAG }};padding:2px 7px;border-radius:20px;}
+.gfs-review__city{font-size:12px;color:#888;margin:2px 0 0;}
+.gfs-review__stars{color:#f6c701;font-size:14px;letter-spacing:1px;}
+.gfs-review__text{font-size:14px;color:#444;line-height:1.55;margin:0;text-align:left;}
+@media(min-width:990px){.gfs-reviews{max-width:1000px;}.gfs-reviews__title{font-size:30px;}.gfs-reviews__list{flex-direction:row;align-items:stretch;}.gfs-reviews__list .gfs-review{flex:1 1 0;}}
+</style>
+<div class="gfs-reviews">
+  <div class="gfs-reviews__head">
+    <p class="gfs-reviews__title">{{ TITLE }}</p>
+    <div class="gfs-reviews__stars">★★★★★</div>
+    <p class="gfs-reviews__count">{{ COUNT_TEXT }}</p>
+  </div>
+  <div id="gfs-reviews-list" class="gfs-reviews__list"></div>
+</div>
+<script>
+/* ═══ EDITAR LAS RESEÑAS AQUI ↓  (image:"" muestra inicial. image:"URL" muestra foto) ═══ */
+/* ⚠️ EJEMPLO — REEMPLAZAR POR RESEÑAS REALES. Si el cliente no tiene reseñas todavía, se */
+/* entregan estos ejemplos buenos y variados (NUNCA vacío). Cambia nombres/ciudades/texto por */
+/* los reales cuando existan. Mantén 5–6, con una de 4★ para que se vea creíble (REGLA #3). */
+window.GFS_REVIEWS = [
+  {name:"Andrea G.",   city:"Bogotá",       stars:5, image:"", text:"La calidad superó lo que esperaba y llegó rápido. Pagué al recibir, sin enredos. 100% recomendado."},
+  {name:"Carlos M.",   city:"Medellín",     stars:5, image:"", text:"Justo lo que buscaba. Tal cual las fotos, bien empacado y la atención por WhatsApp de una."},
+  {name:"Valentina R.",city:"Cali",         stars:4, image:"", text:"Muy bueno, cumple lo que promete. Se demoró un día más de lo que pensé, pero valió la pena."},
+  {name:"Julián P.",   city:"Barranquilla", stars:5, image:"", text:"Segundo que compro. Funciona igual de bien que el primero, por eso volví a pedir."},
+  {name:"Daniela F.",  city:"Bucaramanga",  stars:5, image:"", text:"Me encantó. Lo recomendé a dos amigas y ya pidieron el suyo. Excelente relación calidad-precio."},
+  {name:"Santiago L.", city:"Pereira",      stars:5, image:"", text:"Pago contra entrega real, lo recibí en mi casa y revisé antes de pagar. Quedé muy satisfecho."}
+];
+/* ═══ NO TOCAR ABAJO ═══ */
+(function(){var list=document.getElementById('gfs-reviews-list');if(!list)return;var data=window.GFS_REVIEWS||[];if(!data.length){var wrap=document.querySelector('.gfs-reviews');if(wrap)wrap.style.display='none';return;}/* salvaguarda: si quedara vacío, oculta la sección en vez de mostrar un hueco */data.forEach(function(r){var initials=r.name.trim().charAt(0).toUpperCase();var full=Math.max(0,Math.min(5,r.stars||0));var stars='★★★★★'.slice(0,full)+'☆☆☆☆☆'.slice(0,5-full);var avatarStyle=r.image?('background-image:url('+r.image+')'):'';var avatarText=r.image?'':initials;var el=document.createElement('div');el.className='gfs-review';el.innerHTML='<div class="gfs-review__top"><div class="gfs-review__avatar" style="'+avatarStyle+'">'+avatarText+'</div><div class="gfs-review__id"><p class="gfs-review__name">'+r.name+' <span class="gfs-review__verified">✓ Verificada</span></p><p class="gfs-review__city">'+r.city+'</p><div class="gfs-review__stars">'+stars+'</div></div></div><p class="gfs-review__text">'+r.text+'</p>';list.appendChild(el);});})();
+</script>

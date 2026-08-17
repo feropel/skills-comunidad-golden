@@ -1,0 +1,33 @@
+{% comment %} === COMPONENTE: Ticker marquee custom-liquid (Dawn/Sense — Shrine usa horizontal-ticker nativo) === {% endcomment %}
+{% comment %} Extraído de un product.json real y probado. Pegar como bloque custom_liquid. {% endcomment %}
+
+{%- comment -%}
+═══════════════════════════════════════════════════
+  📝 EDITAR AQUI — TICKER TOP (texto desplazandose arriba)
+═══════════════════════════════════════════════════
+{%- endcomment -%}
+
+{% assign TEXT_1 = "ENVÍO GRATIS A TODO EL PAÍS 🚚" %}
+{% assign TEXT_2 = "PAGA AL RECIBIR · CONTRA ENTREGA 💳" %}
+{% assign TEXT_3 = "FRAGANCIA DE LARGA DURACIÓN ✨" %}
+
+{% assign BG_COLOR       = "#ffffff" %}
+{% assign TEXT_COLOR     = "#121212" %}
+{% assign SPEED_SECONDS  = 22 %}
+
+{%- comment -%}
+═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══
+{%- endcomment -%}
+
+<style>
+.pe-mq{overflow:hidden;background:{{ BG_COLOR }};border-top:1px solid #ececec;border-bottom:1px solid #ececec;}
+.pe-mq__track{display:flex;width:max-content;animation:peMqTop {{ SPEED_SECONDS }}s linear infinite;}
+.pe-mq__track span{padding:13px 34px;font-size:13.5px;font-weight:700;text-transform:uppercase;letter-spacing:.6px;color:{{ TEXT_COLOR }};white-space:nowrap;}
+@keyframes peMqTop{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+</style>
+<div class="pe-mq" aria-hidden="true">
+  <div class="pe-mq__track">
+    <span>{{ TEXT_1 }}</span><span>{{ TEXT_2 }}</span><span>{{ TEXT_3 }}</span>
+    <span>{{ TEXT_1 }}</span><span>{{ TEXT_2 }}</span><span>{{ TEXT_3 }}</span>
+  </div>
+</div>

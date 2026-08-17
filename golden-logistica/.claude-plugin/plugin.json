@@ -1,0 +1,17 @@
+{
+  "name": "golden-logistica",
+  "version": "1.0.0",
+  "description": "Rescate de novedades y control de devoluciones para COD.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "novedades",
+    "devoluciones",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-logistica/"
+  ]
+}

@@ -1,0 +1,136 @@
+{% comment %} === COMPONENTE: Verificado Google + estrellas === {% endcomment %}
+{% comment %} Extraído de un product.json real y probado. Pegar como bloque custom_liquid. {% endcomment %}
+
+{% comment %}
+========================
+TEXTOS EDITABLES
+========================
+{% endcomment %}
+{% comment %} ⚠️ EJEMPLO — REEMPLAZAR POR EL RATING REAL cuando exista. Nunca se deja en placeholder ni {% endcomment %}
+{% comment %} en 0.0; si el cliente no tiene rating todavía, se entrega este ejemplo creíble (REGLA #3). {% endcomment %}
+{% assign RATING_VALUE = 4.8 %}
+{% assign RATING_MAX = 5 %}
+{% assign RATING_TEXT = "Verificado en" %}
+
+{% comment %}
+========================
+IMÁGENES
+========================
+{% endcomment %}
+{% assign GOOGLE_LOGO_URL = "https://cdn.shopify.com/s/files/1/0737/6977/9459/files/Google_Logo.png?v=1772769692" %}
+
+{% comment %}
+========================
+COLORES
+========================
+{% endcomment %}
+{% assign STAR_COLOR = "var(--brand-primary)" %}
+{% assign STAR_EMPTY_COLOR = "#E0E0E0" %}
+{% assign TEXT_COLOR = "#444" %}
+
+{% comment %}
+========================
+TIPOGRAFÍA
+========================
+{% endcomment %}
+{% assign TEXT_SIZE_DESKTOP = "15px" %}
+{% assign TEXT_SIZE_MOBILE = "14px" %}
+{% assign FONT_WEIGHT = "500" %}
+
+{% comment %}
+========================
+MÁRGENES Y ESPACIADOS DESKTOP
+========================
+{% endcomment %}
+{% assign GAP = "6px" %}
+{% assign MARGIN_TOP = "6px" %}
+{% assign MARGIN_BOTTOM = "-6px" %}
+{% assign STAR_SIZE_DESKTOP = "20" %}
+{% assign LOGO_SIZE_DESKTOP = "42px" %}
+
+{% comment %}
+========================
+MÁRGENES Y ESPACIADOS MOBILE
+========================
+{% endcomment %}
+{% assign STAR_SIZE_MOBILE = "18" %}
+{% assign LOGO_SIZE_MOBILE = "36px" %}
+
+{% assign GRAD_ID = "half-" | append: section.id | default: "half-1" %}
+
+<div class="product-rating">
+  <div class="stars">
+    {%- assign full_stars = RATING_VALUE | floor -%}
+    {%- assign half_star = RATING_VALUE | modulo: 1 | round -%}
+    {%- assign empty_stars = 5 | minus: full_stars | minus: half_star -%}
+
+    {%- for i in (1..full_stars) -%}
+      <svg width="{{ STAR_SIZE_DESKTOP }}" height="{{ STAR_SIZE_DESKTOP }}" viewBox="0 0 20 20">
+        <path fill="{{ STAR_COLOR }}" d="M10 15l-5.878 3.09 1.123-6.545L.49 6.91l6.561-.954L10 0l2.949 5.956 6.561.954-4.755 4.635 1.123 6.545z"/>
+      </svg>
+    {%- endfor -%}
+
+    {%- if half_star > 0 -%}
+      <svg width="{{ STAR_SIZE_DESKTOP }}" height="{{ STAR_SIZE_DESKTOP }}" viewBox="0 0 20 20">
+        <defs>
+          <linearGradient id="{{ GRAD_ID }}">
+            <stop offset="60%" stop-color="{{ STAR_COLOR }}"/>
+            <stop offset="60%" stop-color="{{ STAR_EMPTY_COLOR }}"/>
+          </linearGradient>
+        </defs>
+        <path fill="url(#{{ GRAD_ID }})" d="M10 15l-5.878 3.09 1.123-6.545L.49 6.91l6.561-.954L10 0l2.949 5.956 6.561.954-4.755 4.635 1.123 6.545z"/>
+      </svg>
+    {%- endif -%}
+
+    {%- for i in (1..empty_stars) -%}
+      <svg width="{{ STAR_SIZE_DESKTOP }}" height="{{ STAR_SIZE_DESKTOP }}" viewBox="0 0 20 20">
+        <path fill="{{ STAR_EMPTY_COLOR }}" d="M10 15l-5.878 3.09 1.123-6.545L.49 6.91l6.561-.954L10 0l2.949 5.956 6.561.954-4.755 4.635 1.123 6.545z"/>
+      </svg>
+    {%- endfor -%}
+  </div>
+
+  <div class="rating-number">
+    {{ RATING_VALUE }}/{{ RATING_MAX }} {{ RATING_TEXT }}
+    <img src="{{ GOOGLE_LOGO_URL }}" alt="Google" loading="lazy" decoding="async">
+  </div>
+</div>
+
+<style>
+.product-rating{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:{{ GAP }};
+  margin-top:{{ MARGIN_TOP }};
+  margin-bottom:{{ MARGIN_BOTTOM }};
+}
+
+.product-rating .rating-number{
+  font-size:{{ TEXT_SIZE_DESKTOP }};
+  color:{{ TEXT_COLOR }};
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-weight:{{ FONT_WEIGHT }};
+}
+
+.product-rating img{
+  height:{{ LOGO_SIZE_DESKTOP }};
+}
+
+/* ========================
+   MOBILE
+======================== */
+@media (max-width:749px){
+  .product-rating .stars svg{
+    width:{{ STAR_SIZE_MOBILE }}px;
+    height:{{ STAR_SIZE_MOBILE }}px;
+  }
+  .product-rating .rating-number{
+    font-size:{{ TEXT_SIZE_MOBILE }};
+  }
+  .product-rating img{
+    height:{{ LOGO_SIZE_MOBILE }};
+  }
+}
+</style>

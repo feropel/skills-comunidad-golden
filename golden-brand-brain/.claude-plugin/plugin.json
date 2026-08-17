@@ -1,0 +1,17 @@
+{
+  "name": "golden-brand-brain",
+  "version": "1.0.0",
+  "description": "Cerebro de marca por cliente: voz, productos, avatares y anuncios ganadores.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "marca",
+    "clientes",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-brand-brain/"
+  ]
+}

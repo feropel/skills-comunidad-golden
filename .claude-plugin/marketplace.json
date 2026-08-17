@@ -4,8 +4,8 @@
     "name": "Comunidad Golden"
   },
   "metadata": {
-    "description": "Skills de la Comunidad Golden para Claude Code — familia Chatea Pro.",
-    "version": "1.0.0"
+    "description": "Skills de la Comunidad Golden para Claude Code — el arsenal completo.",
+    "version": "2.0.0"
   },
   "plugins": [
     {
@@ -56,6 +56,188 @@
       "description": "Configura el asistente de carritos abandonados de Chatea Pro: recupera por WhatsApp los checkouts que el cliente dejo a medias.",
       "version": "1.1.0",
       "category": "marketing"
+    },
+    {
+      "name": "golden-ads",
+      "source": "./golden-ads",
+      "description": "Centro de comando de pauta en Meta, TikTok y Google, con o sin métricas.",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-agenda-citas",
+      "source": "./golden-agenda-citas",
+      "description": "Agendamiento automático de citas para negocios de servicios.",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-archivos",
+      "source": "./golden-archivos",
+      "description": "Toma control de carpetas caóticas y las deja con nombres y orden coherentes.",
+      "version": "1.0.0",
+      "category": "operations"
+    },
+    {
+      "name": "golden-blindaje",
+      "source": "./golden-blindaje",
+      "description": "Auditoría de seguridad de tu propio entorno de agentes y credenciales.",
+      "version": "1.0.0",
+      "category": "operations"
+    },
+    {
+      "name": "golden-brand-brain",
+      "source": "./golden-brand-brain",
+      "description": "Cerebro de marca por cliente: voz, productos, avatares y anuncios ganadores.",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-cinematica",
+      "source": "./golden-cinematica",
+      "description": "Web cinematográfica 3D nivel awwwards: escenas reales, preloader con contador y movimiento de cine.",
+      "version": "1.0.0",
+      "category": "design"
+    },
+    {
+      "name": "golden-copywriting",
+      "source": "./golden-copywriting",
+      "description": "Copy de respuesta directa para Meta, TikTok y mensajes orgánicos.",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-critico",
+      "source": "./golden-critico",
+      "description": "El abogado del diablo: crítica honesta de tu plan, oferta o campaña.",
+      "version": "1.0.0",
+      "category": "research"
+    },
+    {
+      "name": "golden-despachos",
+      "source": "./golden-despachos",
+      "description": "Califica cada pedido ANTES de despachar: duplicados, dirección, huella del cliente y la mejor transportadora por efectividad real.",
+      "version": "1.0.0",
+      "category": "operations"
+    },
+    {
+      "name": "golden-dropi-analisis",
+      "source": "./golden-dropi-analisis",
+      "description": "Convierte tus informes de Dropi en dos maestros: logística y base de clientes.",
+      "version": "1.0.0",
+      "category": "operations"
+    },
+    {
+      "name": "golden-ecom-magic",
+      "source": "./golden-ecom-magic",
+      "description": "Fábrica de imágenes de alta conversión con Ecom Magic AI, con la foto real del producto y texto de venta compuesto.",
+      "version": "1.0.0",
+      "category": "design"
+    },
+    {
+      "name": "golden-imagen-arena",
+      "source": "./golden-imagen-arena",
+      "description": "La misma imagen generada en varios motores de IA y calificada por conversión.",
+      "version": "1.0.0",
+      "category": "design"
+    },
+    {
+      "name": "golden-investigacion-mercado",
+      "source": "./golden-investigacion-mercado",
+      "description": "Estudio de mercado 360 y máquina de lanzamiento, de la investigación al montaje.",
+      "version": "1.0.0",
+      "category": "research"
+    },
+    {
+      "name": "golden-logistica",
+      "source": "./golden-logistica",
+      "description": "Rescate de novedades y control de devoluciones para COD.",
+      "version": "1.0.0",
+      "category": "operations"
+    },
+    {
+      "name": "golden-matriz-viral",
+      "source": "./golden-matriz-viral",
+      "description": "Saca la fórmula del contenido que ya funcionó y genera guiones nuevos.",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-meta-ads-analysis",
+      "source": "./golden-meta-ads-analysis",
+      "description": "Diagnóstico ejecutable de campañas de Meta con unit economics en pesos.",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-pdf-check",
+      "source": "./golden-pdf-check",
+      "description": "El estándar de PDF de la comunidad: marca, márgenes y bloques que no se parten.",
+      "version": "1.0.0",
+      "category": "education"
+    },
+    {
+      "name": "golden-productos-ganadores",
+      "source": "./golden-productos-ganadores",
+      "description": "Búsqueda y validación de productos ganadores para COD en LatAm.",
+      "version": "1.0.0",
+      "category": "research"
+    },
+    {
+      "name": "golden-shopify",
+      "source": "./golden-shopify",
+      "description": "Construye páginas de producto Shopify de alta conversión para contra entrega.",
+      "version": "1.0.0",
+      "category": "ecommerce"
+    },
+    {
+      "name": "golden-skill-auditor",
+      "source": "./golden-skill-auditor",
+      "description": "Lee una skill completa, la califica sobre 1000 y la deja funcionando.",
+      "version": "1.0.0",
+      "category": "education"
+    },
+    {
+      "name": "golden-ugc-avatar",
+      "source": "./golden-ugc-avatar",
+      "description": "Avatares con IA hiperrealistas y videos de testimonio hablando.",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-video-editor",
+      "source": "./golden-video-editor",
+      "description": "De grabación cruda a anuncio terminado: corta silencios, subtitula y arma.",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-video-teardown",
+      "source": "./golden-video-teardown",
+      "description": "Desarma un anuncio segundo por segundo: texto en pantalla, locución y ritmo.",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-web",
+      "source": "./golden-web",
+      "description": "Sitios y landings de alta conversión por perfil de cliente.",
+      "version": "1.0.0",
+      "category": "design"
+    },
+    {
+      "name": "golden360",
+      "source": "./golden360",
+      "description": "La ruta completa: de una foto a vender. Investiga, monta la página, la pauta y el bot, con compuertas de calidad en cada paso.",
+      "version": "1.0.0",
+      "category": "research"
+    },
+    {
+      "name": "prompt-master",
+      "source": "./prompt-master",
+      "description": "Convierte una idea suelta en un prompt que la IA obedece.",
+      "version": "1.0.0",
+      "category": "education"
     }
   ]
 }

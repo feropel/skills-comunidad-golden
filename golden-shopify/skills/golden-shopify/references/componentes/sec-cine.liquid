@@ -1,0 +1,32 @@
+{% comment %} === COMPONENTE: SECCIÓN CINE (contraste emocional full-bleed) === {% endcomment %}
+{% comment %} Fusión "GOLDEN FULL" → gfs- tokenizado y accesible (G3.2). {% endcomment %}
+{% comment %} Momento premium de alto impacto: fondo oscuro a todo el ancho, líneas que entran con stagger y un {% endcomment %}
+{% comment %} remate grande en color de marca + CTA. Va cerca del cierre (después de la prueba). Apagable. {% endcomment %}
+
+{% comment %} 📝 EDITAR AQUI {% endcomment %}
+{% assign L1 = "Imagina el resultado que buscas." %}
+{% assign L2 = "Sin pena, sin complicarte." %}
+{% assign L3 = "Desde casa, a tu ritmo." %}
+{% assign BIG = "Así se siente recuperar tu confianza." %}
+{% assign CTA_TEXT = "EMPEZAR HOY  ✨" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<div class="gfs-cine"><div class="gfs-cine__bg" aria-hidden="true"></div><div class="gfs-cine__vig" aria-hidden="true"></div><div class="gfs-cine__in"><p class="gfs-cine__l" data-d="0">{{ L1 }}</p><p class="gfs-cine__l" data-d="450">{{ L2 }}</p><p class="gfs-cine__l" data-d="900">{{ L3 }}</p><p class="gfs-cine__big">{{ BIG }}</p>{% if CTA_TEXT != blank %}<button class="gfs-cine__btn" type="button" data-cod="1">{{ CTA_TEXT }}</button>{% endif %}</div></div>
+<style>
+.gfs-cine{position:relative;width:100vw;margin-left:calc(50% - 50vw);background:#0d0d0d;overflow:hidden;padding:84px 24px;text-align:center;box-sizing:border-box;}
+.gfs-cine__bg{position:absolute;inset:-12%;pointer-events:none;background:radial-gradient(ellipse 60% 55% at 50% 38%,rgba(var(--brand-primary-rgb),.30),transparent 70%),radial-gradient(ellipse 45% 45% at 82% 82%,rgba(var(--brand-bright-rgb),.16),transparent 70%),radial-gradient(ellipse 45% 45% at 15% 80%,rgba(var(--brand-dark-rgb),.18),transparent 70%);animation:gfsCineZoom 18s ease-in-out infinite alternate;will-change:transform;}
+.gfs-cine__vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at center,transparent 55%,rgba(0,0,0,.55) 100%);}
+.gfs-cine__in{position:relative;z-index:2;max-width:760px;margin:0 auto;}
+.gfs-cine__l{font-weight:600;font-size:21px;line-height:1.4;color:#f2f2f2;margin:0 0 12px;opacity:0;transform:translateY(22px);transition:opacity 1s cubic-bezier(.16,1,.3,1),transform 1s cubic-bezier(.16,1,.3,1);}
+.gfs-cine__l.gfs-on{opacity:1;transform:none;}
+.gfs-cine__big{font-weight:900;font-size:30px;line-height:1.2;color:var(--brand-bright,#ff5247);margin:22px 0 0;text-shadow:0 0 34px rgba(var(--brand-primary-rgb),.55),0 0 70px rgba(var(--brand-primary-rgb),.25);opacity:0;transform:translateY(22px) scale(.97);transition:opacity 1.1s cubic-bezier(.16,1,.3,1),transform 1.1s cubic-bezier(.16,1,.3,1);}
+.gfs-cine.gfs-go .gfs-cine__big{opacity:1;transform:none;}
+.gfs-cine__btn{all:unset;box-sizing:border-box;display:inline-flex;align-items:center;justify-content:center;margin-top:28px;cursor:pointer;font-weight:800;font-size:15px;letter-spacing:.5px;color:#fff;background:linear-gradient(135deg,var(--cta,#1D9E06),var(--cta-dark,#157A04));padding:15px 34px;border-radius:999px;box-shadow:0 12px 30px -6px rgba(var(--cta-rgb,29,158,6),.6),inset 0 1px 0 rgba(255,255,255,.3);opacity:0;transform:translateY(14px);transition:opacity 1s .4s,transform 1s .4s,filter .2s;}
+.gfs-cine.gfs-go .gfs-cine__btn{opacity:1;transform:none;}
+.gfs-cine__btn:hover{filter:brightness(1.05);}
+.gfs-cine__btn:focus-visible{outline:3px solid #fff;outline-offset:3px;}
+@keyframes gfsCineZoom{0%{transform:scale(1)}100%{transform:scale(1.16)}}
+@media(min-width:990px){.gfs-cine{padding:128px 24px;}.gfs-cine__l{font-size:30px;}.gfs-cine__big{font-size:46px;}.gfs-cine__btn{font-size:16px;}}
+@media(prefers-reduced-motion:reduce){.gfs-cine__bg{animation:none !important;}.gfs-cine__l,.gfs-cine__big,.gfs-cine__btn{transition:none !important;opacity:1 !important;transform:none !important;}}
+</style>
+<script>(function(){var s=document.querySelector('.gfs-cine');if(!s)return;var ls=s.querySelectorAll('.gfs-cine__l');if(!('IntersectionObserver' in window)){s.classList.add('gfs-go');ls.forEach(function(l){l.classList.add('gfs-on');});return;}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){s.classList.add('gfs-go');ls.forEach(function(l){var dl=parseInt(l.dataset.d||0,10);setTimeout(function(){l.classList.add('gfs-on');},dl);});io.unobserve(s);}});},{threshold:.3});io.observe(s);})();</script>

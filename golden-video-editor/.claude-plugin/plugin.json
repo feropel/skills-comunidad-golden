@@ -1,0 +1,17 @@
+{
+  "name": "golden-video-editor",
+  "version": "1.0.0",
+  "description": "De grabación cruda a anuncio terminado: corta silencios, subtitula y arma.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "video",
+    "edición",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-video-editor/"
+  ]
+}

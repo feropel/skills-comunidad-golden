@@ -1,0 +1,51 @@
+{% comment %} === COMPONENTE: SEO + AIO · Schema invisible (G4.0) === {% endcomment %}
+{% comment %}
+  Sección INVISIBLE (altura 0) que inyecta el JSON-LD de la página. Absorbida de una
+  página real en producción.
+
+  PARA QUÉ: es lo que hace que Google muestre las preguntas desplegables en el resultado
+  y que los buscadores con IA puedan citar las respuestas. Sin esto, el FAQ solo lo lee
+  quien ya está en la página.
+
+  POR QUÉ VA EN SU PROPIA SECCIÓN Y NO DENTRO DEL FAQ:
+  - Si el cliente apaga o reordena el FAQ visual, el schema sobrevive.
+  - Se ve en el panel del tema como una sección con nombre, así nadie la borra por error.
+
+  ⚠️ MANTENIMIENTO: si cambias una pregunta en el FAQ visible, cámbiala TAMBIÉN aquí.
+     Google penaliza que el schema diga algo que no está en la página.
+
+  ⚠️ aggregateRating: NO se incluye salvo que el conteo de reseñas sea REAL y verificable.
+     Las reseñas de ejemplo son visuales; jamás se envían como estructura a Google.
+{% endcomment %}
+
+{% assign Q1 = "" %}{% assign A1 = "" %}
+{% assign Q2 = "" %}{% assign A2 = "" %}
+{% assign Q3 = "" %}{% assign A3 = "" %}
+{% assign Q4 = "" %}{% assign A4 = "" %}
+{% assign Q5 = "" %}{% assign A5 = "" %}
+{% assign Q6 = "" %}{% assign A6 = "" %}
+{% assign Q7 = "" %}{% assign A7 = "" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>#shopify-section-{{ section.id }}{padding:0 !important;margin:0 !important;height:0;overflow:hidden;}</style>
+{%- capture qs -%}{{ Q1 }}|{{ Q2 }}|{{ Q3 }}|{{ Q4 }}|{{ Q5 }}|{{ Q6 }}|{{ Q7 }}{%- endcapture -%}
+{%- capture as -%}{{ A1 }}|{{ A2 }}|{{ A3 }}|{{ A4 }}|{{ A5 }}|{{ A6 }}|{{ A7 }}{%- endcapture -%}
+{%- assign QL = qs | split: "|" -%}
+{%- assign AL = as | split: "|" -%}
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "FAQPage",
+  "mainEntity": [
+    {%- assign first = true -%}
+    {%- for q in QL -%}
+      {%- assign a = AL[forloop.index0] -%}
+      {%- if q != blank and a != blank -%}
+        {%- unless first %},{% endunless -%}
+        {"@type":"Question","name":{{ q | json }},"acceptedAnswer":{"@type":"Answer","text":{{ a | json }}}}
+        {%- assign first = false -%}
+      {%- endif -%}
+    {%- endfor -%}
+  ]
+}
+</script>

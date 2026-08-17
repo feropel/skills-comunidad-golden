@@ -1,0 +1,36 @@
+{% comment %} === COMPONENTE: Sticky bar (dispara Releasit) === {% endcomment %}
+{% comment %} Extraído de un product.json real y probado. Pegar como bloque custom_liquid. {% endcomment %}
+{% comment %} ⚠️ REGLA #2: el botón del sticky usa el VERDE GANADOR #1D9E06 (igual que el CTA). {% endcomment %}
+{% comment %} Al construir, reemplazar el color del botón (aquí var(--cta)) por #1D9E06. {% endcomment %}
+
+{% comment %}
+========================
+TEXTOS EDITABLES
+========================
+{% endcomment %}
+{% assign BTN_TEXT = "QUIERO MI PRODUCTO DEMO 🔥" %}
+{% assign ACCENT_COLOR = "var(--cta)" %}
+{% assign BTN_HEIGHT = "50px" %}
+{% assign SHOW_AFTER_SCROLL = 500 %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+#gfs-sticky-bar{position:fixed;left:0;right:0;bottom:0;z-index:9998;display:flex;align-items:center;justify-content:space-between;gap:12px;padding:10px 14px;background:#fff;border-top:1px solid #f0d6d5;box-shadow:0 -6px 24px rgba(0,0,0,.14);transform:translateY(115%);transition:transform .35s ease;box-sizing:border-box;}
+#gfs-sticky-bar.gfs-visible{transform:translateY(0);}
+#gfs-sticky-bar.gfs-visible #gfs-sticky-btn{animation-play-state:running;}
+.gfs-sticky-price{display:flex;flex-direction:column;line-height:1.1;flex:0 0 auto;}
+.gfs-sticky-price .gfs-now{font-size:19px;font-weight:800;color:#1a1a1a;}
+.gfs-sticky-price .gfs-was{font-size:13px;color:#9a9a9a;text-decoration:line-through;}
+#gfs-sticky-btn{flex:1 1 auto;max-width:380px;height:{{ BTN_HEIGHT }};border:1px solid #ffffff;border-radius:16px;background:{{ ACCENT_COLOR }};color:#fff;font-size:16px;font-weight:800;letter-spacing:.3px;cursor:pointer;box-shadow:0 6px 16px rgba(var(--cta-rgb),.45);animation:gfsStickyPulse 1.8s infinite;animation-play-state:paused;position:relative;overflow:hidden;}
+#gfs-sticky-btn span{position:relative;z-index:2;}
+#gfs-sticky-btn::before{content:"";position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);animation:gfsStickyShine 3.5s infinite;pointer-events:none;z-index:1;}
+@keyframes gfsStickyShine{0%{left:-100%;}40%{left:140%;}100%{left:140%;}}
+#gfs-sticky-btn:active{transform:scale(.98);}
+@keyframes gfsStickyPulse{0%{transform:scale(1)}50%{transform:scale(1.03)}100%{transform:scale(1)}}
+@media(min-width:990px){#gfs-sticky-bar{justify-content:center;gap:24px;}#gfs-sticky-btn{flex:0 0 auto;width:340px;max-width:340px;}.gfs-sticky-price{align-items:flex-end;}} @media(max-width:749px){#gfs-sticky-bar{padding:8px 12px}.gfs-sticky-price .gfs-now{font-size:17px}#gfs-sticky-btn{height:48px;font-size:15px}}
+</style>
+<div id="gfs-sticky-bar" aria-hidden="true">
+  <div class="gfs-sticky-price"><span class="gfs-now">{{ product.selected_or_first_available_variant.price | money }}</span>{% if product.selected_or_first_available_variant.compare_at_price > product.selected_or_first_available_variant.price %}<span class="gfs-was">{{ product.selected_or_first_available_variant.compare_at_price | money }}</span>{% endif %}</div>
+  <button id="gfs-sticky-btn" type="button"><span>{{ BTN_TEXT }}</span></button>
+</div>
+<script>(function(){var bar=document.getElementById('gfs-sticky-bar');var btn=document.getElementById('gfs-sticky-btn');if(!bar||!btn)return;if(bar.parentNode!==document.body){document.body.appendChild(bar);}/* ancla al body: position:fixed siempre relativo al viewport (un ancestro con transform lo rompía) */document.body.style.paddingBottom='80px';try{var c=window.RELEASIT_BUTTON_CONFIG;if(c&&c.text){var sp=btn.querySelector('span');if(sp)sp.textContent=c.text;}}catch(e){}function onScroll(){if(window.scrollY>{{ SHOW_AFTER_SCROLL }}){bar.classList.add('gfs-visible');}else{bar.classList.remove('gfs-visible');}}window.addEventListener('scroll',onScroll,{passive:true});onScroll();btn.addEventListener('click',function(){var main=document.getElementById('custom-releasit-btn');if(main){main.click();}});})();</script>

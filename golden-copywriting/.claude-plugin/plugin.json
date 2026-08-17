@@ -1,0 +1,18 @@
+{
+  "name": "golden-copywriting",
+  "version": "1.0.0",
+  "description": "Copy de respuesta directa para Meta, TikTok y mensajes orgánicos.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "copy",
+    "hooks",
+    "guiones",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-copywriting/"
+  ]
+}

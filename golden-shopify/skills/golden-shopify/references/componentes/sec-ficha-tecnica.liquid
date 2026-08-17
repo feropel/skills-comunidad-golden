@@ -1,0 +1,59 @@
+{% comment %} === COMPONENTE: Ficha técnica (grid de specs icono + label + valor) === {% endcomment %}
+{% comment %} Absorbido de un build real (G2.4). Útil sobre todo en arquetipos D Gadget/Demo y E Kit: {% endcomment %}
+{% comment %} resume specs duras (capacidad, autonomía, material, medidas) en una grid limpia y escaneable. {% endcomment %}
+{% comment %} Cada fila = ÍCONO + LABEL + VALOR. 1 columna en móvil, 2 en desktop. Apagable desde el editor. {% endcomment %}
+{% comment %} REGLA #3: los VALORES son specs duras → confirmar con el cliente, NO inventar (mAh, voltajes, medidas). {% endcomment %}
+{% comment %} Deja un par S#_LABEL en "" para mostrar menos filas. Hereda var(--brand-*) del config center. {% endcomment %}
+
+{% comment %}
+═══════════════════════════════════════════════════
+  📝 EDITAR AQUI — FICHA TÉCNICA
+  · S#_ICON  = emoji o ícono corto
+  · S#_LABEL = nombre de la spec (ej. "Autonomía")
+  · S#_VALUE = valor real de la spec (ej. "8 h")  ← dato duro: confírmalo, no lo inventes
+  Para menos filas, deja S#_LABEL en "" y esa fila no se renderiza.
+═══════════════════════════════════════════════════
+{% endcomment %}
+{% assign SECTION_TITLE = "Ficha técnica" %}
+
+{% assign S1_ICON = "🔋" %}{% assign S1_LABEL = "Autonomía" %}{% assign S1_VALUE = "[confirmar]" %}
+{% assign S2_ICON = "⚡" %}{% assign S2_LABEL = "Carga" %}{% assign S2_VALUE = "[confirmar]" %}
+{% assign S3_ICON = "📦" %}{% assign S3_LABEL = "Incluye" %}{% assign S3_VALUE = "[confirmar]" %}
+{% assign S4_ICON = "📐" %}{% assign S4_LABEL = "Medidas" %}{% assign S4_VALUE = "[confirmar]" %}
+{% assign S5_ICON = "🧵" %}{% assign S5_LABEL = "Material" %}{% assign S5_VALUE = "[confirmar]" %}
+{% assign S6_ICON = "🛡️" %}{% assign S6_LABEL = "Garantía" %}{% assign S6_VALUE = "[confirmar]" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.gfs-spec{max-width:820px;margin:24px auto;box-sizing:border-box;padding:0 14px;}
+.gfs-spec__h{text-align:center;font-size:20px;font-weight:800;color:#1a1a1a;letter-spacing:.3px;margin:0 0 16px;text-transform:uppercase;}
+.gfs-spec__grid{display:grid;grid-template-columns:1fr;gap:10px;}
+.gfs-spec__row{display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,var(--brand-light) 0%,#fff 100%);border:1px solid rgba(var(--brand-primary-rgb),.16);border-radius:14px;padding:14px 16px;box-shadow:0 6px 18px rgba(var(--brand-primary-rgb),.06);}
+.gfs-spec__icon{flex:0 0 44px;width:44px;height:44px;border-radius:12px;background:linear-gradient(135deg,var(--brand-primary),var(--brand-dark));display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(var(--brand-primary-rgb),.4),inset 0 1px 0 rgba(255,255,255,.3);}
+.gfs-spec__label{flex:1 1 auto;font-size:13.5px;font-weight:700;color:#555;text-transform:uppercase;letter-spacing:.3px;}
+.gfs-spec__value{flex:0 0 auto;text-align:right;font-size:15px;font-weight:800;color:#1a1a1a;}
+@media(min-width:750px){
+  .gfs-spec__h{font-size:26px;margin-bottom:24px;}
+  .gfs-spec__grid{grid-template-columns:1fr 1fr;gap:14px;}
+  .gfs-spec__label{font-size:14px;}
+  .gfs-spec__value{font-size:16px;}
+}
+</style>
+<div class="gfs-spec">
+  {% if SECTION_TITLE != "" %}<p class="gfs-spec__h">{{ SECTION_TITLE }}</p>{% endif %}
+  <div class="gfs-spec__grid">
+    {% assign IC = S1_ICON  | append: '||' | append: S2_ICON  | append: '||' | append: S3_ICON  | append: '||' | append: S4_ICON  | append: '||' | append: S5_ICON  | append: '||' | append: S6_ICON  | split: '||' %}
+    {% assign LB = S1_LABEL | append: '||' | append: S2_LABEL | append: '||' | append: S3_LABEL | append: '||' | append: S4_LABEL | append: '||' | append: S5_LABEL | append: '||' | append: S6_LABEL | split: '||' %}
+    {% assign VL = S1_VALUE | append: '||' | append: S2_VALUE | append: '||' | append: S3_VALUE | append: '||' | append: S4_VALUE | append: '||' | append: S5_VALUE | append: '||' | append: S6_VALUE | split: '||' %}
+    {% for lab in LB %}
+      {% assign ico = IC[forloop.index0] %}{% assign val = VL[forloop.index0] %}
+      {% if lab != blank %}
+        <div class="gfs-spec__row">
+          <div class="gfs-spec__icon">{{ ico }}</div>
+          <span class="gfs-spec__label">{{ lab }}</span>
+          <span class="gfs-spec__value">{{ val }}</span>
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>

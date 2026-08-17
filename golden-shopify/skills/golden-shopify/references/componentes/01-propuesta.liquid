@@ -1,0 +1,124 @@
+{% comment %} === COMPONENTE: Propuesta de valor (hero badge+subtítulo) === {% endcomment %}
+{% comment %} Hero del producto. Solo esto; sin efectos embebidos. {% endcomment %}
+{% comment %} BLOQUE INDEPENDIENTE: se apaga/prende solo desde el editor de Shopify (ojo del bloque). {% endcomment %}
+
+{% comment %}
+========================
+TEXTOS EDITABLES
+========================
+{% endcomment %}
+{% assign BADGE_TEXT = "LO MÁS VENDIDO" %}
+{% assign SUBTITLE_TEXT = "CONFIANZA TOTAL" %}
+
+{% comment %}
+========================
+COLORES
+========================
+{% endcomment %}
+{% assign PRIMARY_COLOR = "#0bd4fd" %}
+{% assign PRIMARY_GRADIENT = "linear-gradient(135deg, var(--brand-primary), var(--brand-primary))" %}
+{% assign TEXT_GRAY = "var(--brand-primary)" %}
+{% assign WHITE = "#ffffff" %}
+
+{% comment %}
+========================
+TIPOGRAFÍA
+========================
+{% endcomment %}
+{% assign FONT_SIZE_DESKTOP = "18px" %}
+{% assign FONT_SIZE_MOBILE = "15px" %}
+{% assign SUBTITLE_SIZE_DESKTOP = "14px" %}
+{% assign SUBTITLE_SIZE_MOBILE = "13px" %}
+{% assign FONT_WEIGHT = "800" %}
+{% assign LINE_HEIGHT = "1.1" %}
+{% assign FONT_FAMILY = "inherit" %}
+
+{% comment %}
+========================
+MÁRGENES Y ESPACIADOS DESKTOP
+========================
+{% endcomment %}
+{% assign PADDING_Y_DESKTOP = "8px" %}
+{% assign PADDING_X_DESKTOP = "22px" %}
+{% assign BADGE_RADIUS = "10px" %}
+{% assign MARGIN_TOP = "4px" %}
+{% assign MARGIN_BOTTOM = "6px" %}
+
+{% comment %}
+========================
+MÁRGENES Y ESPACIADOS MOBILE
+========================
+{% endcomment %}
+{% assign PADDING_Y_MOBILE = "7px" %}
+{% assign PADDING_X_MOBILE = "14px" %}
+
+{% comment %}
+========================
+ANIMACIÓN
+========================
+{% endcomment %}
+{% assign ANIMATION_SCALE = "1.02" %}
+{% assign ANIMATION_SPEED = "2.2s" %}
+
+<div class="mb-header-wrapper">
+  <div class="mb-badge">{{ BADGE_TEXT }}</div>
+  <div class="mb-subtitle">{{ SUBTITLE_TEXT }}</div>
+</div>
+
+<style>
+@keyframes mbPulse{
+  0%{transform:scale(1);}
+  50%{transform:scale({{ ANIMATION_SCALE }});}
+  100%{transform:scale(1);}
+}
+
+.mb-header-wrapper{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:4px;
+  margin-top:{{ MARGIN_TOP }};
+  margin-bottom:{{ MARGIN_BOTTOM }};
+}
+
+.mb-badge{
+  background:{{ PRIMARY_GRADIENT }};
+  color:{{ WHITE }};
+  padding:{{ PADDING_Y_DESKTOP }} {{ PADDING_X_DESKTOP }};
+  font-size:{{ FONT_SIZE_DESKTOP }};
+  font-weight:{{ FONT_WEIGHT }};
+  font-family:{{ FONT_FAMILY }};
+  border-radius:{{ BADGE_RADIUS }};
+  text-transform:uppercase;
+  text-align:center;
+  line-height:{{ LINE_HEIGHT }};
+  letter-spacing:0.4px;
+  animation:mbPulse {{ ANIMATION_SPEED }} infinite ease-in-out;
+}
+
+.mb-subtitle{
+  color:{{ TEXT_GRAY }};
+  font-size:{{ SUBTITLE_SIZE_DESKTOP }};
+  text-align:center;
+  font-weight:500;
+  max-width:320px;
+  line-height:1.25;
+}
+
+/* ========================
+   MOBILE
+======================== */
+@media (max-width:749px){
+  .mb-badge{
+    font-size:{{ FONT_SIZE_MOBILE }};
+    padding:{{ PADDING_Y_MOBILE }} {{ PADDING_X_MOBILE }};
+  }
+  .mb-subtitle{
+    font-size:{{ SUBTITLE_SIZE_MOBILE }};
+    max-width:92%;
+  }
+}
+
+/* killer de animaciones removido (v1.15: las animaciones deben verse en móvil) */
+</style>
+

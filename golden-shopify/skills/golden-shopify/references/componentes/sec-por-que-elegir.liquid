@@ -1,0 +1,47 @@
+{% comment %} === COMPONENTE: Por qué elegir [producto]? (trust-grid 4 íconos) === {% endcomment %}
+{% comment %} Absorbido de la tienda real. CLAVE: en las páginas ganadoras (Marbella) la grid se {% endcomment %}
+{% comment %} PERSONALIZA al beneficio del PRODUCTO (Efecto matte / Acabado natural / Lujo / Seguro), {% endcomment %}
+{% comment %} no se deja la genérica de tienda (Calidad / Atención / Precio / Compra segura). {% endcomment %}
+{% comment %} Reescribe los 4 pares por producto — esa personalización es la que convierte. {% endcomment %}
+
+{% comment %}
+═══════════════════════════════════════════════════
+  📝 EDITAR AQUI — POR QUÉ ELEGIR? (4 razones del PRODUCTO)
+  Cada razón = EMOJI + TÍTULO corto + TEXTO de 1 línea. Hazlas específicas al producto.
+═══════════════════════════════════════════════════
+{% endcomment %}
+{% assign SECTION_TITLE = "Por qué elegir este producto?" %}
+
+{% assign R1_ICON = "✨" %}{% assign R1_TITLE = "Resultado real" %}{% assign R1_TEXT = "Notas la diferencia desde el primer uso, no en semanas de espera." %}
+{% assign R2_ICON = "🌿" %}{% assign R2_TITLE = "A tu favor" %}{% assign R2_TEXT = "Fácil de usar y pensado para adaptarse a ti, no al revés." %}
+{% assign R3_ICON = "💎" %}{% assign R3_TITLE = "Calidad premium" %}{% assign R3_TEXT = "Original y sellado, importadores directos." %}
+{% assign R4_ICON = "🛡️" %}{% assign R4_TITLE = "Compra segura" %}{% assign R4_TEXT = "Pagas al recibir, sin adelantos ni riesgo." %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.gfs-why{max-width:820px;margin:24px auto;box-sizing:border-box;padding:0 14px;}
+.gfs-why__h{text-align:center;font-size:20px;font-weight:800;color:#1a1a1a;letter-spacing:.3px;margin:0 0 16px;text-transform:uppercase;}
+.gfs-why__grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.gfs-why__card{background:linear-gradient(135deg,var(--brand-light) 0%,#fff 100%);border:1px solid rgba(var(--brand-primary-rgb),.16);border-radius:16px;padding:16px 14px;text-align:center;box-shadow:0 6px 20px rgba(var(--brand-primary-rgb),.06);transition:transform .3s cubic-bezier(.16,1,.3,1);}
+.gfs-why__card:hover{transform:translateY(-4px);}
+.gfs-why__icon{width:48px;height:48px;margin:0 auto 8px;border-radius:50%;background:linear-gradient(135deg,var(--brand-primary),var(--brand-dark));display:flex;align-items:center;justify-content:center;font-size:24px;box-shadow:0 4px 12px rgba(var(--brand-primary-rgb),.4),inset 0 1px 0 rgba(255,255,255,.3);}
+.gfs-why__t{font-size:14px;font-weight:800;color:#1a1a1a;margin:0 0 4px;text-transform:uppercase;letter-spacing:.3px;line-height:1.2;}
+.gfs-why__p{font-size:12.5px;color:#555;line-height:1.4;margin:0;}
+@media(min-width:750px){
+  .gfs-why__h{font-size:26px;margin-bottom:24px;}
+  .gfs-why__grid{grid-template-columns:repeat(4,1fr);gap:16px;}
+  .gfs-why__card{padding:24px 16px;}
+  .gfs-why__icon{width:60px;height:60px;font-size:30px;}
+  .gfs-why__t{font-size:15px;}
+  .gfs-why__p{font-size:13.5px;}
+}
+</style>
+<div class="gfs-why">
+  <p class="gfs-why__h">{{ SECTION_TITLE }}</p>
+  <div class="gfs-why__grid">
+    <div class="gfs-why__card"><div class="gfs-why__icon">{{ R1_ICON }}</div><p class="gfs-why__t">{{ R1_TITLE }}</p><p class="gfs-why__p">{{ R1_TEXT }}</p></div>
+    <div class="gfs-why__card"><div class="gfs-why__icon">{{ R2_ICON }}</div><p class="gfs-why__t">{{ R2_TITLE }}</p><p class="gfs-why__p">{{ R2_TEXT }}</p></div>
+    <div class="gfs-why__card"><div class="gfs-why__icon">{{ R3_ICON }}</div><p class="gfs-why__t">{{ R3_TITLE }}</p><p class="gfs-why__p">{{ R3_TEXT }}</p></div>
+    <div class="gfs-why__card"><div class="gfs-why__icon">{{ R4_ICON }}</div><p class="gfs-why__t">{{ R4_TITLE }}</p><p class="gfs-why__p">{{ R4_TEXT }}</p></div>
+  </div>
+</div>

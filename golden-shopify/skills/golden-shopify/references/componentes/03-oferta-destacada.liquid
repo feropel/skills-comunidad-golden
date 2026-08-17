@@ -1,0 +1,95 @@
+{% comment %} === COMPONENTE: Oferta destacada === {% endcomment %}
+{% comment %} Extraído de un product.json real y probado. Pegar como bloque custom_liquid. {% endcomment %}
+
+{% comment %}
+========================
+TEXTOS EDITABLES
+========================
+{% endcomment %}
+{% assign LINE_1 = "OFERTA EXCLUSIVA" %}
+{% assign LINE_2 = "POR TIEMPO LIMITADO" %}
+
+{% comment %}
+========================
+COLORES
+  ⚠️ ARMONÍA: NO uses un color distinto al del resto de la página solo para esta caja.
+  Si ya hay un countdown de urgencia, NO la pongas roja también (doble acento = choca).
+  Preferir relleno SUAVE (tint del color de marca) con borde fino, no caja hueca con
+  borde grueso (se ve fea). Ver Regla 0 en reglas-de-oro.md.
+========================
+{% endcomment %}
+{% assign BG_COLOR = "#ffffff" %}
+{% assign BORDER_COLOR = "var(--brand-primary)" %}
+{% assign TEXT_COLOR = "var(--brand-primary)" %}
+
+{% comment %}
+========================
+TIPOGRAFÍA
+========================
+{% endcomment %}
+{% assign FONT_SIZE_DESKTOP = "24px" %}
+{% assign FONT_SIZE_MOBILE = "17px" %}
+{% assign FONT_WEIGHT = "800" %}
+{% assign LINE_HEIGHT = "1.1" %}
+{% assign FONT_FAMILY = "inherit" %}
+{% assign SUBTEXT_SCALE = "0.7" %}
+
+{% comment %}
+========================
+MÁRGENES Y ESPACIADOS DESKTOP
+========================
+{% endcomment %}
+{% assign PADDING_Y_DESKTOP = "8px" %}
+{% assign PADDING_X_DESKTOP = "20px" %}
+{% assign BOX_MAX_WIDTH_DESKTOP = "520px" %}
+{% assign MARGIN_TOP = "4px" %}
+{% assign MARGIN_BOTTOM = "1px" %}
+
+{% comment %}
+========================
+MÁRGENES Y ESPACIADOS MOBILE
+========================
+{% endcomment %}
+{% assign PADDING_Y_MOBILE = "10px" %}
+{% assign PADDING_X_MOBILE = "10px" %}
+{% assign BOX_MAX_WIDTH_MOBILE = "96%" %}
+
+{% comment %}
+========================
+BORDES
+========================
+{% endcomment %}
+{% assign BORDER_WIDTH = "2px" %}
+{% assign BORDER_RADIUS = "10px" %}
+{% assign MAX_WIDTH = "1200px" %}
+
+<section class="mb-banner">
+  <div class="mb-banner__inner">
+    <div class="mb-banner__box">
+      <span class="mb-line-1">{{ LINE_1 }}</span>
+      <span class="mb-line-2">{{ LINE_2 }}</span>
+    </div>
+  </div>
+</section>
+
+<style>
+.mb-banner{width:100%;margin-top:{{ MARGIN_TOP }};margin-bottom:{{ MARGIN_BOTTOM }};}
+.mb-banner__inner{max-width:{{ MAX_WIDTH }};margin:0 auto;text-align:center;}
+.mb-banner__box{max-width:{{ BOX_MAX_WIDTH_DESKTOP }};margin:0 auto;background:{{ BG_COLOR }};border:{{ BORDER_WIDTH }} solid {{ BORDER_COLOR }};border-radius:{{ BORDER_RADIUS }};padding:{{ PADDING_Y_DESKTOP }} {{ PADDING_X_DESKTOP }};color:{{ TEXT_COLOR }};font-size:{{ FONT_SIZE_DESKTOP }};font-weight:{{ FONT_WEIGHT }};font-family:{{ FONT_FAMILY }};text-transform:uppercase;text-align:center;line-height:{{ LINE_HEIGHT }};letter-spacing:0.4px;box-sizing:border-box;}
+.mb-line-1{display:block;}
+.mb-line-2{display:block;margin-top:1px;font-size:{{ SUBTEXT_SCALE }}em;opacity:0.9;}
+
+/* ========================
+   MOBILE
+======================== */
+@media (max-width:749px){
+  .mb-banner__box{
+    max-width:{{ BOX_MAX_WIDTH_MOBILE }};
+    padding:{{ PADDING_Y_MOBILE }} {{ PADDING_X_MOBILE }};
+    font-size:{{ FONT_SIZE_MOBILE }};
+  }
+  .mb-line-2{
+    font-size:0.75em;
+  }
+}
+</style>

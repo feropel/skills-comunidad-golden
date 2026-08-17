@@ -1,0 +1,66 @@
+{% comment %} === COMPONENTE: Override de color del footer === {% endcomment %}
+{% comment %} Pinta el footer del tema con el color de marca, solo en esta página. Independiente y apagable. {% endcomment %}
+{% comment %} BLOQUE INDEPENDIENTE: se apaga/prende solo desde el editor de Shopify (ojo del bloque). {% endcomment %}
+
+{% comment %}
+═══════════════════════════════════════════════════
+  📝 EDITAR AQUI — FOOTER DEL TEMA (por producto)
+  Sobrescribe el color del footer solo en esta página
+═══════════════════════════════════════════════════
+{% endcomment %}
+{% assign FOOTER_BG = "var(--brand-primary)" %}
+{% assign FOOTER_TEXT = "#ffffff" %}
+{% assign FOOTER_LINK_HOVER = "var(--brand-text-hover)" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.shopify-section-group-footer-group,
+.shopify-section-group-footer-group [class*="color-"],
+.shopify-section-group-footer-group section,
+.shopify-section-group-footer-group .footer,
+.shopify-section-group-footer-group .footer__content-top,
+.shopify-section-group-footer-group .footer__content-bottom,
+footer.footer,
+footer.footer [class*="color-"]{
+  background:{{ FOOTER_BG }} !important;
+  background-color:{{ FOOTER_BG }} !important;
+  background-image:none !important;
+}
+.shopify-section-group-footer-group,
+.shopify-section-group-footer-group p,
+.shopify-section-group-footer-group span,
+.shopify-section-group-footer-group a,
+.shopify-section-group-footer-group h1,
+.shopify-section-group-footer-group h2,
+.shopify-section-group-footer-group h3,
+.shopify-section-group-footer-group h4,
+.shopify-section-group-footer-group li,
+.shopify-section-group-footer-group small,
+footer.footer,
+footer.footer p,
+footer.footer span,
+footer.footer a,
+footer.footer h1,
+footer.footer h2,
+footer.footer h3,
+footer.footer h4,
+footer.footer li,
+footer.footer small{
+  color:{{ FOOTER_TEXT }} !important;
+}
+.shopify-section-group-footer-group a:hover,
+footer.footer a:hover{
+  color:{{ FOOTER_LINK_HOVER }} !important;
+  opacity:.92;
+}
+.shopify-section-group-footer-group hr,
+footer.footer hr,
+.shopify-section-group-footer-group [class*="border"]{
+  border-color:rgba(255,255,255,.18) !important;
+}
+.shopify-section-group-footer-group svg,
+footer.footer svg{
+  fill:{{ FOOTER_TEXT }} !important;
+}
+</style>
+

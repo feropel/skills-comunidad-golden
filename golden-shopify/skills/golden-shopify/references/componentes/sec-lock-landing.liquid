@@ -1,0 +1,31 @@
+{% comment %} === COMPONENTE: CANDADO LANDING (COD) — G3.4 === {% endcomment %}
+{% comment %} Bloque custom_liquid. Va TEMPRANO en el main (justo después de PALETA & MARCA). {% endcomment %}
+{% comment %}
+  PARA QUÉ SIRVE
+  ──────────────
+  Convierte la página de producto en una LANDING BLOQUEADA: oculta el header, la
+  barra de anuncios y el footer del tema para que el cliente NO tenga cómo irse
+  al home ni al resto de la tienda. Todo el foco queda en comprar (COD).
+
+  POR QUÉ display:none Y NO "ocultar el header" DESDE EL EDITOR
+  ────────────────────────────────────────────────────────────
+  Si ocultas el header/footer desde el editor de Shopify, ese grupo de sección
+  se deja de RENDERIZAR (sale del DOM). En temas tipo Shrine el JS global del tema
+  se arranca desde ahí; sin él, las secciones del producto (que nacen invisibles y
+  aparecen con animación) quedan sin inicializar → "desaparece todo".
+  Este bloque usa display:none: el DOM sigue existiendo, el tema inicializa su JS,
+  y solo se oculta VISUALMENTE la navegación. Nada se rompe.
+
+  CÓMO PERMITIR NAVEGACIÓN OTRA VEZ
+  ─────────────────────────────────
+  Pon LOCK = false (o apaga el bloque desde el editor). El usuario decide.
+{% endcomment %}
+{% assign LOCK = true %}
+{% if LOCK %}
+<style id="gfs-lock-landing">
+/* Header, announcement y footer del tema: ocultos (sin salidas al home). Cubre Shrine + Dawn/Sense. */
+#shopify-section-header,.shopify-section-group-header-group,.section-header,.header-wrapper,header.header,sticky-header,.announcement-bar,.announcement-bar-section,#shopify-section-announcement-bar,#shopify-section-footer,.shopify-section-group-footer-group,.section-footer,.footer{display:none !important;}
+/* Cualquier enlace suelto al home/tienda queda inerte. */
+a[href="/"],a[href="/#"],a[href$="/collections/all"]{pointer-events:none !important;cursor:default !important;}
+</style>
+{% endif %}

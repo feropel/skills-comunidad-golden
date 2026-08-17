@@ -1,0 +1,17 @@
+{
+  "name": "golden-agenda-citas",
+  "version": "1.0.0",
+  "description": "Agendamiento automático de citas para negocios de servicios.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "citas",
+    "servicios",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-agenda-citas/"
+  ]
+}

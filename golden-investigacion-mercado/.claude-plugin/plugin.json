@@ -1,0 +1,17 @@
+{
+  "name": "golden-investigacion-mercado",
+  "version": "1.0.0",
+  "description": "Estudio de mercado 360 y máquina de lanzamiento, de la investigación al montaje.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "investigación",
+    "lanzamiento",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-investigacion-mercado/"
+  ]
+}

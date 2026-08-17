@@ -1,0 +1,69 @@
+{% comment %} === COMPONENTE: SEGURIDAD · la objeción #1 (G4.0) === {% endcomment %}
+{% comment %}
+  Absorbida de una página real. Es una de las secciones que más plata deja y casi ninguna
+  página la tiene.
+
+  LA IDEA: en muchos productos la objeción que frena la compra NO es el precio, es el
+  MIEDO ("me irritará?", "es seguro para mi piel?", "sirve si tomo medicamentos?",
+  "me va a dañar el equipo?"). Si esa duda no se resuelve, el resto de beneficios no
+  importa. Por eso va ANTES de las features, no en el FAQ del final: cuando el cliente
+  llega al FAQ ya decidió que no.
+
+  DÓNDE VA: justo después del dolor y antes del mecanismo. Es el puente entre "sí, me
+  pasa" y "y cómo funciona".
+
+  CÓMO SE ESCRIBE:
+  - El kicker nombra la objeción sin rodeos ("La objeción número uno").
+  - El titular AFIRMA la seguridad, no la pregunta.
+  - Los 4 puntos son concretos y verificables. Nada de "somos los mejores".
+  - Cada punto: <b>Afirmación corta.</b> Explicación de una línea.
+
+  ⚠️ Solo se afirma lo que es REAL. Si no sabes si el producto es apto para un caso,
+  no lo pongas: se resuelve en "es para ti?" con un "consulta antes".
+
+  Usa el mismo esqueleto que `sec-bloque-alternado.liquid` (clases .gfs-alt), así que
+  cárgalo después de ese o copia su <style>.
+{% endcomment %}
+
+{% assign LADO     = "" %}
+{% assign KICKER   = "La objeción número uno" %}
+{% assign TITULO   = "Seguro para <em>lo que te preocupa</em>" %}
+{% assign PARRAFO  = "Es la razón por la que puedes usarlo tranquilo, todos los días." %}
+
+{% assign IMG_BASE = "" %}
+{% assign IMG_ALT  = "Describe lo que demuestra la imagen de seguridad" %}
+{% assign IMG_W    = 1080 %}
+{% assign IMG_H    = 1341 %}
+
+{% assign S1 = "<b>Primera garantía concreta.</b> Qué NO hace (no arde, no reseca, no mancha)." %}
+{% assign S2 = "<b>Composición o construcción.</b> Qué lleva y qué no lleva." %}
+{% assign S3 = "<b>Compatibilidad.</b> Con qué tipo de piel, superficie o uso es apto." %}
+{% assign S4 = "<b>Uso diario.</b> Por qué se puede usar seguido sin problema." %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<section class="gfs-alt {{ LADO }}">
+  <div class="gfs-alt__in">
+    <div class="gfs-media">
+      {% if IMG_BASE != blank %}
+        <img class="gfs-alt__m"
+             src="{{ IMG_BASE }}?width=750"
+             srcset="{{ IMG_BASE }}?width=400 400w, {{ IMG_BASE }}?width=550 550w, {{ IMG_BASE }}?width=750 750w, {{ IMG_BASE }}?width=1000 1000w"
+             sizes="(min-width:900px) 520px, 94vw"
+             alt="{{ IMG_ALT | escape }}"
+             width="{{ IMG_W }}" height="{{ IMG_H }}"
+             loading="lazy" decoding="async">
+      {% endif %}
+    </div>
+    <div class="gfs-alt__txt">
+      <span class="gfs-alt__k gfs-r">{{ KICKER }}</span>
+      <h2 class="gfs-alt__t gfs-r" style="--d:80ms">{{ TITULO }}</h2>
+      <p class="gfs-alt__p gfs-r" style="--d:140ms">{{ PARRAFO }}</p>
+      <ul class="gfs-alt__pts gfs-r" style="--d:200ms">
+        <li><i>✓</i><span>{{ S1 }}</span></li>
+        <li><i>✓</i><span>{{ S2 }}</span></li>
+        <li><i>✓</i><span>{{ S3 }}</span></li>
+        <li><i>✓</i><span>{{ S4 }}</span></li>
+      </ul>
+    </div>
+  </div>
+</section>

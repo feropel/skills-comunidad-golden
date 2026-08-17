@@ -1,0 +1,17 @@
+{
+  "name": "golden-meta-ads-analysis",
+  "version": "1.0.0",
+  "description": "Diagnóstico ejecutable de campañas de Meta con unit economics en pesos.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "meta",
+    "informes",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-meta-ads-analysis/"
+  ]
+}

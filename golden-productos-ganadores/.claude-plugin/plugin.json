@@ -1,0 +1,17 @@
+{
+  "name": "golden-productos-ganadores",
+  "version": "1.0.0",
+  "description": "Búsqueda y validación de productos ganadores para COD en LatAm.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "productos",
+    "tendencias",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-productos-ganadores/"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "golden-pdf-check",
+  "version": "1.0.0",
+  "description": "El estándar de PDF de la comunidad: marca, márgenes y bloques que no se parten.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "pdf",
+    "documentos",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-pdf-check/"
+  ]
+}

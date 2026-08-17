@@ -1,0 +1,58 @@
+{% comment %} === COMPONENTE: Sección Por qué elegir? (4 beneficios dark) === {% endcomment %}
+{% comment %} Extraído de un product.json real y probado. Pegar como bloque custom_liquid. {% endcomment %}
+
+{% comment %}
+═══════════════════════════════════════════════════
+  📝 EDITAR AQUI — POR QUÉ ELEGIR PRODUCTO DEMO? (4 beneficios premium)
+═══════════════════════════════════════════════════
+{% endcomment %}
+{% assign TITLE = "Por qué elegir PRODUCTO DEMO?" %}
+{% assign SUBTITLE = "Lo que nos hace diferentes" %}
+
+{% assign ITEM1_ICON = "⚡" %}
+{% assign ITEM1_TITLE = "Resultados que se notan" %}
+{% assign ITEM1_DESC = "Activa tu energía y siéntete en tu mejor versión durante el día." %}
+
+{% assign ITEM2_ICON = "🔥" %}
+{% assign ITEM2_TITLE = "Confianza y seguridad" %}
+{% assign ITEM2_DESC = "Proyecta una mejor actitud, presencia y confianza en tu rutina." %}
+
+{% assign ITEM3_ICON = "🌿" %}
+{% assign ITEM3_TITLE = "Fórmula natural" %}
+{% assign ITEM3_DESC = "Ingredientes seleccionados que acompañan tu bienestar diario." %}
+
+{% assign ITEM4_ICON = "🎯" %}
+{% assign ITEM4_TITLE = "Discreto y práctico" %}
+{% assign ITEM4_DESC = "Fácil de usar, ideal para llevar contigo en cualquier momento." %}
+
+{% assign ACCENT_COLOR = "var(--brand-primary)" %}
+{% assign DARK_ACCENT = "var(--brand-dark)" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.gfs-why{max-width:560px;margin:8px auto;box-sizing:border-box;padding:0 14px;}
+.gfs-why__head{text-align:center;margin-bottom:22px;}
+.gfs-why__title{font-size:24px;font-weight:800;color:#1a1a1a;letter-spacing:.3px;margin:0 0 4px;}
+.gfs-why__sub{font-size:14px;color:#6b6b6b;font-style:italic;margin:0;}
+.gfs-why__grid{display:grid;grid-template-columns:1fr;gap:12px;}
+.gfs-why__item{display:flex;align-items:center;gap:16px;background:#ffffff;border:1px solid rgba(var(--brand-primary-rgb),.15);border-radius:16px;padding:16px 18px;box-shadow:0 8px 24px rgba(var(--brand-primary-rgb),.06);transition:transform .35s cubic-bezier(.16,1,.3,1),box-shadow .35s ease;}
+.gfs-why__item:hover{transform:translateY(-4px);box-shadow:0 14px 32px rgba(var(--brand-primary-rgb),.14);}
+.gfs-why__icon{flex:0 0 56px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,{{ ACCENT_COLOR }},{{ DARK_ACCENT }});display:flex;align-items:center;justify-content:center;font-size:26px;box-shadow:0 6px 16px rgba(var(--brand-primary-rgb),.4),inset 0 1px 0 rgba(255,255,255,.25);}
+.gfs-why__body{text-align:left;flex:1 1 auto;}
+.gfs-why__h3{font-size:14px;font-weight:800;color:#1a1a1a;text-transform:uppercase;letter-spacing:.5px;margin:0 0 4px;line-height:1.2;}
+.gfs-why__p{font-size:14px;color:#555;line-height:1.5;margin:0;}
+@media(min-width:600px){.gfs-why{max-width:720px;}.gfs-why__grid{grid-template-columns:repeat(2,1fr);gap:14px;}.gfs-why__title{font-size:28px;}}
+@media(min-width:990px){.gfs-why{max-width:1100px;}.gfs-why__grid{grid-template-columns:repeat(4,1fr);gap:18px;}.gfs-why__item{flex-direction:column;text-align:center;padding:28px 20px;}.gfs-why__body{text-align:center;}.gfs-why__icon{margin:0 auto;}.gfs-why__title{font-size:32px;}}
+</style>
+<div class="gfs-why">
+  <div class="gfs-why__head">
+    <p class="gfs-why__title">{{ TITLE }}</p>
+    <p class="gfs-why__sub">{{ SUBTITLE }}</p>
+  </div>
+  <div class="gfs-why__grid">
+    <div class="gfs-why__item"><div class="gfs-why__icon">{{ ITEM1_ICON }}</div><div class="gfs-why__body"><h3 class="gfs-why__h3">{{ ITEM1_TITLE }}</h3><p class="gfs-why__p">{{ ITEM1_DESC }}</p></div></div>
+    <div class="gfs-why__item"><div class="gfs-why__icon">{{ ITEM2_ICON }}</div><div class="gfs-why__body"><h3 class="gfs-why__h3">{{ ITEM2_TITLE }}</h3><p class="gfs-why__p">{{ ITEM2_DESC }}</p></div></div>
+    <div class="gfs-why__item"><div class="gfs-why__icon">{{ ITEM3_ICON }}</div><div class="gfs-why__body"><h3 class="gfs-why__h3">{{ ITEM3_TITLE }}</h3><p class="gfs-why__p">{{ ITEM3_DESC }}</p></div></div>
+    <div class="gfs-why__item"><div class="gfs-why__icon">{{ ITEM4_ICON }}</div><div class="gfs-why__body"><h3 class="gfs-why__h3">{{ ITEM4_TITLE }}</h3><p class="gfs-why__p">{{ ITEM4_DESC }}</p></div></div>
+  </div>
+</div>

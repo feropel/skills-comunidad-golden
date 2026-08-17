@@ -1,0 +1,49 @@
+{% comment %} === COMPONENTE: Sección Manifiesto cinematográfico === {% endcomment %}
+{% comment %} Extraído de un product.json real y probado. Pegar como bloque custom_liquid. {% endcomment %}
+
+{% comment %}
+========================
+TEXTOS EDITABLES
+========================
+{% endcomment %}
+{% assign LINE_1 = "Hay hombres que se apagan." %}
+{% assign LINE_2 = "Hay hombres que se conforman." %}
+{% assign LINE_3 = "Y hay hombres" %}
+{% assign LINE_4 = "que no bajan el ritmo." %}
+{% assign CLOSING = "PRODUCTO DEMO es para los terceros." %}
+{% comment %} CTA verde de cierre OPCIONAL (G2.4). Deja "" para ocultarlo; pon texto para mostrar un botón que dispara la compra (#custom-releasit-btn). {% endcomment %}
+{% assign CTA_TEXT = "" %}
+{% assign BG_FROM = "#0d0f12" %}
+{% assign BG_TO = "var(--brand-primary)" %}
+{% assign TEXT_COLOR = "#ffffff" %}
+{% assign ACCENT_COLOR = "var(--brand-text-hover)" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.gfs-manifesto{position:relative;background:linear-gradient(135deg,{{ BG_FROM }} 0%,{{ BG_TO }} 100%);padding:70px 24px;overflow:hidden;text-align:center;color:{{ TEXT_COLOR }};box-sizing:border-box;}
+.gfs-manifesto__content{position:relative;max-width:680px;margin:0 auto;}
+.gfs-manifesto__line{font-size:22px;line-height:1.4;margin:0 0 6px;font-weight:300;letter-spacing:.3px;color:{{ TEXT_COLOR }};opacity:0;transform:translateY(20px);transition:opacity 1s cubic-bezier(.16,1,.3,1),transform 1s cubic-bezier(.16,1,.3,1);}
+.gfs-manifesto__line.gfs-shown{opacity:1;transform:translateY(0);}
+.gfs-manifesto__line strong{color:{{ ACCENT_COLOR }};font-weight:700;}
+.gfs-manifesto__closing{margin-top:34px;font-size:12px;text-transform:uppercase;letter-spacing:3px;color:{{ ACCENT_COLOR }};opacity:0;transition:opacity 1.2s ease 1.7s;}
+.gfs-manifesto.gfs-show .gfs-manifesto__closing{opacity:.9;}
+/* CTA verde de cierre opcional (G2.4) */
+#gfs-mani-cta{position:relative;display:inline-block;margin-top:30px;padding:16px 40px;border:0;border-radius:50px;background:var(--cta);color:#fff;font-size:16px;font-weight:800;letter-spacing:.4px;text-transform:uppercase;cursor:pointer;overflow:hidden;opacity:0;transform:translateY(16px);transition:opacity .7s ease,transform .7s cubic-bezier(.16,1,.3,1);box-shadow:0 10px 28px rgba(var(--cta-rgb),.45);}
+#gfs-mani-cta.pe-show{opacity:1;transform:translateY(0);animation:gfsManiPulse 2.2s ease-in-out 1s infinite;}
+#gfs-mani-cta::after{content:"";position:absolute;top:0;left:-120%;width:60%;height:100%;background:linear-gradient(120deg,transparent,rgba(255,255,255,.55),transparent);transform:skewX(-20deg);animation:gfsManiShine 3.2s ease-in-out 1.4s infinite;}
+@keyframes gfsManiPulse{0%,100%{box-shadow:0 10px 28px rgba(var(--cta-rgb),.45);}50%{box-shadow:0 10px 40px rgba(var(--cta-rgb),.75);}}
+@keyframes gfsManiShine{0%{left:-120%;}55%,100%{left:160%;}}
+@media(prefers-reduced-motion:reduce){#gfs-mani-cta.pe-show{animation:none;}#gfs-mani-cta::after{display:none;}}
+@media(min-width:990px){.gfs-manifesto{padding:110px 24px;}.gfs-manifesto__line{font-size:34px;}#gfs-mani-cta{font-size:18px;padding:18px 48px;}}
+</style>
+<section class="gfs-manifesto">
+  <div class="gfs-manifesto__content">
+    <p class="gfs-manifesto__line" data-delay="0">{{ LINE_1 }}</p>
+    <p class="gfs-manifesto__line" data-delay="350">{{ LINE_2 }}</p>
+    <p class="gfs-manifesto__line" data-delay="700">{{ LINE_3 }}</p>
+    <p class="gfs-manifesto__line" data-delay="1050"><strong>{{ LINE_4 }}</strong></p>
+    <p class="gfs-manifesto__closing">{{ CLOSING }}</p>
+    {% if CTA_TEXT != blank %}<button type="button" id="gfs-mani-cta">{{ CTA_TEXT }}</button>{% endif %}
+  </div>
+</section>
+<script>(function(){var section=document.querySelector('.gfs-manifesto');if(!section)return;var lines=section.querySelectorAll('.gfs-manifesto__line');var cta=section.querySelector('#gfs-mani-cta');var io=new IntersectionObserver(function(entries){entries.forEach(function(e){if(e.isIntersecting){section.classList.add('gfs-show');lines.forEach(function(l){var d=parseInt(l.dataset.delay||0,10);setTimeout(function(){l.classList.add('gfs-shown');},d);});if(cta){setTimeout(function(){cta.classList.add('pe-show');},1400);}io.unobserve(section);}});},{threshold:0.25});io.observe(section);if(cta){cta.addEventListener('click',function(){var btn=document.querySelector('#custom-releasit-btn');if(btn){btn.click();btn.scrollIntoView({behavior:'smooth',block:'center'});}});}})();</script>

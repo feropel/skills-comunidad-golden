@@ -1,0 +1,17 @@
+{
+  "name": "prompt-master",
+  "version": "1.0.0",
+  "description": "Convierte una idea suelta en un prompt que la IA obedece.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "prompts",
+    "ia",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/prompt-master/"
+  ]
+}

@@ -1,0 +1,17 @@
+{
+  "name": "golden-imagen-arena",
+  "version": "1.0.0",
+  "description": "La misma imagen generada en varios motores de IA y calificada por conversión.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "imágenes",
+    "comparativa",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-imagen-arena/"
+  ]
+}

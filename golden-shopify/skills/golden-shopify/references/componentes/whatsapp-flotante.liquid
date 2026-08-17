@@ -1,0 +1,38 @@
+{% comment %} === COMPONENTE: Botón flotante de WhatsApp === {% endcomment %}
+{% comment %} Pegar como bloque custom_liquid del main o como sección custom-liquid. {% endcomment %}
+{% comment %} Usa el número del config center si existe; si no, edítalo aquí. {% endcomment %}
+
+{%- comment -%}
+═══════════════════════════════════════════════════
+  📝 EDITAR AQUI — BOTÓN FLOTANTE WHATSAPP
+  WA_NUMBER: número con código de país, SIN + ni espacios (ej. 57300..., 502...).
+  WA_MSG: mensaje con el que abre el chat.
+  WA_SIDE: "right" o "left".
+═══════════════════════════════════════════════════
+{%- endcomment -%}
+{% assign WA_NUMBER = "573001234567" %}
+{% assign WA_MSG    = "Hola, quiero información del producto" %}
+{% assign WA_SIDE   = "right" %}
+
+{%- comment -%} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {%- endcomment -%}
+<a class="wa-float wa-float--{{ WA_SIDE }}"
+   href="https://wa.me/{{ WA_NUMBER }}?text={{ WA_MSG | url_encode }}"
+   target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">
+  <svg viewBox="0 0 32 32" width="30" height="30" fill="#fff" aria-hidden="true">
+    <path d="M16 .4C7.4.4.5 7.3.5 15.9c0 2.8.8 5.5 2.2 7.9L.4 31.6l8-2.1c2.3 1.3 4.9 1.9 7.6 1.9 8.6 0 15.5-6.9 15.5-15.5S24.6.4 16 .4zm0 28.3c-2.4 0-4.7-.6-6.7-1.9l-.5-.3-4.8 1.3 1.3-4.6-.3-.5a12.8 12.8 0 01-2-6.9C3 8.9 8.8 3.2 16 3.2S29 8.9 29 16 23.2 28.7 16 28.7zm7.1-9.6c-.4-.2-2.3-1.1-2.6-1.3-.4-.1-.6-.2-.9.2-.3.4-1 1.3-1.2 1.5-.2.2-.4.3-.8.1-.4-.2-1.6-.6-3.1-1.9-1.1-1-1.9-2.3-2.1-2.7-.2-.4 0-.6.2-.8l.6-.7c.2-.2.3-.4.4-.6.1-.2 0-.5 0-.7-.1-.2-.9-2.1-1.2-2.9-.3-.8-.6-.7-.9-.7h-.7c-.2 0-.6.1-1 .5-.3.4-1.3 1.3-1.3 3.1s1.3 3.6 1.5 3.9c.2.2 2.6 4 6.4 5.6.9.4 1.6.6 2.1.8.9.3 1.7.2 2.3.1.7-.1 2.3-.9 2.6-1.8.3-.9.3-1.6.2-1.8-.1-.1-.3-.2-.7-.4z"/>
+  </svg>
+  <span class="wa-float__pulse"></span>
+</a>
+<style>
+.wa-float{position:fixed;bottom:20px;z-index:9998;display:flex;align-items:center;justify-content:center;
+  width:56px;height:56px;border-radius:50%;background:#25D366;
+  box-shadow:0 6px 20px rgba(37,211,102,.45);text-decoration:none;}
+.wa-float--right{right:18px;}
+.wa-float--left{left:18px;}
+.wa-float__pulse{position:absolute;inset:0;border-radius:50%;background:#25D366;opacity:.6;
+  animation:waPulse 2.2s ease-out infinite;z-index:-1;}
+@keyframes waPulse{0%{transform:scale(1);opacity:.6;}70%{transform:scale(1.8);opacity:0;}100%{opacity:0;}}
+.wa-float:hover{transform:scale(1.06);transition:transform .2s ease;}
+@media(min-width:990px){.wa-float{width:62px;height:62px;bottom:24px;}}
+</style>
+<script>(function(){var w=document.querySelector('.wa-float');if(w&&w.parentNode!==document.body){document.body.appendChild(w);}})();/* ancla al body: el position:fixed no se rompe si un ancestro tiene transform */</script>

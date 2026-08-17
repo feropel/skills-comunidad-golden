@@ -1,0 +1,27 @@
+{% comment %} === COMPONENTE: Compra segura / garantía (MODE) === {% endcomment %}
+{% comment %} Extraído de un product.json real y probado. Pegar como bloque custom_liquid. {% endcomment %}
+
+{% comment %}
+========================
+TEXTOS EDITABLES  (MODE: "contraentrega" | "anticipado" | "ambos")
+========================
+{% endcomment %}
+{% assign MODE = "ambos" %}
+{% assign TITLE_PART1 = "Compra" %}
+{% assign TITLE_PART2 = "100% Segura" %}
+{% assign SEAL_EMOJI = "🛡️" %}
+
+{% assign ACCENT_COLOR = "var(--brand-primary)" %}
+{% assign DARK_ACCENT = "var(--brand-dark)" %}
+{% assign BG_COLOR = "var(--brand-light)" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.gfs-guarantee{max-width:480px;margin:14px auto;background:{{ BG_COLOR }};border:1px solid rgba(var(--brand-primary-rgb),.3);border-radius:16px;padding:14px 16px;display:flex;align-items:center;gap:12px;box-sizing:border-box;text-align:left;box-shadow:0 8px 28px rgba(var(--brand-primary-rgb),.10),inset 0 1px 0 rgba(255,255,255,.5);}
+.gfs-guarantee__seal{flex:0 0 44px;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,{{ ACCENT_COLOR }},{{ DARK_ACCENT }});display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(var(--brand-primary-rgb),.4),inset 0 1px 0 rgba(255,255,255,.3);}
+.gfs-guarantee__title{font-size:14px;font-weight:800;color:#1a1a1a;margin:0 0 2px;text-transform:uppercase;letter-spacing:.3px;}
+.gfs-guarantee__title span{color:{{ DARK_ACCENT }};}
+.gfs-guarantee__text{font-size:13px;color:#444;line-height:1.4;margin:0;}
+.gfs-guarantee__text strong{color:#1a1a1a;}
+</style>
+<div class="gfs-guarantee"><div class="gfs-guarantee__seal">{{ SEAL_EMOJI }}</div><div><p class="gfs-guarantee__title">{{ TITLE_PART1 }} <span>{{ TITLE_PART2 }}</span></p><p class="gfs-guarantee__text">{%- if MODE == "anticipado" -%}<strong>Pago 100% seguro</strong> con tarjetas, PSE o transferencia. Producto sellado y original, entregado en perfecto estado.{%- elsif MODE == "ambos" -%}Elige cómo pagar: <strong>contra entrega</strong> al recibir o <strong>pago anticipado</strong> seguro online. Producto sellado y original.{%- else -%}<strong>Pagas al recibir</strong> en la puerta de tu casa — sin transferencias ni adelantos. Producto sellado y original.{%- endif -%}</p></div></div>

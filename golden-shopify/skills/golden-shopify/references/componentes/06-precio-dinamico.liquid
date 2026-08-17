@@ -1,0 +1,127 @@
+{% comment %} === COMPONENTE: Precio dinámico (PRICE_CONFIG) === {% endcomment %}
+{% comment %} Extraído de un product.json real y probado. Pegar como bloque custom_liquid. {% endcomment %}
+
+<script>
+window.PRICE_CONFIG = {
+  align: "center",
+
+  priceSize: "30px",
+  priceWeight: "700",
+  priceColor: "#2E2A39",
+
+  compareSize: "20px",
+  compareColor: "#555",
+  compareSpacing: "12px",
+
+  badgeText: "Oferta",
+  badgeBg: "#F6C706",
+  badgeColor: "#FFFFFF",
+  badgeSize: "14px",
+  badgeRadius: "10px",
+  badgePaddingY: "4px",
+  badgePaddingX: "8px",
+
+  savingTextPrefix: "💸 Estás ahorrando",
+  savingSize: "15px",
+  savingColor: "#2E2A39",
+  savingWeight: "600",
+  savingMarginTop: "-10px",
+
+  fontFamily: "Montserrat, sans-serif"
+};
+</script>
+
+<div class="custom-price-section">
+  <div class="custom-price-wrapper">
+    <span class="custom-price">
+      {{ product.selected_or_first_available_variant.price | money }}
+    </span>
+
+    {% if product.selected_or_first_available_variant.compare_at_price > product.selected_or_first_available_variant.price %}
+      <span class="custom-compare-price">
+        {{ product.selected_or_first_available_variant.compare_at_price | money }}
+      </span>
+      <span class="custom-badge"></span>
+    {% endif %}
+  </div>
+
+  {% if product.selected_or_first_available_variant.compare_at_price > product.selected_or_first_available_variant.price %}
+    <div class="custom-saving"></div>
+  {% endif %}
+</div>
+
+<style>
+.custom-price-section{
+  text-align:var(--align);
+  font-family:var(--ff);
+}
+.custom-price-wrapper{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+}
+.custom-price{
+  font-size:var(--ps);
+  font-weight:var(--pw);
+  color:var(--pc);
+}
+.custom-compare-price{
+  font-size:var(--cs);
+  text-decoration:line-through;
+  color:var(--cc);
+  margin-left:var(--csp);
+}
+.custom-badge{
+  background:var(--bbg);
+  color:var(--btc);
+  font-size:var(--bs);
+  padding:var(--bpy) var(--bpx);
+  border-radius:var(--br);
+  margin-left:var(--csp);
+}
+.custom-saving{
+  margin-top:var(--smt);
+  font-size:var(--ss);
+  color:var(--sc);
+  font-weight:var(--sw);
+}
+</style>
+
+<script>
+(function(){
+  const c = window.PRICE_CONFIG;
+  const root = document.querySelector(".custom-price-section");
+  if(!root) return;
+
+  root.style.setProperty("--align", c.align);
+  root.style.setProperty("--ff", c.fontFamily);
+
+  root.style.setProperty("--ps", c.priceSize);
+  root.style.setProperty("--pw", c.priceWeight);
+  root.style.setProperty("--pc", c.priceColor);
+
+  root.style.setProperty("--cs", c.compareSize);
+  root.style.setProperty("--cc", c.compareColor);
+  root.style.setProperty("--csp", c.compareSpacing);
+
+  root.style.setProperty("--bbg", c.badgeBg);
+  root.style.setProperty("--btc", c.badgeColor);
+  root.style.setProperty("--bs", c.badgeSize);
+  root.style.setProperty("--br", c.badgeRadius);
+  root.style.setProperty("--bpy", c.badgePaddingY);
+  root.style.setProperty("--bpx", c.badgePaddingX);
+
+  root.style.setProperty("--ss", c.savingSize);
+  root.style.setProperty("--sc", c.savingColor);
+  root.style.setProperty("--sw", c.savingWeight);
+  root.style.setProperty("--smt", c.savingMarginTop);
+
+  const badge = root.querySelector(".custom-badge");
+  if(badge) badge.innerText = c.badgeText;
+
+  const saving = root.querySelector(".custom-saving");
+  if(saving){
+    saving.innerText = `${c.savingTextPrefix} {{ product.selected_or_first_available_variant.compare_at_price | minus: product.selected_or_first_available_variant.price | money }}`;
+  }
+})();
+</script>

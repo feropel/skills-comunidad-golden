@@ -1,0 +1,18 @@
+{
+  "name": "golden360",
+  "version": "1.0.0",
+  "description": "La ruta completa: de una foto a vender. Investiga, monta la página, la pauta y el bot, con compuertas de calidad en cada paso.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "orquestador",
+    "lanzamiento",
+    "360",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden360/"
+  ]
+}

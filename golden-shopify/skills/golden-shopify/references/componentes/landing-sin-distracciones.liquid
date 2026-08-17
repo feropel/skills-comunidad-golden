@@ -1,0 +1,34 @@
+{% comment %} === COMPONENTE: Landing sin distracciones (ocultar header/menú/footer) === {% endcomment %}
+{% comment %} Pegar como bloque custom_liquid del main (o sección custom-liquid). {% endcomment %}
+{% comment %} Solo afecta la PÁGINA DE PRODUCTO (el CSS vive en este product.json), no toda la tienda. {% endcomment %}
+{% comment %} Objetivo: que el visitante no tenga a dónde irse y solo pueda comprar. {% endcomment %}
+
+{%- comment -%}
+═══════════════════════════════════════════════════
+  📝 EDITAR AQUI — qué ocultar (true / false)
+═══════════════════════════════════════════════════
+{%- endcomment -%}
+{% assign HIDE_HEADER_MENU = true %}   {%- comment -%} oculta el menú de navegación {%- endcomment -%}
+{% assign HIDE_HEADER_ALL  = false %}  {%- comment -%} oculta TODO el header (logo+carrito incluidos) {%- endcomment -%}
+{% assign DISABLE_LOGO_LINK = true %}  {%- comment -%} el logo deja de llevar al home (si se ve el header) {%- endcomment -%}
+{% assign HIDE_FOOTER      = true %}   {%- comment -%} oculta el footer (enlaces, políticas, menús) {%- endcomment -%}
+{% assign HIDE_SKIP_LINK   = true %}   {%- comment -%} oculta el "Ir directamente al contenido" {%- endcomment -%}
+
+{%- comment -%} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {%- endcomment -%}
+<style id="gfs-no-distraccion">
+{% if HIDE_SKIP_LINK %}.skip-to-content-link{position:absolute !important;left:-9999px !important;}{% endif %}
+{% if HIDE_HEADER_MENU %}
+  .header__inline-menu,.header__menu,nav.header__inline-menu,.list-menu--inline,
+  .header__menu-item,.header__icons .header__icon--search,.menu-drawer-container,
+  header-drawer,.header__icon--menu{display:none !important;}
+{% endif %}
+{% if DISABLE_LOGO_LINK %}
+  .header__heading-link,.header__heading a,a.header__heading-link{pointer-events:none !important;cursor:default !important;}
+{% endif %}
+{% if HIDE_HEADER_ALL %}
+  .header-wrapper,.header,.section-header,.shopify-section-group-header-group,#shopify-section-header{display:none !important;}
+{% endif %}
+{% if HIDE_FOOTER %}
+  .footer,.shopify-section-group-footer-group,footer.footer,#shopify-section-footer{display:none !important;}
+{% endif %}
+</style>

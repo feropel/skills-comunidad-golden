@@ -1,0 +1,57 @@
+{
+  "fecha": "2026-08-02",
+  "http": {
+    "aliexpress": {
+      "http": "200",
+      "bytes": 640990,
+      "magnitud": 6,
+      "redirigido": false,
+      "destino": "aliexpress.com",
+      "marcas": [
+        "iniciar sesión"
+      ]
+    },
+    "amazon": {
+      "http": "200",
+      "bytes": 1716438,
+      "magnitud": 7,
+      "redirigido": false,
+      "destino": "amazon.com",
+      "marcas": [
+        "anti-csrftoken"
+      ]
+    },
+    "temu": {
+      "http": "200",
+      "bytes": 2915,
+      "magnitud": 4,
+      "redirigido": false,
+      "destino": "temu.com",
+      "marcas": []
+    },
+    "mercadolibre": {
+      "http": "200",
+      "bytes": 23984,
+      "magnitud": 5,
+      "redirigido": true,
+      "destino": "mercadolibre.com.co",
+      "marcas": [
+        "account-verification"
+      ]
+    }
+  },
+  "ytdlp": {
+    "youtube_comentarios": {
+      "titulo_ok": true,
+      "vistas": 1799734121,
+      "likes": 19305183,
+      "comentarios": 15
+    },
+    "tiktok_comentarios": {
+      "titulo_ok": true,
+      "vistas": 49400,
+      "likes": 986,
+      "comentarios": 0
+    }
+  }
+}

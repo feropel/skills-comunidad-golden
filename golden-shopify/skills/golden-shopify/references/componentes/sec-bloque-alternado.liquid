@@ -1,0 +1,96 @@
+{% comment %} === COMPONENTE: BLOQUE ALTERNADO imagen + texto (G4.0) === {% endcomment %}
+{% comment %}
+  El patrón visual DOMINANTE de las páginas actuales. Absorbido de una página real.
+  Móvil: imagen arriba, texto abajo. PC: dos columnas; `--rev` invierte el lado.
+
+  Sirve para casi todo el cuerpo de la landing (mecanismo, seguridad, modo de uso,
+  combos, envío) — se repite con contenido distinto y la página respira porque el lado
+  de la imagen va alternando. Menos texto, más imagen.
+
+  ⚠️ Requiere `efx-reveal-seguro.liquid` cargado una vez (config center).
+  ⚠️ La imagen va con srcset + width/height + alt. Sin eso hay CLS y penaliza.
+{% endcomment %}
+
+{% comment %}
+═══════════════════════════════════════════════════
+  📝 EDITAR AQUI
+  LADO: "" = imagen a la izquierda · "gfs-alt--rev" = imagen a la derecha
+  IMG_BASE: URL del archivo en Shopify SIN parámetros (se le añaden los anchos)
+═══════════════════════════════════════════════════
+{% endcomment %}
+{% assign LADO     = "" %}
+{% assign KICKER   = "El kicker de esta sección" %}
+{% assign TITULO   = "El titular, con una parte <em>destacada</em>" %}
+{% assign PARRAFO  = "Un párrafo corto que explique el beneficio, no la ficha técnica." %}
+{% assign IMG_BASE = "" %}
+{% assign IMG_ALT  = "Descripción real de lo que se ve en la imagen" %}
+{% assign IMG_W    = 1080 %}
+{% assign IMG_H    = 1341 %}
+
+{% assign P1 = "<b>Primer punto.</b> La razón más fuerte va primero." %}
+{% assign P2 = "<b>Segundo punto.</b> Una objeción resuelta." %}
+{% assign P3 = "<b>Tercer punto.</b> Algo concreto y verificable." %}
+{% assign P4 = "" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.gfs-alt{max-width:1180px;margin:0 auto;padding:6px 14px 0;box-sizing:border-box;
+  font-family:var(--gfs-sans,inherit);}
+.gfs-alt__in{display:block;}
+.gfs-alt__txt{margin-top:10px;text-align:center;}
+.gfs-alt__k{display:block;font-size:13px;font-weight:800;letter-spacing:1.4px;text-transform:uppercase;
+  color:var(--brand-primary);margin:0 0 8px;}
+.gfs-alt__t{font-size:28px;line-height:1.12;font-weight:900;color:var(--brand-dark);
+  margin:0 0 8px;letter-spacing:-.6px;}
+.gfs-alt__t em{font-style:normal;color:var(--brand-primary);}
+.gfs-alt__p{font-size:16.5px;line-height:1.6;color:#5A5A5A;margin:0 auto 6px;max-width:520px;}
+.gfs-alt__m{display:block;width:100%;height:auto;object-fit:cover;border-radius:22px;
+  box-shadow:0 18px 38px rgba(var(--brand-primary-rgb),.14);
+  background:linear-gradient(160deg,var(--brand-light),#fff);}
+.gfs-alt__pts{list-style:none;padding:0;margin:8px auto 0;max-width:460px;text-align:left;}
+.gfs-alt__pts li{display:flex;gap:12px;align-items:flex-start;margin:0 0 14px;
+  font-size:16px;color:#4A4A4A;line-height:1.45;}
+.gfs-alt__pts b{color:var(--brand-dark);}
+.gfs-alt__pts i{flex:0 0 26px;height:26px;border-radius:50%;
+  background:rgba(var(--brand-primary-rgb),.12);color:var(--brand-primary);
+  display:flex;align-items:center;justify-content:center;font-style:normal;font-weight:900;
+  font-size:14px;margin-top:1px;}
+@media(min-width:900px){
+  .gfs-alt{padding:34px 24px 8px;}
+  .gfs-alt__in{display:grid;grid-template-columns:1fr 1.02fr;gap:52px;align-items:center;}
+  .gfs-alt__txt{text-align:left;margin-top:0;}
+  .gfs-alt__p{margin-left:0;font-size:17.5px;}
+  .gfs-alt__t{font-size:40px;}
+  .gfs-alt--rev .gfs-media{order:2;}
+  .gfs-alt--rev .gfs-alt__txt{order:1;}
+  .gfs-alt__m{animation:gfsAltFloat 7s ease-in-out infinite;}
+  @keyframes gfsAltFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-9px)}}
+}
+@media(prefers-reduced-motion:reduce){.gfs-alt__m{animation:none;}}
+</style>
+<section class="gfs-alt {{ LADO }}">
+  <div class="gfs-alt__in">
+    <div class="gfs-media">
+      {% if IMG_BASE != blank %}
+        <img class="gfs-alt__m"
+             src="{{ IMG_BASE }}?width=750"
+             srcset="{{ IMG_BASE }}?width=400 400w, {{ IMG_BASE }}?width=550 550w, {{ IMG_BASE }}?width=750 750w, {{ IMG_BASE }}?width=1000 1000w"
+             sizes="(min-width:900px) 520px, 94vw"
+             alt="{{ IMG_ALT | escape }}"
+             width="{{ IMG_W }}" height="{{ IMG_H }}"
+             loading="lazy" decoding="async">
+      {% endif %}
+    </div>
+    <div class="gfs-alt__txt">
+      <span class="gfs-alt__k gfs-r">{{ KICKER }}</span>
+      <h2 class="gfs-alt__t gfs-r" style="--d:80ms">{{ TITULO }}</h2>
+      <p class="gfs-alt__p gfs-r" style="--d:140ms">{{ PARRAFO }}</p>
+      <ul class="gfs-alt__pts gfs-r" style="--d:200ms">
+        <li><i>✓</i><span>{{ P1 }}</span></li>
+        <li><i>✓</i><span>{{ P2 }}</span></li>
+        <li><i>✓</i><span>{{ P3 }}</span></li>
+        {% if P4 != blank %}<li><i>✓</i><span>{{ P4 }}</span></li>{% endif %}
+      </ul>
+    </div>
+  </div>
+</section>

@@ -1,0 +1,327 @@
+/* ============================================================
+   GOLDEN PDF · hoja de estilo de impresión (Comunidad Golden)
+   Paleta y geometría desde assets/golden-brand.json
+   Objetivo: documento premium, legible e imprimible, y sobre
+   todo bloques de prompt ATÓMICOS (nunca cortados entre páginas).
+   ============================================================ */
+
+:root {
+  --page-bg: #faf9f5;
+  --surface: #ffffff;
+  --surface-soft: #f6f5f1;
+  --ink: #17140d;
+  --muted: #6b7280;
+  --line: #e7e4dc;
+  --gold: #b8912a;
+  --gold-strong: #d4af37;
+  --gold-soft: #e7c65a;
+  --gold-tint: #fbf5e2;
+  --gold-line: #ecd79a;
+  --on-gold: #1a1508;
+  --radius: 14px;
+
+  /* Alto máximo (mm) que puede ocupar una tarjeta de prompt para caber en
+     UNA página. build_pdf.py lo deriva de la geometría real (área útil menos
+     colchón de 20mm por el encabezado que precede a la tarjeta) y lo inyecta;
+     este valor es solo el fallback y debe cuadrar con esa derivación. */
+  --card-max-mm: 246;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --mono: "SF Mono", "JetBrains Mono", "Fira Code", ui-monospace, Menlo, Consolas, monospace;
+}
+
+/* El tamaño/margen reales del PDF los fija el renderizador (Playwright
+   pdf() o Chrome --print-to-pdf). Aquí solo tamaño de página por si el
+   motor respeta @page. */
+@page { size: A4; }
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: var(--font);
+  color: var(--ink);
+  background: var(--page-bg);
+  font-size: 11pt;
+  line-height: 1.5;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* ---------- Portada COMPACTA (norma FER 2026-08-03) ----------
+   "Un título grandote y una hoja casi vacía da hasta pereza leerla."
+   La portada NO ocupa una hoja entera: es una cabecera premium y el
+   CONTENIDO (índice o cuerpo) arranca en la MISMA hoja. */
+.cover {
+  break-after: avoid;
+  min-height: auto;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  padding: 0 4mm 6mm;
+  background:
+    radial-gradient(120mm 70mm at 82% 8%, rgba(212,175,55,0.12), transparent 60%),
+    var(--page-bg);
+}
+.cover .logo { width: 52px; height: 52px; margin-bottom: 12px; }
+/* El SVG inline trae width/height propios: forzarlo a llenar su caja */
+.logo svg, .cover .logo svg { width: 100%; height: 100%; display: block; }
+/* Igual para el logo alterno de --logo: sin esto, un PNG de 600px se sale de
+   la caja y se monta encima del título. */
+.logo img, .cover .logo img {
+  width: 100%; height: 100%; display: block; object-fit: contain;
+}
+.cover .kicker {
+  font-size: 9.5pt; font-weight: 600; color: var(--gold);
+  text-transform: uppercase; letter-spacing: 0.14em; margin: 0 0 8px;
+}
+.cover h1 {
+  font-size: 23pt; line-height: 1.1; margin: 0 0 8px;
+  letter-spacing: -0.02em; font-weight: 800; max-width: 165mm;
+}
+.cover .subtitle { font-size: 11.5pt; color: var(--muted); margin: 0; max-width: 165mm; }
+.cover .cover-rule {
+  height: 4px; width: 90px; margin: 12px 0;
+  background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+  border-radius: 4px;
+}
+.cover .cover-meta { margin-top: 10px; font-size: 9.5pt; color: var(--muted); }
+.cover .cover-meta strong { color: var(--ink); }
+
+/* ---------- Encabezado de secciones ---------- */
+.doc { padding: 0; }
+h2 {
+  font-size: 16pt; margin: 22px 0 8px; font-weight: 700;
+  letter-spacing: -0.01em; break-after: avoid;
+}
+h2::before {
+  content: ""; display: inline-block; width: 8px; height: 8px;
+  border-radius: 50%; margin-right: 9px; vertical-align: middle;
+  background: linear-gradient(145deg, var(--gold-soft), var(--gold));
+}
+h3 {
+  font-size: 12.5pt; margin: 16px 0 6px; font-weight: 700;
+  color: var(--ink); break-after: avoid;
+}
+p { margin: 0 0 9px; }
+a { color: var(--gold); text-decoration: none; }
+ul, ol { margin: 0 0 9px; padding-left: 20px; }
+li { margin: 2px 0; }
+hr { border: none; border-top: 1px solid var(--line); margin: 16px 0; }
+strong { font-weight: 700; }
+code.inline {
+  font-family: var(--mono); font-size: 0.9em;
+  background: var(--surface-soft); border: 1px solid var(--line);
+  padding: 0.5px 5px; border-radius: 5px; color: var(--ink);
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+  /* v5.9 · un span de codigo en linea (nombre de estado, ID) que cae justo en
+     el borde de pagina se partia a la mitad de la palabra — el propio auditor
+     lo cazo (informe Dolce, pagina 12->13, "SIN MOVIMIENTOS" cortado en "SIN"
+     / "MOVIMIENTOS"). break-inside:avoid lo mueve entero a la pagina que
+     sigue en vez de rebanarlo. */
+  break-inside: avoid; page-break-inside: avoid; white-space: nowrap;
+}
+
+/* ============================================================
+   TARJETA DE PROMPT — el corazón de la skill.
+   break-inside: avoid  → nunca se parte entre dos páginas.
+   Si es más alta que una página, autofit.js reduce el tipo
+   (y como último recurso escala) para que quepa entera.
+   ============================================================ */
+.prompt-card {
+  break-inside: avoid;
+  page-break-inside: avoid;   /* compatibilidad */
+  border: 1px solid var(--gold-line);
+  border-radius: var(--radius);
+  background: linear-gradient(180deg, var(--gold-tint), var(--surface) 60%);
+  margin: 14px 0;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.04);
+}
+.prompt-card .prompt-head {
+  display: flex; align-items: center; justify-content: space-between;
+  gap: 10px; padding: 8px 14px;
+  background: linear-gradient(145deg, var(--gold-soft), var(--gold));
+  color: var(--on-gold);
+}
+.prompt-card .prompt-title {
+  font-size: 10pt; font-weight: 700; letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+.prompt-card .prompt-tag {
+  font-size: 8pt; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; opacity: 0.8;
+}
+.prompt-card .prompt-body {
+  font-family: var(--mono);
+  font-size: 10pt;
+  line-height: 1.45;
+  white-space: pre-wrap;       /* respeta saltos, permite reflujo */
+  word-break: break-word;
+  padding: 13px 15px;
+  color: var(--ink);
+  margin: 0;
+  /* SIN ligaduras: JetBrains Mono fusiona >> // etc. en un solo glifo y el
+     copiar-pegar del PDF sale corrupto (>> se extraía como <>, // como </).
+     La página se VE igual; lo que protege esto es el texto extraíble. */
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
+}
+/* Prosa: misma fidelidad (texto escapado, saltos respetados) con fuente sans */
+.prompt-body.prose { font-family: var(--font); white-space: pre-wrap; }
+.prompt-card.was-scaled { box-shadow: 0 0 0 1px var(--gold-line) inset; }
+
+/* Bloque de prosa "prompt" (no monoespaciado), mismo comportamiento atómico */
+.note-card {
+  break-inside: avoid; page-break-inside: avoid;
+  border-left: 3px solid var(--gold); background: var(--surface-soft);
+  border-radius: 0 10px 10px 0; padding: 11px 15px; margin: 12px 0;
+}
+
+/* ============================================================
+   FIGURA (pantallas, diagramas, capturas) — v5.6
+   Atómica igual que la tarjeta de prompt: la imagen y su pie
+   viajan juntos y nunca se parten entre páginas. El alto máximo
+   sale de la misma geometría (--card-max-mm) para que una figura
+   grande no empuje su pie a la hoja siguiente.
+   ============================================================ */
+figure.figure {
+  break-inside: avoid; page-break-inside: avoid;
+  margin: 14px 0; padding: 10px 10px 7px;
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+}
+figure.figure img {
+  display: block; margin: 0 auto;
+  max-width: 100%; height: auto;
+  max-height: calc((var(--card-max-mm) - 20) * 1mm);
+  border-radius: 8px;
+}
+figure.figure figcaption {
+  margin-top: 8px; font-size: 8.8pt; color: var(--muted);
+  line-height: 1.35; text-align: left;
+}
+/* La insignia va en la fuente SANS a propósito (mismo motivo que .toc-count:
+   con la mono, el auditor la lee como bloque de prompt al filo del borde). */
+figure.figure .fig-num {
+  display: inline-block; margin-right: 6px;
+  font-size: 7.5pt; font-weight: 700; letter-spacing: 0.1em;
+  text-transform: uppercase; font-family: var(--font);
+  color: var(--on-gold); background: var(--gold-tint);
+  border: 1px solid var(--gold-line);
+  border-radius: 5px; padding: 0.5px 5px;
+}
+
+/* Tablas legibles e imprimibles. Las tablas largas SÍ se parten entre páginas
+   (una tabla entera saltando de hoja deja media página en blanco — el mismo
+   defecto de la portada vacía, en pequeño). La cabecera se repite en cada
+   página y ninguna FILA queda cortada a la mitad. */
+/* v5.9 · el crema de --gold-tint lleno en CADA th, multiplicado por cada tabla
+   de un documento con muchas tablas de datos (no tarjetas de prompt), inundaba
+   la pagina de amarillo y volvia el documento "aglomerado" — medido por FER
+   viendo el PDF real (informe Dolce, 24 tablas). El oro pasa a acento — un
+   borde inferior de 2px, no un relleno — y las filas de datos alternan un gris
+   casi imperceptible para que una tabla larga se pueda seguir sin cabecera
+   repitiendose cada linea. El padding sube porque el texto tocaba el borde. */
+table { width: 100%; border-collapse: collapse; margin: 12px 0; font-size: 10pt; break-inside: auto; }
+thead { display: table-header-group; }
+tr { break-inside: avoid; page-break-inside: avoid; }
+th, td { border: 1px solid var(--line); padding: 9px 12px; text-align: left; }
+th {
+  background: var(--surface); color: var(--ink); font-weight: 700;
+  border-bottom: 2px solid var(--gold); border-top: none;
+}
+tbody tr:nth-child(even) td { background: var(--surface-soft); }
+
+/* ---------- Página de CONTENIDO (norma FER v5.4) ----------
+   Se genera sola desde los encabezados del documento y va justo
+   después de la portada. Lista TODO lo que hay, línea por línea. */
+.toc {
+  /* Arranca en la MISMA hoja que la portada compacta (norma FER); el cuerpo
+     del documento sí empieza en hoja nueva (break-after de abajo). */
+  break-before: avoid;
+  break-after: page;
+  padding-top: 6mm;
+  border-top: 1px solid var(--gold-line);
+}
+.toc .kicker {
+  font-size: 8.5pt; letter-spacing: 0.16em; text-transform: uppercase;
+  color: var(--gold); margin: 0 0 4px;
+}
+.toc .toc-title {
+  font-size: 20pt; line-height: 1.05; letter-spacing: -0.02em;
+  margin: 0 0 8px; color: var(--ink);
+}
+.toc .toc-hint {
+  font-size: 9pt; color: var(--muted); margin: 0 0 10px;
+  max-width: 155mm; line-height: 1.4;
+}
+.toc-list {
+  list-style: none; margin: 0; padding: 0;
+  columns: 2; column-gap: 13mm;
+  border-top: 1px solid var(--gold-line);
+  padding-top: 10px;
+}
+.toc-list li {
+  break-inside: avoid; page-break-inside: avoid;
+  display: flex; align-items: baseline; gap: 7px;
+  padding: 2.6px 0;
+}
+.toc-list .toc-h2 {
+  font-size: 9.8pt; font-weight: 700; color: var(--ink);
+  margin-top: 8px; break-after: avoid; line-height: 1.4;
+}
+.toc-list .toc-h2:first-child { margin-top: 0; }
+.toc-list .toc-h3 {
+  font-size: 8.8pt; color: var(--muted); padding-left: 8px; line-height: 1.4;
+}
+/* OJO: la insignia va en la fuente SANS a propósito. Si usa la mono, el auditor
+   (audit_pdf.py) lee la página de CONTENIDO como si fuera un bloque de prompt
+   pegado al borde y tumba el veredicto con un falso positivo. */
+.toc-count {
+  flex: 0 0 auto; min-width: 17px; text-align: center;
+  font-size: 7.5pt; font-weight: 700; font-family: var(--font);
+  font-variant-numeric: tabular-nums;
+  color: var(--gold); background: var(--surface);
+  border: 1px solid var(--gold-line); border-radius: 5px;
+  padding: 0 3px; line-height: 1.5;
+}
+.toc-list .toc-text { flex: 1 1 auto; }
+
+/* Índice DENSO: lo activa build_pdf.py cuando el documento pasa de 70 líneas.
+   Tres columnas y tipo un punto más chico para que un manual largo no derrame
+   el índice a una segunda hoja medio vacía. */
+.toc.dense .toc-list { columns: 3; column-gap: 7mm; }
+.toc.dense .toc-list li { padding: 0.6px 0; gap: 4px; }
+.toc.dense .toc-list .toc-h2 { font-size: 8.9pt; margin-top: 4px; }
+.toc.dense .toc-list .toc-h3 { font-size: 8pt; padding-left: 6px; }
+.toc.dense .toc-count { min-width: 14px; font-size: 6.8pt; }
+.toc.dense .toc-hint { font-size: 8.5pt; margin-bottom: 8px; }
+/* Nivel 2 del índice denso (más de 105 líneas): cuatro columnas. Es el caso de
+   un manual de módulo completo; con tres seguía derramando media hoja. */
+.toc.dense-4 .toc-list { columns: 4; column-gap: 5mm; }
+.toc.dense-4 .toc-list .toc-h2 { font-size: 8.2pt; margin-top: 3px; line-height: 1.25; }
+.toc.dense-4 .toc-list .toc-h3 { font-size: 7.4pt; padding-left: 4px; line-height: 1.25; }
+.toc.dense-4 .toc-count { min-width: 12px; font-size: 6.2pt; padding: 0 2px; }
+
+/* Evita que un título quede huérfano al final de página */
+h2, h3 { break-after: avoid-page; }
+p, li { orphans: 2; widows: 2; }
+
+
+/* ============================================================
+   BLOQUE CON ESTILO  ::: nombre Título ... :::   (v5.7)
+   Contenedor atómico para que un documento largo respire. Neutro
+   por defecto; cada tema le pone color a las clases que use.
+   ============================================================ */
+.block {
+  break-inside: avoid; page-break-inside: avoid;
+  margin: 13px 0; padding: 13px 16px;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--surface-soft);
+}
+.block > :last-child { margin-bottom: 0; }
+.block .block-title {
+  font-size: 8pt; font-weight: 700; letter-spacing: 0.13em;
+  text-transform: uppercase; color: var(--gold); margin: 0 0 7px;
+}

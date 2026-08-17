@@ -1,0 +1,63 @@
+{% comment %} === COMPONENTE: MOTOR DE REVELADO SEGURO (G4.0) === {% endcomment %}
+{% comment %}
+  Absorbido de una página real en producción. Reemplaza al reveal-on-scroll anterior.
+
+  QUÉ ARREGLA (por eso es "seguro"):
+  1. **El CTA jamás se oculta.** El botón de compra y todo lo que venda quedan fuera del
+     revelado con !important. Si el observer falla, lo último que puede pasar es que el
+     cliente no vea el botón. Nunca se arriesga eso por una animación.
+  2. **Red de seguridad por tiempo.** A los 1.2 s todo lo que siga sin revelarse se marca
+     visible a la fuerza. Un IntersectionObserver que no dispara dejaba secciones en blanco.
+  3. **rootMargin enorme (1200 px).** Revela antes de que entre en pantalla; en móvil con
+     scroll rápido ya no se ve el "salto" de la sección apareciendo tarde.
+  4. **Re-escaneos.** Las secciones que Shopify inyecta después (apps, lazy) también entran.
+  5. **Opt-in por clase en <html>.** Sin JS, nada se oculta: la página funciona igual.
+
+  Va UNA sola vez por página (se protege con window.__gfsObs). Ponlo en el config center.
+{% endcomment %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style id="gfs-reveal">
+/* Sin la clase en <html> todo es visible: si el JS no corre, no se rompe nada */
+.gfs-r{opacity:1;transform:none;}
+html.gfs-anim .gfs-r{opacity:.001;transform:translateY(16px);
+  transition:opacity .55s cubic-bezier(.16,1,.3,1),transform .55s cubic-bezier(.16,1,.3,1);
+  transition-delay:var(--d,0ms);}
+html.gfs-anim .gfs-r.is-in{opacity:1;transform:none;}
+
+/* LO QUE VENDE NUNCA SE OCULTA — regla innegociable del componente */
+html.gfs-anim #custom-releasit-btn,
+html.gfs-anim #gfs-sticky-bar,
+html.gfs-anim .gfs-cta,
+html.gfs-anim .gfs-cta.gfs-r,
+html.gfs-anim [data-cod],
+.gfs-cta{opacity:1 !important;transform:none !important;}
+
+/* Las imágenes tampoco se ocultan: evita el hueco blanco mientras cargan */
+html.gfs-anim .gfs-media,html.gfs-anim .gfs-media *{opacity:1 !important;transform:none !important;}
+
+@media(prefers-reduced-motion:reduce){
+  html.gfs-anim .gfs-r{opacity:1;transform:none;transition:none;}
+}
+</style>
+<script>
+(function(){
+  if(window.__gfsObs)return;window.__gfsObs=1;
+  var ok=('IntersectionObserver' in window)&&!matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!ok)return;                        /* sin soporte o reduced-motion: todo visible, no se toca nada */
+  document.documentElement.classList.add('gfs-anim');
+  var io=new IntersectionObserver(function(es){
+    es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('is-in');io.unobserve(e.target);}});
+  },{rootMargin:'1200px 0px 1200px 0px',threshold:0});
+  function scan(){document.querySelectorAll('.gfs-r:not(.is-in)').forEach(function(el){io.observe(el);});}
+  scan();
+  [200,700,1500,2500].forEach(function(t){setTimeout(scan,t);});   /* secciones inyectadas tarde */
+  window.addEventListener('load',scan);
+  document.addEventListener('scroll',scan,{passive:true,once:true});
+  /* RED DE SEGURIDAD: pase lo que pase, a los 1.2 s todo es visible */
+  setTimeout(function(){
+    document.querySelectorAll('.gfs-r:not(.is-in)').forEach(function(el){el.classList.add('is-in');});
+  },1200);
+  window.gfsRevealScan=scan;
+})();
+</script>

@@ -1,0 +1,35 @@
+{% comment %} === COMPONENTE: Banda de autoridad / prueba social de marca === {% endcomment %}
+{% comment %} Absorbido de la tienda real: marquesina infinita con cifras de la TIENDA (no del producto). {% endcomment %}
+{% comment %} Va a media página, antes del cierre. Refuerza confianza de marca en todo el catálogo. {% endcomment %}
+{% comment %} ⚠️ REGLA #3 (G2.5): nunca se deja en placeholder visible con corchetes. Las cifras de abajo son un {% endcomment %}
+{% comment %}    EJEMPLO creíble y se entregan llenas; el dueño las REEMPLAZA por las reales cuando las tenga. {% endcomment %}
+{% comment %}    Son prueba social de marca (no dato de riesgo legal), por eso se rellenan como ejemplo. {% endcomment %}
+
+{% comment %}
+═══════════════════════════════════════════════════
+  📝 EDITAR AQUI — MENSAJES DE AUTORIDAD (separados por |)
+  ⚠️ EJEMPLO — reemplazar por las cifras reales de la tienda cuando existan.
+═══════════════════════════════════════════════════
+{% endcomment %}
+{% assign ITEMS = "Importadores directos|+12.000 clientes satisfechos|+30.000 productos entregados|Calidad premium garantizada" %}
+{% assign SEP_EMOJI = "★" %}
+{% assign SPEED = "26s" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.gfs-auth{margin:22px 0;padding:13px 0;background:linear-gradient(135deg,var(--brand-primary),var(--brand-dark));overflow:hidden;position:relative;}
+.gfs-auth__track{display:flex;width:max-content;animation:gfsAuthScroll var(--sp,26s) linear infinite;}
+.gfs-auth:hover .gfs-auth__track{animation-play-state:paused;}
+.gfs-auth__item{display:inline-flex;align-items:center;gap:10px;padding:0 26px;font-size:14px;font-weight:800;color:#fff;letter-spacing:.4px;text-transform:uppercase;white-space:nowrap;}
+.gfs-auth__sep{color:rgba(255,255,255,.55);font-size:12px;}
+@keyframes gfsAuthScroll{0%{transform:translateX(0);}100%{transform:translateX(-50%);}}
+@media(min-width:750px){.gfs-auth__item{font-size:16px;padding:0 34px;}}
+</style>
+<div class="gfs-auth" style="--sp:{{ SPEED }};">
+  <div class="gfs-auth__track">
+    {% assign LIST = ITEMS | split: '|' %}
+    {% for pass in (1..2) %}
+      {% for it in LIST %}<span class="gfs-auth__item">{{ it }}<span class="gfs-auth__sep">{{ SEP_EMOJI }}</span></span>{% endfor %}
+    {% endfor %}
+  </div>
+</div>

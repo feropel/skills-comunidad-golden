@@ -1,0 +1,162 @@
+{# === COMPONENTE: CONFIG CENTER (Paleta & Marca) — solo PRODUCTO DEMO/Shrine, base del sistema === #}
+{# Extraído de un product.json real y probado. Pegar como bloque custom_liquid. #}
+
+{% comment %}
+═══════════════════════════════════════════════════════════
+  🎨 PALETA & MARCA — CENTRO DE CONTROL
+  ───────────────────────────────────────────────────────────
+  CAMBIA AQUI los colores y datos del producto.
+  Todos los demas bloques (futuros y los del nuevo sistema)
+  heredan estos valores automaticamente.
+
+  Para un PRODUCTO NUEVO:
+    1. Cambia BRAND_NAME → nombre del producto
+    2. Cambia BRAND_PRIMARY → color principal
+    3. Cambia BRAND_DARK   → version oscura del color
+    4. Cambia BRAND_BRIGHT → version brillante (acentos)
+    5. Cambia BRAND_LIGHT  → tint claro para fondos
+    6. Cambia WHATSAPP_NUMBER → tu numero de WhatsApp
+
+  Eso es TODO. La pagina entera se reinventa.
+═══════════════════════════════════════════════════════════
+{% endcomment %}
+
+{% assign BRAND_NAME       = "PRODUCTO DEMO" %}
+{% assign BRAND_PRIMARY    = "#b82622" %}
+{% assign BRAND_DARK       = "#8e1c19" %}
+{% assign BRAND_BRIGHT     = "#ff5247" %}
+{% assign BRAND_LIGHT      = "#fff5f5" %}
+{% assign BRAND_TEXT       = "#ffffff" %}
+{% assign BRAND_TEXT_HOVER = "#ffe3e1" %}
+
+{% comment %} CTA fijo — VERDE GANADOR (REGLA #2). No cambiar salvo orden expreso. {% endcomment %}
+{% assign CTA_BG       = "#1D9E06" %}
+{% assign CTA_BG_DARK  = "#157A04" %}
+{% assign CTA_BG_RGB   = "29,158,6" %}
+
+{% assign WHATSAPP_NUMBER  = "573001234567" %}
+{% assign WHATSAPP_MESSAGE = "Hola, quiero información de PRODUCTO DEMO" %}
+
+{% assign REVIEW_COUNT     = "150" %}
+{% assign RATING_VALUE     = "4.9" %}
+
+{% comment %} Sello de versión de la skill con que se generó (poner la versión actual del changelog) {% endcomment %}
+{% assign GFS_VERSION      = "G3.14" %}
+{% assign GFS_DATE         = "2026-07-01" %}
+
+{% comment %}
+  Componentes RGB (triplete para usar en rgba)
+  Calculalos en https://www.rgbtohex.net/hex-to-rgb si cambias los colores.
+{% endcomment %}
+{% assign BRAND_PRIMARY_RGB = "184,38,34" %}
+{% assign BRAND_DARK_RGB    = "142,28,25" %}
+{% assign BRAND_BRIGHT_RGB  = "255,82,71" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<!-- Generado con GOLDEN SHOPIFY {{ GFS_VERSION }} · {{ BRAND_NAME }} · {{ GFS_DATE }} -->
+<style id="gfs-brand-tokens">
+:root{
+  --brand-name: "{{ BRAND_NAME }}";
+  --brand-primary: {{ BRAND_PRIMARY }};
+  --brand-dark: {{ BRAND_DARK }};
+  --brand-bright: {{ BRAND_BRIGHT }};
+  --brand-light: {{ BRAND_LIGHT }};
+  --brand-text: {{ BRAND_TEXT }};
+  --brand-text-hover: {{ BRAND_TEXT_HOVER }};
+  --brand-primary-rgb: {{ BRAND_PRIMARY_RGB }};
+  --brand-dark-rgb: {{ BRAND_DARK_RGB }};
+  --brand-bright-rgb: {{ BRAND_BRIGHT_RGB }};
+  --cta: {{ CTA_BG }};
+  --cta-dark: {{ CTA_BG_DARK }};
+  --cta-rgb: {{ CTA_BG_RGB }};
+}
+.gfs-reviews,.gfs-faq,.gfs-manifesto,.gfs-steps,.gfs-why,.gfs-lad,.pe-pyramid{content-visibility:auto;contain-intrinsic-size:auto 600px;}
+</style>
+<style id="gfs-desktop-apple">
+/* === LAYOUT ESCRITORIO (PC) estilo "Apple": ancho real, tipografía grande, rejillas, aire.
+   Capa centralizada y apagable (quita este <style> y vuelve al layout mobile-first).
+   Absorbida de un build real probado (PRODUCTO DEMO) en G2.1. === */
+@media(min-width:990px){
+  .gfs-steps,.gfs-reviews,.gfs-faq,.gfs-why,.gfs-lad,.pe-pyramid{max-width:1140px !important;margin-left:auto !important;margin-right:auto !important;}
+  .gfs-steps__title,.gfs-reviews__title,.gfs-faq__title,.gfs-why__title,.gfs-lad__h{font-size:40px !important;letter-spacing:-.6px !important;}
+  .gfs-steps__sub,.gfs-reviews__count,.gfs-why__sub{font-size:16px !important;}
+  /* Escalera → rejilla de tarjetas (no filas largas con lados vacíos) */
+  .gfs-lad{display:grid !important;grid-template-columns:repeat(2,1fr) !important;gap:22px !important;align-items:stretch !important;}
+  .gfs-lad__h{grid-column:1/-1 !important;margin-bottom:8px !important;}
+  .gfs-lad__row{margin-bottom:0 !important;height:100% !important;padding:26px 30px !important;}
+  .gfs-lad__t{font-size:22px !important;}
+  .gfs-lad__p{font-size:16px !important;}
+  /* FAQ ancha y legible */
+  .gfs-faq{max-width:920px !important;}
+  .gfs-faq__q{font-size:17px !important;padding:18px 24px !important;}
+  .gfs-faq__a p{font-size:15.5px !important;padding:0 24px 16px !important;}
+  /* Reseñas amplias */
+  .gfs-reviews__list .gfs-review{padding:24px 26px !important;}
+  .gfs-review__text{font-size:15.5px !important;line-height:1.6 !important;}
+  /* Bloques de la columna de compra: que no se vean "móvil" en PC */
+  .gfs-guarantee{max-width:640px !important;}
+  .gfs-ship{max-width:920px !important;}
+  .gfs-cd,.mb-banner__box{max-width:640px !important;}
+  /* Doble CTA más presente en PC */
+  .gfs-mid-cta{max-width:560px !important;}
+  #gfs-cta-mid{font-size:18px !important;min-height:60px !important;}
+}
+@media(min-width:1280px){
+  .gfs-steps,.gfs-reviews,.gfs-why,.gfs-lad,.pe-pyramid{max-width:1240px !important;}
+}
+</style>
+<style id="gfs-cta-center">
+/* Centra el texto de TODOS los CTA (botón Releasit, sticky, doble CTA y el botón del cart drawer de Releasit). Absorbido de build real en G2.2. */
+#custom-releasit-btn,#gfs-sticky-btn,#gfs-cta-mid{text-align:center !important;}
+#custom-releasit-btn span,#gfs-sticky-btn span,#gfs-cta-mid span{display:block;width:100%;text-align:center !important;line-height:1.2;transform:none !important;}
+._rsi-buy-now-button-cart,._rsi-modal-submit-button{text-align:center !important;justify-content:center !important;}
+</style>
+<style id="gfs-a11y">
+/* === Capa GLOBAL de accesibilidad (WCAG 2.2) — foco visible + respeto a reduced-motion.
+   Cubre toda la página de una vez: cualquier CTA, enlace o control gfs es operable por teclado
+   con un anillo de foco claro, y si el usuario pide menos movimiento, TODA animación gfs se calma. === */
+#custom-releasit-btn:focus-visible,#gfs-sticky-btn:focus-visible,#gfs-cta-mid:focus-visible,#gfs-mani-cta:focus-visible,.wa-float:focus-visible,.gfs-faq__q:focus-visible,.gfs-lad a:focus-visible,.gfs-manifesto a:focus-visible{outline:3px solid var(--brand-dark,#8e1c19) !important;outline-offset:3px !important;border-radius:12px;}
+@media(prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms !important;animation-iteration-count:1 !important;transition-duration:.01ms !important;}
+}
+</style>
+<script>
+/* === Globals para que TODOS los <script> que vienen despues lean de aqui === */
+window.GFS_BRAND = {
+  name:        {{ BRAND_NAME | json }},
+  primary:     {{ BRAND_PRIMARY | json }},
+  dark:        {{ BRAND_DARK | json }},
+  bright:      {{ BRAND_BRIGHT | json }},
+  light:       {{ BRAND_LIGHT | json }},
+  text:        {{ BRAND_TEXT | json }},
+  textHover:   {{ BRAND_TEXT_HOVER | json }},
+  whatsapp:    {{ WHATSAPP_NUMBER | json }},
+  whatsappMsg: {{ WHATSAPP_MESSAGE | json }},
+  reviewCount: {{ REVIEW_COUNT | json }},
+  ratingValue: {{ RATING_VALUE | json }}
+};
+</script>
+<script>
+/* === MOTOR COD ROBUSTO (gfsFireCOD) — G3.2, absorbido de la línea GOLDEN FULL, reconstruido.
+   Cualquier elemento con data-cod dispara el botón Releasit CORRECTO: prueba varios selectores,
+   EVITA el botón que vive dentro del modal, y REINTENTA si Releasit aún no inyectó el botón.
+   Más confiable que un simple .click(). Coexiste con los botones existentes (que ya funcionan). === */
+(function(){if(window.gfsFireCOD)return;
+  function inModal(el){return !!(el.closest&&el.closest('._rsi-cod-form-modal, ._rsi-modal-container'));}
+  function inner(el){if(!el)return null;return (el.classList&&el.classList.contains('_rsi-buy-now-button'))?el:((el.querySelector&&el.querySelector('._rsi-buy-now-button'))||el);}
+  function pick(){
+    var sels=['._rsi-buy-now-button-product:not(._rsi-buy-now-button-product-floating)','#_rsi-buy-now-button-overwrite','._rsi-buy-now-button-product-floating','#_rsi-buy-now-button-floating','._rsi-buy-now-button'];
+    for(var s=0;s<sels.length;s++){var n=document.querySelectorAll(sels[s]);for(var i=0;i<n.length;i++){if(!inModal(n[i]))return inner(n[i]);}}
+    return null;
+  }
+  function fire(el){var o={bubbles:true,cancelable:true,view:window};try{el.dispatchEvent(new MouseEvent('mousedown',o));}catch(e){}try{el.dispatchEvent(new MouseEvent('mouseup',o));}catch(e){}try{el.click();}catch(e){}}
+  var iv=null;
+  window.gfsFireCOD=function(){
+    if(iv){clearInterval(iv);iv=null;}
+    var b=pick(); if(b){fire(b);return true;}
+    var k=0;iv=setInterval(function(){var x=pick();if(x){fire(x);clearInterval(iv);iv=null;}else if(++k>=80){clearInterval(iv);iv=null;}},200);
+    return false;
+  };
+  document.addEventListener('click',function(e){var t=e.target&&e.target.closest?e.target.closest('[data-cod]'):null;if(t){e.preventDefault();window.gfsFireCOD();}},true);
+})();
+</script>

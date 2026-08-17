@@ -1,0 +1,43 @@
+{% comment %} === COMPONENTE: Sección educativa producto (Cómo actúa / Pirámide) — REEMPLAZAR por producto === {% endcomment %}
+{% comment %} Extraído de un product.json real y probado. Pegar como bloque custom_liquid. {% endcomment %}
+
+{% comment %}
+========================
+TEXTOS EDITABLES
+========================
+{% endcomment %}
+{% assign TITLE = "Cómo actúa PRODUCTO DEMO" %}
+{% assign SUBTITLE = "Tres fases, un solo objetivo: tu mejor versión" %}
+{% assign L1_LABEL = "Activación" %}
+{% assign L1_NOTES = "Primeros minutos · el impulso que enciende" %}
+{% assign L1_ICON = "⚡" %}
+{% assign L2_LABEL = "Rendimiento" %}
+{% assign L2_NOTES = "En el momento · energía y vigor sostenidos" %}
+{% assign L2_ICON = "🔥" %}
+{% assign L3_LABEL = "Resultados" %}
+{% assign L3_NOTES = "Con uso constante · vitalidad que se mantiene" %}
+{% assign L3_ICON = "🎯" %}
+{% assign ACCENT_COLOR = "var(--brand-primary)" %}
+{% assign DARK_ACCENT = "var(--brand-dark)" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.gfs-steps{max-width:560px;margin:8px auto;box-sizing:border-box;padding:0 14px;}
+.gfs-steps__title{text-align:center;font-size:24px;font-weight:800;color:#1a1a1a;letter-spacing:.3px;margin:0 0 4px;}
+.gfs-steps__sub{text-align:center;font-size:14px;color:#6b6b6b;margin:0 0 22px;font-style:italic;}
+.gfs-steps__grid{display:flex;flex-direction:column;gap:12px;}
+.gfs-step{display:flex;align-items:center;gap:14px;background:var(--brand-light);border:1px solid rgba(var(--brand-primary-rgb),.2);border-left:5px solid {{ ACCENT_COLOR }};border-radius:14px;padding:14px 16px;box-shadow:0 8px 24px rgba(var(--brand-primary-rgb),.08);}
+.gfs-step__icon{flex:0 0 46px;width:46px;height:46px;border-radius:50%;background:linear-gradient(135deg,{{ ACCENT_COLOR }},{{ DARK_ACCENT }});display:flex;align-items:center;justify-content:center;font-size:22px;box-shadow:0 4px 12px rgba(var(--brand-primary-rgb),.4),inset 0 1px 0 rgba(255,255,255,.25);}
+.gfs-step__label{font-size:13px;font-weight:800;color:{{ ACCENT_COLOR }};text-transform:uppercase;letter-spacing:.6px;margin:0 0 3px;}
+.gfs-step__notes{font-size:15px;font-weight:600;color:#1a1a1a;margin:0;}
+@media(min-width:990px){.gfs-steps{max-width:960px;}.gfs-steps__title{font-size:30px;}.gfs-steps__grid{flex-direction:row;align-items:stretch;gap:20px;}.gfs-step{flex:1;flex-direction:column;text-align:center;gap:14px;border-left:none;border-top:5px solid {{ ACCENT_COLOR }};padding:28px 18px;}.gfs-step__icon{width:54px;height:54px;flex:0 0 54px;font-size:26px;}}
+</style>
+<div class="gfs-steps">
+  <p class="gfs-steps__title">{{ TITLE }}</p>
+  <p class="gfs-steps__sub">{{ SUBTITLE }}</p>
+  <div class="gfs-steps__grid">
+    <div class="gfs-step"><div class="gfs-step__icon">{{ L1_ICON }}</div><div><p class="gfs-step__label">{{ L1_LABEL }}</p><p class="gfs-step__notes">{{ L1_NOTES }}</p></div></div>
+    <div class="gfs-step"><div class="gfs-step__icon">{{ L2_ICON }}</div><div><p class="gfs-step__label">{{ L2_LABEL }}</p><p class="gfs-step__notes">{{ L2_NOTES }}</p></div></div>
+    <div class="gfs-step"><div class="gfs-step__icon">{{ L3_ICON }}</div><div><p class="gfs-step__label">{{ L3_LABEL }}</p><p class="gfs-step__notes">{{ L3_NOTES }}</p></div></div>
+  </div>
+</div>

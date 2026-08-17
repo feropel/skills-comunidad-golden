@@ -1,0 +1,42 @@
+{% comment %} === COMPONENTE: TE SUENA? (identificación por escenas) === {% endcomment %}
+{% comment %} Fusión de la línea "GOLDEN FULL" → reconstruido en gfs- tokenizado y accesible (G3.2). {% endcomment %}
+{% comment %} Enganche emocional: el cliente se reconoce en 3-4 escenas de su problema, luego una conclusión {% endcomment %}
+{% comment %} que valida "esto es para ti". Va temprano en el embudo (tras el hero), antes de educar. {% endcomment %}
+
+{% comment %} 📝 EDITAR AQUI {% endcomment %}
+{% assign TITLE = "Te suena alguna de estas escenas?" %}
+{% assign E1_ICON = "🙈" %}{% assign E1 = "Escondes la zona para que nadie note el problema." %}
+{% assign E2_ICON = "😳" %}{% assign E2 = "Te da pena en momentos donde deberías estar tranquilo." %}
+{% assign E3_ICON = "🔁" %}{% assign E3 = "Probaste algo, mejoró un poco… y volvió a aparecer." %}
+{% assign E4_ICON = "💸" %}{% assign E4 = "Te asustan los procedimientos, las cicatrices o el costo." %}
+{% assign CONCL = "Si te pasa aunque sea una, esto te interesa." %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.gfs-sc{max-width:600px;margin:8px auto;padding:0 14px;box-sizing:border-box;}
+.gfs-sc__title{text-align:center;font-size:24px;font-weight:800;color:#1a1a1a;margin:0 0 20px;}
+.gfs-sc__list{display:flex;flex-direction:column;gap:11px;}
+.gfs-sc__item{display:flex;align-items:flex-start;gap:12px;background:#fff;border:1px solid rgba(var(--brand-primary-rgb),.28);border-radius:14px;padding:15px 16px;box-shadow:0 6px 18px rgba(var(--brand-primary-rgb),.06);opacity:0;transform:translateY(18px);transition:opacity .6s cubic-bezier(.16,1,.3,1),transform .6s cubic-bezier(.16,1,.3,1);}
+.gfs-sc.gfs-in .gfs-sc__item{opacity:1;transform:none;}
+.gfs-sc.gfs-in .gfs-sc__item:nth-child(1){transition-delay:.05s;}
+.gfs-sc.gfs-in .gfs-sc__item:nth-child(2){transition-delay:.18s;}
+.gfs-sc.gfs-in .gfs-sc__item:nth-child(3){transition-delay:.31s;}
+.gfs-sc.gfs-in .gfs-sc__item:nth-child(4){transition-delay:.44s;}
+.gfs-sc__ic{flex:0 0 26px;width:26px;height:26px;border-radius:50%;background:var(--brand-light,#fff5f5);display:flex;align-items:center;justify-content:center;font-size:14px;}
+.gfs-sc__tx{font-size:14.5px;color:#333;font-weight:600;line-height:1.45;margin:2px 0 0;text-align:left;}
+.gfs-sc__concl{margin-top:18px;text-align:center;background:linear-gradient(135deg,var(--brand-light,#fff5f5),#fff);border:1.5px solid rgba(var(--brand-primary-rgb),.55);border-radius:16px;padding:16px 18px;font-weight:800;font-size:16.5px;color:var(--brand-dark,#8e1c19);box-shadow:0 10px 26px rgba(var(--brand-primary-rgb),.12);opacity:0;transform:translateY(16px);transition:opacity .7s .6s cubic-bezier(.16,1,.3,1),transform .7s .6s cubic-bezier(.16,1,.3,1);}
+.gfs-sc.gfs-in .gfs-sc__concl{opacity:1;transform:none;}
+@media(min-width:990px){.gfs-sc{max-width:920px;}.gfs-sc__title{font-size:30px;}.gfs-sc__list{display:grid;grid-template-columns:1fr 1fr;gap:12px;}.gfs-sc__tx{font-size:15.5px;}.gfs-sc__concl{font-size:20px;max-width:620px;margin-left:auto;margin-right:auto;}}
+@media(prefers-reduced-motion:reduce){.gfs-sc__item,.gfs-sc__concl{transition:none !important;opacity:1 !important;transform:none !important;}}
+</style>
+<div class="gfs-sc">
+  <p class="gfs-sc__title">{{ TITLE }}</p>
+  <div class="gfs-sc__list">
+    <div class="gfs-sc__item"><div class="gfs-sc__ic" aria-hidden="true">{{ E1_ICON }}</div><p class="gfs-sc__tx">{{ E1 }}</p></div>
+    <div class="gfs-sc__item"><div class="gfs-sc__ic" aria-hidden="true">{{ E2_ICON }}</div><p class="gfs-sc__tx">{{ E2 }}</p></div>
+    <div class="gfs-sc__item"><div class="gfs-sc__ic" aria-hidden="true">{{ E3_ICON }}</div><p class="gfs-sc__tx">{{ E3 }}</p></div>
+    <div class="gfs-sc__item"><div class="gfs-sc__ic" aria-hidden="true">{{ E4_ICON }}</div><p class="gfs-sc__tx">{{ E4 }}</p></div>
+  </div>
+  <div class="gfs-sc__concl">{{ CONCL }}</div>
+</div>
+<script>(function(){var s=document.querySelector('.gfs-sc');if(!s)return;if(!('IntersectionObserver' in window)){s.classList.add('gfs-in');return;}var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){s.classList.add('gfs-in');io.unobserve(s);}});},{threshold:.2});io.observe(s);})();</script>

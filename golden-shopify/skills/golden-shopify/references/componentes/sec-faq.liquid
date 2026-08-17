@@ -1,0 +1,48 @@
+{% comment %} === COMPONENTE: Sección FAQ (acordeón ACCESIBLE, WCAG 2.2) === {% endcomment %}
+{% comment %} Extraído de un product.json real y probado. Pegar como bloque custom_liquid. {% endcomment %}
+{% comment %} A11y: la pregunta es un <button> real con aria-expanded/aria-controls; la respuesta es {% endcomment %}
+{% comment %} role="region" con aria-labelledby. Operable con teclado (Tab + Enter/Espacio), foco visible. {% endcomment %}
+
+{% comment %}
+========================
+TEXTOS EDITABLES
+========================
+{% endcomment %}
+{% assign TITLE = "Preguntas Frecuentes" %}
+{% assign Q1 = "Cómo se usa PRODUCTO DEMO?" %}
+{% assign A1 = "Muy fácil, siguiendo las indicaciones del empaque. <strong>Práctico y para usar en casa.</strong>" %}
+{% assign Q2 = "Qué tan rápido actúa?" %}
+{% assign A2 = "Es de <strong>acción progresiva</strong>: con <strong>uso constante</strong> se notan los mejores resultados." %}
+{% assign Q3 = "Es natural y seguro?" %}
+{% assign A3 = "Sí, siguiendo las instrucciones de uso. Si tienes alguna condición particular, consulta a un profesional de la salud." %}
+{% assign Q4 = "Cómo y cuándo pago?" %}
+{% assign A4 = "<strong>Pago contra entrega:</strong> pagas en efectivo cuando el transportador te entrega el pedido en la puerta de tu casa. Sin transferencias ni adelantos." %}
+{% assign Q5 = "El envío es discreto?" %}
+{% assign A5 = "Sí. Llega en <strong>empaque discreto</strong>, con <strong>envío gratis a todo el país</strong>, normalmente entre <strong>3 y 7 días hábiles</strong>." %}
+{% assign ACCENT_COLOR = "var(--brand-primary,#b82622)" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+.gfs-faq{max-width:560px;margin:8px auto;box-sizing:border-box;padding:0 14px;}
+.gfs-faq__title{text-align:center;font-size:24px;font-weight:800;color:#1a1a1a;margin:0 0 18px;}
+.gfs-faq__item{background:#fff;border:1px solid rgba(var(--brand-primary-rgb),.15);border-radius:14px;margin-bottom:10px;overflow:hidden;box-shadow:0 4px 14px rgba(0,0,0,.04);position:relative;}
+.gfs-faq__item::before{content:"";position:absolute;left:0;top:0;bottom:0;width:0;background:linear-gradient(180deg,{{ ACCENT_COLOR }},var(--brand-dark,#8e1c19));border-radius:14px 0 0 14px;transition:width .35s cubic-bezier(.16,1,.3,1);z-index:1;}
+.gfs-faq__item.gfs-open::before{width:4px;}
+.gfs-faq__q{all:unset;box-sizing:border-box;position:relative;z-index:2;display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;padding:14px 16px;cursor:pointer;font-family:inherit;font-size:14.5px;font-weight:700;color:#1a1a1a;text-align:left;}
+.gfs-faq__q::after{content:"+";font-size:22px;font-weight:700;color:{{ ACCENT_COLOR }};flex:0 0 auto;transition:transform .35s cubic-bezier(.16,1,.3,1);}
+.gfs-faq__item.gfs-open .gfs-faq__q[aria-expanded="true"]::after{transform:rotate(45deg);}
+.gfs-faq__q:focus-visible{outline:3px solid {{ ACCENT_COLOR }};outline-offset:-3px;border-radius:14px;}
+.gfs-faq__a{max-height:0;overflow:hidden;transition:max-height .4s cubic-bezier(.16,1,.3,1);}
+.gfs-faq__a p{padding:0 16px 14px;margin:0;font-size:14px;color:#555;line-height:1.6;text-align:left;}
+@media(min-width:990px){.gfs-faq{max-width:720px;}.gfs-faq__title{font-size:30px;}}
+@media(prefers-reduced-motion:reduce){.gfs-faq__item::before,.gfs-faq__q::after,.gfs-faq__a{transition:none !important;}}
+</style>
+<div class="gfs-faq">
+  <p class="gfs-faq__title">{{ TITLE }}</p>
+  <div class="gfs-faq__item"><button class="gfs-faq__q" type="button" id="gfs-faq-q1" aria-expanded="false" aria-controls="gfs-faq-a1"><span>{{ Q1 }}</span></button><div class="gfs-faq__a" id="gfs-faq-a1" role="region" aria-labelledby="gfs-faq-q1"><p>{{ A1 }}</p></div></div>
+  <div class="gfs-faq__item"><button class="gfs-faq__q" type="button" id="gfs-faq-q2" aria-expanded="false" aria-controls="gfs-faq-a2"><span>{{ Q2 }}</span></button><div class="gfs-faq__a" id="gfs-faq-a2" role="region" aria-labelledby="gfs-faq-q2"><p>{{ A2 }}</p></div></div>
+  <div class="gfs-faq__item"><button class="gfs-faq__q" type="button" id="gfs-faq-q3" aria-expanded="false" aria-controls="gfs-faq-a3"><span>{{ Q3 }}</span></button><div class="gfs-faq__a" id="gfs-faq-a3" role="region" aria-labelledby="gfs-faq-q3"><p>{{ A3 }}</p></div></div>
+  <div class="gfs-faq__item"><button class="gfs-faq__q" type="button" id="gfs-faq-q4" aria-expanded="false" aria-controls="gfs-faq-a4"><span>{{ Q4 }}</span></button><div class="gfs-faq__a" id="gfs-faq-a4" role="region" aria-labelledby="gfs-faq-q4"><p>{{ A4 }}</p></div></div>
+  <div class="gfs-faq__item"><button class="gfs-faq__q" type="button" id="gfs-faq-q5" aria-expanded="false" aria-controls="gfs-faq-a5"><span>{{ Q5 }}</span></button><div class="gfs-faq__a" id="gfs-faq-a5" role="region" aria-labelledby="gfs-faq-q5"><p>{{ A5 }}</p></div></div>
+</div>
+<script>(function(){var items=document.querySelectorAll('.gfs-faq__item');items.forEach(function(it){var q=it.querySelector('.gfs-faq__q');var a=it.querySelector('.gfs-faq__a');q.addEventListener('click',function(){var open=it.classList.contains('gfs-open');items.forEach(function(o){o.classList.remove('gfs-open');var oq=o.querySelector('.gfs-faq__q');var oa=o.querySelector('.gfs-faq__a');if(oq)oq.setAttribute('aria-expanded','false');if(oa)oa.style.maxHeight='0';});if(!open){it.classList.add('gfs-open');q.setAttribute('aria-expanded','true');a.style.maxHeight=a.scrollHeight+'px';}});});})();</script>

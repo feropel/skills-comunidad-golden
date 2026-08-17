@@ -1,0 +1,17 @@
+{
+  "name": "golden-blindaje",
+  "version": "1.0.0",
+  "description": "Auditoría de seguridad de tu propio entorno de agentes y credenciales.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "seguridad",
+    "auditoría",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-blindaje/"
+  ]
+}

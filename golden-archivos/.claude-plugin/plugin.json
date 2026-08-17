@@ -1,0 +1,17 @@
+{
+  "name": "golden-archivos",
+  "version": "1.0.0",
+  "description": "Toma control de carpetas caóticas y las deja con nombres y orden coherentes.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "orden",
+    "archivos",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-archivos/"
+  ]
+}

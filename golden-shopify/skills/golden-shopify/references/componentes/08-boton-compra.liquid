@@ -1,0 +1,178 @@
+{% comment %} === COMPONENTE: Botón de compra (dispara Releasit, RELEASIT_BUTTON_CONFIG) === {% endcomment %}
+{% comment %} Extraído de un product.json real y probado. Pegar como bloque custom_liquid. {% endcomment %}
+{% comment %} ⚠️ REGLA #2: COLOR DEL BOTÓN = VERDE GANADOR #1D9E06 (oscuro #157A04). Al construir, {% endcomment %}
+{% comment %} reemplazar el color del botón (aquí var(--cta)) por #1D9E06. SIEMPRE verde, todo producto. {% endcomment %}
+
+<script>
+window.RELEASIT_BUTTON_CONFIG = {
+  text: "QUIERO MI PRODUCTO DEMO 🔥 ",
+
+  width: "100%",
+  height: "58px",
+
+  paddingY: "14px",
+  paddingX: "20px",
+  marginTop: "12px",
+  marginBottom: "12px",
+
+  bgColor: "var(--cta)",
+  bgColorHover: "#347b77",
+
+  textColor: "#FFFFFF",
+  fontSize: "16px",
+  fontWeight: "700",
+  letterSpacing: "0.5px",
+
+  borderWidth: "1px",
+  borderStyle: "solid",
+  borderColor: "#FFFFFF",
+  borderRadius: "16px",
+
+  shadowColor: "rgba(0,0,0,0.35)",
+  shadowBlur: "20px",
+  shadowOffsetY: "8px",
+
+  hoverScale: 1.04,
+
+  animation: "pulse",
+  animationSpeed: "1.8s",
+
+  textOffsetX: "0px"
+};
+</script>
+
+<button id="custom-releasit-btn" type="button">
+  <span></span>
+</button>
+
+<style>
+#_rsi-buy-now-button-floating,._rsi-buy-now-button-product-floating{display:none !important;}
+/* === Anti-flash verde: oculta el botón Releasit hasta que nuestro paint() lo repinte === */
+._rsi-buy-now-button-cart:not([data-gfs-painted="1"]),
+._rsi-build-block-submit-button ._rsi-modal-submit-button:not([data-gfs-painted="1"]){opacity:0 !important;transition:opacity .25s ease !important;}
+._rsi-buy-now-button-cart[data-gfs-painted="1"],
+._rsi-build-block-submit-button ._rsi-modal-submit-button[data-gfs-painted="1"]{opacity:1 !important;}
+#custom-releasit-btn{
+  all:unset;
+  position:relative;
+  overflow:hidden;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  user-select:none;
+  transition:all .25s ease;
+  box-sizing:border-box;
+}
+#custom-releasit-btn:hover{
+  transform:scale(var(--hs));
+  background:var(--bh);
+}
+#custom-releasit-btn span{
+  position:relative;
+  z-index:2;
+  transform:translateX(var(--tox));
+}
+#custom-releasit-btn::before{content:"";position:absolute;top:0;left:-100%;width:60%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.45),transparent);animation:ggBtnShine 3.5s infinite;pointer-events:none;z-index:1;}
+@keyframes ggBtnShine{0%{left:-100%;}40%{left:140%;}100%{left:140%;}}
+@keyframes pulse{
+  0%{transform:scale(1)}
+  50%{transform:scale(1.05)}
+  100%{transform:scale(1)}
+}
+@keyframes shake{
+  0%{transform:translateX(0)}
+  25%{transform:translateX(-2px)}
+  50%{transform:translateX(2px)}
+  75%{transform:translateX(-2px)}
+  100%{transform:translateX(0)}
+}
+</style>
+
+<script>
+(function(){
+  const c=window.RELEASIT_BUTTON_CONFIG;
+  const b=document.getElementById("custom-releasit-btn");
+  if(!b) return;
+
+  b.querySelector("span").innerText=c.text;
+
+  b.style.width=c.width;
+  b.style.height=c.height;
+  b.style.padding=`${c.paddingY} ${c.paddingX}`;
+  b.style.marginTop=c.marginTop;
+  b.style.marginBottom=c.marginBottom;
+
+  b.style.background=c.bgColor;
+  b.style.color=c.textColor;
+  b.style.fontSize=c.fontSize;
+  b.style.fontWeight=c.fontWeight;
+  b.style.letterSpacing=c.letterSpacing;
+
+  b.style.border=`${c.borderWidth} ${c.borderStyle} ${c.borderColor}`;
+  b.style.borderRadius=c.borderRadius;
+
+  b.style.boxShadow=`0 ${c.shadowOffsetY} ${c.shadowBlur} ${c.shadowColor}`;
+
+  b.style.setProperty("--hs",c.hoverScale);
+  b.style.setProperty("--bh",c.bgColorHover);
+  b.style.setProperty("--tox",c.textOffsetX);
+
+  if(c.animation==="pulse") b.style.animation=`pulse ${c.animationSpeed} infinite`;
+  if(c.animation==="shake") b.style.animation=`shake ${c.animationSpeed} infinite`;
+
+  b.addEventListener("click",function(){
+    const r=document.querySelector("#_rsi-buy-now-button-overwrite, ._rsi-buy-now-button");
+    if(r) r.click();
+  });
+})();
+</script>
+
+{% comment %}
+═══════════════════════════════════════════════════
+  📝 EDITAR AQUI — COLOR DE LOS BOTONES DE RELEASIT (por producto)
+
+  PRIMARY  = botón COD (Pagar Contra Entrega) → el principal
+  SECONDARY = botón Pago Anticipado (MercadoPago / PSE) → déjalo vacío "" para
+              conservar el color original de Releasit; ponle un color para overridearlo.
+═══════════════════════════════════════════════════
+{% endcomment %}
+{% assign RSI_PRIMARY_BG = "var(--cta)" %}
+{% assign RSI_SECONDARY_BG = "" %}
+{% assign RSI_TEXT = "#ffffff" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<script>
+(function(){
+  var P="{{ RSI_PRIMARY_BG }}",S="{{ RSI_SECONDARY_BG }}",T="{{ RSI_TEXT }}";
+  function paintEl(el,bg){
+    if(!el||!bg) return;
+    el.style.setProperty('background',bg,'important');
+    el.style.setProperty('background-color',bg,'important');
+    if(T) el.style.setProperty('color',T,'important');
+    el.setAttribute('data-gfs-painted','1');
+  }
+  function paint(){
+    if(P){
+      document.querySelectorAll('._rsi-build-block-submit-button ._rsi-modal-submit-button').forEach(function(el){paintEl(el,P);});
+      document.querySelectorAll('._rsi-buy-now-button-cart').forEach(function(el){paintEl(el,P);});
+    }
+    if(S){
+      document.querySelectorAll('._rsi-build-block-custom-button ._rsi-buy-now-custom-additionals-button').forEach(function(el){paintEl(el,S);});
+    }
+    // SYNC: el botón del cart drawer copia el texto del botón principal
+    try{var cfg=window.RELEASIT_BUTTON_CONFIG;if(cfg&&cfg.text){document.querySelectorAll('._rsi-buy-now-button-cart').forEach(function(el){var sp=el.querySelector('span');if(sp&&sp.textContent.trim()!==cfg.text.trim())sp.textContent=cfg.text;else if(!sp&&el.textContent.trim()!==cfg.text.trim())el.textContent=cfg.text;});}}catch(e){}
+  }
+  function init(){
+    paint();
+    var throttle=null;
+    function tPaint(){if(throttle)return;throttle=setTimeout(function(){throttle=null;paint();},120);}
+    var mo=new MutationObserver(function(muts){
+      for(var i=0;i<muts.length;i++) if(muts[i].addedNodes.length){tPaint();return;}
+    });
+    if(document.body) mo.observe(document.body,{childList:true,subtree:true});
+    document.addEventListener('click',function(){paint();setTimeout(paint,40);setTimeout(paint,160);setTimeout(paint,400);},true);
+  }
+  if(document.body){init();}else if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',init);}else{init();}
+})();
+</script>

@@ -1,0 +1,67 @@
+{% comment %} === COMPONENTE: DOLOR SEGMENTADO por público (G4.0) === {% endcomment %}
+{% comment %}
+  Absorbido de una página real que le vende al mismo tiempo a dos públicos distintos.
+
+  EL PROBLEMA QUE RESUELVE: cuando un producto le sirve a dos perfiles (ella y él, deportista
+  y oficinista, dueño de mascota y criador), una sola sección de dolor le habla a los dos a
+  medias y no le pega a ninguno. El cliente no se reconoce y se va.
+
+  LA SOLUCIÓN: DOS secciones de dolor seguidas, cada una con su público, su escena y su
+  imagen. Cada visitante se salta la que no es suya en dos segundos y se clava en la propia.
+
+  CUÁNDO USARLO:
+  - SÍ: el producto tiene dos públicos con dolores DISTINTOS y ambos compran.
+  - NO: hay un público dominante (más del ~75%). Ahí segmentar diluye — una sola sección
+    bien afilada convierte más.
+  - NO: los dos públicos tienen el MISMO dolor. Entonces no hay nada que segmentar.
+
+  ⚠️ No usar la segmentación para excluir. Nunca "el masculino" / "el femenino" si el
+  producto no es exclusivo de un género: es cuestión de a quién le hablas en esa sección,
+  no de a quién le sirve el producto.
+
+  CÓMO: duplica este archivo dos veces (una por público) y alterna el LADO de la imagen
+  para que se lean como dos escenas y no como un bloque repetido.
+{% endcomment %}
+
+{% assign PUBLICO  = "A" %}
+{% assign LADO     = "" %}
+
+{% assign KICKER   = "Para quien [describe el público, sin excluir a nadie]" %}
+{% assign TITULO   = "La escena que <em>le pasa a este público</em>" %}
+{% assign PARRAFO  = "Una situación concreta de su día, contada como se la contaría un amigo. Nada de lista clínica." %}
+
+{% assign IMG_BASE = "" %}
+{% assign IMG_ALT  = "Describe la escena que se ve en la imagen" %}
+{% assign IMG_W    = 1080 %}
+{% assign IMG_H    = 1341 %}
+
+{% assign D1 = "<b>Momento 1.</b> Cuándo le pasa." %}
+{% assign D2 = "<b>Momento 2.</b> Qué siente cuando le pasa." %}
+{% assign D3 = "<b>Momento 3.</b> Qué ha intentado y no le funcionó." %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<section class="gfs-alt {{ LADO }}" data-publico="{{ PUBLICO }}">
+  <div class="gfs-alt__in">
+    <div class="gfs-media">
+      {% if IMG_BASE != blank %}
+        <img class="gfs-alt__m"
+             src="{{ IMG_BASE }}?width=750"
+             srcset="{{ IMG_BASE }}?width=400 400w, {{ IMG_BASE }}?width=550 550w, {{ IMG_BASE }}?width=750 750w, {{ IMG_BASE }}?width=1000 1000w"
+             sizes="(min-width:900px) 520px, 94vw"
+             alt="{{ IMG_ALT | escape }}"
+             width="{{ IMG_W }}" height="{{ IMG_H }}"
+             loading="lazy" decoding="async">
+      {% endif %}
+    </div>
+    <div class="gfs-alt__txt">
+      <span class="gfs-alt__k gfs-r">{{ KICKER }}</span>
+      <h2 class="gfs-alt__t gfs-r" style="--d:80ms">{{ TITULO }}</h2>
+      <p class="gfs-alt__p gfs-r" style="--d:140ms">{{ PARRAFO }}</p>
+      <ul class="gfs-alt__pts gfs-r" style="--d:200ms">
+        <li><i>·</i><span>{{ D1 }}</span></li>
+        <li><i>·</i><span>{{ D2 }}</span></li>
+        <li><i>·</i><span>{{ D3 }}</span></li>
+      </ul>
+    </div>
+  </div>
+</section>

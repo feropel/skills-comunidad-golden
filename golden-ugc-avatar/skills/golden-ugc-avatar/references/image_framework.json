@@ -1,0 +1,136 @@
+{
+  "_meta": {
+    "name": "higgsfield_ugc_avatar_framework",
+    "version": "2.0",
+    "purpose": "Field-by-field schema for building a hyperrealistic UGC avatar image prompt for the Higgsfield MCP. Default model is soul_2 (Higgsfield Soul 2.0) for UGC/portrait/character; use nano_banana_pro for max-quality or on-image-text frames. Fill every field, then flatten in block order into one descriptive paragraph of 150-400 words. Block 1 and Block 3 are LOCKED once defined and must be reused verbatim across every image of the same avatar — that is what keeps the character recognizably the same person.",
+    "how_to_use": "1) Copy the `template` object. 2) Fill each field, choosing from `options` where provided or writing free text. 3) Flatten using `flatten_order` into a single paragraph. 4) Pass that paragraph as `prompt` to generate_image with model soul_2 (or nano_banana_pro). 5) Save the filled `block_3_subject` object as the avatar's reusable identity card. NOTE: for true reuse prefer Higgsfield's native identity tools — train a Soul (show_characters action=train, 5-20 photos) and pass the returned soul_id with model soul_2, or save a Reference Element. The text identity card below is the fallback when no Soul/Element is used.",
+    "identity_strategy": {
+      "soul_trained": "show_characters action=train (5-20 photos, ~10 min) -> soul_id -> generate_image model=soul_2 with soul_id. Most identity-faithful, one person per generation.",
+      "reference_element": "show_reference_elements action=create from one image -> reusable reference. Works across many models, allows multiple subjects in one shot.",
+      "one_off": "Generate from text only, then reuse the first approved image's job_id as a reference (medias role=image) on every later shot so the face holds."
+    }
+  },
+
+  "flatten_order": [
+    "block_1_quality_style",
+    "block_2_composition",
+    "block_3_subject",
+    "block_4_foreground",
+    "block_5_background"
+  ],
+
+  "template": {
+    "block_1_quality_style": {
+      "_lifespan": "LOCKED across all generations of all avatars in the UGC style",
+      "_why": "Mixing rendering styles between shots is the fastest way to break the illusion that two images show the same real person.",
+      "overall_style": "hyperrealistic",
+      "device_aesthetic": "high-end smartphone camera, modern iPhone",
+      "texture_rendering": "ultra-detailed lifelike skin with visible pores, realistic individual hair strands, precise fabric weave",
+      "lighting_signature": "natural smartphone HDR, sharp focus, slight digital sharpening",
+      "imperfection_layer": "subtle real-camera imperfections: faint sensor noise, mild lens softness at edges, true-to-life color (not over-saturated)"
+    },
+
+    "block_2_composition": {
+      "_lifespan": "Changes per scene",
+      "content_type": {
+        "_choose_one": true,
+        "options": {
+          "ugc_selfie": "selfie photograph, close-up, eye level or slightly high angle, slight wide-angle lens distortion, arm's-length framing",
+          "talking_head": "portrait, head and shoulders, eye level, 85mm portrait compression, shallow depth of field",
+          "full_lifestyle": "full body shot, three-quarter framing, eye level, environmental context visible"
+        }
+      },
+      "orientation": { "_choose_one": true, "options": ["vertical 9:16", "square 1:1"] },
+      "framing_notes": "free text: how much headroom, where the eyes sit, any handheld tilt"
+    },
+
+    "block_3_subject": {
+      "_lifespan": "IDENTITY LOCKED forever; only clothing/pose/expression/accessories change per scene",
+      "_why": "These fields are the avatar's identity card. Reusing them verbatim is what lets one avatar appear in dozens of videos as the same recognizable person.",
+      "identity_locked": {
+        "demographics": {
+          "gender": "free text (e.g., female)",
+          "apparent_age": "free text (e.g., 22)",
+          "ethnicity": "free text (e.g., Latina)"
+        },
+        "physical_build": {
+          "body_type": "free text (e.g., slim athletic)",
+          "height_impression": "free text (e.g., average height)",
+          "skin_tone": "free text (e.g., warm light-brown, golden undertone)"
+        },
+        "hair": {
+          "color": "free text (e.g., dark brown with subtle caramel highlights)",
+          "texture": "free text (e.g., loose waves)",
+          "length": "free text (e.g., mid-back)",
+          "default_style": "free text (e.g., center part, soft face-framing layers)"
+        },
+        "face": {
+          "shape": "free text (e.g., oval with soft jawline)",
+          "complexion": "free text (e.g., clear, dewy, light freckles across nose)",
+          "eyes": "free text (color, shape, lashes — e.g., warm brown, almond, full natural lashes)",
+          "eyebrows": "free text (e.g., full, softly arched, natural)",
+          "nose": "free text (e.g., straight bridge, refined tip)",
+          "mouth": "free text (e.g., medium-full lips, natural rose tone)",
+          "jawline": "free text (e.g., soft, feminine)",
+          "distinguishing_marks": "free text (e.g., small beauty mark above left lip) — keep these consistent, they are strong identity anchors"
+        }
+      },
+      "changes_per_scene": {
+        "clothing": "free text (e.g., oversized cream knit sweater)",
+        "pose": "free text (e.g., holding phone at arm's length, head slightly tilted)",
+        "expression": "free text (e.g., warm relaxed half-smile, eyes to camera)",
+        "accessories": "free text (e.g., small gold hoop earrings) — keep minimal for UGC realism"
+      }
+    },
+
+    "block_4_foreground": {
+      "_lifespan": "Changes per scene; keep minimal",
+      "_why": "Clutter reads as a staged set, not a real person's phone video.",
+      "props": "free text, 0-2 items (e.g., a phone in hand, a ceramic coffee mug)"
+    },
+
+    "block_5_background": {
+      "_lifespan": "Changes per scene",
+      "_why": "Background lighting must match Block 1's smartphone aesthetic, or a studio-clean background behind a 'selfie' instantly looks fake.",
+      "setting": "free text (e.g., sunlit bedroom, soft white bedding, plant in corner)",
+      "lighting": "free text consistent with Block 1 (e.g., soft morning window light, warm)",
+      "depth_of_field": "free text (e.g., gently blurred background, subject in sharp focus)",
+      "key_elements": "free text, the 1-3 things actually visible behind the subject"
+    }
+  },
+
+  "filled_example": {
+    "_scenario": "Profile B / Millennial Wellness avatar, morning skincare UGC selfie",
+    "block_1_quality_style": "Hyperrealistic image, shot on a modern iPhone, ultra-detailed lifelike skin with visible pores and realistic hair strands, natural smartphone HDR lighting, sharp focus with slight digital sharpening and faint true-to-life sensor noise.",
+    "block_2_composition": "Selfie photograph, close-up, slightly high angle, arm's-length framing with mild wide-angle distortion, vertical 9:16.",
+    "block_3_subject": "A 28-year-old Latina woman, slim build, warm light-brown skin with a golden undertone; dark brown mid-back hair in loose waves with a center part and soft face-framing layers; oval face with a soft jawline, clear dewy complexion and light freckles across the nose, warm brown almond eyes with full natural lashes, softly arched full brows, straight refined nose, medium-full natural-rose lips, a small beauty mark above the left lip; wearing an oversized cream knit sweater, relaxed warm half-smile, eyes to camera, holding the phone at arm's length with head slightly tilted.",
+    "block_4_foreground": "A ceramic coffee mug just visible at the bottom edge of frame.",
+    "block_5_background": "A sunlit bedroom with soft white bedding and a leafy plant in the corner, warm soft morning window light, background gently blurred with the subject in sharp focus.",
+    "flattened_prompt": "Hyperrealistic image, shot on a modern iPhone, ultra-detailed lifelike skin with visible pores and realistic hair strands, natural smartphone HDR lighting, sharp focus with slight digital sharpening and faint true-to-life sensor noise. Selfie photograph, close-up, slightly high angle, arm's-length framing with mild wide-angle distortion, vertical 9:16. A 28-year-old Latina woman, slim build, warm light-brown skin with a golden undertone; dark brown mid-back hair in loose waves with a center part and soft face-framing layers; oval face with a soft jawline, clear dewy complexion and light freckles across the nose, warm brown almond eyes with full natural lashes, softly arched full brows, straight refined nose, medium-full natural-rose lips, a small beauty mark above the left lip; wearing an oversized cream knit sweater, relaxed warm half-smile, eyes to camera, holding the phone at arm's length with head slightly tilted. A ceramic coffee mug just visible at the bottom edge of frame. A sunlit bedroom with soft white bedding and a leafy plant in the corner, warm soft morning window light, background gently blurred with the subject in sharp focus."
+  },
+
+  "settings": {
+    "_verify": "These are live-verified defaults; confirm exact ranges with models_explore action=get before relying on them. Tool: generate_image. Pass the flattened paragraph as `prompt`; set model + params at the top level of params.",
+    "default_model": "soul_2",
+    "models": {
+      "soul_2": {
+        "label": "Higgsfield Soul 2.0 — default for UGC/portrait/character",
+        "params": { "quality": ["1.5k", "2k"], "quality_default": "2k", "soul_id": "optional — from a trained Soul (show_characters)" },
+        "aspect_ratios": ["1:1", "16:9", "9:16", "4:3", "3:4", "3:2", "2:3"],
+        "medias": [{ "role": "image", "max": 1 }]
+      },
+      "nano_banana_pro": {
+        "label": "Google Nano Banana Pro — max quality, on-image text, diagrams, one-off refs",
+        "params": { "resolution": ["1k", "2k", "4k"], "resolution_default": "1k" },
+        "aspect_ratios": ["1:1", "9:16", "16:9", "4:5", "5:4", "4:3", "3:4", "3:2", "2:3", "21:9"],
+        "medias": [{ "role": "image" }]
+      }
+    },
+    "ugc_recommended": { "model": "soul_2", "aspect_ratio": "9:16", "quality": "2k" },
+    "media_rule": "Pass references as medias:[{role:'image', value:'<media_id or job_id>'}]. Never pass a raw URL — import web URLs first with media_import_url; upload local files with media_upload_widget (Apps UI) or media_upload -> PUT bytes -> media_confirm.",
+    "cost_preflight": "Set params.get_cost=true to return the credit cost WITHOUT submitting a job. Use before any generation the user has not pre-approved.",
+    "no_polling": "There is no job_status tool. generate_image returns a job id; render it with job_display (one id per call). Do not loop a poll step."
+  },
+
+  "negative_guidance": "soul_2 and nano_banana_pro are positive-prompt driven, so steer away from artifacts by adding counter-language to the relevant block: plastic/airbrushed skin, over-saturated color, doll-like symmetry, mismatched lighting between subject and background, extra fingers, warped accessories, studio-perfect backdrop behind a casual selfie. Example counter-language: 'natural asymmetric features, real skin texture, not airbrushed, true-to-life color'."
+}

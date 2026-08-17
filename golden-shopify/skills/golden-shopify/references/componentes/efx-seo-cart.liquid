@@ -1,0 +1,46 @@
+{% comment %} === COMPONENTE: SEO JSON-LD + carrito animado === {% endcomment %}
+{% comment %} Schema de producto (SEO) + animación del ícono carrito. Independiente. {% endcomment %}
+{% comment %} BLOQUE INDEPENDIENTE: se apaga/prende solo desde el editor de Shopify (ojo del bloque). {% endcomment %}
+
+{% comment %}
+═══════════════════════════════════════════════════
+  📝 EDITAR AQUI — CARRITO CINEMATOGRÁFICO + SCHEMA SEO (por producto)
+═══════════════════════════════════════════════════
+{% endcomment %}
+{% assign CART_COLOR = "var(--brand-primary)" %}
+{% assign CART_COLOR_HOVER = "var(--brand-dark)" %}
+{% assign SCHEMA_RATING = "4.9" %}
+{% comment %} SCHEMA_REVIEWS: pon el NÚMERO REAL de reseñas para mostrar estrellas en Google. Déjalo "" (vacío) si aún no tienes un conteo real → no se renderiza aggregateRating (REGLA #3: no inventar). {% endcomment %}
+{% assign SCHEMA_REVIEWS = "" %}
+
+{% comment %} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {% endcomment %}
+<style>
+/* === CARRITO CINEMATOGRÁFICO === */
+.header__icon[href*="/cart"],.header__icon--cart,header a[href*="/cart"],[class*="cart-link"],[class*="site-header__cart"]{position:relative !important;display:inline-flex !important;align-items:center !important;justify-content:center !important;animation:gfsCartCinematic 8s ease-in-out infinite !important;transition:transform .35s cubic-bezier(.16,1,.3,1),filter .35s ease !important;}
+.header__icon[href*="/cart"] svg,.header__icon--cart svg,header a[href*="/cart"] svg,[class*="cart-link"] svg,[class*="site-header__cart"] svg{color:{{ CART_COLOR }} !important;fill:{{ CART_COLOR }} !important;transition:all .35s ease !important;}
+
+.header__icon[href*="/cart"]:hover,.header__icon--cart:hover,header a[href*="/cart"]:hover,[class*="cart-link"]:hover,[class*="site-header__cart"]:hover{transform:scale(1.25) !important;}
+.header__icon[href*="/cart"]:hover svg,.header__icon--cart:hover svg,header a[href*="/cart"]:hover svg,[class*="cart-link"]:hover svg,[class*="site-header__cart"]:hover svg{color:{{ CART_COLOR_HOVER }} !important;fill:{{ CART_COLOR_HOVER }} !important;}
+@keyframes gfsCartCinematic{0%,84%,100%{transform:scale(1) rotate(0);}86%{transform:scale(1.12) rotate(-15deg);}88%{transform:scale(1.18) rotate(14deg);}90%{transform:scale(1.15) rotate(-12deg);}92%{transform:scale(1.12) rotate(8deg);}94%{transform:scale(1.05) rotate(0);}}
+</style>
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "Product",
+  "name": {{ product.title | json }},
+  "image": [{% for img in product.images limit:4 %}"https:{{ img | image_url: width: 1200 }}"{% unless forloop.last %},{% endunless %}{% endfor %}],
+  "description": {{ product.description | strip_html | truncate: 300 | json }},
+  "brand": { "@type": "Brand", "name": {{ shop.name | json }} },
+  {% if SCHEMA_REVIEWS != "" %}"aggregateRating": { "@type": "AggregateRating", "ratingValue": "{{ SCHEMA_RATING }}", "reviewCount": "{{ SCHEMA_REVIEWS }}", "bestRating": "5" },{% endif %}
+  "offers": {
+    "@type": "Offer",
+    "url": "{{ shop.url }}{{ product.url }}",
+    "priceCurrency": "{{ cart.currency.iso_code }}",
+    "price": "{{ product.selected_or_first_available_variant.price }}",
+    "availability": "{% if product.available %}https://schema.org/InStock{% else %}https://schema.org/OutOfStock{% endif %}",
+    "itemCondition": "https://schema.org/NewCondition"
+  }
+}
+</script>
+

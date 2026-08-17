@@ -1,0 +1,19 @@
+{% comment %} === COMPONENTE: RATING SIMPLE — alternativa liviana a 05-verificado-google === {% endcomment %}
+{% comment %} Cuándo usarlo: rating sobrio sin logo de Google ni medias estrellas. Absorbido de un build real (G2.3). {% endcomment %}
+{% comment %} REGLA #3: nunca se deja vacío ni en placeholder. Si el cliente aún no tiene rating, se entrega el {% endcomment %}
+{% comment %} EJEMPLO de abajo (creíble) y se reemplaza por el conteo real cuando exista. {% endcomment %}
+
+{%- comment -%} ═══ 📝 CALIFICACION — ⚠️ EJEMPLO, REEMPLAZAR POR EL REAL (ej: 4.8 · 127 reseñas) ═══ {%- endcomment -%}
+{% assign RATING_VALUE = "4.8" %}
+{% assign RATING_TEXT  = "· 127 reseñas verificadas" %}
+{%- comment -%} ═══ ↓ NO TOCAR ↓ ═══ {%- endcomment -%}
+<style>
+.gfs-rating{display:flex;align-items:center;justify-content:center;gap:8px;margin:6px 0 -4px;}
+.gfs-rating .stars svg{display:inline-block;}
+.gfs-rating__num{font-size:14px;color:#555;font-weight:600;}
+.gfs-rating__num b{color:#1a1a1a;font-weight:800;}
+</style>
+<div class="gfs-rating">
+  <div class="stars">{% for i in (1..5) %}<svg width="20" height="20" viewBox="0 0 20 20"><path fill="var(--brand-primary)" d="M10 15l-5.878 3.09 1.123-6.545L.49 6.91l6.561-.954L10 0l2.949 5.956 6.561.954-4.755 4.635 1.123 6.545z"/></svg>{% endfor %}</div>
+  <div class="gfs-rating__num"><b>{{ RATING_VALUE }}</b>/5 {{ RATING_TEXT }}</div>
+</div>

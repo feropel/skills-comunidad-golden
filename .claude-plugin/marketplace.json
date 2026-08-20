@@ -75,7 +75,7 @@
       "name": "golden-archivos",
       "source": "./golden-archivos",
       "description": "Toma control de carpetas caóticas y las deja con nombres y orden coherentes.",
-      "version": "1.0.0",
+      "version": "1.4.0",
       "category": "operations"
     },
     {
@@ -124,21 +124,21 @@
       "name": "golden-dropi-analisis",
       "source": "./golden-dropi-analisis",
       "description": "Convierte tus informes de Dropi en dos maestros: logística y base de clientes.",
-      "version": "1.0.0",
+      "version": "1.3.0",
       "category": "operations"
     },
     {
       "name": "golden-ecom-magic",
       "source": "./golden-ecom-magic",
       "description": "Fábrica de imágenes de alta conversión con Ecom Magic AI, con la foto real del producto y texto de venta compuesto.",
-      "version": "1.0.0",
+      "version": "2.1.0",
       "category": "design"
     },
     {
       "name": "golden-imagen-arena",
       "source": "./golden-imagen-arena",
       "description": "La misma imagen generada en varios motores de IA y calificada por conversión.",
-      "version": "1.0.0",
+      "version": "1.6.0",
       "category": "design"
     },
     {
@@ -173,7 +173,7 @@
       "name": "golden-pdf-check",
       "source": "./golden-pdf-check",
       "description": "El estándar de PDF de la comunidad: marca, márgenes y bloques que no se parten.",
-      "version": "1.0.0",
+      "version": "5.8.0",
       "category": "education"
     },
     {
@@ -194,14 +194,14 @@
       "name": "golden-skill-auditor",
       "source": "./golden-skill-auditor",
       "description": "Lee una skill completa, la califica sobre 1000 y la deja funcionando.",
-      "version": "1.0.0",
+      "version": "1.7.0",
       "category": "education"
     },
     {
       "name": "golden-ugc-avatar",
       "source": "./golden-ugc-avatar",
       "description": "Avatares con IA hiperrealistas y videos de testimonio hablando.",
-      "version": "1.0.0",
+      "version": "1.7.0",
       "category": "marketing"
     },
     {
@@ -215,7 +215,7 @@
       "name": "golden-video-teardown",
       "source": "./golden-video-teardown",
       "description": "Desarma un anuncio segundo por segundo: texto en pantalla, locución y ritmo.",
-      "version": "1.0.0",
+      "version": "1.3.0",
       "category": "marketing"
     },
     {
@@ -243,7 +243,7 @@
       "name": "golden-chatea-pro-producto-comentarios",
       "source": "./golden-chatea-pro-producto-comentarios",
       "description": "Carga un producto en el asistente de comentarios con los disparadores para que el bot sepa de cuál hablan.",
-      "version": "1.0.0",
+      "version": "1.3.1",
       "category": "marketing"
     },
     {

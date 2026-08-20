@@ -1,0 +1,17 @@
+{
+  "name": "golden-chatea-auditoria",
+  "version": "1.0.0",
+  "description": "Revisa tu espacio de Chatea entero y te dice campo por campo qué está sano y qué está roto.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "chatea",
+    "auditoría",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-chatea-auditoria/"
+  ]
+}

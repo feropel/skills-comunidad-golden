@@ -1,0 +1,17 @@
+{
+  "name": "golden-chatea-operacion",
+  "version": "1.0.0",
+  "description": "Revisa las conversaciones del día y te dice dónde se murió cada venta y qué no supo responder el bot.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "chatea",
+    "conversaciones",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-chatea-operacion/"
+  ]
+}

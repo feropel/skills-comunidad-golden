@@ -245,6 +245,20 @@
       "description": "Carga un producto en el asistente de comentarios con los disparadores para que el bot sepa de cuál hablan.",
       "version": "1.0.0",
       "category": "marketing"
+    },
+    {
+      "name": "golden-chatea-auditoria",
+      "source": "./golden-chatea-auditoria",
+      "description": "Revisa tu espacio de Chatea entero y te dice campo por campo qué está sano y qué está roto.",
+      "version": "1.0.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-chatea-operacion",
+      "source": "./golden-chatea-operacion",
+      "description": "Revisa las conversaciones del día y te dice dónde se murió cada venta y qué no supo responder el bot.",
+      "version": "1.0.0",
+      "category": "marketing"
     }
   ]
 }

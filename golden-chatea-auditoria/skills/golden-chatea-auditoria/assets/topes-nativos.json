@@ -1,0 +1,49 @@
+{
+  "_fuente": "chunks estaticos de https://instalacion-asistentes.chateapro.app/assets/*.js",
+  "_fecha_extraccion": "2026-08-07",
+  "_nota": "Techo B. Escribir por encima por API funciona; el campo se corta cuando alguien abre el formulario en el panel y guarda.",
+  "techo_bot_field": {
+    "text": 20000,
+    "array": 20000,
+    "longtext": 500000,
+    "practico_escapado": 19000,
+    "alerta_porcentaje": 0.9,
+    "ultimo_medido_que_dispara": 19895,
+    "primer_medido_que_no_dispara": 23266
+  },
+  "por_ruta": {
+    "comentarios_negativos.prompt_general": 10000,
+    "venta_conversacional.prompt": 8000,
+    "respuesta_publica.prompt": 3000,
+    "comentarios_negativos.ej_a_eliminar": 1000,
+    "comentarios_negativos.ej_a_no_eliminar": 1000,
+    "informacion_del_negocio.info_extra": 500,
+    "informacion_del_negocio.contacto": 200,
+    "informacion_del_negocio.t_envio": 200,
+    "venta_conversacional.datos_req": 200,
+    "prompt.prompt_libre": 12000,
+    "producto_segundos.prompt_datos": 4000,
+    "comportamiento_ia.rol": 2000,
+    "comportamiento_ia.restricciones": 2000,
+    "comportamiento_ia.analizar_palabra.prompt": 2000,
+    "embudo_de_ventas.mensaje_inicial": 1000,
+    "embudo_de_ventas.pregunta_de_entrada": 1000,
+    "remarketing.prompt_1": 1000,
+    "remarketing.prompt_2": 1000,
+    "informacion_de_producto.descripcion": 500,
+    "desc": 500,
+    "token_proveedor_dropi": 1200
+  },
+  "por_sufijo_de_ruta": {
+    "notificaciones.*.mensaje": 400,
+    "upsells.*.descripcion": 200,
+    "upsells.*.mensaje_inicial": 200
+  },
+  "sin_tope_nativo": [
+    "[Logistico]",
+    "[Logístico]",
+    "[Logistica]",
+    "[Carritos IA]",
+    "[Carritos]"
+  ]
+}

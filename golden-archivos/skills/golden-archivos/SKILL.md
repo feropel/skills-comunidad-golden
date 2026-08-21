@@ -13,13 +13,13 @@ description: >-
   fotos/videos", "separa lo que subo a Shopify de los originales", "hay imágenes repetidas",
   "esto no va en esa carpeta" — o cuando arrastre una carpeta suelta pidiendo que la ubique.
   Dispara aunque no diga "organizar": basta con desorden de archivos, duplicados, nombres
-  crípticos (IMG_4924, UUID, "Video 1") o material de producto mezclado. NO usar para organizar
-  código/repos, ni para analizar datos de ventas (golden-dropi-analisis), ni para generar
-  imágenes (golden-imagen-arena).
+  crípticos (IMG_4924, UUID, "Video 1") o material de producto mezclado. NO para código/repos,
+  datos de ventas (golden-dropi-analisis) ni generar imágenes (golden-imagen-arena).
 ---
 
 # Golden Archivos — orden de bibliotecas de archivos
 
+<!-- skill v1.5 · auditoría golden-skill-auditor 2026-08-21, verificada corriendo los 8 scripts contra un sandbox sintético (clasificar, nombrar DRY+real, separar-web dry+aplicar, duplicados, eliminar ok/rechazo, hoja-contactos con imágenes reales, deshacer): nombrar.sh ALLOW list (scripts/nombrar.sh:21) le faltaban 22 extensiones que clasificar.sh SÍ clasifica (svg, psd, ai, eps, tiff, bmp, numbers, tsv, zip, rar, 7z, rtf, txt, md, ppt, key, pages, hevc) — un logo .svg o un .zip de datos quedaban correctamente ubicados en su carpeta pero NUNCA se les anteponía el prefijo del producto, en silencio; ahora ambas listas están alineadas. Documentado en SKILL.md el formato real que escribe eliminar.sh con FORCE (dos md5 distintos separados por "!=", no un solo hash) — antes el ejemplo de formato del log no cubría ese caso. Blindaje: chflags -R uchg (mecanismo confirmado y re-aplicado al cierre de esta auditoría). -->
 <!-- skill v1.4 · fix auditoría 2026-07-25: separar-web.sh es_generica ahora pliega casing y tilde (nocasematch + IMÁGENES explícito), así "Fotos"/"Canva"/"IMÁGENES" del usuario sí se reconocen — antes daba "0 piezas" en silencio con carpetas en casing natural; auditar.sh usa emojis en las cabeceras en vez de rayas de caja (regla global sin separadores de rayas) -->
 <!-- skill v1.3 · ejercida en fuego real 2026-07-23 (986→1000): duplicados.sh sobre biblioteca real (1515 archivos), separar-web.sh exige que TODA la ascendencia entre unidad y archivo sea genérica (ruta_solo_generica) -->
 <!-- skill v1.2 · auditoría 2026-07-23 (931→): eliminar.sh (el formato RM de ELIMINADOS.log se exigía pero ningún script lo producía y la corrida real ya se había desviado; ahora verifica md5 y se niega si no coinciden), separar-web.sh (la fase 4 no tenía herramienta y se escribía a mano cada vez, con criterios distintos entre imágenes y videos; corre en seco por defecto), auditar.sh chequeo 3 ahora aplica EXCL como los otros 5, hoja-contactos avisa y sugiere tandas cuando el mosaico pasa de 8 filas. CRÍTICO: auditar.sh daba falsos ✅ — usaba los filtros de exclusión como texto sin comillas, el shell los glob-expandía y find fallaba en silencio; ahora es array (un auditor que miente en verde es peor que no tenerlo). El detector de UUID pasó de "4 guiones" a la forma hex real 8-4-4-4-12: atrapaba nombres claros como "2026-07 (Jul-Ago) - por pedido.xlsx" y ahogaba los hallazgos reales en ruido -->
@@ -61,6 +61,8 @@ Crea la carpeta de control y el log **antes del primer movimiento**:
 <raíz>/_ORGANIZACION-PRODUCTOS/
 ├── movimientos.log      ← cada operación, formato: MV<TAB>origen<TAB>destino
 ├── ELIMINADOS.log       ← cada borrado, formato: RM<TAB>ruta-borrada<TAB>ruta-del-sobreviviente<TAB>md5
+│                          (con FORCE el cuarto campo es md5-borrado!=md5-sobreviviente: dos hashes distintos,
+│                           prueba de que NO era un duplicado exacto — ver scripts/eliminar.sh)
 └── LEEME.md             ← acta de qué se hizo y cómo revertir
 ```
 

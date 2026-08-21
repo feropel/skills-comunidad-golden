@@ -5,6 +5,7 @@ description: Golden Group — ORQUESTADOR MAESTRO de Chatea Pro. Configura de pu
 
 # Golden · Chatea Pro — Full Configuración (orquestador maestro)
 
+<!-- skill v1.2 · 2026-08-21 (auditoría golden-skill-auditor 918/1000 PLATA → reparada) · 🔴 el mapa de hijas declaraba "Dos asistentes tienen skill hija" y omitía por completo `golden-chatea-pro-producto-comentarios` (el hijo de Comentarios, equivalente a prompt-ventas para Ventas: existe, está instalado, y config-comentarios ya lo cita como su propio hijo) — el orquestador dejaba huérfano el paso de cargar la ficha de cada producto en el asistente de Comentarios. Corregido en la tabla de asistentes, en el párrafo de hijas (ahora TRES), en PASO 1 (Comentarios invoca a producto-comentarios por cada producto) y en el mapa de derivación; sumado un chequeo de coherencia de producto entre Ventas/Carritos/Comentarios en PASO 2. -->
 <!-- skill v1.1.1 · 2026-08-08 (centro de mando, chat otro espacio de Chatea 2026-08-08 (2ª ronda: 5ª categoría + prosa libre)) · QUINTA CATEGORÍA VETADA en la ley: claims y cifras de negocio (años en el mercado, clientes atendidos, porcentajes de entrega, premios) — no rompen nada técnico ni los caza un barrido de llaves, pero el bot termina mintiendo con datos de otra empresa (caso real: "Más de 100.000 clientes atendidos en Colombia" a punto de heredarse). Y regla operativa LA MARCA VIVE TAMBIÉN EN PROSA LIBRE: al barrido se añade grep -i por el nombre de la marca origen sobre todo el texto a escribir (cazó 10 menciones en 3 campos que el mapeo de llaves no vio). -->
 <!-- skill v1.1 · 2026-08-08 (centro de mando, chat otro espacio de Chatea 2026-08-08) · horneada la LEY "NUNCA HEREDAR DATOS ENTRE ESPACIOS": al basarse en una cuenta guía se hereda estructura/prompts/config, JAMÁS datos (APIs, plantillas de WhatsApp, teléfonos, correos, dominios, marca, productos y disparadores); única excepción Le'côterra como producto-ejemplo; método de barrido obligatorio antes y después de escribir en espacio ajeno. Origen: incidente Golden → otra marca 2026-08-08 (se colaron una credencial, teléfono, plantilla de notificación y firmas de la marca origen; revertido el mismo día). La ley entra como PREVENCIÓN, no reparación: línea base pre-horneado verificada por verificador externo — 8/8 skills sin credenciales (CRITICA=0); únicos hallazgos 3 teléfonos de relleno legítimos (+57 300 de ejemplo) que se conservan. ADEMÁS (chat otro espacio de Chatea 2026-08-08, retractación pixel): regla CAMPOS [Meta] = VALORES CALIENTES — los eventos de pixel los mueve el flujo en vivo, prohibido diagnosticar con una lectura suelta. -->
 <!-- v1.0 · sin sello previo -->
@@ -75,14 +76,15 @@ Dentro de un espacio de trabajo viven **4 asistentes**, cada uno con su configur
 
 | Asistente | Qué hace | Skill hija que lo configura |
 |---|---|---|
-| 💬 **Comentarios** | Responde comentarios públicos de posts/anuncios, clasifica negativos y lleva la conversación al DM/venta | `golden-chatea-pro-config-comentarios` |
+| 💬 **Comentarios** | Responde comentarios públicos de posts/anuncios, clasifica negativos y lleva la conversación al DM/venta | `golden-chatea-pro-config-comentarios` (padre) + `golden-chatea-pro-producto-comentarios` (hijo: la ficha de cada producto) |
 | 📦 **Logístico** | Valida la dirección del cliente antes del envío COD (responde en una sola línea: correcta / falta info) | `golden-chatea-pro-config-logistico` (padre) + `golden-chatea-pro-validacion-direcciones` (hijo: el prompt de validación) |
 | 🛒 **Ventas WhatsApp** | Agente conversacional que vende por WhatsApp (config general del asistente por workspace/país + productos) | `golden-chatea-pro-config-ventas-wp` |
 | 🔁 **Carritos** | Recupera carritos/checkouts abandonados por WhatsApp con recordatorios y remarketing | `golden-chatea-pro-config-carritos` |
 
-Dos asistentes tienen una skill **hija** que hace su trabajo fino:
+Tres asistentes tienen una skill **hija** que hace su trabajo fino:
 - **Ventas WhatsApp** → cada **producto** tiene su **promo** (prompt de venta), que genera `golden-chatea-pro-prompt-ventas`.
 - **Logístico** → su **prompt de validación de direcciones** lo genera `golden-chatea-pro-validacion-direcciones`.
+- **Comentarios** → cada **producto** tiene su ficha de 5 llaves (`img/name/desc/rela/estado`) para que el bot sepa de qué producto habla cada comentario, que genera `golden-chatea-pro-producto-comentarios`.
 
 ## Cuándo usar esta skill vs. una hija directa
 
@@ -185,6 +187,7 @@ Configura en este orden (cada uno invocando su skill hija y pasándole país + d
 1. **Ventas WhatsApp** (`golden-chatea-pro-config-ventas-wp`) → es el corazón; define productos y voz de venta.
    - Por cada producto, dispara la **promo** con `golden-chatea-pro-prompt-ventas`.
 2. **Comentarios** (`golden-chatea-pro-config-comentarios`) → alinea la respuesta pública con la misma voz y lleva al DM de ventas.
+   - Por cada producto, carga su ficha con `golden-chatea-pro-producto-comentarios` (mismo objeto de 5 llaves que ya armaste al montar Ventas — reutilízalo, no lo reinventes).
 3. **Logístico** (`golden-chatea-pro-config-logistico`) → config operativa (transportadoras/tiempos) + su hijo `golden-chatea-pro-validacion-direcciones` arma el prompt con el pack del país.
 4. **Carritos** (`golden-chatea-pro-config-carritos`) → recupera los abandonos con la misma oferta y datos de pago.
 
@@ -192,7 +195,7 @@ Configura en este orden (cada uno invocando su skill hija y pasándole país + d
 Cuando cada hija entregue su config, NO termines: revisa que todas encajen. Corrige si algo no cuadra:
 - **Mismo país** en las 4 (nomenclatura de dirección, transportadoras y pago consistentes con el pack de país).
 - **Misma voz de marca** (nombre del asistente, tono, sin signos de apertura, humano, nunca "soy un bot").
-- **Mismos datos de producto y precios** entre Ventas y Carritos (que no haya un precio en un asistente y otro distinto en el otro).
+- **Mismos datos de producto y precios** entre Ventas, Carritos y Comentarios (que no haya un precio o un nombre de producto en un asistente y otro distinto en el resto; la ficha de Comentarios reutiliza el mismo producto que ya armaste en Ventas, no uno nuevo).
 - **Mismos datos de pago anticipado** (si aplica) en Ventas y Carritos.
 - **Mismos tiempos de entrega** en Logístico, Ventas y Carritos.
 - **Handoff correcto:** Comentarios → lleva a la venta; Ventas → dispara Logístico al pedir dirección; Carritos → reengancha con la misma oferta.
@@ -210,10 +213,11 @@ Entrega un **checklist final** marcando cada asistente configurado, su país, y 
 - **Cero rastros de Golden** (nombre o dominios) en cualquier workspace de cliente.
 
 ## Skills hijas (mapa de derivación)
-- 💬 Comentarios → `golden-chatea-pro-config-comentarios`
+- 💬 Comentarios (padre) → `golden-chatea-pro-config-comentarios`
+- 🗂️ Ficha de producto en Comentarios (hijo de Comentarios) → `golden-chatea-pro-producto-comentarios`
 - 📦 Logístico (padre) → `golden-chatea-pro-config-logistico`
 - 🧭 Validación de direcciones (hijo del logístico) → `golden-chatea-pro-validacion-direcciones`
-- 🛒 Ventas WhatsApp → `golden-chatea-pro-config-ventas-wp`
+- 🛒 Ventas WhatsApp (padre) → `golden-chatea-pro-config-ventas-wp`
 - 🎯 Promo por producto (hijo de Ventas) → `golden-chatea-pro-prompt-ventas`
 - 🔁 Carritos → `golden-chatea-pro-config-carritos`
 

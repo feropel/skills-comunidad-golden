@@ -17,7 +17,11 @@ description: >-
 
 # Golden Group — Análisis de Meta Ads
 
+**Versión:** `GMA1.1` · **Última modificación:** 2026-08-21 (auditoría golden-skill-auditor: CSV soportado + limpieza) · versión declarada el 2026-08-19 por el Centro de Mando para que el censo diario pueda detectar ediciones
+
 <!-- 2026-08-07 · DESCRIPCIÓN RECORTADA: superaba el tope de ~1.536 caracteres del listado de skills y se estaba TRUNCANDO, así que las frases del final NO disparaban. Medido antes/después: 1565 → 821 chars. Lo que se movió al cuerpo son rutas de references y explicaciones; se conservaron y ampliaron las frases reales del usuario, que son lo que dispara. -->
+<!-- adenda 2026-08-20 (centro de mando, autoevalúo del ecosistema): resuelta la contradicción tarjeta/cuerpo — la description declara EL DISPARADOR ES EL ARCHIVO y el cuerpo ordenaba empezar SIEMPRE en vivo, ignorando el archivo que el usuario trajo. Regla nueva: con archivo sobre la mesa, el archivo manda y el vivo se ofrece como contraste; sin archivo, vivo. Coherente con la frontera declarada por golden-ads. -->
+<!-- skill v1.1 · 2026-08-21 · auditoría golden-skill-auditor: (1) 🔴 CSV realmente NO cargaba — analyze_meta_report.py solo usaba openpyxl/read_excel pese a que description y SKILL.md prometen "Excel o CSV"; agregado _load_csv_report() con detección de encoding/header, probado en vivo (CSV + XLSX corren el mismo pipeline sin error, incluida la generación del .docx); (2) corregida la línea que decía "Modo EN VIVO (camino por defecto)" contradiciendo "EL DISPARADOR ES EL ARCHIVO" de la description y la propia sección 1B; (3) movidas las Reglas duras COD Colombia y los Análisis adicionales de valor a references/reglas_duras_colombia.md (SKILL.md bajó de 506 a 449 líneas, bajo el tope de 500); (4) corregido el docstring de analyze_meta_report.py que decía "6 capas" — el script automatiza 4, las capas 5-8 se calculan inline y ahora lo dice; (5) assets/report_template.md no reflejaba generate_report.py real (P&L histórico era subsección 1.4 y es sección propia "2.", faltaba "Ranking de Campañas" y "Embudo de conversión", y "KPIs de monitoreo" no existe como sección aparte) — reescrito para calzar con el código; (6) eliminado .gitignore suelto en la raíz (material intruso detectado por el inventario del auditor). -->
 
 Método estándar de Golden Group para analizar informes de Meta Ads de cualquier producto y modelo de negocio. Produce diagnósticos accionables con configuración exacta de campañas nuevas.
 
@@ -25,8 +29,8 @@ Método estándar de Golden Group para analizar informes de Meta Ads de cualquie
 
 ## 1. CUÁNDO USAR ESTE SKILL
 
-- El usuario quiere **conectar su cuenta de Meta y que bajes los informes tú** (camino por defecto — **Modo EN VIVO**)
-- El usuario sube un archivo Excel (.xlsx) o CSV exportado de Ads Manager (**Modo ARCHIVO** — respaldo)
+- El usuario sube o comparte un archivo Excel (.xlsx) o CSV exportado de Ads Manager (**Modo ARCHIVO** — manda cuando hay archivo sobre la mesa, ver sección 1B)
+- El usuario quiere **conectar su cuenta de Meta y que bajes los informes tú** sin traer archivo (**Modo EN VIVO** — el camino cuando no hay archivo, ej. llegaste por derivación de `golden-ads`)
 - Pide analizar campañas, revisar performance, entender qué pausar o escalar
 - Menciona CPA, CPL, ROAS, costo por conversación, creativos, segmentación, demografía, plataformas, landings
 - La campaña NO es de ventas (leads, mensajes, reconocimiento) — se usan benchmarks por objetivo + 3 Q's
@@ -40,7 +44,7 @@ Método estándar de Golden Group para analizar informes de Meta Ads de cualquie
 
 ## 1B. CÓMO ENTRAN LOS DATOS — EN VIVO por defecto, ARCHIVO de respaldo
 
-El motor de análisis (unit economics, capas, veredicto, Word) es idéntico: solo cambia de dónde salen los números. **Empieza SIEMPRE por el modo en vivo**; cae al archivo solo si el usuario lo prefiere o si no hay acceso API.
+El motor de análisis (unit economics, capas, veredicto, Word) es idéntico: solo cambia de dónde salen los números. **El archivo manda cuando hay archivo:** si el usuario trajo un Excel/CSV, ese archivo es el disparador y su expectativa — se analiza EL ARCHIVO, y el modo en vivo se OFRECE como contraste de frescura si hay MCP disponible. Solo cuando no hay archivo de por medio (llegaste por derivación de golden-ads) se empieza por el modo en vivo.
 
 ### ✅ Modo EN VIVO (por defecto) — extracción directa de la Meta Marketing API
 El usuario no exporta nada: tú traes los datos con los scripts `fetch_*.py`. Al inicio, ofrécelo así:
@@ -217,7 +221,9 @@ Reporta CPA breakeven, ROAS breakeven, tabla CPA por margen (5%, 10%, 15%, 20%, 
 
 ### Paso 4 — Análisis estructural en 8 capas
 
-Analizar en este orden estricto (cada capa responde una pregunta distinta):
+Analizar en este orden estricto (cada capa responde una pregunta distinta). Antes de leer los
+resultados, aplica las reglas de campo de `references/reglas_duras_colombia.md` — son el
+conocimiento validado que separa un CPA alto normal de uno que hay que apagar.
 
 **Capa 1 — Tipos de campaña.** Agrupar por tipo (VENTA OPEN, ADVANTAGE+, RETARGETING, CATALOG, TRAFICO/CHATEA, etc.). CPA y ROAS de cada tipo. Identificar estructura ganadora. Ver `references/campaign_taxonomy.md`.
 
@@ -359,38 +365,11 @@ Antes de cerrar, verificar:
 
 ## 5. REGLAS DURAS — VALIDADAS EN COLOMBIA COD
 
-### Logística y costos
-- Producto devuelto típicamente vuelve a bodega en Colombia COD. Confirmarlo.
-- Cancelación COD = $0 en la mayoría de casos. Confirmarlo.
-- Dropshipping con costo >50% del ticket rara vez es viable en Meta Colombia. Calcularlo y mostrarlo.
-- Devolución 20% es normal en COD. Si el usuario reporta <10%, verificar que mide bien.
-
-### Demografía
-- Mujeres 18-24: CPA alto estructuralmente en productos físicos COD. No incluir en escala sin evidencia.
-- Mujeres 55-64 y 65+: CPA alto en bienestar/belleza. Verificar.
-- Hombres 55-64: frecuentemente el más rentable. Siempre reportar si hay datos.
-- Núcleo típico: hombres y mujeres 25-44.
-- 45-54: en el límite. Validar antes de escalar.
-
-### Campañas
-- Tráfico a WhatsApp / ChatEA Pro: CPA 2-3× mayor que retargeting web. Pausar salvo evidencia contraria en el archivo.
-- Catalog DPA en frío: pierde. Solo retargeting.
-- ASC (Advantage+ Shopping): requiere margen pre-pauta ≥40%.
-- Geosegmentación por ciudad para distribución nacional: CPA ~2× mayor. No recomendar.
-
-### Creativos
-- Video > foto estática en ~70% de productos físicos de consumo.
-- Variantes de sexo del mismo video (HOMBRE/MUJER/MIX) pueden tener CPAs muy distintos. Evaluar por separado.
-- Ángulo fitness/deportivo no convierte en productos de bienestar/belleza.
-
-### Ubicaciones
-- **Excluir en OPEN manual:** Messenger Inbox, Columna derecha FB, Notificaciones FB, Threads, WhatsApp Status, AN banner e intersticial.
-- **No excluir:** Resultados de búsqueda FB, AN nativo, Reels instream (suelen tener ROAS sorpresa).
-
-### Landings
-- HOME convierte menos que landing de producto individual.
-- Página MIX: ticket más alto pero tasa de pago iniciado más baja.
-- Match óptimo: creativo con ángulo de producto X → landing de producto X.
+Conocimiento de campo (logística, demografía, campañas, creativos, ubicaciones, landings)
+validado en operaciones reales COD en Colombia. Léelo en `references/reglas_duras_colombia.md`
+antes del Paso 4 (análisis en 8 capas) y del Paso 6 (plan de acción) — ahí también están las
+"Análisis adicionales de valor" (clasificaciones de calidad Meta, producción creativa
+recomendada, sensibilidad de margen y palancas de margen).
 
 ---
 
@@ -410,40 +389,7 @@ Antes de cerrar, verificar:
 
 ---
 
-## 7. ANÁLISIS ADICIONALES DE VALOR
-
-### Clasificaciones de calidad Meta
-Si el archivo trae `Clasificación de calidad`, `Clasificación del porcentaje de interacción` y `Clasificación del porcentaje de conversiones`:
-- `above_average`: bueno, no tocar
-- `average`: aceptable
-- `below_average`: Meta penaliza (CPM más alto). El CPA se deteriorará. Reportar.
-- `below_average_10`: fuertemente penalizado. Considerar apagar pronto.
-
-### Producción creativa recomendada
-Al final del plan de acción:
-- Ángulo ganador (problema-solución / transformación / UGC / demostración)
-- Duración recomendada (basada en hold rate de los ganadores)
-- Casting (sexo y edad basados en demografía compradora del archivo)
-- Hook (primeros 3 segundos de los videos ganadores)
-- Landing por tipo de creativo (basada en Capa 5)
-
-### Sensibilidad de margen
-Si CPA promedio histórico está a <15% del CPA breakeven, mostrar qué pasa si:
-- Sube precio 5% o 10%
-- Baja costo de producto 10%
-- Baja tasa de devolución 5 puntos
-
-### Palancas de margen (siempre al final)
-Ordenadas por impacto y dificultad:
-1. Subir ticket con upsell
-2. Bajar devolución con confirmación WhatsApp pre-despacho
-3. Subir % pago anticipado con descuento
-4. Bajar costo de producto (volumen / proveedor)
-5. Bajar costo logístico (cambio de transportadora)
-
----
-
-## 8. ANTI-PATRONES (NUNCA hacer)
+## 7. ANTI-PATRONES (NUNCA hacer)
 
 - ❌ Mostrar valores en USD en el output final
 - ❌ Versión corregida, v2, actualizado, final en el nombre del archivo
@@ -461,7 +407,7 @@ Ordenadas por impacto y dificultad:
 
 ---
 
-## 9. OUTPUT ESPERADO
+## 8. OUTPUT ESPERADO
 
 1. **Documento Word:** `Analisis de [Producto] [YYYY-MM-DD].docx` en `/mnt/user-data/outputs/`, presentado con `present_files`.
 2. **Resumen ejecutivo en chat** con las 3 acciones inmediatas.
@@ -470,10 +416,10 @@ Si el usuario pide refinamientos (simplifica tabla, calcula con otro precio, enf
 
 ---
 
-## 10. RECURSOS DEL SKILL
+## 9. RECURSOS DEL SKILL
 
-**Scripts — Modo A (análisis de Excel, requieren pandas/openpyxl/python-docx preinstalados):**
-- `scripts/analyze_meta_report.py` — Carga el Excel, detecta formato, clasifica campañas, analiza por capas.
+**Scripts — Modo A (análisis de Excel o CSV, requieren pandas/openpyxl/python-docx preinstalados):**
+- `scripts/analyze_meta_report.py` — Carga el Excel (.xlsx/.xls) o CSV, detecta formato y fila de header, clasifica campañas, automatiza capas 1-4 (ver docstring del script para el detalle de qué automatiza y qué se calcula inline).
 - `scripts/calculate_unit_economics.py` — CPA breakeven, ROAS breakeven, tabla CPA por margen, semáforo, P&L histórico.
 - `scripts/trm_resolver.py` — Resuelve TRM USD→COP con fallback. Usar SIEMPRE que la moneda sea USD.
 - `scripts/generate_report.py` — Genera el .docx con todas las secciones. `build_output_filename(producto)` da el nombre estándar.
@@ -492,6 +438,7 @@ Si el usuario pide refinamientos (simplifica tabla, calcula con otro precio, enf
 - `references/file_formats.md` — Formatos de exportación de Ads Manager.
 - `references/semaforos.md` — Tiers verde/amarillo/rojo y benchmarks.
 - `references/replication_playbook.md` — Replicar en otra cuenta / BM nuevo.
+- `references/reglas_duras_colombia.md` — Reglas de campo COD Colombia (logística, demografía, campañas, creativos, ubicaciones, landings) + clasificaciones de calidad, producción creativa, sensibilidad y palancas de margen. Leer antes del Paso 4 y del Paso 6.
 
 ---
 

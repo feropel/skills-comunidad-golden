@@ -5,7 +5,7 @@ sobre datos reales (REGLA 1) y contra el **breakeven** del producto (REGLA 2).
 
 > Antes de leer la cuenta: sigue la **receta exacta del MCP** (`11-mcp-meta-recipe.md`) para no fallar
 > con los nombres de campo, y ten la **calculadora de breakeven COD** (`12-unit-economics.md`). Al
-> cerrar corre el **auto-check** (`13`). Estándar de entrega: `examples/EJEMPLO-diagnostico.md`.
+> cerrar corre el **auto-check** (`13`). Estándar de entrega: `references/EJEMPLO-diagnostico.md`.
 
 ## 0. El dato es CONFIABLE? (REGLA 12 — antes de concluir nada)
 Filtra por **significancia** antes de dar veredicto. Una entidad es concluyente si: **gasto ≥ 2–3× CPA
@@ -36,6 +36,10 @@ Pide insights por **nivel**: campaña → conjunto → anuncio (3 llamadas), par
 video o WhatsApp/Chatea PRO) — para ver en qué escalón se cae. A pedido, entrega el preset de columnas.
 **Siempre** revisa el activity log buscando **churn de encendido/apagado** o reglas automáticas de
 "apagar al gastar X" — es una fuga clásica de COD que encarece todo (`references/14-fase-aprendizaje.md`).
+
+> **Antes de interpretar cualquier número, aplica el método de patrones** (`22-patrones-y-lectura-de-datos.md`):
+> contra qué se compara, si es tendencia o ruido, si es ciclo/estacionalidad, y 3 hipótesis de causa
+> antes de culpar a nada. Un número sin marco de comparación no es un hallazgo.
 
 ## 3. Ranking y clasificación (semáforo)
 Clasifica cada entidad contra breakeven:

@@ -1,8 +1,18 @@
 # Changelog — GOLDEN INVESTIGACIÓN DE MERCADO
 
+## Índice (orden cronológico DESCENDENTE — más reciente arriba)
+G5.9 · G5.8.1 · G5.8 · G5.7 · G5.6 · G5.5 · G5.4 · G5.3 · G5.2 · G5.1 · G5.0 · G4.3 · G4.2.1 · G4.2
+· G4.1 · G4.0 · G3.10 · G3.9 · G3.8 · G3.7 · G3.6 · G3.5 · G3.4 · G3.3 · G3.2 · G3.1 · G3.0 · G2.5
+· G2.4 · G2.3 · G2.2 · G2.1 · G2.0 · G1.0
+
+> Nota de auditoría G5.9: G4.2 y G4.2.1 (2026-07-29) vivían mal insertadas al final del archivo,
+> después de G1.0 — rompían el orden cronológico descendente que respeta el resto del changelog.
+> Reubicadas aquí, entre G4.3 (2026-07-30) y G4.1 (2026-07-27), que es donde su fecha las ubica.
+
 ## G5.7 — 2026-08-07 — Cosecha del chat "un estudio de producto(Chile)" (6 ítems)
 Repartido por el Centro de Mando desde la bandeja (orden de FER: "sin omitir detalle"). Todo salió
-de una corrida real de la skill sobre `la-tienda-del-cliente.com (un producto COD):
+de una corrida real de la skill sobre una tienda real de gotas dentales COD en Chile (dominio
+omitido a propósito — no es información que aporte a la lección técnica):
 - **Compuerta de IDENTIDAD DEL PRODUCTO** (`00-identificacion-forense.md`, paso duro): la versión
   local puede declarar OTRA fórmula que la marca original — el frasco chileno declaraba glicerina,
   pantenol y PCA de sodio (humectantes) mientras la marca original (Amazon B0DB2ZBXZD, US$69)
@@ -185,6 +195,16 @@ en la **minería de comentarios**:
   elogios→beneficios · preguntas→FAQ · lenguaje textual→hooks · títulos más vistos→formatos validados.
   Todo con fuente y volcado a 1.5 (voz del cliente) y al dossier (capas 7-13 y 21).
 - SKILL.md Fase 1 actualizada para exigir la minería como parte de la fase. Sello → **G4.3**.
+
+## G4.2.1 — 2026-07-29 — Compuerta 2 ampliada: universo real de piezas + criterio de transformación
+El universo son plantilla+descripción+GALERÍA+pósters (227 piezas, no 99) y el criterio es texto O
+TRANSFORMACIÓN (un antes/después sin letras ES el claim). + cruce render vs producto físico.
+
+## G4.2 — 2026-07-29 — Compuerta 2 incluye IMÁGENES
+Los claims viven quemados en los pixels, no solo en el texto: hoja de contactos + revisión visual
+obligatoria antes de cerrar la compuerta, y el gotcha del `\/` escapado en JSON de plantilla.
+Origen: claims eliminados del texto que seguían publicados en banners (GoPure/Tag Recede/Organic
+Bless) — la compuerta de texto solo no los cazaba.
 
 ## G4.1 — 2026-07-27 — La ficha vieja es fuente contaminada
 Regla dura añadida a `00-identificacion-forense.md`: cuando el producto ya tiene ficha, esa ficha
@@ -438,5 +458,3 @@ que no omita nada y complemente lo no mencionado (estándar 100/100).
 ## G1.0 — 2026-06-25 — Versión inicial (investigación + reporte .docx)
 Investigación de negocio/competidores/reseñas/redes/anuncios → reporte Word. Regla obligatoria:
 si deriva en página Shopify, generarla sí o sí con `golden-shopify`. Blindada read-only (chflags uchg).
-## G4.2 — 2026-07-29 — Compuerta 2 incluye IMÁGENES: los claims viven quemados en los pixels; hoja de contactos + revisión visual obligatoria; gotcha del \/ escapado. Origen: claims eliminados del texto que seguían publicados en banners (GoPure/Tag Recede/Organic Bless).
-## G4.2.1 — 2026-07-29 — Compuerta 2 ampliada: el universo son plantilla+descripción+GALERÍA+pósters (227, no 99) y el criterio es texto O TRANSFORMACIÓN (un antes/después sin letras ES el claim). + cruce render vs producto físico.

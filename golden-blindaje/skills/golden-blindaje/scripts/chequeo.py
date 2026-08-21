@@ -359,7 +359,14 @@ def revisar_blindaje(hallazgos):
     base = os.path.join(CLAUDE, "skills")
     if not os.path.isdir(base):
         return 0, 0
-    protegidas, abiertas = 0, []
+    # Excepciones por diseño: skills que una rutina programada ESCRIBE sola.
+    # Blindarlas no las protege, las rompe en silencio (la rutina falla sin avisar).
+    # golden-copywriting: la rutina copywriting-tendencias-8-dias le escribe su propio
+    # skills/golden-copywriting/references/tendencias-vivas.md cada 8 dias (archivo de
+    # esa skill, no de esta). Verificado el 2026-08-19: llevaba 3 dias blindada por
+    # seguir el consejo de este mismo chequeo.
+    SIN_BLINDAJE_POR_DISENO = {"golden-copywriting"}
+    protegidas, abiertas, exentas = 0, [], []
     for d in sorted(os.listdir(base)):
         if not d.startswith("golden-"):
             continue
@@ -371,12 +378,26 @@ def revisar_blindaje(hallazgos):
             ))
             continue
         try:
-            if os.stat(skill_md).st_flags & 0x00000002:  # UF_IMMUTABLE
-                protegidas += 1
-            else:
-                abiertas.append(d)
+            blindada = bool(os.stat(skill_md).st_flags & 0x00000002)  # UF_IMMUTABLE
         except (AttributeError, OSError):
-            pass
+            continue
+        if d in SIN_BLINDAJE_POR_DISENO:
+            if blindada:
+                exentas.append(d)
+            continue
+        if blindada:
+            protegidas += 1
+        else:
+            abiertas.append(d)
+    if exentas:
+        hallazgos.append(Hallazgo(
+            "ALTO", "Blindaje",
+            f"{len(exentas)} skill(s) blindada(s) que NO deben estarlo",
+            ", ".join(exentas),
+            "Una rutina programada les escribe: con uchg falla EN SILENCIO. "
+            "Desblindar (el directorio primero, luego -R): "
+            "chflags nouchg <skill> && chflags -R nouchg <skill> && chmod -R u+w <skill>",
+        ))
     if abiertas:
         hallazgos.append(Hallazgo(
             "BAJO", "Blindaje",

@@ -17,7 +17,16 @@ description: >-
 
 # Golden Group — Web por Perfil
 
-**Versión:** `GW2.2` · Fábrica: este chat.
+**Versión:** `GW2.3` · Fábrica: este chat.
+_GW2.3 (2026-08-21) — reparación golden-skill-auditor: `references/arte-generativo-templates/viewer.html`
+y `generator_template.js` traían tokens y comentarios de la skill Anthropic original de la que se
+rescataron (paleta "Anthropic Brand Colors", instrucción de "mantener el branding Anthropic",
+título en inglés) — quedaba en contradicción directa con la regla propia de la skill ("las
+direcciones se llaman SIEMPRE Golden"). Se re-brandearon a la paleta Golden (`--golden-gold`
+`#e8b84b` / `--golden-gold-light` `#f7e3a1` / `--golden-gold-deep` `#b8860b`), se tradujo el HTML
+y se añadió en `arte-generativo-golden.md` el puntero explícito de CUÁNDO y CÓMO usar cada
+template (antes eran huérfanos: existían pero ningún archivo los mencionaba por nombre). + sección
+**Definición de "terminado"** y **manejo de piezas del stack caídas** en el Flujo._
 _GW2.2 (2026-07-25): + `references/estilo-agencia-premium.md` — receta del look agencia premium (destilado 2026-07: serif display gigante peso 400 + sans ultra-light, gradiente firma único sobre casi-negro, springs por letra en titulares, Lenis, video como textura, copy de una frase con CTA único de agenda). Destilado a nivel de código de una agencia Awwwards de referencia; receta Golden original, sin textos ni marca ajena._
 _GW2.1 (2026-07-17): + sección **CITABLE POR LA IA (GEO/AEO)** obligatoria: los 2 ejes (Google vs motores de IA), la distinción crítica entre bots de ENTRENAMIENTO (GPTBot/ClaudeBot, bloqueables) y bots de CITACIÓN (OAI-SearchBot/**Claude-SearchBot**/PerplexityBot — si los bloqueas desapareces de las respuestas en vivo), bloques de respuesta extraíbles, densidad de hechos/entidades, FAQ+LocalBusiness en JSON-LD, y la verdad sobre llms.txt (impacto incierto, no venderlo como ranking). Destilado de la guía de claude-seo-ai (plugin MIT de tododeia). Oportunidad anotada: vender auditoría de visibilidad en IA._
 _GW2.0 (2026-07-17): **SECUENCIA sube de nivel** — método oficial 2 imágenes (inicial+final con Nano Banana) → 1 video (Kling) → ~120 frames WebP con ffmpeg, en vez de 60 generaciones sueltas: mucho más barato y con consistencia perfecta. + GOTCHA de publicación (los frames se excluyen del repo y la animación muere en producción) + plan mode + auto-mejora de la skill tras cada build. + Framer Motion como estándar de motion en React. Destilado del tutorial de Nate Herk (230k vistas, "Nano Banana 2 + Claude Code = $10k websites") y del setup de noocap (Claude Code + motion + design skill + 21st.dev = lo que ya teníamos)._
@@ -298,12 +307,24 @@ audita los DOS ejes y da dos notas separadas 0-100 (nunca promediadas). Útil pa
 propio o de cliente — **oportunidad de servicio Golden: auditoría de visibilidad en IA.**
 
 ## Flujo
-1. **Perfil + datos** (negocio, objetivo, marca/colores, secciones, dominio).
+1. **Perfil + datos** (negocio, objetivo, marca/colores, secciones, dominio) — pide todo esto UNA sola vez al inicio (intake), no lo gotees a lo largo del build.
 2. **Diseñar** con el blueprint usando las skills de frontend.
 3. **Assets** (imágenes/logo) con Higgsfield/canvas-design si faltan.
 4. **Blindar (si aplica)** — si la web maneja login, formularios, datos o claves, corre `cyber-neo` (`/cyber-neo .`) y arregla Critical/High antes de seguir.
 5. **Publicar** con `all-deploy` (`/all-deploy`): elige hosting (Vercel para estático/Next/Vite; Railway/VPS si hay backend), preview → prod con rollback. Conecta dominio. *(NO uses `all-deploy` para páginas de producto Shopify — esas van por su flujo.)*
 6. **Entregar** URL + cómo editar a futuro.
+
+**Si falta una pieza del stack (MCP Magic/Stitch caído, sin ffmpeg, sin acceso a Vercel):** no
+bloquees el build completo. Sigue con lo disponible (código a mano, deploy manual, frames vía
+otro método) e INFORMA qué se saltó y qué falta correr cuando la pieza vuelva — nunca inventes el
+resultado de una herramienta que no corrió.
+
+**Definición de "terminado":** el build no está listo para entregar hasta que:
+- [ ] Carga y se ve bien en 390px (móvil), 768px (tablet) y desktop.
+- [ ] La capa de movimiento mínima está presente (reveals + un momento sticky + micro-interacciones) y `prefers-reduced-motion` se respeta donde corresponde (ver excepción de fondos decorativos en `arte-generativo-golden.md`).
+- [ ] `cyber-neo` corrió si había login/formularios/datos, sin Critical/High abiertos.
+- [ ] Publicado con URL real (no solo localhost) y esa URL se abrió y revisó — el gotcha de Golden Secuencia (frames que no viajan al repo) se verifica siempre en producción, no en local.
+- [ ] Sección GEO/AEO (robots.txt con bots de citación, JSON-LD FAQ/LocalBusiness) presente si el sitio es de negocio real.
 
 ## Cierre
 Ofrece: «Conecto dominio propio, agrego captación de citas (`golden-agenda-citas`) o sumo esta web como recurso del Portal Golden?»

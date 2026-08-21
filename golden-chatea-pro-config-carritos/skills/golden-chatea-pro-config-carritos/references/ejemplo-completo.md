@@ -9,6 +9,7 @@
 - **Incentivo de recuperación:** envío gratis + mini-muestra de regalo en el último intento
 - **Tiempos de entrega:** capital 2-3 días, intermedia 3-4, rural 5-7
 - **Asistente:** "Vale", tono cálido y cercano
+- **Prueba social real (confirmada por el negocio en el intake):** 12.000 clientas — dato ficticio de este ejemplo, pero en uso real solo se escribe si el negocio la entrega; sin ella, REACTIVACIÓN 2 se apoya en garantía y contra entrega, nunca en una cifra inventada.
 - **Tipo de contacto:** carrito frío (dejó el checkout en la tienda, no había escrito al WhatsApp) → el primer toque necesita plantilla de Meta
 
 ---

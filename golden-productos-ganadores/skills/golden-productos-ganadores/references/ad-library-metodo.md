@@ -64,6 +64,9 @@ ads_library_search(search_terms=X, countries=[PAIS], ad_active_status="ALL",    
 
 - **Apagados = T − A**
 - **Tasa de supervivencia = A / T**
+- Calcúlalo con el script, no a mano: `python3
+  ~/.claude/skills/golden-productos-ganadores/scripts/metricas_saturacion.py cementerio
+  --activos <A> --historicos <T>`.
 
 > Medido: "fibra capilar" · CO → ACTIVE **1.496**, ALL **2.014**. Apagados **518**, supervivencia
 > **74,3%** → categoría sana, la gente que entra se queda.

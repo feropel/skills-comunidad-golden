@@ -39,51 +39,62 @@ Destacar el CPA breakeven en un párrafo centrado con tamaño 36 y color verde.
 Tabla con columnas: Margen deseado | CPA máximo | ROAS objetivo | Ganancia por 100 órdenes
 Filas con colores: breakeven amarillo, demás verde gradient
 
-**1.4 P&L histórico real**
-Tabla mostrando si la cuenta perdió o ganó plata aplicando los unit economics al gasto real.
+### 2. P&L histórico real de la cuenta
+Sección propia (no subsección de Unit Economics — `generate_report.py` la genera como
+bloque independiente porque responde una pregunta distinta: no "cuál es el breakeven" sino
+"esta cuenta ganó o perdió plata de verdad"). Tabla mostrando si la cuenta perdió o ganó
+plata aplicando los unit economics al gasto real, con veredicto GANÓ/PERDIÓ destacado.
 
-### 3. Ranking de Creativos
-**2.1 Tabla maestra**
+### 3. Ranking de Campañas (si aplica)
+Tabla maestra por tipo de campaña (Capa 1): tipo | gasto | compras | CPA | ROAS | % compras.
+Filas con colores según tier.
+
+### 4. Ranking de Creativos
+**4.1 Tabla maestra**
 Columnas: Video | Inversión | Compras | CPA | ROAS | Veredicto
 Filas con colores según tier (verde/amarillo/rojo)
 
-**2.2 Detalle de los top 3-4 ganadores**
+**4.2 Detalle de los top 3-4 ganadores**
 Para cada uno: tabla con métricas clave (gasto, compras, CPA, ROAS, CTR, CPC, hold rate, view through, mejor demografía, mejor ubicación)
 
-**2.3 Videos a descartar**
+**4.3 Videos a descartar**
 Lista breve con razón
 
-### 4. Demografía
-**3.1 Distribución por sexo**
+### 5. Demografía
+**5.1 Distribución por sexo**
 Tabla: Sexo | % Compras | % Inversión | CPA | ROAS | Lectura
 
-**3.2 Distribución por edad**
+**5.2 Distribución por edad**
 Tabla: Edad | % Compras | CPA | ROAS | Veredicto
 
-**3.3 Combinaciones edad x sexo más rentables**
+**5.3 Combinaciones edad x sexo más rentables**
 Tabla solo con combos con CPA bajo breakeven
 
-### 5. Plataformas y Ubicaciones (si aplica)
-**4.1 Por plataforma**
+### 6. Plataformas y Ubicaciones (si aplica)
+**6.1 Por plataforma**
 Tabla: Plataforma | Inversión | Compras | CPA | ROAS | % compras
 
-**4.2 Por ubicación específica**
+**6.2 Por ubicación específica**
 Tabla con top ubicaciones ordenadas por volumen
 
-**4.3 Ubicaciones secretas con mejor ROAS**
+**6.3 Ubicaciones secretas con mejor ROAS**
 Las 3-5 ubicaciones con ROAS más alto aunque tengan poco volumen
 
-### 6. Landing destino (si aplica)
-**5.1 Performance global por landing**
+### 7. Landing destino (si aplica)
+**7.1 Performance global por landing**
 Tabla comparando todas las landings
 
-**5.2 Mismo video en diferentes landings**
+**7.2 Mismo video en diferentes landings**
 Comparativa cuando el mismo creativo va a múltiples landings
 
-**5.3 Regla landing → creativo**
+**7.3 Regla landing → creativo**
 Patrón identificado
 
-### 7. PLAN DE ACCIÓN (la sección más importante)
+### 8. Embudo de conversión (si aplica)
+Tabla: Etapa | Tasa actual | Benchmark | Veredicto — una fila por etapa del embudo
+(Impresiones → Clics → Visitas LP → Pagos iniciados → Compras), coloreada por tier.
+
+### 9. PLAN DE ACCIÓN (la sección más importante)
 
 **A. QUÉ PAUSAR HOY MISMO**
 Tabla con: Nombre exacto | Razón | Pérdida acumulada
@@ -104,19 +115,21 @@ Estructura completa de cada campaña/adset/anuncio nuevo
 - Checklist técnico
 - Riesgos a vigilar
 
-### 8. KPIs de monitoreo
-Tabla: KPI | Verde | Amarillo | Rojo
-
-Reglas de decisión rápida en bullets
-
-### 9. Síntesis Ejecutiva
-Tabla numerada con 7-10 conclusiones clave.
+### 10. Síntesis Ejecutiva
+Tabla numerada con 7-10 conclusiones clave (`sintesis_ejecutiva` en el config).
 
 Párrafo de cierre con recomendación final.
 
-### 10. Recomendaciones extra
-- Palancas para mejorar margen (subir precio, bajar devolución, etc.)
-- Pruebas adicionales sugeridas
+### 11. Producción creativa recomendada (si aplica)
+Bloque clave/valor (`produccion_creativa` en el config) con: ángulo ganador, duración
+recomendada, casting, hook y landing por tipo de creativo — ver
+`references/reglas_duras_colombia.md` para el detalle de cada uno. Aquí es donde van
+las palancas de margen y cualquier prueba adicional sugerida, como parte del punto final
+del bloque.
+
+No hay una sección separada de "KPIs de monitoreo" en el documento generado: los
+semáforos por KPI viven dentro de cada tabla (Ranking de campañas, Creativos, Demografía,
+Ubicaciones, Embudo) coloreados fila por fila — no como una tabla de referencia aparte.
 
 ## Reglas de redacción
 

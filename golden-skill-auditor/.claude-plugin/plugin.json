@@ -1,6 +1,6 @@
 {
   "name": "golden-skill-auditor",
-  "version": "1.8.0",
+  "version": "1.9.0",
   "description": "Lee una skill completa, la califica sobre 1000 y la deja funcionando.",
   "author": {
     "name": "Comunidad Golden"

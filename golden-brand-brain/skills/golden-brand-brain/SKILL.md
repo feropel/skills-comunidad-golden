@@ -16,7 +16,7 @@ description: >
 
 # Golden Brand Brain — el cerebro vivo de cada marca
 
-**Versión:** `BB1.0` · Un setup, todos los assets on-brand.
+**Versión:** `BB1.1` · Un setup, todos los assets on-brand.
 
 La idea: en vez de re-explicar tu negocio en cada chat, cada marca tiene UNA carpeta de
 conocimiento que yo leo antes de generar cualquier cosa. Se monta una vez, se actualiza
@@ -39,15 +39,28 @@ Si la carpeta no existe cuando se necesita, ofrécete a crearla (Modo 1) — no 
 
 ## Modo 1 — CREAR el cerebro (setup, una vez)
 
+0. **Revisa si la carpeta ya existe antes de escribir nada.** Si `PROYECTOS/BRAND-BRAINS/<MARCA>/`
+   ya tiene alguno de los 6 archivos, esto NO es un setup limpio: es un cerebro parcial. No
+   sobrescribas lo que ya está lleno — completa solo los archivos faltantes y los campos
+   `[PENDIENTE]` que ya existan, tal como en Modo 2. Sobrescribir un archivo con datos reales
+   por una plantilla vacía es la forma más rápida de perder trabajo ya hecho.
 1. **Fuentes primero, preguntas después.** Reúne de lo que ya existe:
    - Dossier de `golden-investigacion-mercado` si lo hay (avatares, competidores, voz del cliente).
    - La tienda/web real (URL), reseñas, redes.
    - Datos de la operación: best-sellers, anuncios que funcionaron (pedir métricas reales).
+   Si ninguna fuente existe (marca 100% nueva), no te detengas: pasa al paso 2 y arranca los 6
+   archivos casi todo en `[PENDIENTE]` — un cerebro incompleto que existe es más útil que uno
+   perfecto que nunca se creó.
 2. **Pregunta SOLO lo que falte** y con campo para llenar (precio real: ____, WhatsApp: ____).
    Lo que no esté, se marca `[PENDIENTE]` y se sigue — preguntar no es bloquear.
-3. **Escribe los 6 archivos** con la plantilla de `references/plantilla-cerebro.md`.
+3. **Escribe los archivos que falten** con la plantilla de `references/plantilla-cerebro.md`.
    Concreto y usable: frases de la voz real del cliente, números reales, nada de relleno.
-4. **Informa** el resumen: qué quedó cargado, qué quedó `[PENDIENTE]`.
+4. **Verifica contra el checklist de setup** (al final de `references/plantilla-cerebro.md`)
+   antes de dar por terminado: los 6 archivos existen, los datos duros son reales o están
+   marcados `[PENDIENTE]` a la vista, hay al menos 3 frases reales de clientes en avatares.md.
+   Terminado = ese checklist en verde o con sus huecos declarados, nunca "quedó listo" a ojo.
+5. **Informa** el resumen: qué quedó cargado, qué quedó `[PENDIENTE]`, y si el checklist cerró
+   completo o con pendientes.
 
 ## Modo 2 — ACTUALIZAR el cerebro (mantenimiento)
 
@@ -84,6 +97,11 @@ Cuando se va a generar CUALQUIER asset para una marca con cerebro:
   de formato y el checklist de setup. Leer al crear o reestructurar un cerebro.
 
 ## Changelog
+- **BB1.1** (2026-08-21) — Auditoría `golden-skill-auditor`: Modo 1 ahora revisa PRIMERO si el
+  cerebro ya existe parcial antes de escribir (no sobrescribe archivos con datos reales), define
+  qué hacer cuando no hay ninguna fuente (arranca en `[PENDIENTE]`, no se detiene), y ata el
+  checklist de `plantilla-cerebro.md` como criterio explícito de "terminado" antes de informar.
+  Contenido y estructura originales intactos.
 - **BB1.0** (2026-07-11) — Creación. Concepto adaptado y mejorado del patrón "Brand Brain"
   (AI CMO/Nu Reach, visto en redes): carpeta viva por marca + 3 modos (crear/actualizar/usar)
   + convención PROYECTOS/BRAND-BRAINS/ + encadenado al ecosistema Golden completo.

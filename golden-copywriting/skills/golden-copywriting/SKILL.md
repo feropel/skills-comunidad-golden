@@ -20,7 +20,7 @@ description: >-
 
 # Golden Group — Copywriting Multicanal
 
-**Versión:** `GCW1.3.4` · **Fábrica: el CENTRO DE MANDO** (chat "🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR").
+**Versión:** `GCW1.3.5` · **Fábrica: el CENTRO DE MANDO** (chat "🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR").
 
 > 🏭 **Quién puede editar esta skill.** No tiene chat-fábrica propio, y por la regla de la casa
 > *skill sin chat-fábrica = su fábrica es el Centro de Mando*. Manos autorizadas, solo dos:
@@ -157,6 +157,14 @@ contradicen la base, manda la reciente; si es una impresión sin medir, manda la
 - Tono cercano, 1 idea por mensaje, emojis con criterio.
 > Si es para configurar el bot completo, deriva a `golden-chatea-pro-full-configuracion` (o `golden-chatea-pro-prompt-ventas` para solo el prompt de venta).
 
+#### 💬 Si el destino del anuncio es un chat (Click to WhatsApp), no una landing
+Cuando el CTA del anuncio abre una conversación de WhatsApp en vez de llevar a una página, el
+copy **no vende el producto, gana el mensaje** — el cierre pasa al chat. Lee
+`references/referencia-externa-copy-click-to-whatsapp.md` antes de escribir ese caso: estructura
+de 3 pasos (dolor → validación/prueba social → CTA que invita a conversar, no a comprar), y por
+qué sobre-vender en el anuncio quema el clic. Es material de terceros marcado como referencia
+opcional, no regla dura — los 5 copys por rubro siguen siendo obligatorios.
+
 ## Formato de salida
 Agrupa por canal con encabezados claros. Marca el ángulo de cada variante: `[Dolor]`, `[Deseo]`, etc. Respeta siempre los guardrails de formato (sin signos de apertura, sin líneas de rayas, todo copy en bloque de código). Cierra ofreciendo: «Quieres que adapte el ganador a otro canal o genere los creativos con `claude-ads` / Higgsfield?»
 
@@ -178,6 +186,33 @@ vale menos que uno de 3 donde los 3 pelean — porque el relleno se cuela a prod
 lo señala.
 
 ## Changelog
+- **GCW1.3.5** (2026-08-21) — **Tercera corrida de la tarea de 8 días.** La skill se encontró
+  **desblindada por segunda corrida seguida**; esta vez con causa identificada (el CdM editó
+  `tendencias-vivas.md` el 2026-08-20 11:32 para ponerle el rótulo "DATO LOCAL — NO DISTRIBUIBLE"
+  y no volvió a blindar). Cuatro correcciones con número y fuente en `estandar-meta-medido.md`:
+  **(1)** §3, la regla de los 125 se sostiene en **0 de 8** mayores vendedores y se reescribe su
+  aplicación — la oferta va en el TÍTULO (nunca se corta) y solo si no cabe ahí se mete en los
+  primeros 125 del cuerpo. **(2)** §2, **el polo corto YA salió al aire** (33 caracteres, ROAS
+  3,62 sobre 2 compras) y el mecanismo de opciones múltiples queda documentado con fuente oficial
+  de Meta (aplica solo a imagen/video único). **(3)** §4, la oferta emigró al titular y aparece la
+  variante del MECANISMO leída en mercado. **(4)** §6 NUEVA — **el copy no es la variable
+  dominante**: tres creativos con el mismo cuerpo byte por byte dan CPA de 14.794 a 119.346; §7
+  NUEVA con qué del mercado es medible y qué no (emoji y MAYÚSCULAS eran ruido, corrige a la
+  corrida 2). Los dos fallos de higiene de otra marca (negrita Unicode falsa, Markdown sin renderizar)
+  siguen sin corregir y el de Markdown se replicó de 1 a 3 creativos; reportado otra vez a la
+  bandeja del CdM, fuera de mi dominio ejecutarlo. Cobertura: 74 cuentas inventariadas / 42
+  barridas (excl. BACK UP, +6 sin medio de pago que antes no se miraban) / 17 con gasto / 5 a
+  nivel anuncio / 14 creativos leídos. Nueva entrada en `tendencias-vivas.md`. Respaldo previo:
+  `RESPALDOS-SKILLS/golden-copywriting-GCW1.3.4-20260821-1050.tar.gz`.
+  **Auditoría golden-skill-auditor (2026-08-21):** se fusionó `CHANGELOG.md` (duplicaba este
+  changelog en formato más corto y ya había desincronizado — traía esta entrada y aquí faltaba)
+  y se retiró el archivo suelto de la raíz; historial completo queda solo aquí. Se agregó el
+  puntero que faltaba desde esta sección hacia
+  `references/referencia-externa-copy-click-to-whatsapp.md` (existía sin que SKILL.md lo
+  mencionara — huérfano funcional aunque el inventario no lo marcara roto). Ningún dato ni
+  hallazgo de campo se borró: el histórico 2026-07-30 (masterclass Panama) y 2026-08-02
+  (sección AUTO-MEJORA) que traía `CHANGELOG.md` ya vive como contenido vigente de esta skill
+  (la sección AUTO-MEJORA de más abajo, y la referencia CTWA ahora enlazada).
 - **GCW1.3.4** (2026-08-16) — **Segunda corrida de la tarea de 8 días.** Cobertura: 74 cuentas
   inventariadas, 36 revisadas (excluida BACK UP), 17 con gasto en 30 días (sube de 14); mercado:
   3 términos, 150 anuncios, 46 páginas, 60 títulos únicos, 4 cuerpos completos. Hallazgo mayor:

@@ -18,7 +18,7 @@ if [ "$DRY" != "DRY" ]; then
 fi
 raw="$(basename "$UNIT")"
 PREFIX="$(printf '%s' "$raw" | sed 's/™//g; s/®//g; s/ - / /g; s/  */ /g' | sed 's/^ *//; s/ *$//')"
-ALLOW="jpg jpeg png webp heic heif gif mp4 mov webm m4v avi pdf docx doc xlsx xls csv pptx"
+ALLOW="jpg jpeg png webp heic heif gif tiff tif bmp svg psd ai eps mp4 mov webm m4v avi hevc pdf docx doc rtf txt md xlsx xls csv tsv numbers pptx ppt key pages zip rar 7z"
 TMP="$(mktemp)"
 find "$UNIT" -type f ! -name '.*' 2>/dev/null > "$TMP"   # snapshot PRIMERO (renombrar mientras find recorre salta archivos)
 while IFS= read -r f; do

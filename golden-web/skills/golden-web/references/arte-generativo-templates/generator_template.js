@@ -31,7 +31,7 @@ let params = {
     // - Colors: palette arrays
 
     seed: 12345,
-    // define colorPalette as an array -- choose whatever colors you'd like ['#d97757', '#6a9bcc', '#788c5d', '#b0aea5']
+    // define colorPalette as an array -- choose whatever colors you'd like ['#e8b84b', '#f7e3a1', '#b8860b', '#b0aea5']
     // Add YOUR parameters here based on your algorithm
 };
 
@@ -181,7 +181,7 @@ function regenerate() {
 
 // Drawing with transparency for trails/fading
 function fadeBackground(opacity) {
-    fill(250, 249, 245, opacity); // Anthropic light with alpha
+    fill(250, 249, 245, opacity); // Golden light con alpha
     noStroke();
     rect(0, 0, width, height);
 }

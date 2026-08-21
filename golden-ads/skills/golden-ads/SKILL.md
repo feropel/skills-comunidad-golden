@@ -52,6 +52,12 @@ rápido y barato. Trabajas con datos; cuando no hay, lo dices y diseñas para *g
 5. **País/moneda** correctos (presupuestos en la moneda de la cuenta; segmentación/entrega por país).
 6. **Accionable**: cada hallazgo → una acción concreta (qué tocar, a qué valor, por qué).
 7. **Entregables en `PROYECTOS/<PRODUCTO>/ADS/`** (MAYÚSCULA), nada suelto.
+8. **El dato decide QUÉ; la empatía decide CÓMO.** Cero supuestos y cero parálisis: de cada análisis
+   sale **UNA acción escrita**. El mensaje se le escribe a **una persona con nombre** en **su etapa del
+   embudo** (nunca el mismo copy para las 7) y en el **lenguaje de la red** donde está. **Llegar en el
+   MOMENTO** (disparador de vida + temporada, anticipando 3–4 semanas) vale más que llegar a muchos →
+   `references/21-audiencia-momento-humanidad.md`. Y todo número se lee como **patrón**, nunca suelto:
+   marco de comparación, tendencia vs ruido, ciclo y causa → `references/22-patrones-y-lectura-de-datos.md`.
 
 ---
 
@@ -109,6 +115,9 @@ Estructura de testeo (1 campaña, N conjuntos = N ángulos, público amplio, 2�
   o entrega **prompts perfectos** + slots. Copy = 5 hooks/5 títulos/5 descripciones por creativo.
 - **Segmentación** (`references/16-segmentacion.md`): sin histórico → recomendar (Advantage+ + persona);
   **con histórico → basarla en QUIÉN COMPRA** (sexo/edad/ubicación/plataforma por breakdowns del MCP + LAL).
+- **Audiencia ideal + momento + mensaje humano** (`references/21-audiencia-momento-humanidad.md`):
+  segmentos por **SECTOR/contexto de vida** (no solo edad) con nombre propio, un creativo por **etapa del
+  embudo de comportamiento**, la **temporada** que entra, y el **sondeo de marca 1–10** si el cliente es nuevo.
 
 ---
 
@@ -132,13 +141,22 @@ Estructura de testeo (1 campaña, N conjuntos = N ángulos, público amplio, 2�
 - [ ] Todo **en PAUSA**; resumen mostrado; activación solo con OK del usuario.
 - [ ] Entregables guardados en `PROYECTOS/<PRODUCTO>/ADS/`.
 - [ ] **Plan de seguimiento entregado** (`references/20-seguimiento.md`): qué mirar día 0/1/2-3/4-7 y cuándo NO tocar.
+- [ ] **Capa humana** (`21`): segmento con nombre, mensaje distinto POR ETAPA, momento/temporada considerado,
+      y checklist humano del creativo pasado (se reconoce · no se siente atacado · entiende en 3s · lo cree).
 
 ---
 
 ## Sello de versión
-<!-- GAE_VERSION: G4.7 — 2026-08-11 — RED SINÁPTICA (ley de FER): entra el puente a la transcripción LOCAL de creativos en "Relación con otras skills" — los hooks de los anuncios ganadores se minan del audio con whisper local; receta canónica en golden-investigacion-mercado §1.6 (no se duplica para que no envejezca en dos sitios); desglose completo = golden-video-teardown. Propagado por el Centro de Mando tras el hallazgo del chat FILTRO (la capacidad existía en golden-video-editor y nunca circuló). ADEMÁS reconciliado un DESFASE DE SELLO encontrado en esta edición: el ledger decía G4.5 (2026-08-07) mientras el sello impreso decía G4.6 con fecha 2026-07-25 — versión dictada ≠ impresa; desde hoy ambos dicen G4.7 y el ledger es la fuente. · G4.5 — 2026-08-07 — Cosecha del chat "un estudio de producto(Chile)" vía Centro de Mando: (1) 12-unit-economics.md — la escalera de rentabilidad se calcula POR ESCALÓN DE COMBO (breakeven CPA por 1u/2u/3u; ejemplo real $9.744/$12.019/$13.000 con costo $8.500, envío/recaudo $4.500, entrega 65%): "sin combo no cierra" solo se ve con los tres escalones juntos; entregable = tabla por escalón + veredicto de si la unidad suelta es viable; (2) PALANCA DE PRECIO como recomendación estándar cuando el margen queda apretado — del piso al techo del mismo rango de mercado ($27.990→$29.990 = $2.000 más margen = 13% más techo de CPA), siempre como recomendación: el precio lo fija el dueño. · G4.4 — 2026-07-18 — fábrica: este chat. ACLARACIÓN: la data de pedidos/histórico es la EXCEPCIÓN (producto ya vendido o relanzamiento a otro país), no la regla — para producto NUEVO sin datos (el caso normal) el default es Modo B (testeo) y NO se pide ni se asume métricas; nota conditional al inicio de 01 §D y 16 §C. Lógica Modo A/Modo B intacta. + Aprendizajes Le'côterra (COD cuidado personal): segmentar por comprador real y fondear todo (16), cruzar con pedidos Dropi/CRM (01), rankear creativos por compras/ROAS no CTR + ruteo video→destino (08), patrón de edad COD 25–44 (07), combo como palanca + entrega por transportadora (12). -->
-**Versión:** `G4.7` · **Última modificación:** 2026-08-11 · **Validada en vivo** contra cuentas Meta
-reales (COP, COD) — GOLDEN PRO construido y replicado en vivo. Historial en `references/changelog.md`.
+<!-- GAE_VERSION: G5.0 — 2026-08-21 — AUDITORÍA golden-skill-auditor: (1) examples/EJEMPLO-diagnostico.md
+y examples/PRESET-columnas-golden-09.2025.md movidos a references/ (la carpeta examples/ no es empaque
+válido de marketplace: referencias/scripts/assets/agents; los 2 punteros del cuerpo actualizados);
+(2) CHANGELOG.md de la raíz (duplicaba y desincronizaba con references/changelog.md, faltaban las
+entradas G4.5 y G4.7 en el ledger) fusionado dentro de references/changelog.md — ahora es la ÚNICA
+fuente de versión/fecha, con índice al inicio (pasó de 307 a >300 líneas); (3) reconciliadas 2 notas de
+versión que se aplicaron sin bump de GAE_VERSION en 2026-07-30 y 2026-08-02. Detalle completo del
+historial completo, incluyendo versiones anteriores a G4.9, en `references/changelog.md`. -->
+**Versión:** `G5.0` · **Última modificación:** 2026-08-21 · **Validada en vivo** contra cuentas Meta
+reales (COP, COD) — GOLDEN PRO construido y replicado en vivo. Historial completo en `references/changelog.md`.
 
 ## Archivos de esta skill
 - `references/reglas-de-oro.md` — no inventar métricas, unit economics, confirmar antes de gastar, compliance, organización.
@@ -161,8 +179,11 @@ reales (COP, COD) — GOLDEN PRO construido y replicado en vivo. Historial en `r
 - `references/17-entrega.md` — **modos de entrega**: con MCP (montar en pausa) vs sin MCP (**informe full** copia-pega-able).
 - `references/18-columnas-ads-manager.md` — **columnas en orden de embudo** (venta web / landing-video / WhatsApp-Chatea PRO); preset para guardar + campos MCP.
 - `references/19-golden-pro-preset.md` — **GOLDEN PRO, el preset ÚNICO oficial** (40 col · 5 bloques · fórmulas custom · 🚦 semáforo de metas · replicación por URL · receta del doc imprimible).
+- `references/21-audiencia-momento-humanidad.md` — **audiencia real, comportamiento POR RED SOCIAL, MOMENTO/estacionalidad, mensaje humano por etapa, sondeo de marca 1–10 y de PRODUCTO, fidelización/LTV** (la capa que los números no dan).
+- `references/22-patrones-y-lectura-de-datos.md` — **cómo se lee un patrón**: 4 marcos de comparación, tendencia vs ruido, ciclos (semanal/quincena/estacional/fatiga), correlación ≠ causa, patrones que siempre se buscan.
 - `references/20-seguimiento.md` — **seguimiento post-lanzamiento**: calendario día 0/1/2-3/4-7/semanal, cuándo tocar y cuándo NO, escalado sin romper aprendizaje, rutina MCP.
-- `examples/EJEMPLO-diagnostico.md` — **diagnóstico modelo** (caso real anonimizado) = estándar de entrega.
+- `references/EJEMPLO-diagnostico.md` — **diagnóstico modelo** (caso real anonimizado) = estándar de entrega.
+- `references/PRESET-columnas-golden-09.2025.md` — preset original de columnas del usuario (09.2025), absorbido en `19-golden-pro-preset.md`.
 - `references/changelog.md` — historial de versiones.
 
 ## Relación con otras skills (no duplicar)

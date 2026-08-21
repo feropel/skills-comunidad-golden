@@ -24,6 +24,7 @@ humana obligatoria (H).
 | # | auto | Control |
 |---|---|---|
 | B1 | A | **Campos de bot contados con la paginación agotada.** Se compara el número de campos traídos contra `meta.total`. Si no cuadra, el informe **se detiene**: un denominador incompleto invalida todo lo demás. |
+| B1b | A | **El mismo chequeo sobre TODO lo demás que pagina** (subflujos, tags, segmentos, agentes IA, tareas IA, webhooks…), no solo bot fields. Un listado corto en cualquiera de ellos dice DUDA, no ausencia: lo que no aparece puede existir y no haberse medido. |
 | B2 | A | **Campos de usuario contra su límite.** Hay un tope por workspace (visto `412/200` en rojo en el panel). Pasado el límite, dejan de crearse campos nuevos en silencio. |
 | B3 | A | **Asistentes detectados por prefijo de campo**, no por lo que se supone instalado. Los prefijos conocidos son `[Comentarios]`, `[Ventas Wp]` / `[Producto Ventas Wp]`, `[Logistico]` / `[Logistica]`, `[Carritos IA]`, `[Remarketing IA]`, `[WhatsApp IA]`, `[Novedades]`, `[Minimax]`, `[Meta]`, `[Integraciones]`. **Un prefijo desconocido es un hallazgo, no ruido**: significa que hay un asistente o una versión que la skill todavía no sabe auditar, y hay que declararlo. |
 | B4 | A | **Subflujos, tags, agentes IA, tareas IA y webhooks entrantes** contados. |
@@ -88,8 +89,8 @@ Se leen **enteros**, uno por uno. No se muestrean. El estándar está en `estand
 | F9 | H | **El prompt corresponde al producto real.** Precio, promesa, contenido del empaque y garantía contra la ficha real del producto. Lo que la caja dice no se inventa. |
 | F10 | H | **Estructura contra el estándar.** Identidad, oferta, objeciones, cierre, restricciones. Ver `estandar-prompts.md`. |
 | F11 | H | **Un prompt genérico que en realidad tiene horneado otro producto.** Caso real: el campo de fallback `producto_segundos.prompt_prompt` no era genérico, tenía el guion completo de un producto concreto y actuaba de fallback para todos los demás. |
-| F13 | A | **La zona de agentes y tareas de IA.** El extractor baja los prompts de `/flow/ai-agents` y `/flow/ai-tasks`. Ahí vive texto que le llega al cliente y **ningún control de campos lo cubre**: los denominadores de F1, F2 y F3 lo excluyen por completo. Se audita aparte, con su propio denominador. |
 | F12 | A | **País y lenguaje.** El país declarado manda: en México el código postal es requerido y no existe recolección en oficina; en Colombia al revés. **Cualquier país clonado de otra plantilla hereda el criterio equivocado.** Y la palabra "domicilio" significa el pedido en Colombia y la casa en México. |
+| F13 | A | **La zona de agentes y tareas de IA.** El extractor baja los prompts de `/flow/ai-agents` y `/flow/ai-tasks`. Ahí vive texto que le llega al cliente y **ningún control de campos lo cubre**: los denominadores de F1, F2 y F3 lo excluyen por completo. Se audita aparte, con su propio denominador. |
 
 ## Bloque G · Seguridad
 

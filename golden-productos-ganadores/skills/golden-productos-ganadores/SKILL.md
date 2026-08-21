@@ -19,6 +19,13 @@ description: >-
 
 # Golden Group — Productos Ganadores
 
+<!-- skill GPG1.8 · 2026-08-21 · auditoria golden-skill-auditor (880/1000 antes de reparar): (a)
+SOURCING LOCAL sacado del cuerpo a references/sourcing-local.md — no hace falta en cada corrida,
+solo cuando el producto no esta en Dropi; (b) fallback agregado si candado_scraping.py (script de la
+hermana golden-investigacion-mercado) no existe o falla: verificacion manual de la Regla Cero, no se
+detiene el flujo; (c) duplicado "el informe se entrega siempre" (aparecia en SKILL.md Y en
+entregable.md) reducido a una sola fuente en entregable.md, SKILL.md solo apunta; (d) blindaje
+documentado explicitamente: chflags uchg, coherente con el resto de skills golden- publicas -->
 <!-- skill GPG1.7 · 2026-08-02 · AMAZON RESUCITA POR NAVEGADOR y cae la afirmacion no verificada. GPG1.6 dijo "para Temu y Amazon usar Chrome MCP" SIN PROBARLO — se escribio por deduccion, el mismo error que esta skill corrige en todas partes. Medido hoy: (a) AMAZON POR NAVEGADOR ✅ es la MEJOR fuente del scanner — 48 tarjetas, 34 con "comprados el mes pasado" (71%), 46 con precio, 45 con rating, total "155 resultados", precios en COP y envio a Colombia detectados solos; da mas que AliExpress. Receta con selectores en el cuerpo. (b) TEMU ❌ por ninguna via: muro de SESION ("Email o numero de telefono"), no es JS es autenticacion; solo saldria con claude-in-chrome si FER ya tiene sesion — preguntar, no asumir. (c) MERCADOLIBRE CO ❌ nuevo: por Firecrawl da CAPTCHA y el extractor inventa "Producto 1..8" con precios y ratings falsos CON metadata.title poblado (modo 4, rompe el check 2); por navegador, muro de sesion. (d) DESCRIPCION corregida: prometia "TikTok Creative Center" que no se puede leer — ahora nombra AliExpress y Amazon, que si. (e) COMPUERTA nueva: pasar todo scrape por candado_scraping.py antes de puntuar -->
 <!-- skill GPG1.5 · 2026-07-27 · AUDITORIA con golden-skill-auditor tras pregunta de FER ("por que no lo habias descubierto"): la causa raiz fue auditar el TEXTO de la skill y nunca EJECUTAR la herramienta que recomienda. Ahora medido en vivo: (a) CEMENTERIO nuevo — comparar ad_active_status ACTIVE vs ALL con limit:1 da la tasa de supervivencia de la categoria (fibra capilar CO: 1.496 activos / 2.014 historicos = 74,3%; <40% = bandera roja aunque hoy se vean tiendas activas). Supera al metodo de terceros, que lo planteaba como chequeo manual opcional. (b) CORRECCION de GPG1.4: el sesgo de recencia solo aplica cuando el total SUPERA el limit; si es menor se recibe todo, historico incluido (medido: 9 de 9, uno de 36 dias). La redaccion anterior era imprecisa. (c) ESTRUCTURA: de 295 lineas en un solo archivo a SKILL.md + 2 references (divulgacion progresiva). (d) Del metodo ajeno se adapto lo que faltaba: mapa de angulos con HUECOS y hooks, lectura de precios (techo/piso), MODO LOTE con ranking y lectura transversal, fast-flags, y la regla de entregar el informe tambien cuando el veredicto es NO -->
 <!-- skill GPG1.4 · 2026-07-27: filtro de un metodo de validacion de terceros (Vertex Digital, otra empresa — se extrajo el METODO, nada de su marca). Aporte propio MEDIDO: los 2 sesgos del MCP ads_library_search — tope duro de 50 sin paginacion (cobertura 3,3% sobre 1.496 reportados) y devuelve LOS MAS RECIENTES (los 50 de la prueba cubrian 4,5 horas del mismo dia), asi que NUNCA muestra el anuncio de 30+ dias que esta misma skill declara señal reina: contradiccion interna real, ahora documentada con su workaround por navegador. Del metodo ajeno se horneo: minimo 8 keywords en 4 capas con permutaciones, REGISTRO DE COBERTURA obligatorio (0 encontradas != no revisadas), filtrado de ruido y dedup por tienda, curva de saturacion numerica (0=riesgo no oportunidad, 1-3 punto dulce, 4-7 competido, 8+ saturado), señales por competidor y indice de anuncios con link directo por ID -->
@@ -27,7 +34,8 @@ description: >-
 <!-- skill GPG1.1 · 2026-07-25: nueva fuente SCANNER DE VOLUMEN VISIBLE (Temu/AliExpress/Amazon por navegador, contadores de órdenes como señal de demanda dura) — patrón destilado de las extensiones de WiFi Money; se replica con el MCP de Chrome sin instalar código ajeno -->
 <!-- skill GPG1.0 · creación: Ad Library como prueba reina + rúbrica 0-100 + ficha entregable -->
 
-**Versión:** `GPG1.7` · Fábrica: este chat.
+**Versión:** `GPG1.8` · Fábrica: este chat. · **Blindaje:** `chflags uchg` (desbloquear con
+`chflags -R nouchg`, reponer con `chflags -R uchg` al cerrar cualquier reparación).
 
 Objetivo: pasar de "no sé qué vender" a una **ficha de producto validado con evidencia**, en minutos, usando solo herramientas ya conectadas (sin pagar spy tools).
 
@@ -137,6 +145,10 @@ Objetivo: pasar de "no sé qué vender" a una **ficha de producto validado con e
    - **Compuerta obligatoria antes de puntuar:** pasar la respuesta por el candado
      `python3 ~/.claude/skills/golden-investigacion-mercado/scripts/candado_scraping.py resp.json
      --pedi "<lo que buscabas>"`. Si dice DESCARTAR, ese producto **no entra a la rúbrica**.
+     **Si el script no existe o falla** (la skill hermana se movió o se renombró): no te detengas —
+     aplica a mano las 4 verificaciones anti-fantasma de la Regla Cero (existe `json`? ·
+     `metadata.title` poblado? · `metadata.url` == `sourceURL`? · el dato responde a lo que pedí?) y
+     dilo en el informe: "compuerta automática no disponible, verificación manual aplicada".
    - **Verificación anti-fantasma (las 4, antes de puntuar):** existe el campo `json`? ·
      `metadata.title` poblado? · `metadata.url` == `sourceURL`? · **el dato responde a lo que pedí?**
      Cualquiera que falle = fuera de la rúbrica, y se reporta "no obtenido" en vez de inventar.
@@ -145,6 +157,11 @@ Objetivo: pasar de "no sé qué vender" a una **ficha de producto validado con e
    sale si buscas "faja cinturilla"), **registro de cobertura** por keyword ("0 encontradas" no es
    lo mismo que "no revisadas") y el **cementerio** (activos vs históricos = tasa de supervivencia).
    Deduplica por tienda y descarta el ruido antes de contar.
+   **Calcula cobertura% y supervivencia% con el script, no a mano** (evita error de redondeo/memoria):
+   `python3 ~/.claude/skills/golden-productos-ganadores/scripts/metricas_saturacion.py cobertura
+   --reportado <N> --revisados <N>` y `python3
+   ~/.claude/skills/golden-productos-ganadores/scripts/metricas_saturacion.py cementerio --activos <N>
+   --historicos <N>`.
 
 3. **Puntuación** — Score Ganador 0–100 (ver rúbrica). Descarta lo que no pase el umbral (≥60).
 4. **Ficha de Producto Ganador** (formato abajo) para los 1–3 mejores.
@@ -193,68 +210,45 @@ estaban mal. Antes de puntuar un 0, vuelve al registro de cobertura: **si la cob
 
 Ahí vive el formato completo: **ficha** de producto (con cementerio, cobertura y confianza),
 **mapa de ángulos** con los HUECOS que nadie usa y sus hooks, **lectura de precios** (techo de las
-cadenas, piso del margen), **índice de anuncios** con link directo por ID, y el **MODO LOTE** con
-ranking comparativo cuando llegan varios productos a la vez.
-
-**El informe se entrega SIEMPRE, aunque el veredicto sea descartar:** un "no" documentado con sus
-números ahorra plata y evita re-evaluar lo mismo en tres meses.
+cadenas, piso del margen), **índice de anuncios** con link directo por ID, el **MODO LOTE** con
+ranking comparativo cuando llegan varios productos a la vez, y la **regla de entrega** (aplica
+siempre, incluso si el veredicto es descartar).
 
 ## 🏭 SOURCING LOCAL (cuando el producto NO está en Dropi)
 
 Para dropshipping puro el catálogo de Dropi resuelve. Para **marca propia** hay que conseguir
-proveedor, y ahí el margen se define: comprar bien es la mitad del negocio.
-
-**Regla de precio:** `costo × 3 = precio de venta mínimo`. Con eso el combo funciona — camiseta a
-$12.000 mayorista → venta $36.000 → 3x2 a $108.000 y el cliente percibe que ahorra $36.000.
-
-### Método 1 · Grupos de mayoristas en Facebook (ropa, calzado, accesorios)
-Únete sin filtrar a los grupos grandes de tu país. En **Colombia**: busca por las zonas mayoristas
-reales — **San Victorino** y **El Restrepo** (Bogotá), **El Hueco** (Medellín) — más "Mayoristas
-Colombia", "Proveedores Colombia al por mayor". Los buenos tienen decenas de miles de miembros.
-Facebook permite publicar en **hasta 10 grupos a la vez**.
-
-Texto de publicación (funciona por tres razones deliberadas):
-
-```
-Busco 10 docenas de [PRODUCTO]. Pago al mejor precio mayorista.
-Enviar precio por docena al privado. NO respondo comentarios.
-Mucha cantidad disponible = prioridad.
-```
-
-- **"10 docenas"** señala volumen y filtra de entrada al que vende al detal.
-- **"NO respondo comentarios"** fuerza el privado y evita que la competencia vea el hilo.
-- **"mucha cantidad = prioridad"** invierte la relación de poder: el proveedor compite por ti.
-
-### Método 2 · Búsqueda asistida (gadgets, tecnología, hogar)
-Pide proveedores **locales** excluyendo explícitamente AliExpress y Alibaba, con precio de
-referencia, enlace y WhatsApp. Para cosmética y limpieza, lo mismo pero pidiendo **laboratorios
-de marca blanca** con precio por unidad, cantidad mínima y tiempo de producción.
-
-> ⚠️ **Verificación obligatoria.** Aquí es exactamente donde un modelo inventa proveedores,
-> teléfonos y precios que no existen. **Ningún proveedor devuelto por IA entra a una ficha sin
-> confirmarse** por Firecrawl o por llamada. Regla global de datos reales antes de generar.
-
-### Cómo se evalúa un proveedor (6 factores)
-Precio con escala por volumen · stock actual real · capacidad de **reposición y continuidad**
-(un ganador sin reposición es un problema, no una oportunidad) · si despacha a la transportadora
-o solo entrega en bodega · tiempos de entrega · calidad de la comunicación.
-
-### Señales de que hay que salir corriendo
-Sin fotos claras del producto · no da precio hasta que insistes tres veces · stock de 10-20
-unidades (ese no es mayorista) · no hace envíos · tarda días en responder. **Si tarda días
-contigo mientras te está vendiendo, imagina cuando ya te cobró.**
+proveedor, y ahí el margen se define: comprar bien es la mitad del negocio. Método completo (grupos
+mayoristas, búsqueda asistida, los 6 factores para evaluar proveedor, señales de alarma) →
+**`references/sourcing-local.md`. Léela solo cuando el flujo llegue a esta decisión** — no hace
+falta en cada corrida.
 
 ## Referencias de esta skill
 - **`references/ad-library-metodo.md`** — cómo se mide de verdad: los 2 sesgos del MCP con sus
   cifras, el **cementerio** (activos vs históricos = supervivencia), keywords en 4 capas, registro
   de cobertura y filtrado de ruido. **Lectura obligatoria antes de un veredicto de saturación.**
 - **`references/entregable.md`** — ficha, mapa de ángulos con HUECOS, lectura de precios, índice de
-  anuncios con link por ID y el MODO LOTE con ranking comparativo.
+  anuncios con link por ID, el MODO LOTE con ranking comparativo, y la **regla de entrega** (el
+  informe se entrega siempre, hasta cuando el veredicto es descartar).
+- **`references/sourcing-local.md`** — conseguir proveedor cuando el producto no está en Dropi:
+  grupos mayoristas, búsqueda asistida, evaluación de proveedor, señales de alarma.
 
 ## Cierre obligatorio
 Tras entregar la ficha, pregunta: «Investigo a fondo el avatar con `golden-investigacion-mercado` y monto la página con `golden-shopify`?»
 
 ## Changelog
+- **GPG1.8** (2026-08-21) — **Reparación por `golden-skill-auditor`** (auditoría inicial 880/1000,
+  sin crítico). Cuatro arreglos con evidencia: (1) `SOURCING LOCAL` (43 líneas que solo aplican a
+  marca propia sin proveedor en Dropi) se movió a `references/sourcing-local.md` — divulgación
+  progresiva real, ya no carga en cada corrida; (2) la compuerta `candado_scraping.py` (script de la
+  hermana `golden-investigacion-mercado`) no tenía plan B si el archivo no existe o falla — se agregó
+  fallback manual con las 4 verificaciones de la Regla Cero; (3) la frase "el informe se entrega
+  siempre" estaba duplicada palabra por palabra en `SKILL.md` y en `references/entregable.md` — se
+  dejó una sola fuente (entregable.md) para que no se desincronicen; (4) el mecanismo de blindaje
+  (`chflags uchg`) no estaba documentado en el propio SKILL.md — ahora consta en la línea de
+  Versión; (5) cobertura% y supervivencia% se calculaban a mano en prosa (matemática repetida cada
+  corrida, propensa a error) — nuevo `scripts/metricas_saturacion.py`, probado contra los 3 casos
+  medidos que esta misma skill ya documentaba (fibra capilar 3,3%/74,3%, verrugas 100%<30) más 3
+  casos adversariales (históricos=0, reportado=0, negativos) — 6/6 correctos.
 - **GPG1.6** (2026-08-01) — **AUTOCORRECCIÓN de GPG1.4: había sobre-generalizado desde un solo
   sitio.** GPG1.4 declaró el scanner de volumen "migrado a Firecrawl" para Temu/AliExpress/Amazon
   habiendo probado **solo AliExpress**. Ejecutadas las tres el 2026-08-01: **AliExpress ✅ ·

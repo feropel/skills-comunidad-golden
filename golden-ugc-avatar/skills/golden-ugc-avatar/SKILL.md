@@ -13,10 +13,24 @@ description: >
   when the user asks to "make a person," "create a character for video," "generate a talking-head,"
   "haz un avatar," "crea un UGC," "hazme un video hablando," or "un avatar para mi marca." Handles
   the image step AND the video step as one unified pipeline, and runs either stage alone when needed.
+  Do NOT use for product-only images (packshots, infographics, product listing photos) — that is
+  `golden-imagen-arena`. Do NOT use to build the product page, run ads, or edit/caption the final
+  clip — those are `golden-shopify`, `golden-ads`, and `golden-video-editor` respectively; this
+  skill's job ends when it delivers the avatar image and/or the .mp4.
 ---
 
 # Golden UGC Avatar — Higgsfield Pipeline
 
+<!-- skill v1.8 · 2026-08-21 (golden-skill-auditor, reparación): description now states explicit
+disambiguation (NOT for product-only images/page/ads/editing, with the correct hermana for each);
+fixed the "hyperframes" handoff to point at golden-video-editor (the actual cut/caption/assembly
+skill); removed the residual "(Moko)" from the seedance_prompt_system.md H1 (stale legacy name the
+v1.3 changelog claimed was already removed); de-duplicated the voice/body coherence table in
+SKILL.md — it now points to the single source of truth in seedance_prompt_system.md §8 instead of
+repeating a shorter, driftable copy; added Step 4 (self-check: identity match, voice-body coherence,
+vertical rules, negative-prompt present) with an explicit "done" definition, since the pipeline had
+no QA gate before handoff. Blindaje: chflags uchg (desbloquear con `chflags -R nouchg`, reponer con
+`chflags -R uchg`) — mechanism now documented here per estandares-golden.md §6. -->
 <!-- skill v1.7 · 2026-08-10 (loop del arsenal, semana 2 · producción): before/after cut BY VERTICAL added to the Step 2 health block. The 2026-08-07 norm banned before/after for dental only; Meta 2026 also bans it for anti-aging/wrinkles/firming and weight loss, and allows it for general cosmetics with an 18+ audience. Two cross-vertical bans added to the negative prompt: second person pointing at the viewer's condition, and timeframe-plus-result headlines (Meta judges implied meaning). Mirrored in golden-ecom-magic and golden-imagen-arena -->
 <!-- skill v1.6 · 2026-08-07 (centro de mando, cosecha del chat un estudio de producto) · reglas de arte para verticales de SALUD (dental y afines) en el Step 2, aplicables a prompts de imagen Y video: prohibido bocas con lesiones, antes/después de dentadura, delantal/estetoscopio/sillón dental, porcentajes en pantalla y preguntas que señalen condición del espectador; permitido macro del gotario, textura, corte de esmalte ilustrado y lifestyle de baño -->
 <!-- skill v1.4 · pipeline foto→video UGC sobre Higgsfield MCP · imagen soul_2/nano_banana_pro + video seedance_2_0 (fallback seedance_2_0_mini en plan starter) · verificado en vivo el camino imagen+talking-head; Soul reutilizable documentado, aún sin correr end-to-end · changelog completo al pie -->
@@ -50,6 +64,8 @@ Step 2  Build image prompt (5-block framework) → generate_image (soul_2 / nano
    ↓                                              → preflight get_cost → display result → approve
 Step 3  Build Seedance prompt (5-layer stack) → generate_video (seedance_2_0, start_image)
    ↓                                              → display result
+Step 4  Self-check: identity match, voice-body coherence, vertical rules, negative prompt present
+   ↓
 Done
 ```
 
@@ -217,13 +233,12 @@ description over **verbatim** and add "Maintain exact appearance throughout, con
 no deformation." Keep direction tight: 50–200 words of actual direction.
 
 ### The coherence guarantee — voice must match the body
-| Physical state | Voice must include |
-|---|---|
-| Running / HIIT | Audible breathing, staccato delivery, words cut short |
-| Post-workout | Recovering breath, interrupted sentences, slower pace |
-| Walking and talking | Cadence matching steps, natural pace |
-| Seated / still | Controlled breathing, full sentences, deliberate pacing |
-| Lying / stretching | Slowest pace, deepest register, long exhales |
+Non-negotiable: whatever the body is doing in Layer 3, the voice in Layers 4–5 must carry the
+matching signature (running → audible breathing and staccato delivery; post-workout → recovering
+breath; seated → controlled full sentences; lying/stretching → slowest pace, deepest register).
+Full 7-row table (incl. "just laughed / excited" and "cold / outdoors") lives in
+`references/seedance_prompt_system.md` §8 — that table is the single source of truth; do not
+re-copy it here so it can't drift out of sync.
 
 ### Seedance 2.0 settings *(live-verified; confirm ranges with `models_explore action=get`)*
 
@@ -257,6 +272,25 @@ with `model: "higgsfield_preset"` + `preset_id`. Always list them live — the c
 4. `job_display` the result.
 
 The start frame must be a confirmed `media_id` (or a completed image job id) — never a raw URL.
+
+### Step 4: Self-check before handing off ("done" means this passes)
+Before presenting the result as final, check it against the skill's own promise — consistency and
+coherence, not taste:
+1. **Identity match** — the face/build/hair in the video's first frame reads as the same person as
+   the approved Block-3 image (the same avatar, not a redraw). If it drifted, do not deliver silently:
+   say so and offer to regenerate with the identity re-locked (character sheet, §7 of
+   `references/seedance_advanced.md`, if this is a recurring problem).
+2. **Voice-body coherence** — re-read the physical state used in Layer 3 against the delivery notes
+   actually written in Layer 4/5 (the table in `references/seedance_prompt_system.md` §8). A mismatch
+   here is the single most common tell of AI video; catch it before the user does.
+3. **Vertical rules honored** — if the product is a health/sensitive vertical (Step 2), confirm the
+   frame contains none of the forbidden elements and no before/after was used where it's banned.
+4. **Negative prompt was included** — Step 3 always ships a `【Negative Prompts】` block; missing it
+   is the top cause of uncanny output (see `references/seedance_prompt_system.md` §9).
+A pipeline run is **done** when: the image was approved by the user, the video's identity and voice
+pass the checks above, and both assets (plus the handoff note to the destination skill, if any) were
+handed to the user. If a check fails and the cause isn't obvious, say what looks off rather than
+re-generating blind — a second guess wastes the same credits as the first.
 
 ---
 
@@ -333,8 +367,9 @@ product images — it connects to the skills that do. Keep the handoffs clear so
 - `golden-imagen-arena` = **product** images (real photo + composed text, infographics/carousel). If
   the user asks for "product images for the listing" → that skill, not this. This makes **people
   and video**; that one makes **product**. Complementary, never substitutes.
-- `hyperframes` (the official video engine) = editing/composition with HTML. This skill **generates**
-  the raw UGC clip; if it needs **editing/assembly/captions**, that's HyperFrames.
+- `golden-video-editor` (cuts silences, captions, assembles the final ad on HyperFrames) = editing/
+  composition of a raw clip into a publishable video. This skill **generates** the raw UGC clip; if
+  it needs **editing/assembly/captions**, hand the .mp4 to `golden-video-editor`.
 
 Golden rule: this skill's job ends when it delivers the **asset** (image and/or .mp4). Publishing,
 running ads, laying out a page, or editing belongs to the destination skill.
@@ -368,6 +403,23 @@ against this table before switching. Rule: iterate with the cheap model, spend o
 ---
 
 ## Version & changelog
+- **v1.8** — Reparación (golden-skill-auditor): description ahora declara desambiguación explícita
+  (no usar para imágenes de producto, página, ads o edición — remite a la skill correcta en cada
+  caso); corregido el handoff de edición para apuntar a `golden-video-editor` en vez de
+  `hyperframes` (el motor real de corte/subtítulos/ensamblaje que consume esta skill); quitado el
+  residuo "(Moko)" del H1 de `seedance_prompt_system.md` (el changelog v1.3 decía que ya se había
+  quitado y no era cierto); des-duplicada la tabla de coherencia voz-cuerpo en SKILL.md — ahora
+  apunta a la tabla completa de `references/seedance_prompt_system.md` §8 en vez de repetir una
+  copia corta que podía desincronizarse; agregado el Paso 4 (auto-chequeo: identidad, coherencia
+  voz-cuerpo, reglas de vertical, negative prompt presente) con definición explícita de
+  "terminado", ya que el pipeline no tenía compuerta de QA antes de la entrega. Blindaje:
+  `chflags uchg` (documentado aquí por primera vez, según estandares-golden.md §6).
+- **v1.7** — Before/after cut BY VERTICAL agregado al bloque de salud del Step 2 (2026-08-10, loop
+  del arsenal semana 2). La norma del 2026-08-07 prohibía antes/después solo para dental; Meta 2026
+  también lo prohíbe en anti-edad/arrugas/firmeza y pérdida de peso, y lo permite en cosmética
+  general con audiencia 18+. Dos prohibiciones cross-vertical agregadas al negative prompt: segunda
+  persona señalando la condición del espectador, y titulares de plazo-más-resultado (Meta juzga el
+  significado implícito). Reflejado en `golden-ecom-magic` y `golden-imagen-arena`.
 - **v1.6** — Art rules for HEALTH verticals (dental and similar) baked into Step 2, applying to image and video prompts. Harvest of the "un estudio de producto(Chile)" chat, assigned by the Centro de Mando (2026-08-07): forbidden — visible lesions, teeth before/after, medical-endorsement props (white coat, stethoscope, dental chair), on-screen result percentages, condition-pointing questions; allowed and field-proven — dropper macro, product texture, illustrated enamel cross-section, bathroom lifestyle.
 - **v1.5** — Added the **Cost reality check** section: verified per-generation prices (Flux Schnell $0.03 → Veo 3 $3.00) and the pay-per-use vs subscription break-even (~30/mo saves, ~60-100 ties, >200 costs 3-5x more). Conclusion baked in: Golden stays on the Higgsfield subscription; "free repo" alternatives get checked against this table first. Rule: iterate cheap, spend on the final only. Destilado de una guía pública de Open-Generative-AI/MuAPI (mayo 2026), sin instalar nada.
 - **v1.4** — Added `references/seedance_advanced.md` (destilado original, sin copiar terceros): multi-reference role mapping (image/video/audio, up to ~9/3/3), beat-budgeting by duration, multi-shot transition language, film-verb camera vocabulary, audio-as-first-class, prompt hygiene (keep settings out of prose), and **character-sheet identity locking** incl. photoreal identity sheets — the fix for one-off-invented drift. Wired into Step 1 (identity), Step 3 (video) and the reference list. Enriquece con lo mejor de la skill `video-prompting` (Seedance 2.0 + hojas de personaje) sin depender de ella.

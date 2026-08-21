@@ -1,5 +1,34 @@
 # Changelog · golden-despachos
 
+## GD1.3 — 2026-08-21
+Auditoría con `golden-skill-auditor` (fábrica: golden-skill-auditor, a pedido del usuario).
+
+- **`decidir_vivo.py` no tenía rama para prepago.** El script (Paso 6, decisión final con
+  cotización en vivo) calificaba TODOS los pedidos —prepago incluido— con la fórmula de valor
+  esperado de contra entrega, que resta probabilidad de devolución y costo de retorno. Un pedido
+  prepago nunca paga eso: `criterios-decision.md` es explícito ("Sin comisión de recaudo y sin
+  costo de retorno... manda el precio"), y `calificar.py` ya lo hacía bien; `decidir_vivo.py`
+  simplemente no leía el campo `prepago` del pedido (0 ocurrencias de la palabra en el archivo,
+  confirmado por grep). Efecto real: para un pedido prepago, la recomendación podía cambiarse a
+  una transportadora más cara persiguiendo un "valor esperado" que no aplicaba, y la columna
+  GANA mostraba ese valor esperado en vez del ahorro de flete cierto.
+  → Ahora `decidir_vivo.py` replica la lógica de `calificar.py`: en prepago descarta candidatas a
+  más de 3 puntos de la mejor efectividad, elige la más barata salvo la excepción de $1.500, no
+  cobra retorno, y la columna GANA reporta el ahorro de flete (no el valor esperado) — la misma
+  separación que ya exige `criterios-decision.md` ("Nunca sumarlos en una sola cifra").
+- **Filtro explícito de `HABILITADAS` en `decidir_vivo.py`.** Antes solo vivía en `calificar.py`;
+  `decidir_vivo.py` confiaba en que `TRANSPORTADORAS-OPERATIVAS.json` y
+  `EFECTIVIDAD-PLATAFORMA.json` excluyeran de facto a Servientrega y las no habilitadas. Ahora el
+  filtro está también explícito en el código, en línea con `direcciones-colombia.md`.
+- Bucle muerto `for c in x['cands']: pass` eliminado.
+- `CHANGELOG.md` se movió a `references/changelog.md`: vivía suelto en la raíz de la skill, que es
+  material que se publicaría tal cual al marketplace (hallazgo de `inventario.sh`, mismo patrón ya
+  corregido antes en `golden-chatea-pro-prompt-ventas`).
+- Verificado corriendo `decidir_vivo.py` contra fixtures sintéticos (un pedido prepago y uno
+  contra entrega, dos escenarios de precio): antes del arreglo el prepago se decidía y reportaba
+  igual que el contra entrega; después, el prepago manda el precio y el "GANA" es el ahorro de
+  flete real.
+
 ## GD1.0 — 2026-08-01
 Creación de la skill, destilada de una corrida real sobre 34 pedidos de Golden.
 

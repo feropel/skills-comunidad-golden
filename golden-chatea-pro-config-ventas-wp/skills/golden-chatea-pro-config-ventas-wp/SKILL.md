@@ -5,6 +5,7 @@ description: Golden Group — Configura el asistente de VENTAS POR WHATSAPP de C
 
 # Golden · Chatea Pro — Asistente de Ventas WhatsApp
 
+<!-- skill v4.2 · 2026-08-21 (auditoría golden-skill-auditor, PLATA→verificar) · DOS CONTRADICCIONES reales cazadas por ejecución (no por lectura): (1) SKILL.md Intake #6 decía "(Opcional)" el prompt maestro, pero build_config.py YA fallaba con exit 1 sin él desde v4.1.4 — el docstring se corrigió entonces pero el cuerpo de SKILL.md quedó desincronizado; ahora dice EXIGE y por qué. (2) build_config.py tenía --flete-max con required=True SIEMPRE, contradiciendo el caso borde documentado "Negocio sin Dropi... el flete no se pregunta" — probado en vivo: --dropi no sin --flete-max tiraba error de argparse (exit 2). Ahora --flete-max solo es obligatorio si --dropi si (el default); sin Dropi se omite y el JSON queda con "0". Probado: dropi=si sin flete-max → exit claro pidiendo el dato; dropi=no sin flete-max → exit 0, JSON con flete_minimo="0". -->
 <!-- skill v4.1.4 · 2026-08-08 (centro de mando, spot-check final) · docstring de scripts/build_config.py: --prompt-maestro re-etiquetado de '(opcional)' a OBLIGATORIO (el código lo volvió bloqueante en v4.1.3 y el docstring quedó sin corregir — la lección 'todos los soportes' aplicada al soporte que la incumplía). -->
 <!-- skill v4.1.3 · 2026-08-08 (centro de mando, verificación final, bloqueante F2) · scripts/build_config.py entregaba {{PROMPT_MAESTRO}} LITERAL con exit 0 cuando faltaba --prompt-maestro (solo un aviso ⚠️) — la clase exacta que v4.1.2 declaró cerrada, viva en el script que nadie miró. Ahora valida la SALIDA con el mismo validador de huecos que valida_producto (dobles {{[^{}]*}} + llaves simples fuera de la whitelist runtime) y ante cualquier hueco da exit 1 SIN escribir archivo, con mensaje que manda a generar el prompt maestro con golden-chatea-pro-prompt-ventas. También: --out-prefix con directorio inexistente da error legible (makedirs). Probado: sin --prompt-maestro exit 1 y cero archivos; con él exit 0 y los 2 BOTFIELD escritos. -->
 <!-- skill v4.1.2 · 2026-08-08 (centro de mando, hallazgo del golden-verificador en la auditoría de la hermana config-comentarios) · FIX PUNTUAL en scripts/valida_producto.py: el regex de placeholders \{\{[A-Z0-9_]+\}\} solo cazaba mayúsculas puras — {{Hueco}}, {{hueco}}, {{ X }}, {{HUECO-2}}, {{HUECO 3}} y los slots de llave SIMPLE sin llenar ({URL_TIENDA}, {ID_DROPI}...) viajaban LITERALES al bot del cliente. Ahora: dobles con \{\{[^{}]*\}\} (cualquier contenido) + llaves simples contra whitelist de las 5 runtime legítimas de Chatea (las de notificacion-venta-realizada.txt: nombre_cliente, nombre_producto, porcentaje_entrega, telefono_cliente, valor_venta) con error ante cualquier otra. Probado: 5 variantes dobles plantadas cazadas, slot simple colado cazado, producto lleno con {valor_venta} runtime sin falso positivo. -->
@@ -146,10 +147,12 @@ límites de la UI de Entrenar para que sirvan por las dos vías:
 3. **WhatsApp** que recibe las notificaciones de venta.
 4. **URL de la tienda** (para redirigir productos no configurados).
 5. **Dropi** sí/no (default sí).
-6. (Opcional) **Prompt maestro** de Producto en Segundos: el prompt de venta GENERAL del
-   negocio que usa "Crea tu asistente en segundos". Su único tope es el del bot field
-   (Techo A escapado); si no existe, pídelo a `golden-chatea-pro-prompt-ventas` como prompt de
-   negocio (catálogo completo).
+6. **Prompt maestro** de Producto en Segundos: el prompt de venta GENERAL del negocio que usa
+   "Crea tu asistente en segundos". **`build_config.py` lo EXIGE** (falla con exit 1 y no
+   escribe archivos si falta — el bot field no puede quedar con `{{PROMPT_MAESTRO}}` literal);
+   no es opcional para generar los 2 Bot Fields. Su único tope es el del bot field (Techo A
+   escapado). Si el negocio todavía no tiene uno, pídelo a `golden-chatea-pro-prompt-ventas`
+   como prompt de negocio (catálogo completo) ANTES de correr `build_config.py`.
 
 Defaults sin preguntar: subida automática del pedido sí · validar entregas sí (mín 3
 órdenes, 60%) · validar flete sí · división "varios" / **máx 2 mensajes** (con 3 la IA
@@ -253,8 +256,8 @@ tarjetas lo produce `golden-chatea-pro-prompt-ventas`; el validador chequea sus 
 
 ## Casos borde (decide por convención e informa)
 
-- **Negocio sin Dropi** → `--dropi no` (apaga también la subida automática); el flete no
-  se pregunta pero el JSON conserva las claves (el flujo las espera).
+- **Negocio sin Dropi** → `--dropi no` (apaga también la subida automática); `--flete-max` se
+  omite (deja de ser obligatorio) y el JSON conserva las claves con `"0"` (el flujo las espera).
 - **Sin voz ElevenLabs** → `usar_voz: No` y se omiten API key, ID y parámetros.
 - **Sin plantillas Meta aprobadas** → remarketing "No enviar plantilla"; solo recordatorios
   (ventana 24h) y avisar que el fuera-de-ventana queda apagado hasta aprobar plantillas.

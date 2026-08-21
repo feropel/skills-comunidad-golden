@@ -909,6 +909,16 @@ class Auditoria:
         self.cubre("I2", "corrido", len(self.cobertura),
                    "un cero solo prueba algo si el bloque cubrio todo")
 
+        # I4 · ausencia no es prueba. Cada bloque ya distingue "medido y vacio" de "no
+        # medido" (B1b compara traidos contra meta.total; A4/B2 marcan sin_datos cuando
+        # el endpoint no trajo nada). Aqui se declara el conteo para que la distincion
+        # quede en la cobertura final, no solo dispersa dentro de cada bloque.
+        medidos_y_vacios = sum(1 for c in self.cobertura if c["estado"] == "sin_datos")
+        no_medidos = sum(1 for c in self.cobertura if c["estado"] == "PARCIAL")
+        self.cubre("I4", "corrido", len(self.cobertura),
+                   f"{medidos_y_vacios} controles en 'sin_datos' (medido y vacio), "
+                   f"{no_medidos} en 'PARCIAL' (no se agoto la paginacion)")
+
     def bloque_h(self):
         for control, nota in (("H1", "id_dropi contra Dropi"),
                               ("H2", "precio contra la tienda"),

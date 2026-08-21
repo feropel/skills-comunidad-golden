@@ -32,7 +32,7 @@ cobertura.
 |---|---|---|---|---|
 | P · trampas de parseo | 13 | N | — | — |
 | Q · clasificación | 6 | N | N de N | Q2 es heurística, declarada |
-| R · calidad de respuesta | 5 | N | N de N | R5 (necesita ficha de producto real) |
+| R · calidad de respuesta | 6 | N | N de N | R5 (necesita ficha de producto real) · R6 solo intra-chat, sin Dropi |
 
 **Lo que NO se verificó y por qué** — lista explícita.
 
@@ -40,13 +40,20 @@ cobertura.
 Ordenados por severidad. Uno por caso, con esta forma:
 
 ### 🔴 MUERTO · R1 · Cliente sin respuesta 3h40 después de preguntar por el precio
-**Qué pasa:** `user_ns f...` preguntó "¿cuánto cuesta con envío?" a las 14:02 y no hay ningún
+**Qué pasa:** `user_ns f...` preguntó "cuánto cuesta con envío?" a las 14:02 y no hay ningún
 mensaje de la empresa después, hasta el corte del día a las 17:42.
 **Evidencia:** hilo citado, mensaje del cliente y hora parseada, último evento del hilo.
 **Consecuencia:** cliente caliente probablemente perdido.
 **Qué habría que hacer:** contactar hoy. Si además la dirección que dio parece mala, se remite
 a `golden-logistica-diaria` en una línea aparte, no se desarrolla aquí.
 **Confianza:** medido contra el hilo real del <fecha>.
+
+Un hallazgo `R6` (coherencia intra-chat) va con la misma forma, con dos reglas propias que no
+se omiten al escribirlo: (1) el campo **Consecuencia** siempre incluye la advertencia de que
+puede ser un aviso legítimo de que el cliente cambió de opinión más tarde en el chat — nunca se
+redacta como si el resumen del bot estuviera confirmado mal; (2) el campo **Qué habría que
+hacer** siempre nombra la frontera: "solo chat, sin Dropi — con Dropi conectado,
+`golden-logistica-diaria` hace la confirmación definitiva contra el pedido real".
 
 ## 5. Preguntas sin cobertura en el prompt (para golden-chatea-pro-prompt-ventas)
 Lista agrupada por producto, con la pregunta real citada y cuántas veces se repitió en el día.

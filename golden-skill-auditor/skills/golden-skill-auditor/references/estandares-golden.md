@@ -29,8 +29,9 @@ Reglas globales del ecosistema de FER / Golden Group. Toda skill propia se mide 
 ## 6. Blindaje
 
 - Skills públicas/estables se blindan read-only. Dos mecanismos en uso — al reparar, restaurar el MISMO que tenía:
-  - `chflags uchg` (ej. golden-ads): quitar con `chflags -R nouchg`, reponer con `chflags -R uchg`.
-  - `chmod` dirs 0555 / archivos 0444 (ej. golden-investigacion-mercado): quitar con `chmod -R u+w`, reponer con `chmod -R a-w`.
+  - `chflags uchg`: quitar con `chflags -R nouchg`, reponer con `chflags -R uchg`.
+  - `chmod` dirs 0555 / archivos 0444: quitar con `chmod -R u+w`, reponer con `chmod -R a-w`.
+  - Cuál mecanismo tiene cada hermana se verifica EN VIVO con `ls -ldO` al momento de auditar — este documento no afirma el estado de terceros porque cambia con cada reparación (foto fechada 2026-08-21: golden-ads y golden-investigacion-mercado estaban en uchg ese día; no asumir que sigue así).
 - El pedido explícito del usuario de arreglar/mejorar ES la autorización para desbloquear. Auditar (solo leer) nunca requiere desbloquear.
 - Blindaje NUEVO (skill que no estaba blindada): el estándar por defecto es `chflags -R uchg`. Una skill golden- que cierra reparación en 1000 sin pendientes con dueño se blinda automáticamente — lo perfecto se protege. Terceros nunca se blindan (rompe sus actualizaciones).
 - Cada skill tiene (idealmente) un chat-fábrica dueño. Reparar desde otro chat es válido con pedido del usuario; el informe final debe recordar cuál es la fábrica si se conoce.

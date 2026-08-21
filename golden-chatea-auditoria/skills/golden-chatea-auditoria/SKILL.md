@@ -20,7 +20,17 @@ description: |
 
 # golden-chatea-auditoria · la salud de un espacio de Chatea Pro
 
-**Versión:** `GCA1.0` · Versión inicial declarada el 2026-08-20 por el Centro de Mando: la skill nació sin CHANGELOG y sin número, y sin versión el censo diario no puede ver que alguien la editó.
+<!-- skill v1.1 (GCA1.1) — 2026-08-21 — auditoría golden-skill-auditor: I4 (controles.md:122,
+"ausencia no es prueba") estaba definido pero auditar.py nunca lo reportaba en la cobertura —
+quedaba invisible en el informe final, justo el modo de fallo que esta skill le prohíbe al
+bloque D. Se agregó self.cubre("I4", ...) en bloque_i. También se documentó B1b en
+controles.md (existía en el código sin entrada en el catálogo) y se reordenó F12/F13 a orden
+numérico. Ver detalle completo debajo. -->
+<!-- skill v1.0 (GCA1.0) — 2026-08-20 — versión inicial declarada por el Centro de Mando: la
+skill nació sin CHANGELOG y sin número, y sin versión el censo diario no puede ver que alguien
+la editó. -->
+
+**Versión:** `GCA1.1`
 
 Auditar aquí significa **medir el estado real del servidor contra el estándar**, no leer la
 configuración y opinar. Nada se da por bueno sin haberlo contado, y el informe se entrega en

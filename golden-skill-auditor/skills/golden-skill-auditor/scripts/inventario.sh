@@ -71,23 +71,43 @@ fi
 # --- Referencias rotas y huérfanas ---
 echo ""
 echo "## REFERENCIAS CRUZADAS"
+# v1.9 — expediente del verificador adversarial cerrado (ronda 2026-08-21):
+#   a) el escaneo VIVO ya no lee solo .md: barre .md .py .sh .json .liquid .html .csv
+#      (misma decisión multi-formato que las señales Golden; una rota citada en el
+#      comentario de un .py era invisible).
+#   b) citas RELATIVAS desde dentro de references/ (caso golden-web: su guía de arte generativo
+#      cita el subdirectorio de templates como ruta relativa a sí misma) se resuelven también
+#      respecto del directorio del archivo que cita, y solo dan cobertura si el directorio existe.
+#   c) colisión de nombres: una cita local rota solo se degrada a ℹ️ si la ruta existe en
+#      EXACTAMENTE UNA hermana Y el texto vivo de la skill nombra a esa hermana; si no,
+#      va a DUDOSOS con la lista de hermanas donde existe (66 rutas relativas viven en 2+
+#      de las 91 skills; degradar por cualquier coincidencia tapaba rotas reales).
+#   d) refs a la raíz de una hermana (skills/<otra>/SKILL.md) ahora se capturan y verifican.
+#   e) SIMETRÍA de historia: el filtro que las rotas ya tenían (comentarios HTML +
+#      changelog/bitácora) aplica también al rescate de huérfanos, y la mención que salva
+#      a un archivo debe parecer RUTA ("/nombre.ext"), no una palabra suelta.
+#   f) los bancos de prueba (*autoprueba*, *selftest*, *fixture*) citan rutas rotas a
+#      propósito: sus citas no cuentan como refs vivas.
 # v1.8 — cinco clases de falso positivo neutralizadas (autoevalúo 2026-08-19/20):
 #   1 cross-skill: si la ruta citada existe en OTRA skill de ~/.claude/skills no es rotura
-#     (incluye la forma "cita local que en realidad vive en la hermana": rescate final).
+#     (el rescate hoy exige dueña única + mención por nombre, ver (c)).
 #   2 rutas con ~: se expande el tilde ANTES de probar existencia.
 #   3 cita por directorio ("scripts/") o glob ("assets/*.json"): cubre huérfanos, no exige archivo literal.
 #   4 comentarios HTML <!-- ... -->: sellos de versión = historia, se quitan antes del escaneo vivo.
 #   5 archivos changelog/bitácora/historial: son HISTORIA — sus menciones no cuentan como refs vivas
 #     y ellos mismos no se marcan huérfanos.
-# Huérfanos: un archivo solo es huérfano si su NOMBRE no aparece en ningún archivo de texto
-# de la skill (md, scripts, lo que sea) Y ningún directorio/glob citado lo cubre.
+# Huérfanos: un archivo solo es huérfano si ninguna mención con forma de ruta lo nombra en el
+# texto VIVO (sin historia, sin comentarios, sin fixtures) Y ningún directorio/glob citado lo cubre.
 # Regla de duda (mandato 2026-08-20): ante duda NO se marca rojo — se cuenta en DUDOSOS.
 RAW_LIVE=$(mktemp); MENT_LIVE=$(mktemp); EXISTING=$(mktemp); SISTER=$(mktemp)
 EXTERN_OK=$(mktemp); DUDOSO_F=$(mktemp); PAT_DIR=$(mktemp); PAT_GLOB=$(mktemp)
+LIVE_TXT=$(mktemp); PAT_ACC=$(mktemp)
 SKILLS_ROOT="$HOME/.claude/skills"
 REAL_NAME=$(basename "$REAL_PATH")
 REF_RE='[A-Za-z0-9._~/-]*(references|scripts|assets|agents)/[A-Za-z0-9._/-]+\.[A-Za-z0-9]+'
 GLOB_RE='[A-Za-z0-9._~/-]*(references|scripts|assets|agents)/[A-Za-z0-9._/-]*\*[A-Za-z0-9._/*-]*'
+# (d) la raíz de una hermana no tiene segmento canónico: patrón propio para skills/<otra>/SKILL.md
+ROOT_RE='[A-Za-z0-9._~/-]*skills/[A-Za-z0-9._-]+/SKILL\.md'
 
 es_historia() {
   case "$(basename "$1" | tr '[:upper:]' '[:lower:]')" in
@@ -95,18 +115,44 @@ es_historia() {
     *) return 1 ;;
   esac
 }
+# (f) bancos de autoprueba: siembran rutas rotas a propósito — no son refs vivas
+es_fixture() {
+  case "$(basename "$1" | tr '[:upper:]' '[:lower:]')" in
+    *autoprueba*|*selftest*|*fixture*) return 0 ;;
+    *) return 1 ;;
+  esac
+}
+lista_texto() {  # (a) todo formato de texto donde viva una cita, no solo .md
+  find "$REAL_PATH" -type f \( -name "*.md" -o -name "*.py" -o -name "*.sh" \
+    -o -name "*.json" -o -name "*.liquid" -o -name "*.html" -o -name "*.csv" \) | sort
+}
 
-# Menciones VIVAS: solo .md que no sean historia (clase 5), con comentarios HTML fuera (clase 4)
+# Texto VIVO consolidado (sin historia, sin fixtures, sin comentarios HTML):
+# de aquí salen las refs, los patrones de cobertura y la mención-por-nombre de hermanas.
 while IFS= read -r f; do
   es_historia "$f" && continue
-  perl -0777 -pe 's/<!--.*?-->//gs' "$f" 2>/dev/null | grep -oE "$REF_RE" >> "$RAW_LIVE" || true
-done < <(find "$REAL_PATH" -type f -name "*.md" | sort)
+  es_fixture "$f" && continue
+  perl -0777 -pe 's/<!--.*?-->//gs' "$f" 2>/dev/null >> "$LIVE_TXT"
+  printf '\n' >> "$LIVE_TXT"
+  # (b) citas de directorio RELATIVAS al archivo que cita: solo si el dir existe de verdad
+  fdirrel=$(dirname "${f#"$REAL_PATH"/}")
+  perl -0777 -pe 's/<!--.*?-->//gs' "$f" 2>/dev/null | \
+    perl -ne 'while (/(?<![A-Za-z0-9._~\/-])((?:[A-Za-z0-9._-]+\/)+)(?![A-Za-z0-9._*-])/g){print "$1\n"}' | \
+    sort -u | while IFS= read -r cand; do
+      [ -z "$cand" ] && continue
+      if [ "$fdirrel" = "." ]; then res="$cand"; else res="$fdirrel/$cand"; fi
+      [ -d "$REAL_PATH/${res%/}" ] && echo "${res%/}/" >> "$PAT_ACC"
+    done
+done < <(lista_texto)
 
-# Clase 3: directorios y globs citados en cualquier .md — dan cobertura a huérfanos
-find "$REAL_PATH" -type f -name "*.md" -exec cat {} + 2>/dev/null | \
-  perl -ne 'while (/((?:references|scripts|assets|agents)(?:\/[A-Za-z0-9._-]+)*\/)(?![A-Za-z0-9._*-])/g){print "$1\n"}' | sort -u > "$PAT_DIR"
-find "$REAL_PATH" -type f -name "*.md" -exec cat {} + 2>/dev/null | \
-  grep -oE "$GLOB_RE" | grep -oE '(references|scripts|assets|agents)/[A-Za-z0-9._/*-]*' | sort -u > "$PAT_GLOB"
+grep -oE "$REF_RE" "$LIVE_TXT" >> "$RAW_LIVE" || true
+grep -oE "$ROOT_RE" "$LIVE_TXT" >> "$RAW_LIVE" || true
+
+# Clase 3: directorios (anclados a la raíz) y globs citados — dan cobertura a huérfanos
+perl -ne 'while (/((?:references|scripts|assets|agents)(?:\/[A-Za-z0-9._-]+)*\/)(?![A-Za-z0-9._*-])/g){print "$1\n"}' \
+  "$LIVE_TXT" >> "$PAT_ACC"
+sort -u "$PAT_ACC" > "$PAT_DIR"
+grep -oE "$GLOB_RE" "$LIVE_TXT" | grep -oE '(references|scripts|assets|agents)/[A-Za-z0-9._/*-]*' | sort -u > "$PAT_GLOB"
 
 while IFS= read -r tok; do
   case "$tok" in
@@ -133,7 +179,7 @@ while IFS= read -r tok; do
       fi
       ;;
     *)
-      # v1.7 (NO regresar): forma CORTA de hermana `<hermana>/references/x.md` sin prefijo skills/
+      # v1.7 (NO regresar): forma CORTA de hermana (nombre-de-hermana + carpeta canónica + archivo, sin prefijo skills)
       # (caso real: el changelog de golden360 la usa y producía el mismo archivo
       # como ✅ hermana Y 🔴 rota-local a la vez — falso rojo medido 2026-08-11).
       rest=$(echo "$tok" | grep -oE '(references|scripts|assets|agents)/[A-Za-z0-9._/-]+\.[A-Za-z0-9]+')
@@ -152,39 +198,54 @@ while IFS= read -r tok; do
   esac
 done < <(sort -u "$RAW_LIVE") | sort -u > "$MENT_LIVE"
 
-(cd "$REAL_PATH" && find references scripts assets agents -type f ! -name ".DS_Store" 2>/dev/null | sort -u) > "$EXISTING"
+{ (cd "$REAL_PATH" && find references scripts assets agents -type f ! -name ".DS_Store" 2>/dev/null)
+  [ -f "$REAL_PATH/SKILL.md" ] && echo "SKILL.md"; } | sort -u > "$EXISTING"
 
-# Rotas: citadas en texto vivo sin archivo local. Rescate clase 1: si esa misma ruta
-# existe dentro de otra skill del arsenal, se informa aparte (cita imprecisa, no rotura).
+# Rotas: citadas en texto vivo sin archivo local. Rescate (c): solo si la ruta existe en
+# EXACTAMENTE UNA hermana Y el texto vivo de esta skill la nombra, se informa aparte
+# (cita imprecisa, no rotura). Cualquier otra coincidencia cross-skill = DUDOSO con lista.
 BROKEN=""; EN_HERMANA=""
 while IFS= read -r b; do
   [ -z "$b" ] && continue
-  duena=""
+  duenas=""; n_duenas=0
   for d in "$SKILLS_ROOT"/*/; do
     [ -d "$d" ] || continue
     dn=$(basename "$d")
     { [ "$dn" = "$SKILL_NAME" ] || [ "$dn" = "$REAL_NAME" ]; } && continue
-    if [ -f "$d$b" ]; then duena="$dn"; break; fi
+    if [ -f "$d$b" ]; then duenas="${duenas:+$duenas }$dn"; n_duenas=$((n_duenas+1)); fi
   done
-  if [ -n "$duena" ]; then
-    EN_HERMANA="${EN_HERMANA}${b} → existe en ${duena}
-"
-  else
+  if [ "$n_duenas" -eq 0 ]; then
     BROKEN="${BROKEN}${b}
 "
+  elif [ "$n_duenas" -eq 1 ] && grep -qF -- "$duenas" "$LIVE_TXT"; then
+    EN_HERMANA="${EN_HERMANA}${b} → existe en ${duenas}
+"
+  elif [ "$n_duenas" -eq 1 ]; then
+    echo "$b → existe solo en $duenas pero el texto no la nombra (confirmar a mano)" >> "$DUDOSO_F"
+  else
+    echo "$b → existe en $n_duenas hermanas ($duenas): cita ambigua, confirmar a mano" >> "$DUDOSO_F"
   fi
 done < <(comm -23 "$MENT_LIVE" "$EXISTING")
 
-# Huérfanos: sin mención por NOMBRE en ningún archivo de texto, sin cobertura de dir/glob,
-# y los archivos de historia (changelog/bitácora) nunca son huérfanos.
+# Huérfanos (e): mismo filtro de historia que las rotas — la mención que salva debe estar en
+# texto VIVO (sin changelogs, sin comentarios HTML, sin fixtures), venir de OTRO archivo, y
+# parecer RUTA ("/nombre.ext"): una palabra suelta igual al nombre no es una cita.
 ORPHAN=""
 while IFS= read -r rel; do
   [ -z "$rel" ] && continue
+  [ "$rel" = "SKILL.md" ] && continue
   es_historia "$rel" && continue
   base=$(basename "$rel")
-  if grep -rIlF -- "$base" "$REAL_PATH" 2>/dev/null | grep -vxF "$REAL_PATH/$rel" | grep -q .; then
-    continue
-  fi
+  salvado=0
+  while IFS= read -r tf; do
+    [ "$tf" = "$REAL_PATH/$rel" ] && continue
+    es_historia "$tf" && continue
+    es_fixture "$tf" && continue
+    if perl -0777 -pe 's/<!--.*?-->//gs' "$tf" 2>/dev/null | grep -qF -- "/$base"; then
+      salvado=1; break
+    fi
+  done < <(lista_texto)
+  [ "$salvado" -eq 1 ] && continue
   cubierto=0
   while IFS= read -r p; do
     [ -z "$p" ] && continue
@@ -225,14 +286,14 @@ echo "DUDOSOS: $N_DUD"
 if [ "$N_DUD" -gt 0 ]; then
   sort -u "$DUDOSO_F" | sed 's/^/    /'
 fi
-# Material que se PUBLICARÍA al marketplace y no debería: cualquier carpeta de
-# primer nivel fuera de las 4 canónicas, o archivo suelto en la raíz que no sea
-# SKILL.md. Aquí es donde se cuela un .claude/ o un settings.local.json (caso real).
+# Material fuera de las 4 carpetas canónicas o suelto en la raíz (fuera de SKILL.md):
+# se publicaría al marketplace tal cual. No es rotura — el estándar de casa manda ese
+# material a references/ — así que es ⚠️ ordenar, no 🔴 romper.
 INTRUSOS=$( (cd "$REAL_PATH" && find . -maxdepth 1 -mindepth 1 \
   ! -name SKILL.md ! -name references ! -name scripts ! -name assets ! -name agents \
   ! -name ".DS_Store" ! -name ".git" ! -name "README.md" 2>/dev/null | sed 's|^\./||') | sort -u)
 if [ -n "$INTRUSOS" ]; then
-  echo "🔴 Material intruso que se publicaría al marketplace (revisar/eliminar):"
+  echo "⚠️ Material fuera de las carpetas canónicas (mover a references/ según estandares-golden.md):"
   echo "$INTRUSOS" | sed 's/^/    /'
 else
   echo "✅ Sin material intruso en la raíz"
@@ -248,7 +309,7 @@ if [ -n "$SISTER_OK" ]; then
   echo "✅ $N_OK referencia(s) a skills hermanas verificadas:"
   echo "$SISTER_OK" | sed 's/^/    /'
 fi
-rm -f "$RAW_LIVE" "$MENT_LIVE" "$EXISTING" "$SISTER" "$EXTERN_OK" "$DUDOSO_F" "$PAT_DIR" "$PAT_GLOB"
+rm -f "$RAW_LIVE" "$MENT_LIVE" "$EXISTING" "$SISTER" "$EXTERN_OK" "$DUDOSO_F" "$PAT_DIR" "$PAT_GLOB" "$LIVE_TXT" "$PAT_ACC"
 
 # --- Sintaxis de scripts ---
 echo ""

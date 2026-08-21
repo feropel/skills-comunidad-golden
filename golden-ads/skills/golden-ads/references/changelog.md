@@ -1,5 +1,118 @@
 # Changelog — GOLDEN ADS
 
+> Fuente única de versión/fecha de la skill (ver reconciliación en G4.7). `SKILL.md` solo refleja el
+> número vigente en su sello; el detalle completo de cada cambio vive aquí.
+
+## Índice
+- [G4.9 — 2026-08-18 · CAPA HUMANA parte 2](#g49--2026-08-18--capa-humana-parte-2-redes-patrones-y-sondeo-de-producto)
+- [G4.8 — 2026-08-18 · CAPA HUMANA](#g48--2026-08-18--capa-humana-audiencia-momento-y-mensaje-con-corazón)
+- [G4.7 — 2026-08-11 · RED SINÁPTICA + reconciliación de sello](#g47--2026-08-11--red-sináptica-puente-a-la-transcripción-local-de-creativos--reconciliación-de-sello)
+- [G4.5 — 2026-08-07 · Cosecha dental Chile](#g45--2026-08-07--cosecha-del-chat-estudio-360-producto-de-ejemplo-chile-vía-centro-de-mando)
+- [Notas menores — 2026-07-30 / 2026-08-02](#notas-de-versión-menores-no-selladas--2026-07-30-y-2026-08-02)
+- [G4.6 — 2026-07-27 · Golden NO es solo contra entrega](#g46--2026-07-27--corrección-de-fondo-golden-no-es-solo-contra-entrega)
+- [G4.4 — 2026-07-18 · Aclaración Modo A/B](#g44--2026-07-18--aclaración-la-datahistórico-es-la-excepción-producto-nuevo--modo-b-por-default)
+- [G4.3 — 2026-07-18 · Aprendizajes Le'côterra](#g43--2026-07-18--aprendizajes-de-campo-lecôterra-cod-cuidado-personal-colombia)
+- [G4.2 — 2026-07-09 · Auditoría A-Z + seguimiento](#g42--2026-07-09--auditoría-a-z--playbook-de-seguimiento-post-lanzamiento)
+- [G4.1 — 2026-07-02 · Replicación GOLDEN PRO por URL](#g41--2026-07-02--replicación-golden-pro-por-url-validada-en-vivo-en-cp1cp5cp6)
+- [G4.0 — 2026-07-02 · Semáforo de metas](#g40--2026-07-02--semáforo-de-metas-por-métrica--guía-imprimible-golden-pro-v11)
+- [G3.9 → G3.0 — 2026-06-25 · construcción del preset y validación en vivo](#g39--2026-06-25--golden-pro-preset-único-construido-en-vivo-hookhold-rate-creadas)
+- [G2.0 — 2026-06-25 · rename + Meta/TikTok/Google + full-funnel](#g20--2026-06-25--rename-a-golden-ads--metatiktokgoogle-completos--full-funnel)
+- [G1.0 — 2026-06-25 · versión inicial](#g10--2026-06-25--versión-inicial-centro-de-comando-de-pauta)
+
+## G4.9 — 2026-08-18 — CAPA HUMANA parte 2: redes, patrones y sondeo de producto
+Segunda pasada sobre la misma clase de FER, buscando lo que había quedado como frase y no como doctrina:
+- **`21` §3-bis · comportamiento POR RED SOCIAL** (era su punto "saber el comportamiento de las redes"
+  y no estaba): tabla FB feed / IG feed / Reels-TikTok / Stories / WhatsApp / Audience Network con el
+  estado mental con que llega la persona, qué creativo funciona y la trampa de cada una. Regla operativa:
+  un creativo por LENGUAJE de red (mínimo 9:16 + 1:1/4:5), Advantage+ por defecto pero revisando el
+  breakdown por ubicación, y los comentarios/mensajes como voz de cliente en crudo.
+- **`21` §6-bis · sondeo del PRODUCTO en el mercado** (pedía marca **y producto**; solo estaba marca):
+  6 criterios con evidencia (demanda, saturación de pauta, madurez del mercado, diferencial defendible,
+  precio vs rango, evidencia de que ya vende) + **matriz cruzada marca × producto** que define la
+  estrategia (el peor cuadrante: marca invisible con producto saturado → no forzar pauta, cambiar oferta).
+- **`22-patrones-y-lectura-de-datos.md` (NUEVO)** — su "analizar los datos y PATRONES" convertido en
+  método: los 4 marcos de comparación (un número siempre se lee contra algo), tendencia vs ruido
+  (3+ puntos, promedio móvil, regla de 72 h, ventanas asimétricas COD), ciclos (semanal, quincena/día de
+  pago LatAm, estacional, ciclo de vida del creativo = fatiga no falla), **correlación ≠ causa** con el
+  método de 3 hipótesis, 6 patrones que siempre se buscan (concentración, divergencia de embudo,
+  duplicados, cero absoluto, outlier, cohorte) y la salida obligatoria en 4 puntos.
+- Enganchado en `02-diagnostico` (nota antes del semáforo), regla 8 del SKILL y mapa de archivos. → **G4.9**
+
+## G4.8 — 2026-08-18 — 🫀 CAPA HUMANA: audiencia, MOMENTO y mensaje con corazón
+Cosecha de la clase de análisis de datos que tomó FER. La skill era fortísima en mecánica de cuenta
+(CPA, breakeven, columnas, MCP) y floja en lo que los números NO dan: a quién le hablamos de verdad,
+cuándo llegarle y CÓMO decírselo.
+- **`21-audiencia-momento-humanidad.md` (NUEVO, 188 líneas)**:
+  - **Filtro anti-parálisis**: 3 preguntas antes de mirar una métrica + lista de las que DECIDEN vs las
+    que solo describen (impresiones, likes, seguidores) + regla "una decisión por revisión".
+  - **Audiencia real** desde 6 fuentes vivas cruzadas (breakdowns Meta, pedidos Dropi, chats de Chatea,
+    reseñas, cerebro de marca, Ad Library) y **segmento por SECTOR/contexto de vida, no solo por edad**,
+    con nombre propio ("Karen, 34, oficinista…"), 3–5 segmentos, todos fondeados de verdad.
+  - **Embudo de COMPORTAMIENTO** (7 etapas: descubre → reconoce → considera → decide → compra → usa →
+    repite) con qué necesita la persona en cada una. Mismo copy para las 7 = error #1 de la cuenta que
+    ya no escala.
+  - **MOMENTO en 3 capas**: disparador de vida, **temporada** (sol y sudor / frío / diciembre-regalo /
+    vuelta a clases) anticipando 3–4 semanas para que el algoritmo aprenda antes del pico, y hora/día
+    (el más débil; nada de dayparting en aprendizaje). Retargeting = herramienta pura de momento.
+  - **Mensaje humano ejecutable**: escribir para UNA persona, usar SUS palabras literales de reseñas y
+    chats, nombrar el sentimiento, empatía sin culpa (choca además con la política de atributos
+    personales), honestidad radical (el claim inflado destruye el % de entrega en COD = destruye el ROAS
+    pagado), prueba humana antes que argumento, cierre con calma. **Checklist humano de 4 puntos** por
+    creativo, con el mismo peso que el técnico de `13`.
+  - **Sondeo de marca 1–10** (huella digital): rúbrica de 10 criterios con evidencia obligatoria por
+    punto + qué estrategia toca según el tramo (1–3 invisible → confianza primero; 9–10 fuerte →
+    defender marca y escalar por temporada).
+  - **Fidelización/LTV**: segmentar la base, excluir compradores recientes del prospecting, campaña de
+    recompra con voz de conocido, y medir LTV (si recompra 2–3 veces el breakeven real es más alto y
+    puedes pagar más por el cliente que la competencia). La entrega es parte del marketing.
+- **Reglas de oro 16 y 17** (numeradas después de las 14/15 que ya existían — CREATIVOS PRIMERO y copys
+  normalizados): "el dato decide QUÉ, la empatía decide CÓMO" y "llegar en el MOMENTO vale más que
+  llegar a muchos".
+- **Conectado en 4 puntos** del SKILL: resumen de reglas (punto 8), Modo B (audiencia ideal por sector),
+  checklist de cierre (capa humana obligatoria) y mapa de archivos. Sello → **G4.8**.
+> Nota de fábrica: al editar se detectó que otros chats habían subido la skill a G4.7; este aporte se
+> montó ENCIMA sin pisar nada (reglas renumeradas a 16/17 para no chocar con las 14/15 existentes).
+
+## G4.7 — 2026-08-11 — RED SINÁPTICA: puente a la transcripción LOCAL de creativos + reconciliación de sello
+Entra el puente a la transcripción LOCAL de creativos en "Relación con otras skills" — los hooks de los
+anuncios ganadores se minan del audio con whisper local (gratis, el material no sale del equipo). Receta
+canónica en `golden-investigacion-mercado` → `references/01-investigacion-360.md` §1.6 (no se duplica
+aquí para que no envejezca en dos sitios); el desglose segundo a segundo lo hace `golden-video-teardown`.
+Propagado por el Centro de Mando tras el hallazgo del chat FILTRO (la capacidad existía en
+`golden-video-editor` y nunca circuló).
+**Además, reconciliado un DESFASE DE SELLO** encontrado en esta misma edición: el ledger (este archivo)
+decía **G4.5 (2026-08-07)** para la cosecha del chat dental, mientras el sello impreso en `SKILL.md`
+decía **G4.6 con fecha 2026-07-25** para el mismo tramo de trabajo — versión dictada ≠ versión impresa.
+Desde esta edición ambos dicen **G4.7** y este ledger (`references/changelog.md`) queda como fuente única
+de verdad de versión/fecha; `SKILL.md` solo refleja el número vigente. Sello → **G4.7**.
+
+## G4.5 — 2026-08-07 — Cosecha del chat "un estudio de producto" (Chile), vía Centro de Mando
+> Nota de reconciliación (ver G4.7 arriba): este tramo de trabajo quedó registrado con doble numeración
+> en su momento (ledger decía G4.5, sello impreso decía G4.6/2026-07-25). El contenido abajo es real y
+> vive hoy en `12-unit-economics.md`; el número de versión que manda es el de este ledger.
+- `12-unit-economics.md` — la escalera de rentabilidad ahora se calcula **POR ESCALÓN DE COMBO**:
+  breakeven CPA por 1u/2u/3u presentados juntos (caso real Chile: costo $8.500, envío/recaudo $4.500,
+  entrega 65% → breakeven $9.744 / $12.019 / $13.000). El veredicto "sin combo no cierra" solo aparece
+  viendo los tres escalones a la vez. Entregable: tabla por escalón + veredicto explícito de viabilidad
+  de la unidad suelta.
+- Misma reference: **PALANCA DE PRECIO** como recomendación estándar de media buyer cuando el margen
+  queda apretado — subir del piso al techo del mismo rango de mercado ($27.990→$29.990 = $2.000 más de
+  margen = 13% más de techo de CPA). Siempre recomendación, nunca imposición: el precio lo fija el dueño.
+- Fuente: bandeja del Centro de Mando, entrada 2026-08-07 del chat dental (orden de FER: "sin omitir
+  detalle"). Backup de esa edición: `~/.claude/skill-backups/golden-ads-2026-08-07-dental.tgz`.
+
+## Notas de versión menores no selladas — 2026-07-30 y 2026-08-02
+> Estos dos cambios se aplicaron entre G4.4 y G4.6 sin bump explícito de `GAE_VERSION` en su momento
+> (gap detectado y cerrado en la auditoría `golden-skill-auditor` de 2026-08-21). Contenido verificado
+> presente en la skill; se documentan aquí para que el ledger quede completo.
+- **2026-07-30** — AGREGADO `references/referencia-externa-ctwa-cod-panama.md`: material de masterclass
+  de terceros (Leyendas E.C.O.M + Ecom Founders, data de Dropi Panama) sobre embudo COD por Click-to-WhatsApp.
+  Marcado explícitamente como **REFERENCIA OPCIONAL, NO REGLA** — no modifica `SKILL.md` ni ninguna regla
+  dura de la skill.
+- **2026-08-02** — LOOP DEL ARSENAL (semana 1, skills de negocio): se hornea la sección **🔄 AUTO-MEJORA**
+  (mandato global de FER, autorización permanente) al cierre de `SKILL.md` — auto-calificación al cerrar
+  cada corrida real, horneado de lecciones de sistema, autocorrección proactiva de huecos propios.
+
 ## G4.6 — 2026-07-27 — CORRECCIÓN DE FONDO: Golden NO es solo contra entrega
 Corregido por FER, que aclaró que además del catálogo COD tiene **marcas propias con pago
 anticipado** — clientes que ya conocen el portal y pagan directo. La skill asumía COD en todo:

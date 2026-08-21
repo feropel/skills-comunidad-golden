@@ -41,11 +41,11 @@ def bodega_ok(car): return (not ESTADO_BODEGA) or ESTADO_BODEGA.get(car) in ('OP
 O={x['orden']:x for x in json.load(open(D('salidas/salida-v3.json')))}
 def m(n): return '$'+format(int(round(n)),',d').replace(',','.')
 
+HABILITADAS={'INTERRAPIDISIMO','ENVIA','TCC','VELOCES','COORDINADORA','DOMINA','JAMV-DRIVE'}
 res=[]
 for oid,precios in Q.items():
-    x=O[oid]; ef=EF.get(x['dep'],{})
+    x=O[oid]; ef=EF.get(x['dep'],{}); prepago=bool(x.get('prepago'))
     cli={}
-    for c in x['cands']: pass
     import csv
     for row in csv.DictReader(open(huellas_recientes()),delimiter='|'):
         if row['orden']==oid:
@@ -54,36 +54,59 @@ for oid,precios in Q.items():
                     k,v=tok.split(':'); e,d=v.split('/'); cli[N(k)]=(int(e),int(d))
     cands=[]
     for car,fl in precios.items():
+        if car not in HABILITADAS: continue          # colombia.md: Servientrega y otras no habilitadas nunca compiten
         if not bodega_ok(car): continue
         base=ef.get(car,{}).get('pct')
         if base is None: continue
         if (car,x['ciu'],x['dep']) in VET_C or (car,x['dep']) in VET_D or car in VET_N: continue
         if x['forzada'] and car!=x['forzada']: continue
         p=base/100
-        if x['tot']>0: p=(x['entP']/100*x['tot'] + 10*p)/(x['tot']+10)
-        e,d=cli.get(car,(0,0)); n=e+d
-        if n>0: p=(e + 3*p)/(n+3)
-        ret=fl*RET.get(car,1.00)
+        if not prepago:
+            if x['tot']>0: p=(x['entP']/100*x['tot'] + 10*p)/(x['tot']+10)
+            e,d=cli.get(car,(0,0)); n=e+d
+            if n>0: p=(e + 3*p)/(n+3)
+        else:
+            p=max(p,0.97)                            # 9 de 9 prepagos resueltos se entregaron
+            e,d=cli.get(car,(0,0)); n=e+d
+        ret=0 if prepago else fl*RET.get(car,1.00)    # criterios-decision.md: prepago sin costo de retorno
         ev=p*(x['ticket']-x['costo']-fl) - (1-p)*(fl+ret)
         cands.append(dict(car=car,fl=fl,base=round(base,2),p=round(p*100,1),ev=round(ev),
                           hist=('%d/%d'%(e,d)) if n else '—',
                           marg=ESTADO_BODEGA.get(car)=='MARGINAL'))
-    cands.sort(key=lambda c:-c['ev'])
+    if prepago:
+        # criterios-decision.md: en prepago manda el precio, no el valor esperado.
+        # Descarta las que estan a mas de 3 puntos de la mejor efectividad; entre las
+        # que quedan, la mas barata, salvo que una con mejor efectividad cueste <$1.500 mas.
+        if cands:
+            mejorEf=max(c['base'] for c in cands)
+            viables=[c for c in cands if c['base']>=mejorEf-3]
+            viables.sort(key=lambda c:c['fl'])
+            barato=viables[0]
+            up=[c for c in viables if c['base']>barato['base'] and c['fl']-barato['fl']<=1500]
+            b=max(up,key=lambda c:c['base']) if up else barato
+            cands.sort(key=lambda c:c['fl'])
+        else: b=None
+    else:
+        cands.sort(key=lambda c:-c['ev']); b=cands[0] if cands else None
     a=next((c for c in cands if c['car']==x['asig']),None)
-    b=cands[0] if cands else None
-    res.append((x,a,b,cands))
-res.sort(key=lambda r:-((r[2]['ev']-r[1]['ev']) if (r[1] and r[2]) else 0))
+    res.append((x,a,b,cands,prepago))
+def _d(a,b,prepago):
+    # prepago manda el precio (ahorro de flete, cierto e inmediato); contra entrega manda el valor esperado.
+    # criterios-decision.md: "Nunca sumarlos en una sola cifra" — no confundir ahorro con valor esperado.
+    if not (a and b): return None
+    return (a['fl']-b['fl']) if prepago else (b['ev']-a['ev'])
+res.sort(key=lambda r:-(_d(r[1],r[2],r[4]) or 0))
 tot=0
 print('%-9s %-19s %-15s %-26s %-26s %9s'%('ORDEN','CLIENTE','CIUDAD','ACTUAL','RECOMENDADA','GANA'))
-for x,a,b,c in res:
-    d=(b['ev']-a['ev']) if (a and b) else None
+for x,a,b,c,prepago in res:
+    d=_d(a,b,prepago)
     if d and d>500: tot+=d
     print('%-9s %-19s %-15s %-26s %-26s %9s'%(x['orden'],x['cli'][:18],x['ciu'][:14],
       '%s%s %s [%s]'%(a['car'][:8],'*' if a.get('marg') else '',m(a['fl']),a['hist']) if a else '—',
       '%s%s %s [%s]'%(b['car'][:8],'*' if b.get('marg') else '',m(b['fl']),b['hist']) if b else '—',
       m(d) if d and d>500 else 'queda igual'))
 print(); print('TOTAL:',m(tot))
-if any(b and b.get('marg') for _,_,b,_ in res):
+if any(b and b.get('marg') for _,_,b,_,_ in res):
     print('* = MARGINAL para la bodega: proponer avisando el riesgo y confirmar con la bodega antes de asignar')
-json.dump([{**{'orden':x['orden'],'cli':x['cli'],'ciu':x['ciu']},'actual':a,'mejor':b,'cands':c} for x,a,b,c in res],
+json.dump([{**{'orden':x['orden'],'cli':x['cli'],'ciu':x['ciu'],'prepago':prepago},'actual':a,'mejor':b,'cands':c} for x,a,b,c,prepago in res],
           open(D('salidas/DECISION-VIVO.json'),'w'),ensure_ascii=False,indent=1)

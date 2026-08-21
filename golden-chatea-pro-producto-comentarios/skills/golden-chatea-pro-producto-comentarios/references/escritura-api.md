@@ -112,8 +112,12 @@ verde. (Fallo real cazado en la auditoría de esta skill.)
 **No lo confundas con la serialización de arriba**, que sí va con `ensure_ascii=False`. La regla en
 una línea: **se guarda sin escapar y se mide escapado.**
 
-Medido en vivo: 16.882 crudos / 19.895 escapados **dispara**; 19.922 / 23.266 **no**, y muere sin
-un error visible. El único rastro queda en Panel → Registros de errores.
+Dos mediciones reales, para calibrar el ojo:
+
+- **16.882 crudos / 19.895 escapados** → pasa (queda bajo el techo de 20.000), pero **dispara el
+  aviso** porque ya superó el objetivo de 19.000: sin margen para crecer.
+- **19.922 crudos / 23.266 escapados** → **no** pasa: supera el techo de 20.000 y muere sin un
+  error visible. El único rastro queda en Panel → Registros de errores.
 
 Y por producto, `desc ≤ 500` (ver `desc-plantilla.md`).
 

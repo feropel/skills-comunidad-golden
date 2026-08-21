@@ -6,6 +6,8 @@ description: Golden Group — Configura el asistente de CARRITOS ABANDONADOS de 
 # Golden · Chatea Pro — Asistente de Carritos Abandonados
 
 <!-- skill v1.3.1 · 2026-08-08 (centro de mando, chat otro espacio de Chatea 2026-08-08 (2ª ronda: 5ª categoría + prosa libre)) · QUINTA CATEGORÍA VETADA en la ley: claims y cifras de negocio (años en el mercado, clientes atendidos, porcentajes de entrega, premios) — no rompen nada técnico ni los caza un barrido de llaves, pero el bot termina mintiendo con datos de otra empresa (caso real: "Más de 100.000 clientes atendidos en Colombia" a punto de heredarse). Y regla operativa LA MARCA VIVE TAMBIÉN EN PROSA LIBRE: al barrido se añade grep -i por el nombre de la marca origen sobre todo el texto a escribir (cazó 10 menciones en 3 campos que el mapeo de llaves no vio). -->
+<!-- adenda 2026-08-20 (centro de mando, autoevalúo del ecosistema): completada la ley de DOS NIVELES del techo — el tope de 20.000 escapados aplica al bot field tipo JSON legacy; un campo creado o convertido a LONG JSON aguanta hasta 500.000 (medido y validado en las hermanas config-comentarios v1.4.1 y config-ventas-wp v3.0). La cifra de esta skill era incompleta, no falsa: sin la mención a LONG JSON, quien la siga se autolimita. -->
+<!-- skill v1.4 · 2026-08-21 (auditoría golden-skill-auditor 934→ORO): hallazgo real — el paso "Resolver la objeción" recomendaba prueba social pero el intake nunca pedía ese dato, y el ejemplo de vara de calidad traía una cifra inventada ("Más de 12.000 clientas") sin marcarla como dato real requerido; eso fosilizaba la fabricación de una cifra de negocio, justo lo que la LEY de arriba prohíbe entre espacios y el estándar Golden "datos reales antes de generar" prohíbe siempre. Se añadió el punto 7 al intake (prueba social real, opcional), la regla explícita de nunca inventar cifras de negocio, el chequeo en el QA, y se corrigió el ejemplo para dejar la cifra marcada como dato real del intake, no como técnica libre. -->
 <!-- skill v1.3 · 2026-08-08 (centro de mando, chat otro espacio de Chatea 2026-08-08) · horneada la LEY "NUNCA HEREDAR DATOS ENTRE ESPACIOS": al basarse en una cuenta guía se hereda estructura/prompts/config, JAMÁS datos (APIs, plantillas de WhatsApp, teléfonos, correos, dominios, marca, productos y disparadores); única excepción Le'côterra como producto-ejemplo; método de barrido obligatorio antes y después de escribir en espacio ajeno. Origen: incidente Golden → otra marca 2026-08-08 (se colaron una credencial, teléfono, plantilla de notificación y firmas de la marca origen; revertido el mismo día). La ley entra como PREVENCIÓN, no reparación: línea base pre-horneado verificada por verificador externo — 8/8 skills sin credenciales (CRITICA=0); únicos hallazgos 3 teléfonos de relleno legítimos (+57 300 de ejemplo) que se conservan. ADEMÁS (chat otro espacio de Chatea 2026-08-08, retractación pixel): regla CAMPOS [Meta] = VALORES CALIENTES — los eventos de pixel los mueve el flujo en vivo, prohibido diagnosticar con una lectura suelta. -->
 <!-- skill v1.2 · 2026-08-07 (centro de mando, briefing BRIEFING-PARA-SKILLS.md de CHATEA-PRO-ASISTENTES-MAPA, cosecha del chat CONFIG CHATEA KEVIN MX): confirmado desde el código de la app que el módulo Carritos (CartsPage) NO tiene topes nativos salvo los campos de correo — cierra parte del pendiente "verificar en vivo"; añadido el techo del bot field (20.000 ESCAPADOS ~ 17.000 crudos, corte silencioso con 200 ok); países limitados a los 7 que acepta la plataforma; higiene al clonar ([Carritos IA] Información de productos #N no se hereda) y regla de escribir y RELEER. -->
 <!-- skill v1.1 · auditada con golden-skill-auditor 893→ORO: corregida la regla real de la ventana de 24h (contacto frío = plantilla en el primer toque), etiquetas unificadas (REACTIVACIÓN N), paso de QA + checklist de "terminado", modelo de plataforma marcado "verificar en vivo", changelog añadido -->
@@ -71,7 +73,7 @@ Configura el asistente que **recupera carritos/checkouts abandonados** por Whats
 ## Techos de caracteres (confirmado desde el código de la app, 2026-08-07)
 
 - **Techo nativo del módulo Carritos (`CartsPage`): NO hay `maxLength`** en sus campos de texto. Solo los campos de **correo** (asunto y contenido) validan longitud, contra una tabla de un módulo compartido. Fuente: `TOPES-NATIVOS-POR-CAMPO.md` de CHATEA-PRO-ASISTENTES-MAPA.
-- **Techo del bot field: 20.000 ESCAPADOS, no crudos** (~17.000 crudos: cada tilde ocupa 6 caracteres y cada emoji 12). Pasarse NO da error — la API responde `200 ok`, guarda cortado y el asistente muere en silencio; el error solo aparece en Panel → Registros de errores. Medir: `len(json.dumps(valor)[1:-1])` bajo 19.000. Tras escribir por API, **releer y comparar** siempre.
+- **Techo del bot field: 20.000 ESCAPADOS, no crudos** (~17.000 crudos: cada tilde ocupa 6 caracteres y cada emoji 12). Pasarse NO da error — la API responde `200 ok`, guarda cortado y el asistente muere en silencio; el error solo aparece en Panel → Registros de errores. Medir: `len(json.dumps(valor)[1:-1])` bajo 19.000. Tras escribir por API, **releer y comparar** siempre. **Nivel B — LONG JSON:** el tope de 20.000 es del campo tipo JSON legacy; si el bot field se crea o convierte a **LONG JSON**, el techo sube a 500.000 escapados (ley de dos niveles medida en las hermanas config-comentarios y config-ventas-wp). Con configuraciones grandes, convertir el campo a LONG JSON antes de escribir.
 - **Al clonar un workspace a otro cliente:** vaciar `[Carritos IA] Información de productos #N` (son productos reales cacheados por el bot del dueño anterior) y jamás arrastrar `[Integraciones] Datos de integracion`.
 
 ## Qué es esto y qué NO es (límite con Ventas)
@@ -115,6 +117,7 @@ Reusa lo que ya definió el asistente de ventas del workspace; solo pregunta lo 
 4. **Incentivo de recuperación disponible** (envío gratis, descuento, regalo, bono) — si existe. Sin incentivo, el paso 4 cierra con valor/garantía, no con descuento.
 5. **Tiempos de entrega por zona** — el mismo dato que Ventas y Logístico, para no contradecir.
 6. **Nombre y tono del asistente** (el mismo del asistente de ventas).
+7. **Prueba social real (opcional)** — número de clientes/reseñas o calificación, SOLO si el negocio la tiene y la confirma. Se usa en REACTIVACIÓN 2 (resolver objeción). Sin este dato, ese mensaje se apoya en garantía y contra entrega, nunca en una cifra inventada.
 
 ## Secuencia de recuperación (estructura ganadora)
 
@@ -138,6 +141,7 @@ Diseña **4 mensajes, cada uno con un ángulo distinto** — nunca repetir el mi
 - **Beneficio, no reproche:** reengancha por lo que **gana** el cliente, no por lo que "dejó a medias".
 - **Precio claro** si lo pregunta; **anticipado blindado** (nunca confirmar sin comprobante).
 - **Personaliza con lo que traiga el carrito** (nombre, producto) pero que el mensaje funcione aunque falte un dato.
+- **Nunca inventes cifras de negocio** (número de clientes, reseñas, porcentajes de entrega, años en el mercado) en ningún mensaje — es la misma prohibición de la LEY de arriba, aplicada dentro de un solo espacio, no solo al clonar entre espacios. Úsalas solo si el negocio las confirmó en el intake (punto 7); si no hay dato real, el mensaje de objeción se apoya en garantía y contra entrega.
 - Al cerrar, **dispara el flujo de venta/logístico** para tomar la dirección y confirmar el pedido (no reimplementes la validación de dirección aquí).
 
 ## Plantilla de Meta (para todo mensaje que caiga fuera de la ventana)
@@ -165,6 +169,7 @@ Antes de dar la secuencia por lista, verifica y corrige:
 - [ ] **Precio, oferta y datos de pago** idénticos a los del asistente de ventas (`golden-chatea-pro-config-ventas-wp`). Si no coinciden, manda Ventas.
 - [ ] **Tiempos de entrega** iguales a Ventas y Logístico.
 - [ ] Cada mensaje: ≤35 palabras, máx 2 emojis, 1 sola pregunta, sin signos de apertura, beneficio (no reproche).
+- [ ] **Sin cifras de negocio inventadas** (clientes, reseñas, porcentajes): si aparece una, viene del intake (punto 7) o se retira.
 - [ ] **4 ángulos distintos** (ningún mensaje repite el mismo gancho).
 - [ ] El **primer mensaje** trae plantilla de Meta si el contacto es frío (caso normal).
 - [ ] Cada mensaje fuera de la ventana tiene su **plantilla completa** (nombre, cuerpo con `{{1}}`, botón).

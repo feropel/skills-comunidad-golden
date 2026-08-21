@@ -21,11 +21,12 @@ description: >-
 
 # Golden Cinemática — el salto de "página" a "experiencia"
 
+<!-- skill GC1.3 (2026-08-21) · auditoría golden-skill-auditor: (1) desambigua la cita a `references/estilo-agencia-premium.md` — vive en golden-web, no localmente, se escribía sin dueño y se leía como archivo propio; (2) suma sección "Cuando algo falla o falta" con plan de degradación explícito (CDN caído, sin render de fondo, 60fps no alcanzado en móvil, tokens no entregados por el usuario) — antes no había manejo de error declarado; (3) TOC en references/recetas.md (309 líneas, pasaba el umbral de 300 sin índice). Blindaje: chflags uchg (quitar con chflags -R nouchg, reponer con chflags -R uchg) — mecanismo documentado aquí por primera vez -->
 <!-- skill GC1.2 (2026-08-02) · filtro de 2 reels de efectos (code.xr OTP v5 · code_and_chill MENISCUS): dos familias NUEVAS que el vocabulario no tenia — ESTADOS (success state animado, carga en el boton, validacion en vivo, progreso por segmentos) con la nota de que en contra entrega la confirmacion NO es decoracion sino la venta (el cliente dio sus datos sin pagar y la duda reaparece como cancelacion al confirmar por WhatsApp), y NAVEGACION (morphing dock por path SVG y tangentes, sticky compacto, desplazamiento por vecindad). Ninguno de los 2 reels publica el codigo (piden comentar), asi que se documenta el PATRON, no la receta -->
 <!-- skill GC1.1 (2026-07-27) · filtro de 9 reels: 5 términos nuevos al vocabulario de entrada y revelado (pixel/entrance reveal por grid, smooth loader con máscara, stacked sticky sections, fondo ligado al scroll) con la nota de que se hacen a mano en CSS/JS y no hace falta Framer -->
 <!-- skill GC1.0 (2026-07-25) · nace de un diagnóstico de FER: "las páginas que me has hecho son 10 de 100". Destilado del análisis frame a frame de 6 sitios de Textura Agency (@textura.eu / getlayers.ai), donde se capturó el PROMPT REAL con sus tokens numéricos. El hallazgo central: la diferencia entre 10/100 y 100/100 no es la librería, es que el encargo lleva milisegundos, grados, radios y hex exactos en vez de adjetivos -->
 
-**Versión:** `GC1.2` · Fábrica: chat centro de mando.
+**Versión:** `GC1.3` · Fábrica: chat centro de mando.
 
 Esta skill existe por una razón concreta: las páginas Golden nombraban las librerías
 correctas y aun así salían genéricas. El diagnóstico fue que **conocer el nombre de la
@@ -128,14 +129,41 @@ completa abajo.
   ondulan, cromado con reflejos, cursor con inercia, wireframe, scroll cinemático
 
 ## Encadena con
-- `golden-web` → estructura, blueprints por perfil y `references/estilo-agencia-premium.md`
-  (tipografía display + springs + aire). Esta skill es su capa 3D
+- `golden-web` → estructura y blueprints por perfil, con su propia
+  `references/estilo-agencia-premium.md` (tipografía display + springs + aire). Esta skill
+  es su capa 3D
 - `three` · `gsap` (ScrollTrigger) · `apple-design` (easing físico) · `emil-design-eng`
   (pulido invisible) · `improve-animations` (auditar una web ya hecha)
 - `golden-imagen-arena` / Higgsfield → generar el render pre-hecho del fondo del hero
 - `all-deploy` → publicar · `cyber-neo` → si la página lleva formularios o datos
 
+## Cuando algo falla o falta (degradación, no bloqueo)
+
+- **El CDN de unpkg no responde o el import falla:** no inventes una versión distinta a la
+  fijada en `references/recetas.md`. Informa el corte, reintenta una vez, y si sigue caído
+  entrega igual el HTML con el `<script type="importmap">` correcto — el sitio funcionará
+  en cuanto el CDN vuelva. Nunca se degrada a gradientes CSS por un corte temporal.
+- **No hay foto/render para el fondo del hero (mecanismo 5):** delega a
+  `golden-imagen-arena` o Higgsfield para producirlo; si tampoco están disponibles, arranca
+  con la escena WebGL sola (mecanismos 2-4) y dilo explícitamente como pendiente — no se
+  inventa un video de stock genérico.
+- **El 60fps no se sostiene en móvil de gama media (vara de calidad):** en este orden,
+  antes de tocar el diseño: baja `COLS`/`ROWS` de la malla de partículas (receta 2), baja
+  el `dpr` cap de `[1,2]` a `[1,1.5]`, apaga el bloom, y solo si sigue sin llegar, reduce a
+  3 mecanismos en vez de 4. Nunca se sacrifica el fallback de `prefers-reduced-motion` para
+  ganar fps: ese camino ya es la salida de emergencia.
+- **El usuario no da los hex/tokens exactos:** no se inventan colores "bonitos" a ciegas —
+  se piden UNA vez al inicio con la plantilla de `references/vocabulario.md`, y si el
+  usuario no los tiene, se extraen del logo o la paleta de marca ya existente del proyecto
+  (nunca un genérico #000/#fff sin decisión).
+
 ## Changelog
+- **GC1.3** (2026-08-21) — Auditoría golden-skill-auditor: desambigua la cita a
+  `estilo-agencia-premium.md` (vive en golden-web), suma la sección de degradación
+  ("Cuando algo falla o falta") y el índice de `references/recetas.md`.
+- **GC1.2** (2026-08-02) — Vocabulario de ESTADOS (confirmación en contra entrega) y
+  NAVEGACIÓN (morphing dock), del filtro de 2 reels de efectos.
+- **GC1.1** (2026-07-27) — 5 términos nuevos de entrada y revelado, del filtro de 9 reels.
 - **GC1.0** (2026-07-25) — Creación. Diagnóstico de FER ("10 de 100") + análisis frame a
   frame de 6 sitios de referencia. Aporta lo que faltaba: la disciplina de tokens
   numéricos, la ruta HTML por importmap (el entregable real de Golden), las recetas con

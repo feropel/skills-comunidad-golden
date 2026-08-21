@@ -4,6 +4,13 @@ Genera un Word profesional con la skill `docx` (o python-docx). Es la **fuente d
 proyecto. Accionable: cada sección termina en "qué significa esto para la campaña". Todo citado.
 Se guarda en `PROYECTOS/<PRODUCTO>/00-ESTUDIO-DE-MERCADO.docx`.
 
+**Si ninguna de las dos vías está disponible** (skill `docx` no instalada y `python-docx` no
+instalable en el entorno): no se omite la fase. Se entrega el `.md` completo con toda la
+estructura de abajo y se marca `[PENDIENTE — .docx real, requiere skill docx o python-docx]` en
+`estado.pendientes` del expediente. El candado de completitud (regla 7 de `reglas-de-oro.md`)
+sigue exigiendo el `.docx` en cuanto la herramienta esté disponible — el `.md` es un sustituto
+declarado, nunca un cierre silencioso de la fase.
+
 ## Estructura del documento
 ```
 PORTADA — Producto · País · Fecha · "Golden Group — Estudio de Mercado 360°"

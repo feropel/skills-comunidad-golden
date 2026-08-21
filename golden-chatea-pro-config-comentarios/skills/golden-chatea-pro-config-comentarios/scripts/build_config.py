@@ -124,8 +124,18 @@ def datos_req_por_pais(pais, override=None):
 
 
 def cargar_template():
-    with open(TEMPLATE, encoding="utf-8") as f:
-        return json.load(f)
+    try:
+        with open(TEMPLATE, encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        print(f"ERROR: no se encontró la plantilla en {TEMPLATE}.")
+        print("       La skill está corrupta o incompleta (falta assets/template.json).")
+        print("       Reinstala golden-chatea-pro-config-comentarios y vuelve a intentar.")
+        sys.exit(1)
+    except json.JSONDecodeError as e:
+        print(f"ERROR: assets/template.json no es JSON válido ({e}).")
+        print("       La skill está corrupta. Reinstala golden-chatea-pro-config-comentarios.")
+        sys.exit(1)
 
 
 def parsear_productos(items):
@@ -374,8 +384,15 @@ def main():
     a = p.parse_args()
 
     if a.intake:
-        with open(a.intake, encoding="utf-8") as f:
-            d = json.load(f)
+        try:
+            with open(a.intake, encoding="utf-8") as f:
+                d = json.load(f)
+        except FileNotFoundError:
+            print(f"ERROR: no se encontró el archivo de intake {a.intake}.")
+            sys.exit(1)
+        except json.JSONDecodeError as e:
+            print(f"ERROR: {a.intake} no es JSON válido ({e}).")
+            sys.exit(1)
         pais = d.get("pais", a.pais)
         contacto = d.get("contacto", a.contacto)
         t_envio = d.get("t_envio", a.t_envio)

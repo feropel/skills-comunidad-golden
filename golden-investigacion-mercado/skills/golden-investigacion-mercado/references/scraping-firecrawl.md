@@ -1,5 +1,16 @@
 # Scraping con Firecrawl — manual verificado Golden
 
+## Índice
+1. [Regla Cero — el resultado puede ser BASURA aunque todo diga que salió bien](#-regla-cero--el-resultado-puede-ser-basura-aunque-todo-diga-que-salió-bien) (4 modos de fallo + el candado)
+2. [Matriz de fuentes — Firecrawl](#matriz-de-fuentes--qué-funciona-y-qué-no-medido)
+3. [Matriz por navegador](#matriz-por-navegador--el-respaldo-también-medido-2026-08-02)
+4. [Recetas verificadas](#recetas-verificadas)
+5. [Parámetros que importan](#parámetros-que-importan)
+6. [Video y comentarios — `yt-dlp`](#video-y-comentarios--yt-dlp--instalado-2026-08-01)
+7. [Checklist antes de entregar cualquier dato scrapeado](#checklist-antes-de-entregar-cualquier-dato-scrapeado)
+8. [La matriz CADUCA — la suite de verificación](#-la-matriz-caduca--la-suite-de-verificación)
+9. [Changelog](#changelog)
+
 **Versión:** `SF3.1` · Probado en vivo el **2026-07-31, 08-01 y 08-02** contra AliExpress, YouTube,
 TikTok Creative Center, Temu, Amazon, MercadoLibre Colombia, Reddit y dos dominios propios —
 **por Firecrawl Y por navegador real**.

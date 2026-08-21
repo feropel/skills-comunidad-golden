@@ -32,6 +32,7 @@ from clasificar import (                                          # noqa: E402
     Clasificador, invertir_hilo, parse_fecha, parse_dinero,
     direccion, contenido_real, redactar_texto, imprimir, es_nota_pixel,
     plantillas_de, MIN_PERSONAS_FORMA, _parsear_argv,
+    extraer_atributos, es_resumen_final_r6,
 )
 
 RESULTADOS = {}   # codigo -> (paso: bool, detalle: str)
@@ -698,6 +699,199 @@ def test_main_args_orden_independiente():
     marcar("MAIN-ARGS-ORDEN", paso, f"orden 1: {r1} · orden 2: {r2} (deben ser iguales)")
 
 
+def test_plantilla_solo_frecuencia_se_declara():
+    """Ronda 3: 5+ clientes reales con la MISMA objecion de precio, SIN '¡', cruzan el
+    umbral de frecuencia (limite heredado de produccion, no un bug de esta skill) y
+    borran esas objeciones -- pero el hallazgo P6/DUDA que lo declara DEBE disparar,
+    nombrando el texto, para que no se lea como un dia sin objeciones de precio."""
+    def objecion(n):
+        return {"user_ns": f"obj{n}", "get_info": {},
+               "mensajes": [{"type": "in", "content": "esta muy caro",
+                            "ts": f"2026-08-19 10:{n:02d}:00"}]}
+    contactos = [objecion(i) for i in range(5)]
+    c = Clasificador({"contactos": contactos}).correr()
+    borradas = all(conv["motivo_no_compra"] == [] for conv in c.conversaciones)
+    declarado = any(h["control"] == "P6" and h["severidad"] == "DUDA" and
+                    "esta muy caro" in h["evidencia"] for h in c.hallazgos)
+    paso = borradas and declarado
+    marcar("PLANTILLA-FRECUENCIA-DECLARADA", paso,
+          f"5 objeciones identicas sin '¡' cruzan el umbral de frecuencia y se borran: "
+          f"{borradas} · el hallazgo P6/DUDA que lo declara con el texto citado "
+          f"disparo: {declarado}")
+
+
+# ------------------------------------------------------------------------------------- R6
+# COHERENCIA INTRA-CHAT (sin Dropi). Tres casos que el encargo exige explicitamente:
+# incoherencia real clara, cambio de opinion legitimo (NO debe marcarse), y caso ambiguo
+# (debe caer en DUDA, no forzar severidad). Mas dos casos adicionales de robustez.
+
+def test_r6_incoherencia_real():
+    """Caso 1 (obligatorio): cliente pide azul, el resumen final del bot dice rojo, sin
+    ningun mensaje del cliente entre medio que explique el cambio -> MUERTO."""
+    contacto = {"user_ns": "fr6-incoherente", "get_info": {},
+               "mensajes": [
+                   {"type": "in", "content": "lo quiero en azul",
+                    "ts": "2026-08-19 09:00:00"},
+                   {"type": "out", "content": "perfecto, tu pedido: 1 producto, "
+                    "confirmamos tu pedido en color rojo, direccion recibida",
+                    "ts": "2026-08-19 09:10:00"},
+               ]}
+    c = Clasificador({"contactos": [contacto]}, modo="cod").correr()
+    h = next((x for x in c.hallazgos if x["control"] == "R6"), None)
+    lleva_disclaimer = h is not None and "cambió de opinión" in h["consecuencia"]
+    paso = h is not None and h["severidad"] == "MUERTO" and lleva_disclaimer
+    marcar("R6-INCOHERENCIA-REAL", paso,
+          f"hallazgo R6 disparado: {h is not None} · severidad: "
+          f"{h['severidad'] if h else None} (debe ser MUERTO) · lleva el disclaimer de "
+          f"'puede ser un cambio de opinion legitimo' en consecuencia: {lleva_disclaimer}")
+
+
+def test_r6_cambio_opinion_no_se_marca():
+    """Caso 2 (obligatorio): cliente pide azul, LUEGO dice 'mejor cambialo a rojo', el
+    resumen final dice rojo -- coherente, NO debe generar ningun hallazgo R6."""
+    contacto = {"user_ns": "fr6-cambio-legitimo", "get_info": {},
+               "mensajes": [
+                   {"type": "in", "content": "lo quiero en azul",
+                    "ts": "2026-08-19 09:00:00"},
+                   {"type": "in", "content": "mejor cambialo a rojo",
+                    "ts": "2026-08-19 09:05:00"},
+                   {"type": "out", "content": "listo, confirmamos tu pedido en color rojo, "
+                    "direccion recibida", "ts": "2026-08-19 09:10:00"},
+               ]}
+    c = Clasificador({"contactos": [contacto]}, modo="cod").correr()
+    disparo = any(x["control"] == "R6" for x in c.hallazgos)
+    marcar("R6-CAMBIO-OPINION-NO-MARCA", not disparo,
+          f"hallazgo R6 disparado: {disparo} (debe ser False -- el resumen final SI "
+          "recogio el ultimo valor que dijo el cliente, no es una incoherencia)")
+
+
+def test_r6_ambiguo_cae_en_duda():
+    """Caso 3 (obligatorio): el cliente menciona 3+ valores distintos de color a lo largo
+    del hilo -- no se fuerza severidad alta, cae en DUDA."""
+    contacto = {"user_ns": "fr6-ambiguo", "get_info": {},
+               "mensajes": [
+                   {"type": "in", "content": "lo quiero en azul", "ts": "2026-08-19 09:00:00"},
+                   {"type": "in", "content": "mejor en verde", "ts": "2026-08-19 09:02:00"},
+                   {"type": "in", "content": "no espera, a negro",
+                    "ts": "2026-08-19 09:04:00"},
+                   {"type": "out", "content": "confirmamos tu pedido en color rojo, "
+                    "direccion de envio recibida", "ts": "2026-08-19 09:10:00"},
+               ]}
+    c = Clasificador({"contactos": [contacto]}, modo="cod").correr()
+    h = next((x for x in c.hallazgos if x["control"] == "R6"), None)
+    paso = h is not None and h["severidad"] == "DUDA"
+    marcar("R6-AMBIGUO-DUDA", paso,
+          f"hallazgo R6 disparado: {h is not None} · severidad: "
+          f"{h['severidad'] if h else None} (debe ser DUDA, no una severidad alta forzada)")
+
+
+def test_r6_sin_atributo_no_genera_ruido():
+    """Robustez: una conversacion donde el cliente nunca menciono un atributo concreto no
+    debe generar NINGUN hallazgo R6 (no es ruido, es 'nada que comparar')."""
+    contacto = {"user_ns": "fr6-sin-atributo", "get_info": {},
+               "mensajes": [
+                   {"type": "in", "content": "hola, cuanto cuesta el envio",
+                    "ts": "2026-08-19 09:00:00"},
+                   {"type": "out", "content": "el envio es gratis, gracias por tu compra",
+                    "ts": "2026-08-19 09:10:00"},
+               ]}
+    c = Clasificador({"contactos": [contacto]}).correr()
+    disparo = any(x["control"] == "R6" for x in c.hallazgos)
+    marcar("R6-SIN-ATRIBUTO", not disparo,
+          f"hallazgo R6 disparado: {disparo} (debe ser False -- nada que comparar)")
+
+
+def test_r6_no_requiere_dropi():
+    """Robustez: R6 funciona con un DUMP que no trae ningun rastro de Dropi (get_info
+    vacio, sin opted_in_through) -- confirma que el control es puramente intra-chat."""
+    contacto = {"user_ns": "fr6-sin-dropi", "get_info": {},
+               "mensajes": [
+                   {"type": "in", "content": "quiero talla M",
+                    "ts": "2026-08-19 09:00:00"},
+                   {"type": "out", "content": "confirmamos tu pedido, talla L, direccion "
+                    "recibida", "ts": "2026-08-19 09:10:00"},
+               ]}
+    c = Clasificador({"contactos": [contacto]}, modo="cod").correr()
+    h = next((x for x in c.hallazgos if x["control"] == "R6"), None)
+    paso = h is not None and h["severidad"] == "MUERTO"
+    marcar("R6-SIN-DROPI", paso,
+          f"R6 funciono sin ningun dato de Dropi en get_info: hallazgo {h is not None}, "
+          f"severidad {h['severidad'] if h else None} (debe ser MUERTO -- talla M vs L)")
+
+
+# ---------------------------------------------------- fixes de la verificacion adversarial R6
+# Cada uno reproduce un defecto REAL que golden-verificador encontro corriendo R6 contra 1.829
+# hilos reales de dos espacios de produccion (2026-08-21) -- no un caso hipotetico.
+
+def test_r6_talla_no_captura_basura():
+    """El verificador midio 'no se cual es mi talla' -> talla='LA', 'que talla me
+    recomienda' -> talla='ME' contra produccion real. PATRON_TALLA ahora solo acepta
+    valores reales de talla (S/M/L/XL/XXL/XS o 1-2 digitos)."""
+    casos_basura = [
+        "no se cual es mi talla la verdad",
+        "que talla me recomienda",
+        "la talla no me quedo",
+        "cual es la talla de este producto",
+    ]
+    capturas_basura = []
+    for texto in casos_basura:
+        atributos = extraer_atributos(texto)
+        if any(t == "talla" for t, _ in atributos):
+            capturas_basura.append((texto, atributos))
+    caso_real = extraer_atributos("necesito talla M por favor")
+    talla_real_ok = ("talla", "M") in caso_real
+    paso = not capturas_basura and talla_real_ok
+    marcar("R6-TALLA-NO-CAPTURA-BASURA", paso,
+          f"frases sin talla real que NO deben capturar nada: "
+          f"{'ninguna capturo basura' if not capturas_basura else capturas_basura} · "
+          f"'talla M' sigue capturando talla=M: {talla_real_ok}")
+
+
+def test_r6_color_sin_leadin_no_dispara():
+    """El verificador midio, contra produccion real: 'a lo mejor la transportadora no
+    vino a entregar' y 'no me vino no se porque' -> color='vino' (falso positivo del
+    VERBO 'vino'), y lo mismo con 'cafe' (bebida), 'rosa' (nombre), 'gris' (clima). Sin
+    un lead-in ('color'/'en'/'a' + palabra de color) esas frases NO deben producir
+    ninguna mencion de color -- con el lead-in, el color real SI se sigue detectando."""
+    frases_sin_leadin = [
+        "a lo mejor la transportadora no vino a entregar",
+        "no me vino no se porque",
+        "me tome un cafe esperando el pedido",
+        "rosa es mi vecina que tambien compro",
+        "el clima esta gris hoy por aca",
+    ]
+    falsos = [(t, extraer_atributos(t)) for t in frases_sin_leadin
+             if any(tp == "color" for tp, _ in extraer_atributos(t))]
+    con_leadin = extraer_atributos("lo quiero en color vino") + extraer_atributos(
+        "mandalo en cafe") + extraer_atributos("cambialo a rosa")
+    detecta_con_leadin = sum(1 for t, v in con_leadin if t == "color") == 3
+    paso = not falsos and detecta_con_leadin
+    marcar("R6-COLOR-SIN-LEADIN-NO-DISPARA", paso,
+          f"frases con palabras-color-que-son-palabras-corrientes SIN lead-in, falsos "
+          f"positivos: {falsos or 'ninguno'} · con lead-in ('en'/'a'/'color') los 3 "
+          f"colores reales se detectan igual: {detecta_con_leadin}")
+
+
+def test_r6_correccion_post_resumen():
+    """El verificador encontro que un cliente que corrige el color DESPUES del resumen
+    final quedaba en silencio total (ni MUERTO ni DUDA). Ahora debe generar DUDA."""
+    contacto = {"user_ns": "fr6-post-resumen", "get_info": {},
+               "mensajes": [
+                   {"type": "in", "content": "hola quiero el producto",
+                    "ts": "2026-08-19 09:00:00"},
+                   {"type": "out", "content": "confirmamos tu pedido en color rojo, "
+                    "direccion de envio recibida", "ts": "2026-08-19 09:05:00"},
+                   {"type": "in", "content": "espera, yo lo pedi en azul",
+                    "ts": "2026-08-19 09:06:00"},
+               ]}
+    c = Clasificador({"contactos": [contacto]}, modo="cod").correr()
+    h = next((x for x in c.hallazgos if x["control"] == "R6"), None)
+    paso = h is not None and h["severidad"] == "DUDA" and "DESPUÉS" in h["titulo"]
+    marcar("R6-CORRECCION-POST-RESUMEN", paso,
+          f"hallazgo R6 disparado para correccion posterior al resumen: {h is not None} · "
+          f"severidad: {h['severidad'] if h else None} (debe ser DUDA, no silencio)")
+
+
 TRAMPAS_DEL_ENCARGO = ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11",
                       "P12", "P13"]
 EXTRA_CALIDAD = ["R1", "R2", "R3", "R4", "Q4"]
@@ -706,7 +900,12 @@ FIXES_ADVERSARIALES = ["TYPE-REAL", "DESCONOCIDOS", "COMPUERTA-SILENCIA",
                        "Q4-FALSO-POSITIVO", "INVENTARIO-ABORTA", "CREDENCIALES-AMPLIADAS"]
 FIXES_RONDA_2 = ["DROPI-NORMALIZADO", "TS-ILEGIBLE", "CORTE-IGNORA-NOTAS",
                 "DENOMINADOR-3-ESTADOS", "PLANTILLA-NO-BORRA-OBJECION",
-                "PLANTILLA-CHICO-DECLARADO", "DINERO-RECHAZA-NO-STR", "MAIN-ARGS-ORDEN"]
+                "PLANTILLA-CHICO-DECLARADO", "DINERO-RECHAZA-NO-STR", "MAIN-ARGS-ORDEN",
+                "PLANTILLA-FRECUENCIA-DECLARADA"]
+CONTROL_R6 = ["R6-INCOHERENCIA-REAL", "R6-CAMBIO-OPINION-NO-MARCA", "R6-AMBIGUO-DUDA",
+             "R6-SIN-ATRIBUTO", "R6-SIN-DROPI"]
+FIXES_R6_VERIFICACION = ["R6-TALLA-NO-CAPTURA-BASURA", "R6-COLOR-SIN-LEADIN-NO-DISPARA",
+                         "R6-CORRECCION-POST-RESUMEN"]
 
 
 def main():
@@ -743,6 +942,17 @@ def main():
     test_plantilla_universo_chico_declarado()
     test_parse_dinero_rechaza_no_str()
     test_main_args_orden_independiente()
+    test_plantilla_solo_frecuencia_se_declara()
+
+    test_r6_incoherencia_real()
+    test_r6_cambio_opinion_no_se_marca()
+    test_r6_ambiguo_cae_en_duda()
+    test_r6_sin_atributo_no_genera_ruido()
+    test_r6_no_requiere_dropi()
+
+    test_r6_talla_no_captura_basura()
+    test_r6_color_sin_leadin_no_dispara()
+    test_r6_correccion_post_resumen()
 
     print("Las 13 trampas del encargo (ENCARGO-golden-chatea-operacion.md):")
     fallidas = []
@@ -786,19 +996,45 @@ def main():
         if not paso:
             fallidas_ronda2.append(codigo)
 
-    if fallidas or fallidas_extra or fallidas_fixes or fallidas_ronda2:
+    print("\nControl R6 · coherencia intra-chat (sin Dropi) -- incoherencia real, cambio "
+         "de opinion legitimo (NO debe marcarse) y caso ambiguo (debe caer en DUDA):")
+    fallidas_r6 = []
+    for codigo in CONTROL_R6:
+        paso, detalle = RESULTADOS.get(codigo, (False, "no se corrio ninguna prueba"))
+        marca = "OK   " if paso else "FALLA"
+        print(f"  {marca} {codigo:26} {detalle}")
+        if not paso:
+            fallidas_r6.append(codigo)
+
+    print("\nFixes de la verificacion adversarial de golden-verificador sobre R6 "
+         "(2026-08-21, 1.829 hilos reales de dos espacios de produccion) -- cada uno "
+         "reproduce un defecto real que encontro:")
+    fallidas_r6_verif = []
+    for codigo in FIXES_R6_VERIFICACION:
+        paso, detalle = RESULTADOS.get(codigo, (False, "no se corrio ninguna prueba"))
+        marca = "OK   " if paso else "FALLA"
+        print(f"  {marca} {codigo:30} {detalle}")
+        if not paso:
+            fallidas_r6_verif.append(codigo)
+
+    if (fallidas or fallidas_extra or fallidas_fixes or fallidas_ronda2 or fallidas_r6 or
+            fallidas_r6_verif):
         print(f"\nAUTOPRUEBA FALLIDA. Trampas del encargo sin detectar: {fallidas or 'ninguna'}. "
              f"Controles de calidad sin detectar: {fallidas_extra or 'ninguno'}. "
              f"Fixes adversariales (ronda 1) sin confirmar: {fallidas_fixes or 'ninguno'}. "
-             f"Fixes (ronda 2) sin confirmar: {fallidas_ronda2 or 'ninguno'}.")
+             f"Fixes (ronda 2) sin confirmar: {fallidas_ronda2 or 'ninguno'}. "
+             f"Control R6 sin confirmar: {fallidas_r6 or 'ninguno'}. "
+             f"Fixes de verificacion R6 sin confirmar: {fallidas_r6_verif or 'ninguno'}.")
         print("El clasificador esta roto. No se corre contra un DUMP real hasta arreglarlo.")
         return 1
 
     total_controles = (len(TRAMPAS_DEL_ENCARGO) + len(EXTRA_CALIDAD) +
-                       len(FIXES_ADVERSARIALES) + len(FIXES_RONDA_2))
+                       len(FIXES_ADVERSARIALES) + len(FIXES_RONDA_2) + len(CONTROL_R6) +
+                       len(FIXES_R6_VERIFICACION))
     print(f"\n  {total_controles} de {total_controles} controles confirmados en total "
          f"({len(TRAMPAS_DEL_ENCARGO)} trampas del encargo + {len(EXTRA_CALIDAD)} calidad + "
-         f"{len(FIXES_ADVERSARIALES)} fixes ronda 1 + {len(FIXES_RONDA_2)} fixes ronda 2)")
+         f"{len(FIXES_ADVERSARIALES)} fixes ronda 1 + {len(FIXES_RONDA_2)} fixes ronda 2 + "
+         f"{len(CONTROL_R6)} control R6 + {len(FIXES_R6_VERIFICACION)} fixes verificacion R6)")
     print("\nAutoprueba pasada. Esto valida el DETECTOR contra casos que se SABEN rotos, no "
          "valida ningun dia real.")
     return 0

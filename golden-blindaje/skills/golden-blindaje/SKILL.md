@@ -21,9 +21,11 @@ description: >-
 
 # Golden Blindaje — auditoría del entorno de agentes
 
-<!-- skill GB1.0 · auditoría local de ~/.claude sin salida de red · 6 áreas (secretos, permisos, hooks, MCP, blindaje, caché) -->
+<!-- skill GB1.2 · 2026-08-21 · auditoría golden-skill-auditor: agrega Fase 0 (flujo explícito paso a paso: correr, verificar ALTO abriendo el archivo, presentar triage, pedir permiso antes de tocar seguridad) con definición de terminado y manejo de error si el script no corre; blindaje propio documentado (chflags uchg); cita a tendencias-vivas.md desambiguada como archivo de golden-copywriting, no local -->
+<!-- skill GB1.1 · 2026-07-27 · filtro del PDF Claude Security y de blender-mcp, protocolo de triage con ventanas duras, 5 errores que hacen inútil una auditoría, sección MCPs de terceros -->
+<!-- skill GB1.0 · 2026-07-23 · auditoría local de ~/.claude sin salida de red · 6 áreas (secretos, permisos, hooks, MCP, blindaje, caché) -->
 
-**Versión:** `GB1.0` · Fábrica: chat centro de mando.
+**Versión:** `GB1.2` · Fábrica: chat centro de mando. Blindaje propio: `chflags uchg` (estándar de la casa).
 
 Hay una capa que ninguna herramienta de seguridad de código mira: **la configuración
 con la que corren los agentes**. Ahí viven los tokens de Shopify, Meta, Stripe y
@@ -61,6 +63,38 @@ Opciones:
 
 Termina en `0` si no hay nada ALTO, en `1` si sí. Sirve para automatizarlo.
 
+**Si el script falla en vez de correr** (python3 no está en el PATH, permiso denegado, error de
+sintaxis tras una edición): no te detengas. Audita a mano con lo que ya sabe esta skill —
+`grep -rnE` de los patrones de la tabla de `SECRET_PATTERNS` (arriba en `scripts/chequeo.py`)
+sobre `skills/ agents/ commands/ hooks/`, más lectura directa de `settings.json` y
+`settings.local.json` para las reglas de `permissions.allow` y los `hooks`. Es más lento, pero
+el chequeo manual cubre las mismas 6 áreas.
+
+## Flujo (qué hace el agente, en orden)
+
+1. **Corre el script** con el comando de arriba. Si el usuario no dio bandera, corre sin
+   `--json` (reporte legible); usa `--json` solo si el resultado se va a encadenar con otra
+   skill o guardar histórico.
+2. **Verifica cada ALTO abriendo el archivo o la regla señalada** antes de reportarlo como real
+   — el reporte da tipo y ubicación, nunca el valor; el valor solo se ve abriendo el archivo. Un
+   hallazgo sin verificar se reporta como "por confirmar", no como hecho.
+3. **Presenta el reporte completo con la tabla de triage** (ALTO/MEDIO/BAJO/DESCARTADO, ver más
+   abajo) — nunca resumas solo los ALTO: los MEDIO y BAJO sin mostrar son la fuga #2 de "Los 5
+   errores" más abajo.
+4. **No apliques ningún arreglo sin que el usuario lo pida explícitamente.** Esta skill
+   DIAGNOSTICA; no rota credenciales, no edita `settings.json`, no borra hooks ni caché por su
+   cuenta — son cambios de seguridad/configuración del propio agente y el estándar de la casa
+   exige permiso explícito para tocarlos (ver protocolo de triage: cada nivel dice la ventana,
+   no autoriza el arreglo automático). Si el usuario pide "arréglalo", aplica el arreglo
+   concreto que ya trae cada hallazgo y muéstrale el diff antes de guardarlo (regla #1 de
+   "Los 5 errores").
+5. **Si algo se descarta por falso positivo, documenta el porqué** en la respuesta (archivo +
+   motivo) — un descarte sin razón escrita obliga a re-investigar el mes siguiente.
+
+**Definición de terminado:** el script corrió hasta el final (exit 0 o 1, nunca se cortó a
+medias), el usuario vio los hallazgos de los 3 niveles con su ventana, cada ALTO quedó verificado
+o marcado "por confirmar", y ningún arreglo se aplicó sin pedirlo el usuario.
+
 ## Qué revisa (6 áreas)
 
 ### 1 · Secretos escritos a mano
@@ -89,6 +123,20 @@ texto plano y detecta servidores que descarguen algo al arrancar.
 ### 5 · Blindaje
 Cuenta cuántas skills `golden-*` están con `chflags uchg` y cuáles quedaron abiertas.
 Una skill abierta mientras se edita es normal; olvidada, no.
+
+**Excepciones por diseño** (`SIN_BLINDAJE_POR_DISENO` en `scripts/chequeo.py`): una skill que
+una rutina programada ESCRIBE sola va sin `uchg` a propósito. Blindarla no la protege: hace que
+la rutina falle en silencio. Hoy la lista es `golden-copywriting` (la rutina
+`copywriting-tendencias-8-dias` le escribe su propio
+`~/.claude/skills/golden-copywriting/references/tendencias-vivas.md` cada 8 días — ese archivo
+vive en golden-copywriting, no en esta skill). Para esas skills el chequeo invierte el semáforo:
+avisa en ALTO si aparecen blindadas. Cuando una rutina nueva empiece a escribir dentro de una
+skill, añádela a ese conjunto.
+
+**Desblindar son dos pasos, no uno** (medido el 2026-08-19): con el directorio inmutable,
+`chflags -R nouchg` no alcanza. El orden que funciona es
+`chflags nouchg <skill> && chflags -R nouchg <skill> && chmod -R u+w <skill>`; el blindaje
+también deja los archivos en modo `444`, así que sin el `chmod` la escritura sigue fallando.
 
 ### 6 · Caché de sesión ← el punto ciego real
 Los resultados de herramientas se guardan **tal cual llegan de la API**. Si una
@@ -170,6 +218,13 @@ a una carpeta con datos del negocio.
 - `golden-archivos` → si la limpieza de caché se vuelve un tema de orden general.
 
 ## Changelog
+- **GB1.2** (2026-08-21) — Auditoría `golden-skill-auditor`: agrega la sección **Flujo** con los
+  5 pasos explícitos del agente (correr, verificar cada ALTO abriendo el archivo, presentar el
+  triage completo, no aplicar arreglos sin pedirlo el usuario, documentar descartes) y la
+  **definición de terminado**; documenta qué hacer si el script no corre (chequeo manual con los
+  mismos patrones); desambigua la cita a `tendencias-vivas.md` como archivo propio de
+  `golden-copywriting`, no de esta skill; documenta el blindaje propio (`chflags uchg`). Sin
+  cambios de comportamiento en `chequeo.py` más allá de un comentario aclaratorio.
 - **GB1.1** (2026-07-27) — Filtro del PDF "Claude Security setup" (Joaco Cierra) y de la
   auditoría de `blender-mcp`. Se hornea el **protocolo de triage con ventanas duras**
   (ALTO menos de 24 h · MEDIO esta semana · BAJO este mes · DESCARTADO se documenta), los

@@ -1,39 +1,41 @@
 <!DOCTYPE html>
 <!--
-    THIS IS A TEMPLATE THAT SHOULD BE USED EVERY TIME AND MODIFIED.
-    WHAT TO KEEP:
-    ✓ Overall structure (header, sidebar, main content)
-    ✓ Anthropic branding (colors, fonts, layout)
-    ✓ Seed navigation section (always include this)
-    ✓ Self-contained artifact (everything inline)
+    ESTA ES UNA PLANTILLA GOLDEN QUE SE USA Y MODIFICA CADA VEZ.
+    QUÉ CONSERVAR:
+    ✓ Estructura general (sidebar de controles + área de canvas)
+    ✓ Identidad Golden (paleta y tipografía — ver abajo, NUNCA dejar los tokens Anthropic
+      de la plantilla original de la que se rescató esta base; adapta el acento al color
+      de marca del cliente si aplica, dorado solo si es su marca)
+    ✓ Sección de navegación por semilla (siempre incluirla — reproducibilidad)
+    ✓ Artifact autocontenido (todo inline, sin dependencias externas salvo p5.js/fuentes)
 
-    WHAT TO CREATIVELY EDIT:
-    ✗ The p5.js algorithm (implement YOUR vision)
-    ✗ The parameters (define what YOUR art needs)
-    ✗ The UI controls (match YOUR parameters)
+    QUÉ EDITAR CREATIVAMENTE:
+    ✗ El algoritmo p5.js (implementa TU visión, ver arte-generativo-golden.md)
+    ✗ Los parámetros (define lo que TU pieza necesita)
+    ✗ Los controles UI (que calcen con tus parámetros)
 
-    Let your philosophy guide the implementation.
-    The world is your oyster - be creative!
+    Deja que la filosofía algorítmica de la pieza guíe la implementación.
 -->
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generative Art Viewer</title>
+    <title>Golden Generative Art Viewer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/p5.js/1.7.0/p5.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&family=Lora:wght@400;500&display=swap" rel="stylesheet">
     <style>
-        /* Anthropic Brand Colors */
+        /* Paleta Golden (ver references/arte-generativo-golden.md) — sustituye por el
+           acento de marca del cliente cuando la pieza sea para un cliente con marca propia */
         :root {
-            --anthropic-dark: #141413;
-            --anthropic-light: #faf9f5;
-            --anthropic-mid-gray: #b0aea5;
-            --anthropic-light-gray: #e8e6dc;
-            --anthropic-orange: #d97757;
-            --anthropic-blue: #6a9bcc;
-            --anthropic-green: #788c5d;
+            --golden-dark: #141413;
+            --golden-light: #faf9f5;
+            --golden-mid-gray: #b0aea5;
+            --golden-light-gray: #e8e6dc;
+            --golden-gold: #e8b84b;
+            --golden-gold-light: #f7e3a1;
+            --golden-gold-deep: #b8860b;
         }
 
         * {
@@ -44,9 +46,9 @@
 
         body {
             font-family: 'Poppins', sans-serif;
-            background: linear-gradient(135deg, var(--anthropic-light) 0%, #f5f3ee 100%);
+            background: linear-gradient(135deg, var(--golden-light) 0%, #f5f3ee 100%);
             min-height: 100vh;
-            color: var(--anthropic-dark);
+            color: var(--golden-dark);
         }
 
         .container {
@@ -73,12 +75,12 @@
             font-family: 'Lora', serif;
             font-size: 24px;
             font-weight: 500;
-            color: var(--anthropic-dark);
+            color: var(--golden-dark);
             margin-bottom: 8px;
         }
 
         .sidebar .subtitle {
-            color: var(--anthropic-mid-gray);
+            color: var(--golden-mid-gray);
             font-size: 14px;
             margin-bottom: 32px;
             line-height: 1.4;
@@ -92,7 +94,7 @@
         .control-section h3 {
             font-size: 16px;
             font-weight: 600;
-            color: var(--anthropic-dark);
+            color: var(--golden-dark);
             margin-bottom: 16px;
             display: flex;
             align-items: center;
@@ -101,26 +103,26 @@
 
         .control-section h3::before {
             content: '•';
-            color: var(--anthropic-orange);
+            color: var(--golden-gold);
             font-weight: bold;
         }
 
         /* Seed Controls */
         .seed-input {
             width: 100%;
-            background: var(--anthropic-light);
+            background: var(--golden-light);
             padding: 12px;
             border-radius: 8px;
             font-family: 'Courier New', monospace;
             font-size: 14px;
             margin-bottom: 12px;
-            border: 1px solid var(--anthropic-light-gray);
+            border: 1px solid var(--golden-light-gray);
             text-align: center;
         }
 
         .seed-input:focus {
             outline: none;
-            border-color: var(--anthropic-orange);
+            border-color: var(--golden-gold);
             box-shadow: 0 0 0 2px rgba(217, 119, 87, 0.1);
             background: white;
         }
@@ -145,7 +147,7 @@
             display: block;
             font-size: 14px;
             font-weight: 500;
-            color: var(--anthropic-dark);
+            color: var(--golden-dark);
             margin-bottom: 8px;
         }
 
@@ -158,7 +160,7 @@
         .slider-container input[type="range"] {
             flex: 1;
             height: 4px;
-            background: var(--anthropic-light-gray);
+            background: var(--golden-light-gray);
             border-radius: 2px;
             outline: none;
             -webkit-appearance: none;
@@ -168,7 +170,7 @@
             -webkit-appearance: none;
             width: 16px;
             height: 16px;
-            background: var(--anthropic-orange);
+            background: var(--golden-gold);
             border-radius: 50%;
             cursor: pointer;
             transition: all 0.2s ease;
@@ -176,13 +178,13 @@
 
         .slider-container input[type="range"]::-webkit-slider-thumb:hover {
             transform: scale(1.1);
-            background: #c86641;
+            background: #c9982f;
         }
 
         .slider-container input[type="range"]::-moz-range-thumb {
             width: 16px;
             height: 16px;
-            background: var(--anthropic-orange);
+            background: var(--golden-gold);
             border-radius: 50%;
             border: none;
             cursor: pointer;
@@ -192,7 +194,7 @@
         .value-display {
             font-family: 'Courier New', monospace;
             font-size: 12px;
-            color: var(--anthropic-mid-gray);
+            color: var(--golden-mid-gray);
             min-width: 60px;
             text-align: right;
         }
@@ -205,7 +207,7 @@
         .color-group label {
             display: block;
             font-size: 12px;
-            color: var(--anthropic-mid-gray);
+            color: var(--golden-mid-gray);
             margin-bottom: 4px;
         }
 
@@ -228,12 +230,12 @@
         .color-value {
             font-family: 'Courier New', monospace;
             font-size: 12px;
-            color: var(--anthropic-mid-gray);
+            color: var(--golden-mid-gray);
         }
 
         /* Buttons */
         .button {
-            background: var(--anthropic-orange);
+            background: var(--golden-gold);
             color: white;
             border: none;
             padding: 10px 16px;
@@ -246,7 +248,7 @@
         }
 
         .button:hover {
-            background: #c86641;
+            background: #c9982f;
             transform: translateY(-1px);
         }
 
@@ -255,19 +257,19 @@
         }
 
         .button.secondary {
-            background: var(--anthropic-blue);
+            background: var(--golden-gold-light);
         }
 
         .button.secondary:hover {
-            background: #5a8bb8;
+            background: #d9c26a;
         }
 
         .button.tertiary {
-            background: var(--anthropic-green);
+            background: var(--golden-gold-deep);
         }
 
         .button.tertiary:hover {
-            background: #6b7b52;
+            background: #96690a;
         }
 
         .button-row {
@@ -309,7 +311,7 @@
             align-items: center;
             justify-content: center;
             font-size: 18px;
-            color: var(--anthropic-mid-gray);
+            color: var(--golden-mid-gray);
         }
 
         /* Responsive - Stack on mobile */
@@ -396,8 +398,8 @@
                 <div class="color-group">
                     <label>Primary Color</label>
                     <div class="color-picker-container">
-                        <input type="color" id="color1" value="#d97757" onchange="updateColor('color1', this.value)">
-                        <span class="color-value" id="color1-value">#d97757</span>
+                        <input type="color" id="color1" value="#e8b84b" onchange="updateColor('color1', this.value)">
+                        <span class="color-value" id="color1-value">#e8b84b</span>
                     </div>
                 </div>
 
@@ -405,8 +407,8 @@
                 <div class="color-group">
                     <label>Secondary Color</label>
                     <div class="color-picker-container">
-                        <input type="color" id="color2" value="#6a9bcc" onchange="updateColor('color2', this.value)">
-                        <span class="color-value" id="color2-value">#6a9bcc</span>
+                        <input type="color" id="color2" value="#f7e3a1" onchange="updateColor('color2', this.value)">
+                        <span class="color-value" id="color2-value">#f7e3a1</span>
                     </div>
                 </div>
 
@@ -414,8 +416,8 @@
                 <div class="color-group">
                     <label>Accent Color</label>
                     <div class="color-picker-container">
-                        <input type="color" id="color3" value="#788c5d" onchange="updateColor('color3', this.value)">
-                        <span class="color-value" id="color3-value">#788c5d</span>
+                        <input type="color" id="color3" value="#b8860b" onchange="updateColor('color3', this.value)">
+                        <span class="color-value" id="color3-value">#b8860b</span>
                     </div>
                 </div>
             </div>
@@ -448,7 +450,7 @@
             flowSpeed: 0.5,
             noiseScale: 0.005,
             trailLength: 8,
-            colorPalette: ['#d97757', '#6a9bcc', '#788c5d']
+            colorPalette: ['#e8b84b', '#f7e3a1', '#b8860b']
         };
 
         let defaultParams = {...params}; // Store defaults for reset
@@ -493,7 +495,7 @@
             generateFlowField();
 
             // Clear background
-            background(250, 249, 245); // Anthropic light background
+            background(250, 249, 245); // fondo Golden claro
         }
 
         function generateFlowField() {

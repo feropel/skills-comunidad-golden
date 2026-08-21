@@ -82,3 +82,14 @@
     principal 2" → bloque…), titulares y descripciones uno por línea numerada dentro de su bloque.
     PROHIBIDO el párrafo corrido con los 5 copys pegados ("1. … · 2. … · 3. …"): mata el copy-paste
     y da pereza leerlo. Aplica en chat, en .md y en el PDF (tarjetas atómicas de golden-pdf-check).
+
+16. **El dato decide QUÉ; la empatía decide CÓMO.** Cero supuestos (REGLA 1) y cero parálisis: de cada
+    análisis sale **UNA acción escrita**, no veinte observaciones. Y el mensaje se le escribe a **una
+    persona con nombre** en **su etapa del embudo**, con sus palabras y su emoción — nunca el mismo copy
+    para las 7 etapas. No son los números, es el impacto: el número dice si funcionó, el impacto es lo
+    que lo hace funcionar. Detalle en `references/21-audiencia-momento-humanidad.md`.
+
+17. **Llegar en el MOMENTO vale más que llegar a muchos.** Antes de montar o escalar, pregunta qué
+    disparador de vida y qué **temporada** entra (anticipa 3–4 semanas para que el algoritmo aprenda
+    antes del pico) y recomienda del catálogo el producto adecuado a ese momento. Alcance grande en mal
+    momento es presupuesto quemado. (`21` §4)

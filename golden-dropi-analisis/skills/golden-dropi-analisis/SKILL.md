@@ -20,8 +20,9 @@ description: >
 
 # golden-dropi-analisis
 
-<!-- skill v1.3 · fix auditoría 2026-07-25: (1) ZeroDivision resuelto cuando solo hay export "por producto" (tot = len(ped) or 1) — antes moría tras MAESTRO_LOGISTICA y no generaba CONTACTOS; (2) segmento() ya no marca RIESGO a clientes sin ninguna devolución (todo en tránsito = NEUTRO, no "mucha devolución"); (3) moneda con separador de miles LatAm (punto) vía helper cop(), sin colisionar con money() de parseo. -->
+<!-- skill v1.5 · auditada golden-skill-auditor 923→1000 (2026-08-21): (1) reportlab declarado como dependencia junto a openpyxl — faltaba, y es la librería que produce RESUMEN_EJECUTIVO.pdf, el documento que esta misma skill llama "lo primero que se entrega"; sin declararla, un chat limpio sin reportlab instalado se queda sin el entregable principal y nadie lo nota; (2) "Definición de terminado" ahora exige confirmar que el PDF existe (o, si reportlab falta, instalarlo o avisar explícitamente que el resumen quedó solo en Excel) — antes el checklist solo pedía las 2 rutas de Excel, contradiciendo la sección "Qué produce"; (3) orden cronológico del changelog corregido (más nuevo arriba). Motor verificado en vivo con fixtures sintéticas: 200 filas por pedido + 200 por producto, dedup de 3 duplicados detectado y avisado correctamente, caso "solo archivo por producto" (sin por pedido) corrido sin ZeroDivision, cifras de RESUMEN EJECUTIVO y CLIENTES coherentes con la metodología documentada. -->
 <!-- skill v1.4 · decisiones de FER 2026-07-25: (1) TRANSITO A DEVOLUCION se queda contando como DEVOLUCIÓN ("cien por ciento será una devolución" — si ya va en tránsito de vuelta, es pérdida); (2) red de seguridad de duplicados ACTIVA: dedup por (cuenta, ID) en por-pedido y (cuenta, ID, producto) en por-producto, quedándose con la aparición más reciente y AVISANDO cuántas unió (probado: 2 archivos iguales de 10 órdenes → 10 únicas + aviso) -->
+<!-- skill v1.3 · fix auditoría 2026-07-25: (1) ZeroDivision resuelto cuando solo hay export "por producto" (tot = len(ped) or 1) — antes moría tras MAESTRO_LOGISTICA y no generaba CONTACTOS; (2) segmento() ya no marca RIESGO a clientes sin ninguna devolución (todo en tránsito = NEUTRO, no "mucha devolución"); (3) moneda con separador de miles LatAm (punto) vía helper cop(), sin colisionar con money() de parseo. -->
 <!-- skill v1.2 · + RESUMEN EJECUTIVO de rentabilidad (hoja + RESUMEN_EJECUTIVO.pdf): estado de flujo por orden + P&L + veredicto RENTABLE/NO. gasto_publicidad va en _config_dropi.json -->
 <!-- skill v1.1 · auditada golden-skill-auditor 921→1000: puntero a esquema-dropi.md, comando con ruta absoluta, wp_name usado como fallback de nombre, import openpyxl elegante, definición de terminado + ejemplo de entrega -->
 
@@ -108,8 +109,14 @@ Usa la ruta absoluta del motor (el cwd en un chat real es la carpeta del cliente
 python3 ~/.claude/skills/golden-dropi-analisis/scripts/motor_analisis_dropi.py "<ruta de la carpeta base>"
 ```
 El argumento es la carpeta que contiene los exports (con o sin subcarpetas por cuenta); si se
-omite, el motor usa la carpeta actual. Requiere `openpyxl` (`pip install openpyxl` si falta; el
-motor avisa claro si no está). Imprime cuántas filas cargó y las rutas de los 2 maestros.
+omite, el motor usa la carpeta actual. Requiere **`openpyxl`** (obligatorio: sin él el motor no
+arranca, `pip install openpyxl`, avisa claro si falta) y **`reportlab`** (`pip install reportlab`)
+para generar **RESUMEN_EJECUTIVO.pdf** — el documento que se entrega primero. Si falta
+`reportlab`, el motor NO falla: crea igual los 2 maestros Excel (el mismo contenido del PDF
+queda en la hoja `RESUMEN EJECUTIVO`) y solo imprime un aviso. No dejes pasar ese aviso: instala
+`reportlab` y vuelve a correr el motor para tener el PDF, o si de verdad no se puede instalar,
+dile explícitamente al usuario que el resumen quedó solo en Excel. Imprime cuántas filas cargó
+y las rutas de los archivos generados (2 o 3 según si hubo PDF).
 
 ### 4. Entrega el documento + hallazgos, no solo archivos
 Lo primero que se entrega es **RESUMEN_EJECUTIVO.pdf** con el veredicto de rentabilidad (o, si
@@ -133,11 +140,15 @@ hecha (cifras reales del cliente, no de este ejemplo):
 > Los dos maestros quedaron en `Analisis/`. Siguiente: quieres que arme la campaña de remarketing.
 
 ### Definición de terminado
-La corrida está completa cuando: (1) el motor imprimió las 2 rutas sin error, (2) abriste el
-`RESUMEN` de cada maestro y confirmaste que el % de entrega y el nº de clientes son coherentes
-(no 0, no NaN), y (3) entregaste los hallazgos + acciones al usuario. Si el % global se ve
-absurdo (p. ej. 100% o 0%), sospecha de un teléfono/nombre de prueba sin excluir o de un solo
-estado presente: revisa `_config_dropi.json` y la hoja `NOVEDADES` antes de dar por cerrado.
+La corrida está completa cuando: (1) el motor imprimió las rutas de los 2 maestros Excel sin
+error, (2) **confirmaste si `RESUMEN_EJECUTIVO.pdf` se generó** — si el motor avisó "sin
+'reportlab' no se generó el PDF", instala `reportlab` y vuelve a correr antes de dar por cerrado
+(es el documento que se entrega primero; solo se omite si de verdad no se puede instalar, y en
+ese caso se lo dices al usuario explícitamente), (3) abriste el `RESUMEN` de cada maestro y
+confirmaste que el % de entrega y el nº de clientes son coherentes (no 0, no NaN), y (4)
+entregaste los hallazgos + acciones al usuario. Si el % global se ve absurdo (p. ej. 100% o 0%),
+sospecha de un teléfono/nombre de prueba sin excluir o de un solo estado presente: revisa
+`_config_dropi.json` y la hoja `NOVEDADES` antes de dar por cerrado.
 
 ## Metodología (para poder explicarla)
 - **% de entrega = ENTREGADO / (ENTREGADO + DEVOLUCIÓN)**. Se excluyen del denominador los

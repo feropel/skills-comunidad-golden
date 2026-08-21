@@ -5,6 +5,14 @@ description: Golden Group — Genera el PROMPT de validación de direcciones del
 
 # Golden · Chatea Pro — Validación de Direcciones (hijo del logístico)
 
+<!-- skill v2.2 · 2026-08-21 (auditoría golden-skill-auditor) · añadido paso 4 de VERIFICACIÓN/QA
+del prompt antes de entregarlo (contrato de salida, transportadoras no inventadas, ningún
+[PENDIENTE] suelto) y DEFINICIÓN DE "TERMINADO" explícita en el flujo (Proceso y flujo);
+el intake del paso 3 ahora pide también qué hacer si el negocio no puede confirmar un dato en
+el momento; aclarada la ruta del script de barrido como externa a esta skill con fallback manual
+si no existe en el entorno (Robustez/portabilidad). Cero bugs de contenido encontrados en los 8
+packs de país tras verificación cruzada línea por línea del contrato de salida (emojis, código
+postal, transportadoras) — solo huecos de proceso, ya cerrados. -->
 <!-- skill v2.1.1 · 2026-08-08 (centro de mando, chat otro espacio de Chatea 2026-08-08 (2ª ronda: 5ª categoría + prosa libre)) · QUINTA CATEGORÍA VETADA en la ley: claims y cifras de negocio (años en el mercado, clientes atendidos, porcentajes de entrega, premios) — no rompen nada técnico ni los caza un barrido de llaves, pero el bot termina mintiendo con datos de otra empresa (caso real: "Más de 100.000 clientes atendidos en Colombia" a punto de heredarse). Y regla operativa LA MARCA VIVE TAMBIÉN EN PROSA LIBRE: al barrido se añade grep -i por el nombre de la marca origen sobre todo el texto a escribir (cazó 10 menciones en 3 campos que el mapeo de llaves no vio). -->
 <!-- skill v2.1 · 2026-08-08 (centro de mando, chat otro espacio de Chatea 2026-08-08) · horneada la LEY "NUNCA HEREDAR DATOS ENTRE ESPACIOS": al basarse en una cuenta guía se hereda estructura/prompts/config, JAMÁS datos (APIs, plantillas de WhatsApp, teléfonos, correos, dominios, marca, productos y disparadores); única excepción Le'côterra como producto-ejemplo; método de barrido obligatorio antes y después de escribir en espacio ajeno. Origen: incidente Golden → otra marca 2026-08-08 (se colaron una credencial, teléfono, plantilla de notificación y firmas de la marca origen; revertido el mismo día). La ley entra como PREVENCIÓN, no reparación: línea base pre-horneado verificada por verificador externo — 8/8 skills sin credenciales (CRITICA=0); únicos hallazgos 3 teléfonos de relleno legítimos (+57 300 de ejemplo) que se conservan. -->
 <!-- skill v2.0 · 2026-08-07 (centro de mando, briefing BRIEFING-PARA-SKILLS.md de CHATEA-PRO-ASISTENTES-MAPA, cosecha del chat CONFIG CHATEA KEVIN MX) · REFORMA DE PAÍSES: la plataforma solo acepta 7 (COLOMBIA, ECUADOR, CHILE, MEXICO, PANAMA, PERU, PARAGUAY) — creados los packs de Panamá, Perú y Paraguay (transportadoras en [PENDIENTE], se preguntan al negocio, jamás se inventan) y Guatemala marcada FUERA DE PLATAFORMA/histórico sin borrar el archivo. Revisión anti-clon país por país: México decía "NUNCA exijas código postal" — criterio de Colombia clonado y FALSO (en México el CP es REQUERIDO, define la zona de reparto); corregido en todo el pack. Chile y Ecuador revisados: su "sin CP" es criterio local válido (comuna/distrito e intersección mandan), anotado en cada pack; precisado lo de "Santiago no es comuna" en Chile (sí existe la comuna Santiago Centro, pero a secas es ambiguo). La regla global "nunca pide código postal" del contrato de salida se volvió por-país. -->
@@ -36,7 +44,8 @@ dato personal ya está mal, aunque nadie lo copie.
 **Método obligatorio al escribir en un espacio ajeno** — ANTES de escribir, barrer lo que se va a
 escribir buscando `sk_`, `shpat_`, `eyJ`, teléfonos, correos, dominios, nombres de plantilla y de
 marca del origen; si aparece algo, NO se escribe. DESPUÉS de escribir: releer del servidor y barrer
-otra vez. Herramienta encadenable del barrido:
+otra vez. Herramienta encadenable del barrido (ruta del proyecto Golden, fuera de esta skill —
+si no existe en el entorno actual, hazlo a mano con el mismo criterio de patrones):
 `PROYECTOS/STACK-GOLDEN/barrido-datos-ajenos.py` (correrla ANTES de escribir y DESPUÉS releyendo del
 servidor; sale con código 3 si encuentra algo CRITICA).
 
@@ -89,12 +98,16 @@ Dos capacidades del prompt:
    - 🇵🇪 Perú → `references/peru.md` (el distrito manda; transportadoras en [PENDIENTE])
    - 🇵🇾 Paraguay → `references/paraguay.md` (esquinas c/ y e/; transportadoras en [PENDIENTE])
    - ⛔ Guatemala → `references/guatemala.md` **(HISTÓRICO, fuera de plataforma: Chatea Pro no acepta Guatemala; no usar para configurar)**
-3. **Confirma con el usuario los datos operativos del negocio** que el pack necesita (no los inventes) — o recíbelos del padre `golden-chatea-pro-config-logistico`:
+3. **Confirma con el usuario los datos operativos del negocio** que el pack necesita (no los inventes) — o recíbelos del padre `golden-chatea-pro-config-logistico`. Pídelos TODOS de una vez (intake único, no goteado):
    - **Transportadoras habilitadas** para domicilio y para recogida en oficina (varían por negocio).
    - Si hay **recogida en oficina** y con qué transportadoras.
    - Cualquier transportadora **prohibida** (ej. en el pack de Colombia, Servientrega no se usa).
    - Si conserva los emojis de estado (✅/⚠️) o no.
-4. **Entrega el prompt final** listo para pegar en el campo de validación del asistente logístico de Chatea Pro.
+   - Si el negocio no puede confirmar algún dato en el momento (caso típico: Panamá, Perú, Paraguay con transportadoras en `[PENDIENTE]`), dilo explícitamente en el entregable como pendiente con dueño — nunca inventes ni dejes el placeholder sin avisar.
+4. **Verifica el prompt antes de entregarlo** (paso de QA, no te lo saltes): relee el prompt armado y confirma que cumple el contrato de salida (una sola línea, sin saludos, sin explicaciones, con o sin emoji SEGÚN el país), que las transportadoras que puso el usuario quedaron en la lista y no quedó ninguna inventada, y que ningún `[PENDIENTE]` llegó al texto final sin que el usuario lo haya resuelto o aceptado dejarlo así.
+5. **Entrega el prompt final** listo para pegar en el campo de validación del asistente logístico de Chatea Pro.
+
+**Definición de "terminado":** el prompt entregado (a) usa el pack del país correcto, (b) trae solo transportadoras confirmadas por el usuario — ninguna inventada ni heredada de otro país, (c) respeta el contrato de una sola línea de salida con el registro de cortesía del país, y (d) no contiene ningún `[PENDIENTE]` que el usuario no haya resuelto o aceptado conscientemente. Si falta cualquiera de los cuatro, no está listo para pegar.
 
 ## País nuevo (no está en references/)
 

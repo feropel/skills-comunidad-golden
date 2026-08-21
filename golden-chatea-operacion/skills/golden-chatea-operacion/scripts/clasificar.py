@@ -70,6 +70,132 @@ PALABRAS_OBJECION_DESCONFIANZA = re.compile(
 
 CAMPOS_TS = ("ts", "timestamp", "created_at", "date", "fecha", "sent_at")
 
+# ------------------------------------------------------------------------------------- R6
+# COHERENCIA INTRA-CHAT (sin Dropi). Heuristica declarada, NO certeza absoluta (asi lo pide
+# el control): compara lo que el CLIENTE dijo sobre un atributo concreto y variable del
+# producto (color/talla/cantidad) contra lo que el mensaje final de RESUMEN/CONFIRMACION del
+# bot dice sobre ese mismo atributo -- todo dentro del MISMO hilo, sin tocar Dropi/Shopify.
+# Distinto de R5 (que contrasta contra la FICHA REAL del producto, fuera de alcance aqui).
+
+# Colores comunes en espanol, canonizados (variantes de genero/acento -> una sola forma).
+# Incluye la paleta de canas/cabello (castano/rubio/caoba/canoso/cobrizo/ceniza) porque el
+# catalogo real medido en produccion (Fibra Capilar Toppik, ver verificacion adversarial
+# 2026-08-21) usa esos nombres, no los colores "de ropa" que trae la lista base. Diccionario
+# razonable, NO exhaustivo -- declarado como heuristica en clasificacion.md, no como catalogo
+# cerrado: una tienda con su propia paleta puede tener nombres que esta lista no cubre.
+CANON_COLOR = {
+    "rojo": "rojo", "roja": "rojo",
+    "azul": "azul",
+    "verde": "verde",
+    "amarillo": "amarillo", "amarilla": "amarillo",
+    "negro": "negro", "negra": "negro",
+    "blanco": "blanco", "blanca": "blanco",
+    "rosado": "rosado", "rosada": "rosado", "rosa": "rosado",
+    "morado": "morado", "morada": "morado", "violeta": "morado",
+    "gris": "gris",
+    "cafe": "cafe", "café": "cafe", "marron": "cafe", "marrón": "cafe",
+    "dorado": "dorado", "dorada": "dorado",
+    "plateado": "plateado", "plateada": "plateado",
+    "naranja": "naranja",
+    "celeste": "celeste",
+    "beige": "beige",
+    "turquesa": "turquesa",
+    "vino": "vino", "vinotinto": "vino",
+    "fucsia": "fucsia",
+    "lila": "lila",
+    "nude": "nude",
+    "castano": "castano", "castaño": "castano",
+    "chocolate": "chocolate",
+    "rubio": "rubio", "rubia": "rubio",
+    "caoba": "caoba",
+    "canoso": "canoso", "canosa": "canoso", "cano": "canoso", "cana": "canoso",
+    "cobrizo": "cobrizo", "cobriza": "cobrizo",
+    "ceniza": "ceniza",
+    "platino": "platino",
+}
+_ALTERNATIVAS_COLOR = "|".join(sorted(CANON_COLOR.keys(), key=len, reverse=True))
+# LEAD-IN obligatorio ("color X" / "en X" / "a X", p.ej. "cambialo a rojo"): medido contra
+# produccion (verificacion
+# adversarial 2026-08-21) -- sin el lead-in, colores que tambien son palabras corrientes del
+# espanol ("vino" el verbo, "cafe" la bebida, "rosa" un nombre de persona, "gris" el clima,
+# "naranja" la fruta) generaban MUERTO falso sobre hilos reales (0 aciertos, varios falsos
+# positivos en 1.829 hilos medidos). Costo declarado: baja el recall (un "mandeme el negro"
+# suelto, sin "en"/"color" antes, ya no se lee) a cambio de no acusar en falso -- mismo
+# criterio de la skill en general (preferir DUDA/silencio a una acusacion sin base).
+PATRON_COLOR = re.compile(
+    r"\b(?:color|en|a)\s+(" + _ALTERNATIVAS_COLOR + r")\b", re.IGNORECASE)
+# Talla: SOLO valores reconocidos de la vida real (letras de talla de ropa o numero de 1-2
+# digitos de calzado/anillo) -- nunca "cualquier palabra corta que sigue a 'talla'". Medido
+# en produccion: sin esta lista, "no se cual es mi talla" capturaba talla='LA', "que talla me
+# recomienda" capturaba talla='ME'.
+_VALORES_TALLA = r"xxxl|xxl|xl|xs|s|m|l|\d{1,2}"
+PATRON_TALLA = re.compile(r"\btalla\s*[:\s]?\s*(" + _VALORES_TALLA + r")\b", re.IGNORECASE)
+PATRON_NUMERO_CALZADO = re.compile(r"\bn[uú]mero\s*[:\s]?\s*(\d{2,3})\b", re.IGNORECASE)
+PATRON_CANTIDAD_UNIDAD = re.compile(
+    r"\b(\d{1,3})\s*(unidades?|pares?|combos?|paquetes?)\b", re.IGNORECASE)
+PATRON_CANTIDAD_DECLARADA = re.compile(r"\bcantidad\s*[:\s]?\s*(\d{1,3})\b", re.IGNORECASE)
+# Cantidad escrita en palabras (1-10): "quiero dos unidades" no tenia cobertura -- declarado
+# como limite en clasificacion.md para lo que quede fuera (mas de 10, u otras formas).
+NUMEROS_ESCRITOS = {
+    "un": "1", "uno": "1", "una": "1", "dos": "2", "tres": "3", "cuatro": "4",
+    "cinco": "5", "seis": "6", "siete": "7", "ocho": "8", "nueve": "9", "diez": "10",
+}
+PATRON_CANTIDAD_ESCRITA = re.compile(
+    r"\b(" + "|".join(NUMEROS_ESCRITOS.keys()) + r")\s*(unidades?|pares?|combos?|paquetes?)\b",
+    re.IGNORECASE)
+
+# Marcadores del "resumen/confirmacion final" (elemento 1: mencion de producto; elemento 3:
+# direccion o frase de cierre). El elemento 2 (atributo) se calcula con extraer_atributos.
+# Reusa parte del vocabulario de _cierra_con_cliente (Q6) pero es un criterio PROPIO y mas
+# amplio: R6 no exige un cierre literal, exige 2 de 3 señales genericas en el mismo mensaje.
+# SOLO frases de varias palabras -- medido en produccion (verificacion adversarial
+# 2026-08-21): las versiones sueltas "tu pedido", "confirmamos" y "direccion"/"dirección"
+# (sin mas contexto) hacian que 847 de 6.911 mensajes de 2 dias reales calzaran como
+# "resumen final" (una pregunta como "cual es tu direccion?" ya sumaba este elemento),
+# inundando el informe de DUDA sin señal real. Se retiran las sueltas, se dejan solo frases
+# completas de cierre real.
+MARCADORES_PRODUCTO_R6 = ("pedido", "producto", "orden", "compra")
+MARCADORES_CIERRE_R6 = (
+    "pedido confirmado", "confirmamos tu pedido", "tu pedido va en camino",
+    "listo, quedo confirmado", "gracias por tu compra", "muchas gracias por tu compra",
+    "queda registrado", "quedo registrado", "pedido registrado",
+    "direccion de envio", "direccion de entrega",
+)
+
+
+def extraer_atributos(texto):
+    """Devuelve [(tipo, valor_normalizado), ...] con los atributos concretos y variables
+    (color/talla/cantidad) que aparecen en `texto`. Heuristica por palabra clave, declarada
+    como tal -- no es una lectura certera de lo que el cliente realmente quiso decir."""
+    t = normalizar(texto)
+    out = []
+    for m in PATRON_COLOR.finditer(t):
+        out.append(("color", CANON_COLOR[m.group(1).lower()]))
+    for m in PATRON_TALLA.finditer(t):
+        out.append(("talla", m.group(1).upper()))
+    for m in PATRON_NUMERO_CALZADO.finditer(t):
+        out.append(("talla", m.group(1)))
+    for m in PATRON_CANTIDAD_UNIDAD.finditer(t):
+        out.append(("cantidad", m.group(1)))
+    for m in PATRON_CANTIDAD_DECLARADA.finditer(t):
+        out.append(("cantidad", m.group(1)))
+    for m in PATRON_CANTIDAD_ESCRITA.finditer(t):
+        out.append(("cantidad", NUMEROS_ESCRITOS[m.group(1).lower()]))
+    return out
+
+
+def es_resumen_final_r6(texto):
+    """2+ de 3 elementos en el MISMO mensaje: mencion de producto/pedido, un atributo
+    concreto (color/talla/cantidad), y una direccion o frase de cierre de pedido real.
+    Devuelve (es_resumen: bool, atributos: list[(tipo,valor)])."""
+    t = normalizar(texto)
+    tiene_producto = any(p in t for p in MARCADORES_PRODUCTO_R6)
+    atributos = extraer_atributos(t)
+    tiene_atributo = bool(atributos)
+    tiene_cierre = any(c in t for c in MARCADORES_CIERRE_R6)
+    elementos = sum([tiene_producto, tiene_atributo, tiene_cierre])
+    return elementos >= 2, atributos
+
 # P6: umbral de "plantilla del anuncio", igual criterio que golden-logistica-diaria (medido,
 # no adivinado): una frase identica en >=3 personas, o que pasa la cuota de frecuencia.
 MIN_PERSONAS_FORMA = 3
@@ -437,6 +563,12 @@ class Clasificador:
                        f"cliente: \"{pregunta[:140]}\" -> empresa: \"{respuesta[:140]}\"",
                        "Materia prima para golden-chatea-pro-prompt-ventas.")
 
+        hallazgos_r6 = self._coherencia_intra_chat(mensajes_privados)
+        for sev, titulo_corto, evidencia, consecuencia, accion in hallazgos_r6:
+            self.falla("R6", sev,
+                       f"`{contacto.get('user_ns')}` - {titulo_corto}",
+                       evidencia, consecuencia, accion)
+
         atribucion = self._atribucion(mensajes_privados)
         paso = self._paso_embudo(msgs_empresa)
         valor_declarado = self._valor_declarado(contacto.get("get_info") or {})
@@ -471,6 +603,7 @@ class Clasificador:
             "bucle": bool(bucle),
             "es_dropi": es_dropi,
             "valor_declarado": valor_declarado,
+            "r6_hallazgos": len(hallazgos_r6),
         }
         self.conversaciones.append(conv)
         return conv
@@ -539,6 +672,158 @@ class Clasificador:
                 if frase in texto:
                     hallados.append((frase, f"empresa dijo: \"{contenido_real(m)[:160]}\""))
         return hallados
+
+    def _coherencia_intra_chat(self, mensajes_privados):
+        """R6: coherencia intra-chat (sin Dropi). Compara el/los atributo(s) concretos que
+        el CLIENTE menciono (color/talla/cantidad) contra lo que dice el mensaje final de
+        RESUMEN/CONFIRMACION de la EMPRESA sobre ese MISMO atributo. Frontera explicita:
+        SOLO usa el chat, nunca confirma contra Dropi -- si el hallazgo real termina siendo
+        que el cliente cambio de opinion, `golden-logistica-diaria` (con Dropi conectado) es
+        la que hace la confirmacion definitiva contra el pedido real; esto es la version que
+        funciona sin esa integracion.
+
+        Devuelve una lista de tuplas (severidad, titulo_corto, evidencia, consecuencia,
+        accion), lista para pasar a `self.falla('R6', ...)`."""
+        menciones_cliente = []       # [(indice, tipo, valor, texto_citado)]
+        idx_resumen = None
+        atributos_resumen = None
+        texto_resumen = None
+
+        for i, m in enumerate(mensajes_privados):
+            d = direccion(m)
+            texto = contenido_real(m)
+            if d == "cliente":
+                for tipo, valor in extraer_atributos(texto):
+                    menciones_cliente.append((i, tipo, valor, texto))
+            elif d == "empresa":
+                es_resumen, atributos = es_resumen_final_r6(texto)
+                if es_resumen:
+                    # se queda con el ULTIMO candidato del hilo: el resumen/confirmacion
+                    # real esta cerca del final del embudo, no al principio.
+                    idx_resumen = i
+                    atributos_resumen = atributos
+                    texto_resumen = texto
+
+        if not menciones_cliente:
+            # El cliente nunca menciono un atributo concreto y variable -- no hay nada que
+            # comparar. No se genera un hallazgo: forzar una DUDA en cada conversacion sin
+            # atributo mencionado seria ruido, no señal (la mayoria de hilos no llegan a
+            # discutir color/talla/cantidad).
+            return []
+
+        salidas = []
+
+        if idx_resumen is None:
+            salidas.append((
+                "DUDA",
+                "coherencia intra-chat: el cliente mencionó un atributo pero no se detectó "
+                "resumen/confirmación final del pedido",
+                f"cliente mencionó {[(t, v) for _, t, v, _ in menciones_cliente][:5]} en el "
+                "hilo, sin un mensaje final de la empresa con forma de resumen/confirmación "
+                "de pedido (2+ de: producto, atributo, dirección/cierre)",
+                "No se puede comparar sin un resumen final detectable — puede ser que el "
+                "pedido se cerró en otro formato que el criterio no reconoce, o que la "
+                "conversación no llegó a cerrar.",
+                "SOLO chat, sin Dropi (frontera R6): revisar a mano si hubo pedido real; "
+                "si lo hay, golden-logistica-diaria confirma contra Dropi.",
+            ))
+            return salidas
+
+        tipos_resumen = {}
+        for tipo, valor in atributos_resumen:
+            tipos_resumen[tipo] = valor      # el resumen es un solo mensaje: se queda con
+                                              # el ultimo valor citado ahi mismo si repite
+
+        tipos_cliente = {}
+        for i, tipo, valor, texto in menciones_cliente:
+            if i >= idx_resumen:
+                continue          # solo cuenta lo dicho ANTES del resumen final
+            tipos_cliente.setdefault(tipo, []).append((valor, texto))
+
+        for tipo, lista in tipos_cliente.items():
+            if tipo not in tipos_resumen:
+                salidas.append((
+                    "DUDA",
+                    f"coherencia intra-chat: el resumen final no menciona el atributo "
+                    f"'{tipo}' que el cliente sí mencionó",
+                    f"cliente mencionó {tipo}={lista[-1][0]!r} (\"{lista[-1][1][:120]}\"), "
+                    f"pero el resumen final (\"{texto_resumen[:160]}\") no lo incluye",
+                    "El resumen puede haberlo omitido sin error (el atributo puede constar "
+                    "en otro campo/paso), o puede ser una omisión real.",
+                    "SOLO chat, sin Dropi (frontera R6): lectura humana confirma si el "
+                    f"'{tipo}' quedó registrado correctamente; con Dropi conectado, "
+                    "golden-logistica-diaria lo confirma contra el pedido real.",
+                ))
+                continue
+
+            valores_distintos = {v for v, _ in lista}
+            valor_resumen = tipos_resumen[tipo]
+            if len(valores_distintos) > 2:
+                salidas.append((
+                    "DUDA",
+                    f"coherencia intra-chat: el cliente mencionó {len(valores_distintos)} "
+                    f"valores distintos de '{tipo}' antes del resumen — no queda claro cuál "
+                    "es el último válido",
+                    f"valores de {tipo} mencionados en orden: "
+                    f"{[v for v, _ in lista]} · resumen final dice {tipo}={valor_resumen!r}",
+                    "Caso ambiguo: no se fuerza una severidad alta sin saber cuál mención "
+                    "es la definitiva.",
+                    "SOLO chat, sin Dropi (frontera R6): lectura humana abre el hilo y "
+                    "confirma cuál de los valores es el correcto antes de despachar; con "
+                    "Dropi conectado, golden-logistica-diaria lo confirma contra el pedido "
+                    "real.",
+                ))
+                continue
+
+            ultimo_valor, ultimo_texto = lista[-1]
+            if ultimo_valor == valor_resumen:
+                # Coherente -- incluye el caso del cliente que cambió de opinión y el
+                # resumen del bot SÍ recogió el cambio: eso no es un hallazgo.
+                continue
+
+            primero_valor, primero_texto = lista[0]
+            salidas.append((
+                "MUERTO",
+                f"posible incoherencia de '{tipo}' entre lo que pidió el cliente y el "
+                "resumen final del bot",
+                f"cliente dijo {tipo}={ultimo_valor!r} (\"{ultimo_texto[:120]}\"), el "
+                f"resumen final dice {tipo}={valor_resumen!r} (\"{texto_resumen[:160]}\"), "
+                "sin un mensaje posterior del cliente que explique el cambio",
+                "Esto puede ser un aviso legítimo de que el cliente cambió de opinión más "
+                "tarde en el chat con una frase que este criterio por palabra clave no "
+                "capturó; queda para lectura humana confirmar cuál es el atributo correcto "
+                "— nunca se asume automáticamente que el resumen del bot está mal.",
+                "SOLO chat, sin Dropi (frontera R6): revisar el pedido antes de despachar. "
+                "Con Dropi conectado, golden-logistica-diaria hace la confirmación "
+                "definitiva cruzando contra el pedido real.",
+            ))
+
+        # Hallado en verificacion adversarial (2026-08-21): un mensaje del CLIENTE que llega
+        # DESPUES del resumen final y menciona un valor DISTINTO del mismo atributo quedaba
+        # en silencio total (ni MUERTO ni DUDA) -- justo el caso caro: se despacha con el
+        # valor del resumen y el cliente dijo otra cosa despues. No se fuerza MUERTO (llegar
+        # despues del resumen puede ser charla suelta, no necesariamente una correccion real
+        # del pedido), se declara DUDA para que quede en el informe y no en silencio.
+        for i, tipo, valor, texto in menciones_cliente:
+            if i <= idx_resumen or tipo not in tipos_resumen:
+                continue
+            if valor != tipos_resumen[tipo]:
+                salidas.append((
+                    "DUDA",
+                    f"coherencia intra-chat: el cliente mencionó {tipo}={valor!r} DESPUÉS "
+                    "del resumen final, distinto de lo que el resumen dice",
+                    f"resumen final (\"{texto_resumen[:160]}\") dice "
+                    f"{tipo}={tipos_resumen[tipo]!r}, y DESPUÉS el cliente escribió "
+                    f"\"{texto[:140]}\" (con {tipo}={valor!r})",
+                    "Puede ser una corrección real que llegó tarde para el pedido ya "
+                    "resumido, o solo charla suelta sin relación con el pedido — no se "
+                    "fuerza una severidad alta sin lectura humana.",
+                    "SOLO chat, sin Dropi (frontera R6): revisar si el pedido ya se "
+                    "despachó con el valor equivocado; con Dropi conectado, "
+                    "golden-logistica-diaria confirma contra el pedido real.",
+                ))
+
+        return salidas
 
     def _preguntas_sin_cobertura(self, mensajes):
         salidas = []
@@ -759,6 +1044,12 @@ class Clasificador:
         self.cubre("R4", "corrido", len(self.conversaciones))
         self.cubre("R5", "NO_VERIFICADO",
                   nota="requiere la ficha real del producto, fuera del alcance de esta skill")
+        con_menciones_r6 = sum(1 for h in self.hallazgos if h["control"] == "R6")
+        self.cubre("R6", "corrido", len(self.conversaciones),
+                  nota=f"coherencia intra-chat (sin Dropi), heuristica por palabra clave "
+                       f"color/talla/cantidad — {con_menciones_r6} hallazgo(s); frontera "
+                       "declarada con golden-logistica-diaria (confirmacion definitiva "
+                       "con Dropi conectado)")
 
         # P13 / Q6: compuerta de cordura. EXCLUYE dropi del denominador, igual que
         # cualquier otra tasa de conversion (P11): un contacto que nace de un pedido ya

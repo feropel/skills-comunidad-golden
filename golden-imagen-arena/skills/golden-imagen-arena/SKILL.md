@@ -20,6 +20,7 @@ description: >
 
 # golden-imagen-arena — Varias IAs compiten, una gana
 
+<!-- skill v1.7 · 2026-08-21 (auditoría golden-skill-auditor): ley 2 ahora cubre el style_id de ms_image dentro del intake único del preflight (antes goteaba a mitad de la arena); paso 6 suma checklist explícito de "definición de terminado" antes de entregar a golden-shopify/golden-ads -->
 <!-- skill v1.6 · 2026-08-10 (loop del arsenal, semana 2 · producción): el corte de ANTES/DESPUÉS POR VERTICAL en references/prompt-maestro.md. La norma del 2026-08-07 prohibía el antes/después solo en dental; Meta 2026 lo prohíbe además en antiedad/arrugas/reafirmante y en pérdida de peso, y lo permite en cosmética general con 18+. Añadidos los dos transversales al bloque [5 PROHIBIDO]: segunda persona que señala la condición del espectador y titular de plazo con resultado (Meta juzga el significado implícito). Roster de motores verificado contra el MCP en vivo el 2026-08-10: al día. Parche espejo en golden-ecom-magic y golden-ugc-avatar -->
 <!-- skill v1.5 · 2026-08-07 (centro de mando, cosecha del chat un estudio de producto) · reglas de arte para SALUD (dental y afines) horneadas en references/prompt-maestro.md: PROHIBIDO bocas con lesiones visibles, antes/después de dentadura, delantal blanco/estetoscopio/sillón dental (aval médico aparente), porcentajes de resultados en pantalla y preguntas que señalen una condición del espectador; PERMITIDO y probado macro del gotario, textura, corte de esmalte ilustrado y lifestyle de baño. Van al bloque [5 PROHIBIDO] del prompt maestro cuando el vertical es salud -->
 <!-- skill v1.4 · 2026-08-02 · filtro de un carrusel de 20 repos open source (saul.vicentem). De los 20, UNO sirve de verdad y se PROBO con un packshot real: rembg (MIT) queda horneado como scripts/quitar-fondo.py — recorte de fondo LOCAL, 0,63 s por imagen y CERO creditos, frente a remove_background del MCP que cobra por imagen. Medido: tapa blanca sobre fondo blanco resuelta sin halos (52% transparente, 1,7% de borde con antialiasing). Corre offline tras bajar el modelo una vez. El MCP se reserva para pelo/humo/cristal, donde el modelo grande sigue ganando. El script usa histogram() y no getdata(), que Pillow elimina en 2027 -->
@@ -59,7 +60,10 @@ igual que se verifica un JSON. Un motor que escribe mal los datos queda DESCALIF
    bonita que sea.
 2. **Datos reales.** Precio, claims, nombre y país no se inventan (ver
    `feedback_datos_reales_antes_de_generar`). Si falta un dato duro, se pide TODO en una
-   sola tanda antes de gastar el primer crédito.
+   sola tanda antes de gastar el primer crédito. Si la alineación va a incluir `ms_image`
+   (DTC Ads), el `style_id` se pide en esa MISMA tanda, no al llegar al paso 3: es un dato
+   que solo decide el dueño de la marca (ver `models_explore {action:"list", type:"image_style"}`
+   en `references/motores.md`) y goteado a mitad de la arena rompe la regla de intake único.
 3. **Imágenes LIMPIAS.** Sin botón dibujado, sin "Compra aquí" que parezca un control,
    sin número ni keyword de WhatsApp incrustado. El CTA real y el botón los pone
    `golden-shopify` justo debajo de la imagen. Es el contrato de imágenes limpias de todo
@@ -240,6 +244,15 @@ el ganador).
 
 Reporta siempre: piezas generadas, motor ganador, peso de cada WebP, créditos gastados y
 saldo restante.
+
+**Definición de "terminado"** (checklist antes de entregar):
+- [ ] Cada pieza pasó la regla dura de dato-duro-en-imagen (texto verificado letra por letra).
+- [ ] Ninguna pieza ganadora está descalificada por la rúbrica (producto adulterado, botón
+  falso, WhatsApp incrustado, claim inventado, texto ilegible).
+- [ ] Todos los WebP pesan < 150 KB y llevan el naming `PRODUCTO - Contexto NN.webp`.
+- [ ] El motor default del producto quedó fijado y anotado para la próxima ronda.
+- [ ] El reporte final trae piezas, ganador, pesos, créditos gastados y saldo restante.
+Si falta cualquier casilla, la arena no está lista para pasar a `golden-shopify` / `golden-ads`.
 
 ## Reparto con otras skills (no dupliques)
 

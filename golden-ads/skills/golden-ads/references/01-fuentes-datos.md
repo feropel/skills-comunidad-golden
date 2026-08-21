@@ -53,3 +53,12 @@ no necesariamente a quién compra. Por eso, cuando exista, **cruza con la data d
 - **Cuenta y país/moneda.** **Producto: costo, precio, margen, breakeven** (REGLA 2).
 - Objetivo del negocio (vender COD / mensajes WhatsApp / leads). Presupuesto disponible.
 - Pixel/CAPI o Events configurados (si no, es lo primero a resolver — sin señal no hay optimización).
+
+## Si el MCP de Meta falla o no responde (degradación)
+- **ToolSearch no encuentra las tools `ads_*`**: el MCP no está conectado en este entorno. Dilo y cae a
+  **B) informe exportado** o **C) sin datos** — nunca inventes que la cuenta respondió.
+- **Una llamada `ads_*` devuelve error/timeout** (no un `VALIDATION` de campo, sino error de conexión):
+  reintenta UNA vez; si vuelve a fallar, declara "MCP no disponible ahora mismo" y ofrece las mismas dos
+  alternativas (informe / testeo), sin bloquear la entrega completa por un fallo puntual.
+- **Cuenta con permisos insuficientes o `is_ads_mcp_enabled=false`**: no es un error de red, es la cuenta
+  misma — repórtalo tal cual (ver `11-mcp-meta-recipe.md`) y no reintentes.

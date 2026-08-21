@@ -1,14 +1,23 @@
 """
-analyze_meta_report.py — Lee y analiza un archivo Excel/CSV de Meta Ads.
+analyze_meta_report.py — Lee y analiza un archivo Excel (.xlsx/.xls) o CSV de Meta Ads.
 
-Detecta automáticamente el formato (Creative Reporting, Raw Data, Formatted),
-identifica columnas, filtra solo campañas de venta, y produce análisis estructural
-en 6 capas: campaña, creativo, demografía, plataforma, ubicación, landing.
+Detecta automáticamente el formato (Excel: Creative Reporting, Raw Data, Formatted;
+CSV: header en distintas filas), identifica columnas, filtra solo campañas de venta,
+y automatiza 4 de las 8 capas del análisis (ver SKILL.md Paso 4):
+  - Capa 1: tipos de campaña      → analyze_by_campaign_type()
+  - Capa 2: creativos (anuncios)  → analyze_by_ad()
+  - Capa 3: demografía (edad×sexo) → analyze_by_demographics()
+  - Capa 4: plataforma y ubicación → analyze_by_placement()
+
+Las capas 5-8 (landings, tipo/formato de creativo, embudo de conversión, tendencia
+temporal) dependen de columnas muy variables entre exports (URL de destino, fechas)
+y se calculan inline sobre el mismo DataFrame en cada análisis — no tienen función
+dedicada aquí porque su forma cambia según qué desglose trajo el archivo.
 
 Uso:
     from analyze_meta_report import load_meta_report, analyze_all_layers
-    
-    df = load_meta_report('/path/to/file.xlsx')
+
+    df = load_meta_report('/path/to/file.xlsx')   # o '/path/to/file.csv'
     analysis = analyze_all_layers(df, ticket=None)
 """
 
@@ -21,17 +30,57 @@ warnings.filterwarnings('ignore')
 
 def load_meta_report(filepath):
     """
-    Carga un archivo Excel de Meta Ads detectando automáticamente:
-    - Hoja correcta
+    Carga un archivo Excel O CSV de Meta Ads detectando automáticamente:
+    - Formato de archivo (.csv vs .xlsx/.xls)
+    - Hoja correcta (solo Excel)
     - Fila del header
     - Tipo de formato
-    
+
     Returns: DataFrame procesado y limpio
     """
-    from openpyxl import load_workbook
-    
     filepath = Path(filepath)
-    
+
+    if filepath.suffix.lower() == ".csv":
+        return _load_csv_report(filepath)
+    return _load_excel_report(filepath)
+
+
+def _load_csv_report(filepath):
+    """Carga un CSV exportado de Ads Manager, probando encoding y fila de header."""
+    df = None
+    last_err = None
+    for encoding in ("utf-8-sig", "utf-8", "latin-1"):
+        for header_row in [0, 1, 2, 3, 8]:
+            try:
+                test_df = pd.read_csv(filepath, header=header_row, nrows=5, encoding=encoding)
+                named_cols = [c for c in test_df.columns
+                              if not str(c).startswith('Unnamed') and
+                              not str(c).replace('.', '').replace('-', '').isdigit()]
+                if len(named_cols) >= 10:
+                    df = pd.read_csv(filepath, header=header_row, encoding=encoding)
+                    break
+            except Exception as e:
+                last_err = e
+                continue
+        if df is not None:
+            break
+
+    if df is None:
+        # Último recurso: header en fila 0 con utf-8 (o lanza el error real)
+        try:
+            df = pd.read_csv(filepath, header=0, encoding="utf-8-sig")
+        except Exception:
+            raise ValueError(
+                f"No se pudo leer el CSV '{filepath.name}'. Verifica que sea un export "
+                f"válido de Ads Manager (delimitado por comas). Error original: {last_err}"
+            )
+
+    return _apply_hierarchy_ffill(df)
+
+
+def _load_excel_report(filepath):
+    from openpyxl import load_workbook
+
     # Detectar hojas
     wb = load_workbook(filepath, data_only=True)
     sheets = wb.sheetnames
@@ -61,13 +110,17 @@ def load_meta_report(filepath):
     
     if df is None:
         df = pd.read_excel(filepath, sheet_name=target_sheet, header=0)
-    
-    # Forward-fill jerarquía si tiene NaN en niveles superiores
+
+    return _apply_hierarchy_ffill(df)
+
+
+def _apply_hierarchy_ffill(df):
+    """Forward-fill jerarquía (campaña/adset) si el reporte trae NaN en niveles superiores.
+    Compartido entre carga de Excel y de CSV — mismo formato de columnas en ambos."""
     if 'Nombre de la campaña' in df.columns:
         df['Campaña_ff'] = df['Nombre de la campaña'].ffill()
     if 'Nombre del conjunto de anuncios' in df.columns:
         df['Adset_ff'] = df['Nombre del conjunto de anuncios'].ffill()
-    
     return df
 
 

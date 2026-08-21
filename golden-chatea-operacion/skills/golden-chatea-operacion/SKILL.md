@@ -20,8 +20,17 @@ description: |
 
 # golden-chatea-operacion · qué pasó ayer con el bot
 
-**Versión:** `GCO1.0` · Versión inicial declarada el 2026-08-20. Nace hermana de
+**Versión:** `GCO1.1` · `GCO1.0` inicial declarada el 2026-08-20, nace hermana de
 `golden-chatea-auditoria` (`GCA1.0`), mismo patrón de versionado: número + fecha, sin CHANGELOG.
+`GCO1.1` (2026-08-21) agrega el control `R6` — coherencia intra-chat (sin Dropi): compara lo
+que el cliente pidió sobre un atributo concreto (color/talla/cantidad) contra el resumen final
+de pedido que redacta el bot, dentro del mismo hilo, sin tocar Dropi ni Shopify.
+`GCO1.2` (2026-08-21, auditoría `golden-skill-auditor`) quita dos signos de apertura `¿` que se
+habían colado en ejemplos citados de `references/informe.md` e `references/clasificacion.md`
+(estándar Golden de escritura); autoprueba corrida (41/41) y sintaxis de los tres scripts
+verificada como parte del cierre. Pendiente real, no cerrable con código: el endpoint de listado
+de contactos por fecha (`CANDIDATOS_LISTADO` en `extraer.py`) sigue sin confirmar contra un
+token vivo — se confirma en la primera corrida real.
 
 Operar aquí significa **medir lo que el bot escribió de verdad contra lo que debía pasar**, no
 leer la configuración y suponer que si está bien montada el bot se comportó bien. `config sana
@@ -170,6 +179,14 @@ lo confirme contra la config — esta skill no lee bot-fields de configuración.
 
 **No inventa saldo ni consumo.** La API no lo expone (documentado en `references/api.md`,
 trampa 14 del encargo original); un informe de gasto de Chatea por API no se puede hacer hoy.
+
+**`R6` (coherencia intra-chat) no reemplaza la confirmación contra Dropi.** Sin Dropi
+conectado, `R6` cubre PARCIALMENTE lo que `golden-logistica-diaria` confirma con el pedido
+real — compara lo que el cliente pidió contra el resumen final del bot usando solo el chat,
+una heurística por palabra clave declarada como tal. Con Dropi conectado, `golden-logistica-
+diaria` sigue siendo la fuente definitiva: cruza el chat contra el pedido real ya cargado, no
+contra otro mensaje del mismo hilo. `R6` es la versión que funciona sin esa integración —
+útil para quien no la tiene montada (por ejemplo, alumnos).
 
 ## Cuándo correrla
 

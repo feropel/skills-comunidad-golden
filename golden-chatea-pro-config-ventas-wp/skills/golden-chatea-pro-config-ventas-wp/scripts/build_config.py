@@ -25,7 +25,9 @@ La salida es JSON COMPACTO (separators=(',',':')): otro formato infla el conteo.
     --pais            Uno de los 7 validos (colombia, ecuador, chile, mexico,
                       panama, peru, paraguay). Va en minuscula en el JSON.
     --moneda          Moneda (ej: COP)
-    --flete-max       Flete maximo para validar la orden (ej: 23000)
+    --flete-max       Flete maximo para validar la orden (ej: 23000). OBLIGATORIO
+                      solo si --dropi si (el default); sin Dropi (--dropi no) se
+                      omite y el JSON queda con "0" (el flujo espera la clave).
     --whatsapp-notif  WhatsApp que recibe las notificaciones (+57 3XX...)
     --url-tienda      URL de la tienda (redirige productos no configurados)
     --dropi           si | no (default: si)
@@ -197,7 +199,7 @@ def main():
     p = argparse.ArgumentParser()
     p.add_argument("--pais", required=True)
     p.add_argument("--moneda", required=True)
-    p.add_argument("--flete-max", dest="flete_max", required=True)
+    p.add_argument("--flete-max", dest="flete_max")
     p.add_argument("--whatsapp-notif", dest="whatsapp_notif", required=True)
     p.add_argument("--url-tienda", dest="url_tienda", required=True)
     p.add_argument("--dropi", choices=["si", "no"], default="si")
@@ -208,6 +210,17 @@ def main():
     if a.pais.upper() not in PAISES:
         sys.exit(f"Pais '{a.pais}' no valido. Chatea Pro SOLO acepta: {', '.join(PAISES)}. "
                  "Ver references/paises.md para lo que cambia por pais.")
+
+    # --flete-max solo es obligatorio si hay Dropi conectado (valida el pedido contra
+    # el flete real). Sin Dropi (--dropi no) el flete no se pregunta (caso borde
+    # documentado en SKILL.md); el JSON conserva la clave con "0" porque el flujo la
+    # espera, pero validar_flete.esta_activo no se usa sin Dropi.
+    if a.dropi == "si" and not a.flete_max:
+        sys.exit("Falta --flete-max: obligatorio cuando hay Dropi conectado (--dropi si, "
+                 "el default). Si el negocio no tiene Dropi, pasa --dropi no y --flete-max "
+                 "se omite.")
+    if not a.flete_max:
+        a.flete_max = "0"
 
     campo1, campo2 = construir(a)
 

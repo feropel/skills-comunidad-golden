@@ -7,16 +7,27 @@ description: >
   (reels/TikTok/shorts) y los pre-califica con una rúbrica de viralidad antes de grabar.
   Úsala SIEMPRE que el usuario quiera: analizar sus videos virales, "por qué pegó este video",
   sacar la fórmula/patrón viral de un creador, armar la matriz de contenido, generar guiones
-  para reels/TikTok con base en lo que funciona, planear contenido orgánico del mes, o predecir
-  si un guion tiene potencial. Dispara con "matriz viral", "fórmula viral", "analiza estos
-  videos", "guiones virales", "contenido para redes basado en datos". NO es para pauta pagada
-  (golden-ads) ni para escribir el copy de un anuncio suelto (golden-copywriting): esto es la
-  CAPA DE INTELIGENCIA del contenido orgánico.
+  para reels/TikTok con base en lo que funciona, planear contenido orgánico del mes, armar el
+  calendario editorial de reels/TikTok (cuánto publicar, mezcla tráfico/valor/conexión/venta),
+  o predecir si un guion tiene potencial. Dispara con "matriz viral", "fórmula viral", "analiza
+  estos videos", "guiones virales", "contenido para redes basado en datos", "calendario de
+  contenido", "cuánto debo publicar". NO es para pauta pagada (golden-ads) ni para escribir el
+  copy de un anuncio suelto (golden-copywriting): esto es la CAPA DE INTELIGENCIA del contenido
+  orgánico.
 ---
 
 # Golden Matriz Viral — la fórmula de tu contenido
 
-**Versión:** `GMV1.4` · Fábrica: chat centro de mando.
+<!-- skill v1.6 · 2026-08-21 · golden-skill-auditor: (1) Versión desincronizada — la etiqueta decía
+GMV1.4 mientras el Changelog ya iba en GMV1.5 (la transcripción local con whisper-cpp de la Fase 1
+ya estaba en el cuerpo pero la versión no lo reflejaba); corregido a GMV1.6, único número en todo
+el archivo. (2) El description no mencionaba la Fase 5 CALENDARIZAR (capacidad real que la skill
+ya entrega) — se agregaron trigger y frase de disparo. (3) Se agregó un ejemplo concreto
+entrada→salida de un renglón de matriz y un guion (Fase 2/3) para que el primer uso no dependa de
+inferir el formato. (4) Se agregó definición explícita de "terminado" por fase. (5) Blindaje:
+`chflags uchg` — mecanismo documentado aquí y en el registro de golden-skill-auditor. -->
+
+**Versión:** `GMV1.6` · Fábrica: chat centro de mando.
 El principio: el algoritmo ya te dijo qué funciona — está en tus métricas y en las de los
 creadores que admiras. Esta skill convierte esa evidencia en una fórmula reutilizable.
 
@@ -111,6 +122,26 @@ flojos → 3-5 **patrones ganadores** (combinación hook+estructura+emoción+tem
 proyecto del usuario y — si la marca tiene **brand-brain** — se registra ahí como aprendizaje
 (anuncios-ganadores/cambios-recientes) para que TODO el ecosistema la use.
 
+**Ejemplo de un renglón real de la tabla** (para que el primer uso no dependa de adivinar el
+formato):
+| Campo | Ejemplo |
+|---|---|
+| Hook (0-3s) | "Nadie te dice esto antes de comprar minoxidil" (texto en pantalla + cara a cámara) |
+| Estructura | Dato-shock → prueba (antes/después) → CTA |
+| Tema/ángulo | Dolor (miedo a hacerlo mal) + curiosidad |
+| Emoción | Sorpresa + indignación ("me estaban ocultando esto") |
+| Formato | 22s, corte cada 2-3s, texto grande, cara + b-roll de producto |
+| CTA | "Comenta CAÍDA y te mando el link" |
+| Resultado | 340K vistas / 28K likes / 190 comentarios (medido, no estimado) |
+
+Patrón ganador que sale de ahí: **dato-shock + dolor + prueba visual**, que después alimenta un
+guion en la Fase 3 con ese mismo patrón como origen declarado.
+
+**Terminado de esta fase:** hay tabla completa para cada pieza analizada (mínimo 10-15, mezclando
+virales y flojas), 3-5 patrones ganadores nombrados con evidencia (no una sola pieza sustentando
+un patrón) y la lista de anti-patrones. Si el brand-brain de la marca existe, la matriz quedó
+registrada ahí.
+
 ## Fase 3 — GENERAR (guiones nuevos con la fórmula)
 
 - Cada guion nuevo nace de UN patrón ganador de la matriz + el tema del negocio.
@@ -119,6 +150,20 @@ proyecto del usuario y — si la marca tiene **brand-brain** — se registra ah�
 - Formato de entrega por guion: HOOK exacto (primeras palabras) → guion segundo a segundo
   (hablado + texto en pantalla + plano) → CTA → patrón de origen.
 - Entregar en lotes (ej. 5-10 guiones) cubriendo 2-3 patrones distintos — variedad de apuestas.
+- Si no hay brand-brain de la marca, decide con lo que el usuario haya dado en la Fase 1 (voz,
+  producto, país) e INFORMA que el on-brand quedó a nivel básico hasta que exista brand-brain —
+  no te detengas a pedirlo si el usuario ya dio lo mínimo para producir.
+
+**Ejemplo mínimo de un guion entregado** (mismo patrón del ejemplo de la Fase 2):
+> **HOOK:** "Nadie te dice esto antes de comprar minoxidil"
+> **Guion:** 0-3s cara a cámara, texto "ESTO TE LO OCULTAN" — 3-8s muestra el frasco, dato-shock
+> del ingrediente — 8-18s antes/después del producto propio — 18-22s "Comenta CAÍDA y te mando
+> el link"
+> **CTA:** Comenta CAÍDA (remarketing directo)
+> **Patrón de origen:** dato-shock + dolor + prueba visual (Fase 2)
+
+**Terminado de esta fase:** cada guion entregado trae los 4 campos completos (hook, guion
+segundo a segundo, CTA, patrón de origen) y el lote cubre al menos 2 patrones distintos.
 
 ## Fase 4 — PRE-CALIFICAR (simular antes de grabar)
 
@@ -135,6 +180,9 @@ predictor de viralidad (hook strength, retención) como segunda opinión.
 Regla de la casa: **publicar todo igual** (el score solo ordena la prioridad de producción);
 a veces el video que menos promete es el que explota. La matriz se re-alimenta cada 2-4
 semanas con los resultados reales: lo que pegó entra, lo que murió se anota como anti-patrón.
+
+**Terminado de esta fase:** cada guion del lote tiene los 5 criterios calificados y el promedio,
+y el orden de prioridad de grabación quedó explícito (no implica descartar ninguno).
 
 ## Fase 5 — CALENDARIZAR (volumen + ritmo, del guion al plan)
 
@@ -160,6 +208,11 @@ Los guiones ganadores no sirven en un cajón: hay que **planificarlos como calen
 Objetivo: que el usuario nunca se siente frente a "y hoy qué subo" — el plan ya está armado,
 balanceado y priorizado por evidencia.
 
+**Terminado de esta fase:** la cuadrícula L-S está llena con al menos una pieza/día, la mezcla de
+tipos respeta la regla anti-quema (venta en minoría) y cada celda trae patrón, tipo, hook y
+estado. Con esto la skill entrega su ciclo completo: de la evidencia bruta al calendario listo
+para producir.
+
 ## Encadenado al ecosistema
 - **Lee de:** brand-brain (voz/avatares) · métricas reales del usuario · creadores de referencia.
 - **Entrega a:** `golden-ugc-avatar` (los guiones se vuelven videos con avatar) · `golden-ads`
@@ -167,6 +220,14 @@ balanceado y priorizado por evidencia.
 - **No pisa a:** `golden-copywriting` (copy de venta directa) ni `golden-ads` (pauta).
 
 ## Changelog
+- **GMV1.6** (2026-08-21) — Auditoría `golden-skill-auditor`: (1) la etiqueta de versión decía
+  GMV1.4 mientras este Changelog ya iba en GMV1.5 — la capacidad de transcripción local (Fase 1)
+  ya estaba en el cuerpo pero la versión no lo reflejaba; sincronizado a GMV1.5→GMV1.6, un solo
+  número en todo el archivo. (2) el description no mencionaba la Fase 5 CALENDARIZAR — agregado
+  el trigger. (3) agregado un ejemplo entrada→salida de un renglón de matriz y de un guion
+  (Fases 2 y 3) y criterio explícito de "terminado" por fase (2 a 5), para que el primer uso no
+  dependa de inferir el formato. Blindaje: `chflags uchg` (mismo mecanismo de antes, re-aplicado
+  al cierre).
 - **GMV1.5** (2026-08-11) — **El TEXTO del video ya no depende de que el usuario lo pegue.** GMV1.4
   declaraba el guion pegado como "el único que hoy da el TEXTO del video"; eso dejó de ser cierto:
   el audio se transcribe en local con `whisper-cpp`, gratis, sin llave

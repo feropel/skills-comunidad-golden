@@ -1,4 +1,4 @@
-# Seedance 2.0 Prompt System (Moko) — Full Reference
+# Seedance 2.0 Prompt System — Full Reference
 
 Complete prompt architecture for animating a UGC avatar image into a talking-head video with
 Seedance 2.0 (`seedance_2_0`) via the Higgsfield MCP. The SKILL.md has the operating summary;

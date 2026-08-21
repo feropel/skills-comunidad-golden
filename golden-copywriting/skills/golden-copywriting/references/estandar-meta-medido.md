@@ -43,6 +43,19 @@ que funciona — pero es un indicio, no una prueba de conversión.
 
 ### Cómo se aplica al 5+5+5
 
+> **Actualizado 2026-08-21 · el polo corto YA se ejecutó, y el mecanismo tiene fuente oficial.**
+> Dos corridas se cerraron diciendo "los cortos nunca salieron al aire". Ya salieron: BLUE CP2,
+> campaña OPEN 7, anuncio `OPEN 7 - V5 Bergamot`, cuerpo de **33 caracteres** (`BERGAMOT 36 es
+> cítrica y fresca 🧊`) — 84.348 COP, 2 compras, CPA 42.174, **ROAS 3,62, el más alto de las diez
+> piezas de esa cuenta**. Con 2 compras eso **no prueba el pico 1**, solo lo pone a correr.
+>
+> El mecanismo de opciones múltiples **existe y Meta lo documenta**: *"Add text options: input
+> multiple text options for the primary text, headline and description fields **when creating
+> single image or video ads**"* (artículo 223409425500940). Aplica **solo a imagen o video único**.
+> Lo que sigue sin poder verificarse por API es si un anuncio del arsenal lo tiene montado: la
+> lectura devuelve un solo `body` por creativo y no expone `asset_feed_spec`. Van tres corridas.
+> Para comprobarlo hay que abrir el anuncio a mano en el Administrador.
+
 Los 5 textos principales **no se escriben todos del mismo largo**. Reparto por defecto:
 
 | | Largo | Nivel de consciencia (Schwartz) |
@@ -103,7 +116,45 @@ medidos.** Sigue faltando el A/B directo — no hay un anuncio idéntico que SÍ
 corriendo en paralelo para comparar contra estos cinco. Detalle completo en la entrada
 2026-08-16 de `tendencias-vivas.md`.
 
+**Actualizado 2026-08-21, tercera corrida: 0 de 8, y ya hay explicación.** Ocho anuncios con
+cuerpo legible y ventas, en cuatro cuentas y cuatro verticales, **ninguno** mete el argumento
+en los primeros 125: otra marca Anuncio 3 Drive (485 car., 16 compras, CPA 14.794), otra marca Anuncio 3
+(361, 41, 22.946), Tag Recede VIDEO 8 (185, 21, 23.779), otra marca Anuncio 19 Drive (485, 13,
+33.622), Le'côterra V6 vigente (221, 8, 37.344), V6 15 copys (332, 13, 38.165), V6 CP1 (221,
+14, 40.765) y OPEN 7 V5 (33, 2, 42.174).
+
+**La explicación no es que la regla esté mal: es que la oferta se mudó de sitio.** En los tres
+cuerpos de mercado leídos el 2026-08-21 —Alquimia Store, Caphero leather y Laboratorio special
+xs— los tres ponen la promesa logística en el **titular o la descripción del enlace**, no en el
+cuerpo. Y el titular **no se corta nunca**; los primeros 125 del cuerpo sí desaparecen tras el
+"Ver más" si el lector no lo abre.
+
+**Cómo aplicarla desde ahora:**
+1. **La oferta va en el TÍTULO** (40 caracteres, siempre visible). Ese es el sitio seguro.
+2. Si la oferta ya está en el título, **el cuerpo queda libre para el argumento** y la regla de
+   los 125 deja de ser obligatoria — pasa a ser preferencia.
+3. Si la oferta **no** está en el título, entonces sí: métela en los primeros 125 del cuerpo.
+4. Producto que no puede prometer (claims restringidos): no le inventes una oferta para cumplir.
+
+**Contraste medido, con su límite:** en otra marca CP1, mismo producto y misma cuenta, título-oferta
+(`🚛Envío gratis y Pago Contraentrega📦`, 41 compras, CPA 22.946) contra título-beneficio (`Usa
+tu celular sin sacarlo del bolso`, 16 compras, CPA 14.794). Gana el beneficio, **pero el CTA
+también cambia entre los dos**, así que no aísla la variable. No lo cites como prueba de que el
+título-beneficio gana.
+
 ## 4 · El molde COD que está corriendo en Colombia
+
+> **Actualizado 2026-08-21 · dos cambios medidos en el molde.**
+> **(a) La oferta emigró al titular.** En los 3 cuerpos de mercado leídos hoy, los 3 sacaron la
+> línea 🚚 y la línea 💵 del cuerpo y las pusieron en el titular o la descripción del enlace.
+> **(b) Apareció una tercera variante, la del MECANISMO** (Laboratorio special xs): pregunta de
+> apertura *"¿Cómo funciona exactamente X? 🤔"* → ingredientes o piezas → cada una traducida a
+> beneficio con emoji → remate que desactiva la incredulidad (*"No es magia — es que…"*) →
+> **precio + envío + contra entrega consolidados en UNA línea** → cierre hacia conversación
+> (*"¿Tienes preguntas? Escríbenos antes de comprar 👇"*), destino WhatsApp. Sirve para producto
+> que necesita explicarse antes de venderse.
+> **(c) Registro de marca, no de catálogo** (Caphero leather): tres párrafos, cero emoji, cero
+> bullets, cero precio, toda la oferta en el titular. Es el molde del perfil "marca propia".
 
 De cuerpos completos de anuncios activos leídos en la Biblioteca de Anuncios (CreaClub, Seta,
 Cedanni). Los tres, la misma forma exacta:
@@ -201,3 +252,39 @@ hueco, porque una lista corta no da error, devuelve menos y parece correcta.
 13 no (DISABLED, UNSETTLED o CLOSED). De las consultables, solo **36 tienen medio de pago** y de
 esas **14 tuvieron gasto en 30 días**. Ese embudo 75 → 36 → 14 es el denominador del informe.
 **`GOLDEN CP BACK UP` (408753721820872) no se toca ni se lee** — orden del Centro de Mando.
+
+## 6 · El copy NO es la variable dominante (medido 2026-08-21)
+
+Antes de reescribir un copy que rinde mal, **descarta primero destino y creativo.**
+
+En otra marca CP1, tres creativos llevan el **mismo cuerpo byte por byte** (485 caracteres), mismo
+producto, misma cuenta, mismos 30 días:
+
+| CTA | Gasto | Compras | CPA | ROAS |
+|---|---|---|---|---|
+| WHATSAPP_MESSAGE | 236.700 | 16 | **14.794** | 4,81 |
+| SHOP_NOW | 437.084 | 13 | 33.622 | 3,35 |
+| SHOP_NOW | 238.692 | 2 | 119.346 | 0,84 |
+
+**Mismo texto, CPA de 14.794 a 119.346 — ocho veces.** La comparación honesta es entre los dos
+con muestra decente: **WhatsApp 2,3x mejor que SHOP_NOW con texto idéntico** (16 y 13 compras).
+El de CPA 119.346 tiene 2 compras y no aguanta conclusión.
+
+**Qué obliga esto:** un copy no se juzga contra su CPA a secas. Si dos piezas con el mismo texto
+se separan 8x, el texto no explica la diferencia. Al auditar, pregunta primero **a dónde manda el
+anuncio y con qué creativo corre**, y solo después toca las palabras.
+
+## 7 · Qué del mercado se puede medir y qué no (método, 2026-08-21)
+
+Tres corridas de 150 anuncios por recencia dejan esto claro:
+
+- **El largo del título SÍ es medible.** Media 30,1 → 29,6 → 30,0; "cabe en 40" entre 81% y 84%.
+  Estable en tres muestras independientes. Úsalo como base.
+- **Emoji, MAYÚSCULAS y "título = oferta" NO son medibles así.** Emoji hizo 51% → 65% → 26% en
+  tres corridas. Eso no es una tendencia, es una muestra que cambia de composición. Se probó la
+  robustez midiendo **1 título por página** (neutraliza al anunciante que repite): 30%, casi igual
+  — o sea, no lo sesga un anunciante concentrado, **el indicador se mueve solo**.
+- **Corrección explícita a la corrida del 2026-08-16:** allí se anotó el alza de emoji y
+  MAYÚSCULAS como "señal a vigilar". Era ruido. No se sostiene.
+- **Recordatorio permanente:** la API devuelve por RECENCIA. Muestra el molde del mercado, **no
+  prueba qué convierte.** Nunca lo reportes como "lo que funciona".

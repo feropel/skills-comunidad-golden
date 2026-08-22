@@ -115,7 +115,7 @@ code.inline {
   font-feature-settings: "liga" 0, "calt" 0;
   /* v5.9 · un span de codigo en linea (nombre de estado, ID) que cae justo en
      el borde de pagina se partia a la mitad de la palabra — el propio auditor
-     lo cazo (informe otra marca, pagina 12->13, "SIN MOVIMIENTOS" cortado en "SIN"
+     lo cazo (informe Dolce, pagina 12->13, "SIN MOVIMIENTOS" cortado en "SIN"
      / "MOVIMIENTOS"). break-inside:avoid lo mueve entero a la pagina que
      sigue en vez de rebanarlo. */
   break-inside: avoid; page-break-inside: avoid; white-space: nowrap;
@@ -219,7 +219,7 @@ figure.figure .fig-num {
 /* v5.9 · el crema de --gold-tint lleno en CADA th, multiplicado por cada tabla
    de un documento con muchas tablas de datos (no tarjetas de prompt), inundaba
    la pagina de amarillo y volvia el documento "aglomerado" — medido por FER
-   viendo el PDF real (informe otra marca, 24 tablas). El oro pasa a acento — un
+   viendo el PDF real (informe Dolce, 24 tablas). El oro pasa a acento — un
    borde inferior de 2px, no un relleno — y las filas de datos alternan un gris
    casi imperceptible para que una tabla larga se pueda seguir sin cabecera
    repitiendose cada linea. El padding sube porque el texto tocaba el borde. */

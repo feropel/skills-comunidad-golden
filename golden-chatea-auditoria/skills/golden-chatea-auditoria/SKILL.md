@@ -20,6 +20,19 @@ description: |
 
 # golden-chatea-auditoria · la salud de un espacio de Chatea Pro
 
+<!-- skill v1.2 (GCA1.2) — 2026-08-21 — auditoria golden-skill-auditor (874/1000) mas
+simulacion de cliente: la skill diagnosticaba bien y COMUNICABA mal. Seis arreglos.
+(1) LIBRO DE DECISIONES `--decisiones`: cada hallazgo tiene clave estable control|objetivo y lo
+que el dueno ya resolvio sale aparte con motivo y fecha — antes cada corrida repetia los mismos
+40 hallazgos, incluido uno que FER ya habia descartado. (2) SEVERIDAD POR NEGOCIO: un producto
+huerfano CON anuncios es rojo y SIN anuncios es duda; era el criterio del dueno y no estaba en
+codigo. (3) DIFF `--anterior`: que se movio desde la corrida pasada, con alerta si un campo
+cruzo el techo. (4) B6 asistentes ESPERADOS contra instalados (assets/asistentes-esperados.json),
+que es lo unico que contesta "esta completa esta instalacion". (5) HANDOFF `--handoff`: paquete
+de correccion agrupado por la skill duena de cada campo. (6) Cerrada la contradiccion del techo
+entre SKILL.md, controles.md y el codigo — una sola verdad, con los dos umbrales medidos — y
+documentados los dos assets. Autoprueba de 29 a 30 defectos mas 4 pruebas de comportamiento
+(negocio, libro, diff). -->
 <!-- skill v1.1 (GCA1.1) — 2026-08-21 — auditoría golden-skill-auditor: I4 (controles.md:122,
 "ausencia no es prueba") estaba definido pero auditar.py nunca lo reportaba en la cobertura —
 quedaba invisible en el informe final, justo el modo de fallo que esta skill le prohíbe al
@@ -30,7 +43,7 @@ numérico. Ver detalle completo debajo. -->
 skill nació sin CHANGELOG y sin número, y sin versión el censo diario no puede ver que alguien
 la editó. -->
 
-**Versión:** `GCA1.1`
+**Versión:** `GCA1.2`
 
 Auditar aquí significa **medir el estado real del servidor contra el estándar**, no leer la
 configuración y opinar. Nada se da por bueno sin haberlo contado, y el informe se entrega en
@@ -90,6 +103,13 @@ El estándar vive en `references/`. Se mide mientras se revisa, no después:
 - `references/estandar-prompts.md` — qué debe tener el prompt de un producto para estar sano.
 - `references/informe.md` — el formato exacto del entregable.
 
+Y dos datos que viven fuera del código a propósito, para que un cambio de versión de Chatea se
+arregle editando un JSON y no un script:
+
+- `assets/topes-nativos.json` — los dos techos y el tope de cada campo del formulario.
+- `assets/asistentes-esperados.json` — los campos firma de cada asistente, que es lo que permite
+  detectar el que **falta**, no solo los que hay.
+
 ### Fase 3 · TRES FUENTES antes de cualquier veredicto
 
 Ningún hallazgo se publica con una sola fuente:
@@ -105,9 +125,23 @@ Ningún hallazgo se publica con una sola fuente:
 ### Fase 4 · EJECUTAR (la fase que más se salta)
 
 ```bash
-python3 ~/.claude/skills/golden-chatea-auditoria/scripts/autoprueba.py   # primero SIEMPRE
-python3 ~/.claude/skills/golden-chatea-auditoria/scripts/auditar.py <DUMP.json> [--json salida.json]
+S=~/.claude/skills/golden-chatea-auditoria/scripts   # scripts/autoprueba.py y scripts/auditar.py
+python3 $S/autoprueba.py                      # primero SIEMPRE
+python3 $S/auditar.py <DUMP.json> \
+    --decisiones <espacio>-decisiones.json \  # lo ya resuelto no se vuelve a gritar
+    --anterior   <DUMP-de-la-corrida-pasada.json> \
+    --handoff    paquete-correccion.md \
+    --json       hallazgos.json
 ```
+
+Las cuatro banderas son opcionales y ninguna es decorativa:
+
+| Bandera | Para qué |
+|---|---|
+| `--decisiones` | El **libro de decisiones**. Lo que ya resolviste sale aparte, con su motivo y su fecha, y no vuelve a contarse entre lo pendiente. Sin esto, la corrida número tres son los mismos 40 hallazgos y dejas de leerla. |
+| `--anterior` | **Qué se movió** desde la última auditoría: campos creados, borrados y editados con su delta. Es lo que convierte la foto en vigilancia. |
+| `--handoff` | El **paquete de corrección** agrupado por la skill dueña de cada campo, listo para pasarlo al chat que sí escribe. |
+| `--json` | Todo en crudo, para encadenar con otra herramienta. |
 
 **La autoprueba va primero y no se salta.** Fabrica un espacio que se SABE roto (29 defectos
 sembrados, entre ellos los cinco falsos negativos que una verificación adversarial encontró) y
@@ -141,7 +175,7 @@ saber cómo se construyó, e intenta romperlo. Su lista de "no verificado" entra
 
 | Nivel | Significa | Ejemplos |
 |---|---|---|
-| 🔴 **MUERTO** | Algo no está funcionando ahora mismo | Producto activo sin entrada en el disparador · campo por encima del techo escapado · palabra clave que difiere en un acento · token de Meta caído |
+| 🔴 **MUERTO** | Algo no está funcionando ahora mismo | Producto **con pauta activa** fuera del disparador · campo por encima de 19.895 escapados, el último tamaño que se vio disparar · palabra clave principal que difiere en un acento · canal caído |
 | 🟠 **MUERTE ANUNCIADA** | Funciona hoy y se rompe solo | Campo sobre el 90% del techo · campo por encima del tope nativo (se corta cuando alguien abra el panel y guarde) · par array/Extendido ambiguo |
 | 🟡 **FUGA** | Funciona pero está mal | Llave de otra cuenta heredada · nombre de otra tienda dentro de un prompt · placeholder sin reemplazar · ortografía rota |
 | 🔵 **DUDA** | No se pudo verificar, o hay que preguntarle a FER | Valor que difiere de la referencia sin saber cuál es el correcto |
@@ -152,8 +186,9 @@ Se reporta como DUDA y se pregunta, no se "arregla".
 
 ## Lo que esta skill NO hace
 
-**No escribe.** Audita y reporta. Cuando hay que corregir, el hallazgo se pasa a la skill de
-configuración que corresponde, con el campo exacto y el valor propuesto. La razón es dura y
+**No escribe.** Audita y reporta. Cuando hay que corregir, `--handoff` deja el paquete
+agrupado por la skill dueña de cada campo, con la evidencia y la acción, listo para el chat que
+sí escribe. La razón es dura y
 está medida: escribir con POST en vez de PUT devuelve `200` con un mensaje que no contiene la
 palabra "error", y pasarse del techo devuelve `200 ok` guardando el contenido cortado. Una skill
 que audita y escribe en la misma pasada puede reportar "corregido" sobre algo que nunca se
@@ -167,4 +202,25 @@ desde el DUMP nuevo**, releyendo del servidor y comparando.
   disparadores apuntando al viejo, en silencio).
 - Al recibir un workspace de cliente, antes de prometer nada.
 - Cuando algo "dejó de responder" sin error visible.
-- Como revisión periódica, para ver los campos que se van acercando al techo.
+- Como revisión periódica, para ver los campos que se van acercando al techo. A partir de la
+  segunda vez, **siempre con `--anterior` y `--decisiones`**: sin ellas el informe repite lo que
+  ya sabes y entierra lo nuevo.
+
+## Cómo se responde un hallazgo
+
+Cuando dictaminas sobre un hallazgo — "eso no es problema", "eso es a propósito" — la respuesta
+**se escribe en el libro de decisiones**, no se deja en el chat. Un chat se cierra; el libro
+viaja con el espacio.
+
+```json
+{"espacio": "f218311", "decisiones": [
+  {"clave": "D3|huerfanos-sin-pauta",
+   "motivo": "sin pauta activa no llegan mensajes; se registran cuando se les ponga",
+   "fecha": "2026-08-20",
+   "reabrir_si": "se les carga un id de anuncio"}]}
+```
+
+`reabrir_si` es lo que impide que el libro se vuelva una alfombra para esconder hallazgos: dice
+en qué condición la decisión deja de valer. **Sin motivo y sin fecha no se acepta una decisión**,
+porque dentro de tres meses nadie sabría si sigue vigente. El detalle está en el bloque J de
+`references/controles.md`.

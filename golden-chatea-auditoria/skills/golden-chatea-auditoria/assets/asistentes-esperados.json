@@ -1,0 +1,27 @@
+{
+  "_para_que": "Detectar lo que FALTA, no solo lo que hay. Contar prefijos presentes nunca puede contestar 'esta completa la instalacion de este cliente'.",
+  "_como_se_usa": "campos_firma = campos que SIEMPRE existen si ese asistente esta instalado. Ninguno presente = no instalado. Algunos = instalado a medias.",
+  "_medido_contra": "Golden Colombia f218311 (vende a diario) y el workspace plantilla de Mexico f251977, 2026-08",
+  "asistentes": {
+    "Comentarios": {
+      "campos_firma": ["[Comentarios] Configuracion General", "[Comentarios IA] Tipo de actividad"],
+      "skill_duena": "golden-chatea-pro-config-comentarios"
+    },
+    "Ventas WhatsApp": {
+      "campos_firma": ["[Ventas Wp] Configuracion general", "[Ventas Wp] Disparador de productos Extendido"],
+      "skill_duena": "golden-chatea-pro-config-ventas-wp"
+    },
+    "Logistico": {
+      "campos_firma": ["[Logistico] Configuracion General", "[Logistico] Confirmaciones"],
+      "skill_duena": "golden-chatea-pro-config-logistico"
+    },
+    "Carritos": {
+      "campos_firma": ["[Carritos] Configuracion"],
+      "skill_duena": "golden-chatea-pro-config-carritos"
+    }
+  },
+  "_opcionales": {
+    "_nota": "Estos NO se reportan como faltantes: aparecen en unos espacios y en otros no, y su ausencia no es un defecto.",
+    "lista": ["[Remarketing IA]", "[WhatsApp IA]", "[Novedades]", "[Minimax]", "[Meta]", "[Integraciones]"]
+  }
+}

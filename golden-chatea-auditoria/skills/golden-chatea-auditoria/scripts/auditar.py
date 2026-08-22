@@ -6,7 +6,14 @@ Corre los controles mecanicos del catalogo (references/controles.md) sobre un DU
 producido por extraer.py y emite hallazgos con evidencia y cobertura medida.
 
 Uso:
-    python3 auditar.py <DUMP.json> [--json salida.json]
+    python3 auditar.py <DUMP.json> [opciones]
+
+Opciones:
+    --json <archivo>        vuelca universo, hallazgos y cobertura como JSON
+    --decisiones <archivo>  libro de decisiones del dueno: lo ya resuelto NO se vuelve a
+                            gritar (se muestra aparte, con su motivo y su fecha)
+    --anterior <DUMP.json>  diff contra una corrida previa: que se movio desde entonces
+    --handoff <archivo.md>  escribe el paquete listo para la skill que SI corrige
 
 NO escribe nada en Chatea. Audita y reporta.
 
@@ -61,6 +68,22 @@ APAGADO = {"no", "false", "0", "off", "No", "NO", "False", False, 0}
 
 SEV = {"MUERTO": "🔴", "ANUNCIADA": "🟠", "FUGA": "🟡", "DUDA": "🔵"}
 
+# Esta skill audita y NO escribe. Cada hallazgo corregible se reparte a la skill que SI
+# escribe ese campo, para que el paquete de correccion salga masticado y no en prosa.
+DUENA_POR_PREFIJO = {
+    "[Producto Ventas Wp]": "golden-chatea-pro-config-ventas-wp",
+    "[Ventas Wp]": "golden-chatea-pro-config-ventas-wp",
+    "[Comentarios": "golden-chatea-pro-config-comentarios",
+    "[GOLDEN Comentarios]": "golden-chatea-pro-config-comentarios",
+    "[Logistico]": "golden-chatea-pro-config-logistico",
+    "[Logístico]": "golden-chatea-pro-config-logistico",
+    "[Logistica]": "golden-chatea-pro-config-logistico",
+    "[Novedades]": "golden-chatea-pro-config-logistico",
+    "[Carritos": "golden-chatea-pro-config-carritos",
+    "[Remarketing IA]": "golden-chatea-pro-config-ventas-wp",
+    "[Integraciones]": "(panel de Chatea · no hay skill: se toca a mano)",
+}
+
 
 class Auditoria:
     def __init__(self, dump):
@@ -72,17 +95,46 @@ class Auditoria:
         self.productos = {}
         self._cache = {}
         self._vistos = set()
+        self.decisiones = {}     # clave -> {motivo, fecha, reabrir_si}
+        self.cambios = []        # diff contra la corrida anterior
 
     # ---------------------------------------------------------------- utilidades
-    def falla(self, control, sev, titulo, evidencia, consecuencia="", accion=""):
+    def falla(self, control, sev, titulo, evidencia, consecuencia="", accion="",
+              objetivo="", campo="", skill_duena=""):
+        """objetivo: identificador ESTABLE de lo que falla (campo, producto, grupo).
+
+        Es lo que permite que una decision del dueno sobreviva a la siguiente corrida:
+        el titulo lleva conteos que cambian ("8 de 12 ranuras"), el objetivo no.
+        """
         huella = (control, titulo, evidencia[:200])
         if huella in self._vistos:      # un mismo defecto se reporta UNA vez
             return
         self._vistos.add(huella)
-        self.hallazgos.append({
+        # La skill duena se infiere del prefijo del campo cuando no se declara: asi el
+        # paquete de correccion sale repartido sin tener que anotarlo en cada hallazgo.
+        if not skill_duena:
+            marca = campo or titulo
+            for prefijo, duena in DUENA_POR_PREFIJO.items():
+                if prefijo in marca:
+                    skill_duena = duena
+                    break
+        if not campo:
+            m = re.search(r"`(\[[^`]+\]?[^`]*)`", titulo)
+            if m:
+                campo = m.group(1)
+        clave = f"{control}|{objetivo or campo or titulo}"
+        h = {
             "control": control, "severidad": sev, "titulo": titulo,
             "evidencia": evidencia, "consecuencia": consecuencia, "accion": accion,
-        })
+            "clave": clave, "campo": campo, "skill_duena": skill_duena,
+        }
+        # El libro de decisiones: lo que el dueno ya resolvio no se vuelve a gritar.
+        d = self.decisiones.get(clave)
+        if d:
+            h["severidad_original"] = sev
+            h["severidad"] = "DECIDIDO"
+            h["decision"] = d
+        self.hallazgos.append(h)
 
     def cubre(self, control, estado, revisados=None, nota=""):
         self.cobertura.append({"control": control, "estado": estado,
@@ -280,6 +332,35 @@ class Auditoria:
                        "Sus campos quedan fuera de los controles especificos.",
                        "Anadirlos al catalogo o declararlos fuera de alcance en el informe.")
         self.cubre("B3", "corrido", len(prefijos))
+
+        # B6 · lo que FALTA, no solo lo que hay. Detectar prefijos presentes nunca puede
+        # contestar "esta completa la instalacion": para eso hace falta la lista de esperados.
+        esperados = json.loads((RAIZ / "assets" / "asistentes-esperados.json").read_text())
+        faltan = []
+        for nombre, firma in esperados["asistentes"].items():
+            presentes = [f for f in firma["campos_firma"] if f in self.campos]
+            if not presentes:
+                faltan.append((nombre, firma["campos_firma"]))
+            elif len(presentes) < len(firma["campos_firma"]):
+                self.falla("B6", "DUDA",
+                           f"El asistente {nombre} esta instalado a medias",
+                           f"tiene {presentes}, le faltan "
+                           f"{[f for f in firma['campos_firma'] if f not in self.campos]}",
+                           "Una instalacion parcial se comporta distinto segun el camino "
+                           "que tome el flujo.",
+                           objetivo=f"parcial-{nombre}")
+        for nombre, firma in faltan:
+            self.falla("B6", "DUDA",
+                       f"El asistente {nombre} NO esta instalado",
+                       f"no existe ninguno de sus campos firma: {firma}",
+                       "Si el espacio deberia tenerlo, no esta funcionando; si no, sobra "
+                       "declararlo fuera de alcance.",
+                       "Instalarlo o declararlo fuera de alcance en el informe.",
+                       objetivo=f"falta-{nombre}")
+        self.universo["asistentes_esperados"] = (
+            f"{len(esperados['asistentes']) - len(faltan)} de {len(esperados['asistentes'])} presentes")
+        self.cubre("B6", "corrido", len(esperados["asistentes"]),
+                   f"{len(faltan)} sin instalar")
 
         for clave in ("/flow/subflows", "/flow/tags", "/flow/ai-agents", "/flow/ai-tasks",
                       "/flow/inbound-webhooks"):
@@ -551,18 +632,38 @@ class Auditoria:
                            "Si se estan pautando, se pierde la atribucion del anuncio al chat.",
                            "Contrastar contra las campanas activas antes de tocar nada.")
 
-        # D3 · huerfanos: cargados que no estan en NINGUN disparador
+        # D3 · huerfanos: cargados que no estan en NINGUN disparador.
+        # La severidad la decide el NEGOCIO, no la estructura: un producto sin pauta activa
+        # no recibe mensajes, asi que estar fuera del disparador no cuesta nada hoy. Con
+        # pauta encima, cada clic del anuncio se pierde. Criterio del dueno, en codigo.
         huerfanos = sorted(cargados - set(registrados_todos), key=self.orden_ranura)
-        if huerfanos:
+        con_pauta, sin_pauta = [], []
+        for n in huerfanos:
+            ads = ((self.productos[n].get("activadores_del_flujo") or {})
+                   .get("ids_de_anuncio") or "")
+            (con_pauta if str(ads).strip(", ") else sin_pauta).append(n)
+        if con_pauta:
             self.falla("D3", "MUERTO",
-                       f"{len(huerfanos)} de {len(cargados)} ranuras cargadas no estan en "
+                       f"{len(con_pauta)} productos CON anuncios cargados no estan en "
                        "ningun disparador",
-                       f"cargadas: {sorted(cargados, key=self.orden_ranura)}\n"
-                       f"     registradas: {sorted(registrados_todos, key=self.orden_ranura)}\n"
-                       f"     huerfanas: {huerfanos}",
-                       "Esos productos no arrancan por ninguna via, por impecable que sea "
-                       "el prompt.",
-                       "Registrarlos en un disparador o declararlos inactivos a proposito.")
+                       f"{con_pauta}\n     tienen ids_de_anuncio y ninguna entrada de "
+                       "disparador que los reciba",
+                       "Cada clic de esos anuncios entra y no encuentra producto: es plata "
+                       "de pauta que no puede convertir.",
+                       "Registrarlos en el disparador antes de seguir pautando.",
+                       objetivo="huerfanos-con-pauta",
+                       skill_duena="golden-chatea-pro-config-ventas-wp")
+        if sin_pauta:
+            self.falla("D3", "DUDA",
+                       f"{len(sin_pauta)} de {len(cargados)} ranuras cargadas no estan en "
+                       "ningun disparador, y no tienen anuncios",
+                       f"{sin_pauta}\n     registradas: "
+                       f"{sorted(registrados_todos, key=self.orden_ranura)}",
+                       "Sin pauta activa no llegan mensajes de esos productos, asi que hoy "
+                       "no se pierde nada. Se vuelven urgentes el dia que se les ponga pauta.",
+                       "Registrarlos cuando se les haga pauta, o dejarlos como borrador.",
+                       objetivo="huerfanos-sin-pauta",
+                       skill_duena="golden-chatea-pro-config-ventas-wp")
 
         # Un producto en DOS disparadores a la vez es ambiguedad, no redundancia
         for destino, donde in registrados_todos.items():
@@ -926,6 +1027,42 @@ class Auditoria:
                               ("H4", "no heredar datos entre las tres empresas")):
             self.cubre(control, "NO_VERIFICADO", nota="cruce externo: " + nota)
 
+    # ------------------------------------------- diff contra la corrida anterior
+    def comparar(self, anterior):
+        """Que cambio desde la ultima auditoria.
+
+        Sin esto la skill es una foto: cada corrida repite los mismos 40 hallazgos y el
+        dueno deja de leerlos. Con esto se puede preguntar lo unico que importa a diario:
+        que se movio.
+        """
+        viejos = {c["name"]: c for c in (anterior.get("/flow/bot-fields") or [])
+                  if isinstance(c, dict) and "name" in c}
+        nuevos = self.campos
+        for n in sorted(set(nuevos) - set(viejos)):
+            self.cambios.append(("NUEVO", n, f"campo creado ({nuevos[n].get('var_type')})"))
+        for n in sorted(set(viejos) - set(nuevos)):
+            self.cambios.append(("BORRADO", n,
+                                 "el campo ya no existe: un flujo que lo referencie por "
+                                 "var_ns queda apuntando al vacio"))
+        for n in sorted(set(viejos) & set(nuevos)):
+            va, vn = viejos[n].get("value") or "", nuevos[n].get("value") or ""
+            if va == vn:
+                continue
+            ea, en = len(json.dumps(va)[1:-1]), len(json.dumps(vn)[1:-1])
+            signo = "+" if en >= ea else ""
+            self.cambios.append(("EDITADO", n,
+                                 f"{len(va):,} → {len(vn):,} caracteres "
+                                 f"({signo}{en - ea:,} escapados)"))
+            if ea <= TECHO_ESCAPADO < en:
+                self.falla("C1", "MUERTO",
+                           f"`{n}` CRUZO el techo escapado desde la corrida anterior",
+                           f"{ea:,} → {en:,} escapados",
+                           "El cambio que lo cruzo es el sospechoso inmediato.",
+                           "Revertir o compactar ese cambio.", objetivo=f"cruce-techo-{n}")
+        self.universo["cambios_desde_anterior"] = len(self.cambios)
+        self.cubre("J1", "corrido", len(set(viejos) | set(nuevos)),
+                   f"diff contra {anterior.get('_extraido', 'corrida anterior')}")
+
     # ------------------------------------------------------------------ correr
     def correr(self):
         self.bloque_a()
@@ -959,18 +1096,39 @@ def imprimir(a):
         else:
             print(f"  {k:34} {v}")
 
+    if a.cambios:
+        print(f"\nQUE CAMBIO DESDE LA CORRIDA ANTERIOR ({len(a.cambios)})")
+        for tipo, nombre, detalle in a.cambios:
+            print(f"  {tipo:8} {nombre:52} {detalle}")
+    elif "cambios_desde_anterior" in a.universo:
+        print("\nQUE CAMBIO DESDE LA CORRIDA ANTERIOR: nada en los campos de bot")
+
+    decididos = [h for h in a.hallazgos if h["severidad"] == "DECIDIDO"]
+    activos = [h for h in a.hallazgos if h["severidad"] != "DECIDIDO"]
+
     orden = {"MUERTO": 0, "ANUNCIADA": 1, "FUGA": 2, "DUDA": 3}
-    print(f"\nHALLAZGOS ({len(a.hallazgos)})")
+    print(f"\nHALLAZGOS ({len(activos)} sin resolver"
+          + (f" · {len(decididos)} ya decididos por el dueno)" if decididos else ")"))
     if not a.hallazgos:
         print("  Ninguno de los controles mecanicos disparo. Eso NO significa que el espacio")
         print("  este sano: mira la cobertura, hay controles que solo se verifican leyendo.")
-    for h in sorted(a.hallazgos, key=lambda x: orden.get(x["severidad"], 9)):
+    for h in sorted(activos, key=lambda x: orden.get(x["severidad"], 9)):
         print(f"\n{SEV.get(h['severidad'], '')} {h['severidad']} · {h['control']} · {h['titulo']}")
         print(f"     evidencia: {h['evidencia']}")
         if h["consecuencia"]:
             print(f"     consecuencia: {h['consecuencia']}")
         if h["accion"]:
             print(f"     accion: {h['accion']}")
+
+    if decididos:
+        print(f"\nYA DECIDIDO POR EL DUENO ({len(decididos)}) · no se vuelve a levantar")
+        for h in decididos:
+            d = h["decision"]
+            print(f"  ⚪ {h['control']} · {h['titulo']}")
+            print(f"       decision: {d.get('motivo', '(sin motivo)')}"
+                  f"  [{d.get('fecha', 'sin fecha')}]")
+            if d.get("reabrir_si"):
+                print(f"       reabre si: {d['reabrir_si']}")
 
     print("\nCOBERTURA")
     corridos = sum(1 for c in a.cobertura if c["estado"] == "corrido")
@@ -984,18 +1142,88 @@ def imprimir(a):
     print("  Lo NO VERIFICADO va al informe declarado, nunca omitido.")
 
 
+def escribir_handoff(a, destino):
+    """El paquete para la skill que SI corrige.
+
+    Esta skill no escribe en Chatea a proposito, pero dejar el arreglo en prosa obliga al
+    siguiente chat a reconstruir el contexto entero. Aqui sale ya masticado.
+    """
+    porskill = {}
+    for h in a.hallazgos:
+        if h["severidad"] in ("DECIDIDO", "DUDA") or not h.get("accion"):
+            continue
+        porskill.setdefault(h.get("skill_duena") or "(por determinar)", []).append(h)
+    lineas = [f"# Paquete de correccion · {a.d.get('_etiqueta')}",
+              "",
+              f"Generado por golden-chatea-auditoria sobre el DUMP del "
+              f"{a.d.get('_extraido')}. Esta skill NO escribe en Chatea: cada bloque va a "
+              "la skill duena del campo.",
+              "",
+              "**Antes de escribir nada:** medir el escapado del campo completo "
+              "(`len(json.dumps(valor)[1:-1])`) y no pasar de 19.000. **Despues de escribir:** "
+              "releer del servidor y comparar, porque un `200 ok` puede haber guardado el "
+              "contenido cortado.",
+              ""]
+    for skill, hs in sorted(porskill.items()):
+        lineas.append(f"## {skill}")
+        lineas.append("")
+        for h in hs:
+            lineas.append(f"### {SEV.get(h['severidad'], '')} {h['control']} · {h['titulo']}")
+            if h.get("campo"):
+                lineas.append(f"- **Campo:** `{h['campo']}`")
+            lineas.append(f"- **Evidencia:** {h['evidencia']}")
+            if h.get("consecuencia"):
+                lineas.append(f"- **Por que importa:** {h['consecuencia']}")
+            lineas.append(f"- **Que hacer:** {h['accion']}")
+            lineas.append("")
+    Path(destino).write_text("\n".join(lineas))
+    return sum(len(v) for v in porskill.values())
+
+
 def main():
     if len(sys.argv) < 2:
         sys.exit(__doc__)
+
+    def opcion(bandera):
+        return (Path(sys.argv[sys.argv.index(bandera) + 1])
+                if bandera in sys.argv else None)
+
     dump = json.loads(Path(sys.argv[1]).read_text())
-    a = Auditoria(dump).correr()
+    a = Auditoria(dump)
+
+    ruta_dec = opcion("--decisiones")
+    if ruta_dec and ruta_dec.exists():
+        libro = json.loads(ruta_dec.read_text())
+        espacio = libro.get("espacio")
+        medido = (a.d.get("/flow/bot-fields") or [{}])[0].get("var_ns", "")
+        if espacio and not str(medido).startswith(str(espacio)):
+            sys.exit(f"El libro de decisiones es del espacio {espacio} y este DUMP es de "
+                     f"{medido[:8]}. Un libro de otro espacio silenciaria hallazgos reales.")
+        a.decisiones = {d["clave"]: d for d in libro.get("decisiones", [])}
+        print(f"Libro de decisiones: {len(a.decisiones)} resueltas por el dueno\n")
+    elif ruta_dec:
+        print(f"(no existe {ruta_dec}: se audita sin libro de decisiones)\n")
+
+    a.correr()
+
+    ruta_ant = opcion("--anterior")
+    if ruta_ant:
+        a.comparar(json.loads(ruta_ant.read_text()))
+
     imprimir(a)
-    if "--json" in sys.argv:
-        destino = Path(sys.argv[sys.argv.index("--json") + 1])
+
+    destino = opcion("--json")
+    if destino:
         destino.write_text(json.dumps(
-            {"universo": a.universo, "hallazgos": a.hallazgos, "cobertura": a.cobertura},
+            {"universo": a.universo, "hallazgos": a.hallazgos, "cobertura": a.cobertura,
+             "cambios": a.cambios},
             ensure_ascii=False, indent=1))
         print(f"\nHallazgos en {destino}")
+
+    ho = opcion("--handoff")
+    if ho:
+        n = escribir_handoff(a, ho)
+        print(f"Paquete de correccion ({n} hallazgos accionables) en {ho}")
     return 0
 
 

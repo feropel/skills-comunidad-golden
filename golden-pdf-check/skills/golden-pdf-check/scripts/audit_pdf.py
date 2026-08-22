@@ -55,7 +55,7 @@ def rgb_to_hex(c):
 
 
 def near(hexval, allowed, tol=18):
-    """¿El color está cerca de algún permitido? (tolerancia por canal)"""
+    """Dice si el color esta cerca de algun permitido (tolerancia por canal)."""
     try:
         r, g, b = int(hexval[1:3], 16), int(hexval[3:5], 16), int(hexval[5:7], 16)
     except Exception:

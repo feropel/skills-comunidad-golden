@@ -82,7 +82,8 @@ El texto tras los backticks de apertura se usa como título de la tarjeta:
   Esa decisión es de contenido, no de maquetación.
 - No metas capturas de pantalla dentro de una tarjeta de prompt: rompen
   el copiar-pegar. Ponlas como imagen aparte.
-- **Líneas de tarjeta ≤ 76 caracteres (regla de redacción, v5.8 · un chat de producto 2026-08-07).** Dentro de una tarjeta monoespaciada, una línea de más de
+- **Líneas de tarjeta ≤ 76 caracteres (regla de redacción, v5.8 · chat dental
+  Chile 2026-08-07).** Dentro de una tarjeta monoespaciada, una línea de más de
   ~76 caracteres se ENVUELVE al renderizar y la compuerta verbatim la reporta
   como "espaciado/orden alterado" (pasó con dos prompts de imagen; se resolvió
   reescribiéndolos a 72-84 caracteres por línea). `build_pdf.py` ahora AVISA

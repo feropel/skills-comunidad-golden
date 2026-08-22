@@ -38,7 +38,7 @@ válida es el fabricante, no un revendedor.
 ## 🚧 COMPUERTA DE IDENTIDAD DEL PRODUCTO (paso duro, ANTES de cualquier claim de ingrediente)
 
 **La versión local puede declarar OTRA FÓRMULA que la marca original.** Caso real (chat Dental
-el producto del estudio, Chile, 2026-08-07): los revendedores chilenos del mismo frasco declaraban
+Cavity Healing, Chile, 2026-08-07): los revendedores chilenos del mismo frasco declaraban
 **glicerina, pantenol y PCA de sodio** — humectantes — mientras la marca original (Amazon
 B0DB2ZBXZD, US$69) declara **nano-hidroxiapatita** como activo. El ingrediente estrella podría
 no estar en el frasco que se despacha.
@@ -58,7 +58,7 @@ tiene que ser la fuente del frasco que de verdad viaja en el paquete.
 
 ## 🚧 El NOMBRE del producto es un ítem de COMPLIANCE (evaluarlo en esta fase)
 
-Un nombre puede prometer cura: **"Dental el producto del estudio" promete curación** — era el mayor
+Un nombre puede prometer cura: **"Dental Cavity Healing" promete curación** — era el mayor
 pasivo legal del negocio y ninguna revisión lo detectaba, porque el mapa de compliance mira el
 copy, no el nombre. Regla: evaluar el nombre en Fase 0/1 y, si promete cura o resultado médico,
 **proponer renombre** (en el caso real se propuso "Dental Shield / Escudo Dental"). El veredicto

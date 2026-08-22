@@ -28,6 +28,7 @@ humana obligatoria (H).
 | B2 | A | **Campos de usuario contra su límite.** Hay un tope por workspace (visto `412/200` en rojo en el panel). Pasado el límite, dejan de crearse campos nuevos en silencio. |
 | B3 | A | **Asistentes detectados por prefijo de campo**, no por lo que se supone instalado. Los prefijos conocidos son `[Comentarios]`, `[Ventas Wp]` / `[Producto Ventas Wp]`, `[Logistico]` / `[Logistica]`, `[Carritos IA]`, `[Remarketing IA]`, `[WhatsApp IA]`, `[Novedades]`, `[Minimax]`, `[Meta]`, `[Integraciones]`. **Un prefijo desconocido es un hallazgo, no ruido**: significa que hay un asistente o una versión que la skill todavía no sabe auditar, y hay que declararlo. |
 | B4 | A | **Subflujos, tags, agentes IA, tareas IA y webhooks entrantes** contados. |
+| B6 | A | **Lo que FALTA, no solo lo que hay.** Contar prefijos presentes nunca puede contestar "está completa la instalación de este cliente". Se cruza contra la lista de esperados de `assets/asistentes-esperados.json`, que trae los campos firma de cada asistente: **ninguno presente = no instalado · algunos = instalado a medias**, que se comporta distinto según el camino que tome el flujo. Los opcionales del archivo (`[Remarketing IA]`, `[Minimax]`…) no se reportan como faltantes: aparecen en unos espacios y en otros no. |
 | B5 | A | **Ranuras de producto ocupadas.** Campos `[Producto Ventas Wp] N` con contenido. No se asume cuáles: se cuentan. El volcado de la semana pasada no sirve, esa cuenta cambia de un día para otro. |
 
 ## Bloque C · Los dos techos
@@ -36,7 +37,7 @@ Los dos se respetan a la vez. Detalle y tablas en `topes.md`.
 
 | # | auto | Control |
 |---|---|---|
-| C1 | A | **Techo del bot field, ESCAPADO.** `len(json.dumps(valor)[1:-1])`. El flujo copia la config escapada: cada tilde ocupa 6 caracteres y cada emoji 12. El techo práctico de un `array` es **19.000 escapados**; por encima, el asistente **deja de responder sin un solo error visible**. Medido: 19.895 dispara, 23.266 no. |
+| C1 | A | **Techo del bot field, ESCAPADO.** `len(json.dumps(valor)[1:-1])`. El flujo copia la config escapada: cada tilde ocupa 6 caracteres y cada emoji 12. **La frontera está MEDIDA en vivo entre 19.895, que sí dispara, y 23.266, que no.** De ahí salen dos severidades distintas, y confundirlas es gritar muerte donde hay riesgo: por encima de **19.895** es 🔴 MUERTO (pasó el último tamaño que se vio funcionar); entre **19.000 y 19.895** es 🟠, zona sin medir que se trata como riesgo. 19.000 es la alerta prudente, no una prueba de muerte. Los números viven en `assets/topes-nativos.json`, no en el código. |
 | C2 | A | **Alerta de proximidad.** Por encima del 90% del techo es 🟠 MUERTE ANUNCIADA: la próxima línea que alguien agregue lo corta solo. Caso real: `[Comentarios] Configuracion General` a 483 caracteres del techo. |
 | C3 | A | **Tope nativo del campo del formulario.** Escribir por encima por API funciona y no da error, pero el día que alguien abra ese formulario en el panel y guarde, **el campo se corta y se pierde el texto**. Tabla completa en `topes.md`. |
 | C4 | A | **Tipo del campo.** `text` y `array` topan en 20.000; `longtext` en 500.000. Un campo de configuración que sigue siendo `array` y va por el 80% es un candidato a migrar. **El tipo es inmutable**: no se cambia ni por UI ni por API, hay que crear uno nuevo y repuntar la referencia. |
@@ -52,7 +53,7 @@ existir para el bot.
 |---|---|---|
 | D1 | A | **La palabra clave vive en DOS sitios y tienen que ser idénticas byte a byte**: `[Producto Ventas Wp] N.activadores_del_flujo.palabras_clave` y la entrada `keyW` del mismo producto en `[Ventas Wp] Disparador de productos Extendido`. Si difieren **aunque sea en un acento**, el producto no arranca. Caso real: `informacion` contra `información`. 🔴 |
 | D2 | A | **El disparador no admite caracteres de 4 bytes.** Un emoji lo corrompe y el bot no arranca nunca. Validación: `[c for c in texto if ord(c) >= 0x10000] == []`. 🔴 |
-| D3 | A | **Huérfanos en los dos sentidos.** Producto con campo cargado y **sin** entrada en el disparador = cargado y muerto. Entrada en el disparador que apunta a un campo **vacío o inexistente** = disparo al vacío. Los dos son 🔴. |
+| D3 | A | **Huérfanos en los dos sentidos.** Producto con campo cargado y **sin** entrada en el disparador, y entrada del disparador que apunta a un campo vacío o inexistente. **La severidad la decide el NEGOCIO, no la estructura**: un producto huérfano **con** `ids_de_anuncio` cargados es 🔴, porque cada clic de ese anuncio entra y no encuentra producto — es plata de pauta que no puede convertir; uno **sin** pauta es 🔵, porque no le llegan mensajes y hoy no se pierde nada. Criterio del dueño, medido: gritar rojo por productos sin pauta hace que el informe deje de leerse. |
 | D4 | A | **Coherencia de estado.** `estado` del producto dentro del campo contra `estado` de su entrada en el disparador. Uno activo y el otro inactivo es ambigüedad, y la ambigüedad se resuelve preguntando. |
 | D5 | A | **Las siete ranuras.** `keyW` e `idAd` son siete ranuras separadas por coma. Un valor con más o menos de siete ranuras está malformado. |
 | D6 | A | **IDs de anuncio.** Se listan los `idAd` cargados por producto. Vacíos no es necesariamente un fallo (así están varios en producción), pero **un producto que se está pautando y tiene la ranura vacía pierde la atribución**: se reporta como DUDA para contrastar contra las campañas activas. |
@@ -142,3 +143,40 @@ Salieron de una verificación adversarial de la propia skill. No son casos, son 
    sea como no verificada.
 4. **El número de revisados no puede ser el número de hallazgos.** Un `cubre(..., N)` donde N
    solo crece al fallar dice "cero objetos revisados" cuando todo salió bien.
+
+## Bloque J · Continuidad · lo que convierte la foto en vigilancia
+
+Una auditoría que empieza de cero cada vez repite los mismos hallazgos hasta que el dueño deja
+de abrirla. Estos dos controles son los que la vuelven algo que se mira a diario.
+
+| # | auto | Control |
+|---|---|---|
+| J1 | A | **Diff contra la corrida anterior.** `--anterior <DUMP-viejo.json>` compara campo por campo y reporta creados, borrados y editados, con el delta de escapados. Un campo **borrado** es grave aunque no falle nada hoy: un flujo que lo referencie por `var_ns` queda apuntando al vacío. Y si un campo **cruzó** el techo entre las dos corridas, el cambio que lo cruzó es el sospechoso inmediato. |
+| J2 | A | **Libro de decisiones del dueño.** `--decisiones <archivo.json>`. Cada hallazgo tiene una `clave` estable (`control\|objetivo`) que **no cambia con los conteos** del título. Lo que el dueño ya resolvió sale en una sección aparte, con su motivo y su fecha, y no vuelve a contarse entre los hallazgos sin resolver. **Guarda:** si el libro declara un `espacio` que no coincide con el del DUMP, el auditor se detiene — un libro de otro espacio silenciaría fallas reales. |
+
+### Cómo se escribe una decisión
+
+```json
+{
+  "espacio": "f218311",
+  "decisiones": [
+    {
+      "clave": "D3|huerfanos-sin-pauta",
+      "motivo": "sin pauta activa no llegan mensajes; se registran cuando se les ponga pauta",
+      "fecha": "2026-08-20",
+      "reabrir_si": "se les carga un id de anuncio"
+    }
+  ]
+}
+```
+
+`reabrir_si` es la parte que impide que el libro se vuelva una alfombra: dice en qué condición
+la decisión deja de valer. Una decisión sin motivo y sin fecha no se acepta — sin ellos, dentro
+de tres meses nadie sabe si sigue vigente.
+
+### Handoff · `--handoff <archivo.md>`
+
+Esta skill no escribe en Chatea, pero dejar el arreglo en prosa obliga al siguiente chat a
+reconstruir el contexto entero. El handoff agrupa los hallazgos accionables **por la skill
+dueña del campo** (inferida del prefijo) y encabeza cada paquete con las dos reglas que se
+pagan caro: medir el escapado antes de escribir, y releer del servidor después.

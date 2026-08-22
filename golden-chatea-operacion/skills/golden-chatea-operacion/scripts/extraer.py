@@ -44,10 +44,24 @@ BASE = "https://chateapro.app/api"
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
 
-# Candidatos para el listado de contactos con ventana de fecha. NO CONFIRMADOS contra el
-# servidor real en este entorno (aqui no hay token vivo). El primero que responda 200 con una
-# lista se usa, y cual se uso queda declarado en el DUMP bajo "_listado_endpoint_usado".
+# CONFIRMADO contra un token real (espacio LIBIDOUP, 2026-08-21): el endpoint que existe es
+# `/subscribers` (sin prefijo /subscriber ni /flow). Los tres candidatos originales
+# (/subscriber/list, /flow/subscribers, /subscriber/get-list) dan 404 en el servidor real -- se
+# dejan aqui abajo solo como fallback por si otro espacio/version los tiene.
+#
+# TRAMPA P14 (nueva, medida): `/subscribers` NO filtra por `from_date`/`to_date` ni por ninguna
+# variante probada (`date_from/date_to`, `start_date/end_date`, `subscribed_from/to`) -- las
+# cuatro devuelven el MISMO total sin filtrar. No hay ventana de fecha en el servidor para este
+# endpoint. `listar_contactos_del_dia` compensa: pagina el universo COMPLETO (barato, 10 por
+# pagina) y filtra en cliente por actividad ese dia, usando `last_message_at` primero (la senal
+# mas cercana a "hubo conversacion ese dia"), con `last_interaction` y `subscribed` como
+# respaldo si `last_message_at` viene vacio. Queda declarado en el DUMP cual campo decidio cada
+# contacto. LIMITACION DECLARADA: un contacto cuya conversacion cruza mas de un dia con su
+# `last_message_at` cayendo en un dia POSTERIOR al pedido no aparece en el universo de un dia
+# anterior aunque haya tenido mensajes ese dia -- el servidor no expone actividad por dia, solo
+# el ultimo momento.
 CANDIDATOS_LISTADO = [
+    "/subscribers",
     "/subscriber/list",
     "/flow/subscribers",
     "/subscriber/get-list",
@@ -127,11 +141,31 @@ def pedir(token, path, **params):
         return {"_ERROR": str(e)}
 
 
+def _fecha_de(contacto):
+    """P14: `last_message_at` primero (mas cerca de 'hubo charla ese dia'), luego
+    `last_interaction`, luego `subscribed` como ultimo respaldo. Devuelve (fecha_AAAA-MM-DD,
+    campo_usado) o (None, None) si los tres vienen vacios."""
+    for campo in ("last_message_at", "last_interaction", "subscribed"):
+        v = contacto.get(campo)
+        if v:
+            return v[:10], campo
+    return None, None
+
+
 def listar_contactos_del_dia(token, fecha):
-    """Prueba los candidatos de endpoint hasta encontrar uno que responda 200 con una
-    lista. Devuelve (contactos, endpoint_usado, total_declarado)."""
+    """Prueba los candidatos de endpoint hasta encontrar uno que responda 200 con una lista.
+    Para `/subscribers` (P14: no filtra por fecha en el servidor), pagina el universo COMPLETO
+    y filtra en cliente por actividad de `fecha`. Para los demas candidatos (si alguno llega a
+    responder), respeta el filtro de servidor via from_date/to_date como antes.
+    Devuelve (contactos_del_dia, endpoint_usado, total_declarado_por_servidor_para_el_dia,
+    campo_fecha_por_ns, universo_completo_declarado_por_servidor). El 3er valor es None cuando
+    el servidor no da un total POR DIA (caso /subscribers); el 5to siempre lleva el total bruto
+    que sí dio el servidor, para declarar contexto sin usarlo como denominador del día."""
     for ep in CANDIDATOS_LISTADO:
-        r = pedir(token, ep, from_date=fecha, to_date=fecha, page=1)
+        sin_filtro_de_servidor = (ep == "/subscribers")
+        params = {"page": 1} if sin_filtro_de_servidor else {
+            "from_date": fecha, "to_date": fecha, "page": 1}
+        r = pedir(token, ep, **params)
         if "_ERROR" in r or "_ERROR_HTTP" in r:
             continue
         lote = r.get("data") if isinstance(r, dict) else r
@@ -142,14 +176,32 @@ def listar_contactos_del_dia(token, fecha):
             total = meta.get("total")
             ultima = meta.get("last_page")
             while ultima and pagina <= ultima and pagina <= 500:
-                r2 = pedir(token, ep, from_date=fecha, to_date=fecha, page=pagina)
+                params2 = {"page": pagina} if sin_filtro_de_servidor else {
+                    "from_date": fecha, "to_date": fecha, "page": pagina}
+                r2 = pedir(token, ep, **params2)
                 lote2 = r2.get("data") if isinstance(r2, dict) else None
                 if not isinstance(lote2, list) or not lote2:
                     break
                 filas += lote2
                 pagina += 1
-            return filas, ep, total
-    return None, None, None
+            if not sin_filtro_de_servidor:
+                return filas, ep, total, {}, total
+            # filtro en cliente por actividad del dia pedido. El servidor no declara un total
+            # POR DIA para este endpoint (total=meta.total es el universo completo, no el del
+            # dia) -- devolver ese numero como "declarado" haria que clasificar.py comparara
+            # peras con manzanas y abortara con "no_cuadra" sobre un desacople que no es un
+            # fallo real. Se devuelve None: clasificar.py lo declara "no_medible" (avisa, no
+            # aborta) tal como esta disenado para cuando el servidor no da un total fiable.
+            del_dia = []
+            campo_por_ns = {}
+            for c in filas:
+                fch, campo = _fecha_de(c)
+                if fch == fecha:
+                    del_dia.append(c)
+                    ns = c.get("user_ns") or c.get("ns") or c.get("id")
+                    campo_por_ns[ns] = campo
+            return del_dia, ep, None, campo_por_ns, total
+    return None, None, None, {}, None
 
 
 MAX_PAG_HILO = 12   # golden-logistica-diaria midio: con 5 se truncaba el 5% de los hilos
@@ -235,8 +287,12 @@ def main():
     dump["/flow/bot-users-count"] = redactar(pedir(token, "/flow/bot-users-count"))
     print(f"  /flow/bot-users-count  -> {dump['/flow/bot-users-count']}")
 
-    contactos, endpoint_usado, total_declarado = listar_contactos_del_dia(token, fecha)
+    (contactos, endpoint_usado, total_declarado, campo_fecha_por_ns,
+     universo_completo) = listar_contactos_del_dia(token, fecha)
     dump["_listado_endpoint_usado"] = endpoint_usado
+    dump["_listado_filtra_fecha_en_servidor"] = endpoint_usado != "/subscribers"
+    dump["_listado_campo_fecha_por_ns"] = campo_fecha_por_ns
+    dump["_listado_universo_completo_del_espacio"] = universo_completo
     if contactos is None:
         sys.exit(
             "No se pudo listar contactos del dia con ninguno de los endpoints candidatos "

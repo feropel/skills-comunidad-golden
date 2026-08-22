@@ -22,7 +22,7 @@ description: >-
 ---
 
 # GOLDEN SHOPIFY (`golden-shopify`)
-<!-- skill G4.3 · 2026-08-07 (centro de mando, cosecha del chat un estudio de producto): componente estándar "LO QUE ESTE PRODUCTO NO HACE" para verticales de SALUD, descrito junto a sec-disclaimer/sec-es-para-ti como obligatorio-recomendado — declara el límite del producto con honestidad (ej. "no repara una caries ya formada; sí cuida el esmalte") y convierte la objeción "es estafa" en razón de compra en categorías donde los competidores usan avales inventados y estadísticas sin estudio; el mismo mensaje se replica en pauta y en la respuesta pública de comentarios · G4.2 · 2026-08-07 (fuente: chat otro producto/otro producto): TOPE 50 KB por setting custom_liquid (punto 9 del RESUMEN DURO + check obligatorio en auto-check.md) + límites duros y RECETA PROBADA Horizon/Pitch (horizon-bloques.md) + fallback permanente del CTA a /cart/add si Releasit falta (REGLA #2 + releasit-cod.md) + nota [DEUDA] product.base.json en 17 vs 24 secciones; G4.1 · fix 2026-07-27: resumen del PROTOCOLO TEMA VIVO subido al tope (un chat recibió la skill truncada y trabajó sin él — lo crítico va ARRIBA); G4.0 · PERFILES (marca propia | catálogo-dropshipping) + embudo canónico de 24 secciones + bloque alternado imagen-texto + revelado seguro (el CTA nunca se oculta) + video lazy + srcset + schema SEO-AIO en sección propia; historial completo en references/changelog.md -->
+<!-- skill G4.3 · 2026-08-07 (centro de mando, cosecha del chat ESTUDIO 360 DENTAL CAVITY HEALING Chile): componente estándar "LO QUE ESTE PRODUCTO NO HACE" para verticales de SALUD, descrito junto a sec-disclaimer/sec-es-para-ti como obligatorio-recomendado — declara el límite del producto con honestidad (ej. "no repara una caries ya formada; sí cuida el esmalte") y convierte la objeción "es estafa" en razón de compra en categorías donde los competidores usan avales inventados y estadísticas sin estudio; el mismo mensaje se replica en pauta y en la respuesta pública de comentarios · G4.2 · 2026-08-07 (fuente: chat Insulinum/Nuut): TOPE 50 KB por setting custom_liquid (punto 9 del RESUMEN DURO + check obligatorio en auto-check.md) + límites duros y RECETA PROBADA Horizon/Pitch (horizon-bloques.md) + fallback permanente del CTA a /cart/add si Releasit falta (REGLA #2 + releasit-cod.md) + nota [DEUDA] product.base.json en 17 vs 24 secciones; G4.1 · fix 2026-07-27: resumen del PROTOCOLO TEMA VIVO subido al tope (un chat recibió la skill truncada y trabajó sin él — lo crítico va ARRIBA); G4.0 · PERFILES (marca propia | catálogo-dropshipping) + embudo canónico de 24 secciones + bloque alternado imagen-texto + revelado seguro (el CTA nunca se oculta) + video lazy + srcset + schema SEO-AIO en sección propia; historial completo en references/changelog.md -->
 
 > 🔒 **SKILL CANÓNICA — SOLO-LECTURA.** Estos archivos están protegidos (read-only) a propósito.
 > Se pueden LEER y usar libremente, pero **NO se editan desde fuera de la "fábrica"** (el chat del
@@ -39,7 +39,7 @@ description: >-
 6. **CSS prohibido**: jamás `html,body{overflow-x:clip}` — mata el scroll vertical; el desborde se arregla en el elemento culpable.
 7. **Releasit**: el Sticky Bar NUNCA se desactiva en el panel (se oculta por CSS) y el botón se prueba PULSÁNDOLO (abrir el modal).
 8. **Media de la ficha vive en el TEMA y en la DESCRIPCIÓN del producto** (descriptionHtml) — un barrido/parche de media mira ambos. **Video de contenido: `poster` OBLIGATORIO** (sin poster + sin autoplay = recuadro en blanco que simula sección vacía) y el autoplay se comprueba con play() o teléfono real, nunca desde el panel del navegador. GIF pesado (>1 MB) → convertir a MP4 `<video autoplay muted loop playsinline>` (caso real: 23,5 MB → 3,3 MB).
-9. **TOPE DURO: cada setting `custom_liquid` admite máximo 50 KB** — aplica a TODOS los temas, no solo a Horizon/Pitch. Al pasarse, el guardado revienta con *"Setting 'custom_liquid' is invalid. ['Liquid file size cannot exceed 50 kilobytes.']"* (descubierto con `FileSaveError` en tienda real, chat otro producto 2026-08-07). Medir CADA valor en **bytes UTF-8, no caracteres**, antes de entregar (verificación obligatoria en `references/auto-check.md`); si una pieza se acerca al tope, partirla en secciones más pequeñas (una sección por pieza, REGLA #5).
+9. **TOPE DURO: cada setting `custom_liquid` admite máximo 50 KB** — aplica a TODOS los temas, no solo a Horizon/Pitch. Al pasarse, el guardado revienta con *"Setting 'custom_liquid' is invalid. ['Liquid file size cannot exceed 50 kilobytes.']"* (descubierto con `FileSaveError` en tienda real, chat Insulinum 2026-08-07). Medir CADA valor en **bytes UTF-8, no caracteres**, antes de entregar (verificación obligatoria en `references/auto-check.md`); si una pieza se acerca al tope, partirla en secciones más pequeñas (una sección por pieza, REGLA #5).
 
 Sistema para generar páginas de producto Shopify de alta conversión COD. Nació
 del proyecto interno "plantilla down" (tema **Dawn**) y se probó en dos productos
@@ -61,7 +61,7 @@ base, sin importar el tema final.
 > embudo canónico G4.0 — pendiente de sesión dedicada para regenerarlo.** Hasta entonces, la
 > referencia canónica de ORDEN es la tabla del embudo en este SKILL.md, NO el base. El base sigue
 > siendo válido como motor (config center, Releasit, precio), pero nadie debe usarlo creyendo que
-> su orden de secciones está al día. (Detectado en el chat otro producto, 2026-08-07.)
+> su orden de secciones está al día. (Detectado en el chat Insulinum, 2026-08-07.)
 
 ## ⚠️ REGLA #1 — Cada página DEBE ser distinta (innegociable)
 Dos productos NUNCA quedan como la misma página con otro color/fotos. La base PRODUCTO DEMO
@@ -427,7 +427,7 @@ WhatsApp flota (posición indiferente) + Sticky siempre visible.
 > ⚠️ **[DEUDA G4.x] — excepción vigente al párrafo anterior:** `assets/product.base.json` **sigue en
 > 17 secciones vs las 24 del embudo canónico — pendiente de sesión dedicada.** Mientras no se
 > regenere, para el ORDEN de secciones manda la **tabla de arriba** (embudo G4.0 de 24), no el base;
-> el base solo gana en el motor y la config de cada bloque. (Chat otro producto, 2026-08-07.)
+> el base solo gana en el motor y la config de cada bloque. (Chat Insulinum, 2026-08-07.)
 
 Antes del Paso 1, elige **arquetipo** por vertical (define énfasis/orden, no si los bloques
 existen — REGLA #4): A) Perfume · B) Salud lean · C) Vitalidad full · D) Gadget/Demo · E) Kit.
@@ -555,7 +555,7 @@ y NUNCA reintroducir nombres reales** (usar descriptores de categoría; la skill
   de registro/INVIMA solo si es REAL) y `sec-es-para-ti.liquid` (**"es para ti?" + seguridad**:
   califica al cliente y lista cuándo NO usar / consultar antes). **Ambos son OBLIGATORIOS en
   productos de salud/estética COD** (protección legal, REGLA #3).
-  **Desde G4.3 (cosecha del un estudio de producto, 2026-08-07) — componente estándar
+  **Desde G4.3 (cosecha del estudio dental de Chile, 2026-08-07) — componente estándar
   "LO QUE ESTE PRODUCTO NO HACE"** (obligatorio-recomendado en verticales de SALUD, junto a
   `sec-disclaimer` / `sec-es-para-ti`): sección de 3-5 líneas que declara el LÍMITE del producto
   con honestidad brutal ("No repara una caries ya formada — eso lo hace el dentista. Sí cuida el

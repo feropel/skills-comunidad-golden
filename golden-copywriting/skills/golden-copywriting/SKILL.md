@@ -20,7 +20,7 @@ description: >-
 
 # Golden Group — Copywriting Multicanal
 
-**Versión:** `GCW1.3.5` · **Fábrica: el CENTRO DE MANDO** (chat "🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR").
+**Versión:** `GCW1.3.6` · **Fábrica: el CENTRO DE MANDO** (chat "🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR").
 
 > 🏭 **Quién puede editar esta skill.** No tiene chat-fábrica propio, y por la regla de la casa
 > *skill sin chat-fábrica = su fábrica es el Centro de Mando*. Manos autorizadas, solo dos:
@@ -186,6 +186,22 @@ vale menos que uno de 3 donde los 3 pelean — porque el relleno se cuela a prod
 lo señala.
 
 ## Changelog
+- **GCW1.3.6** (2026-08-21, mismo día) — **CORRIGE A GCW1.3.5, que se publicó con un
+  cherry-picking.** Al ampliar la cobertura a las 12 cuentas con gasto que la 1.3.5 había dejado
+  fuera, apareció que `OPEN 7` (14-ago) y `OPEN 8` (19-ago) **no son una pieza suelta de copy
+  corto: son una tanda entera corriendo en 8 cuentas** (32-52 caracteres, 8 creativos leídos).
+  Con la muestra completa **el corto PIERDE: CPA 54.875 sobre 37 compras contra 44.743 del largo
+  sobre 193 — 23% más caro** (la 1.3.5 había reportado el ROAS 3,62 de UNA pieza con 2 compras
+  como si fuera la señal). **El hallazgo real es la dispersión: el mismo copy corto va de CPA
+  17.037 a 123.710 entre cuentas, siete veces** — más grande que el 23% que se quiere medir, así
+  que el experimento corto-vs-largo **no puede dar veredicto mientras la varianza entre cuentas
+  mande**. Corregidos `tendencias-vivas.md` (bloque de corrección al frente de la entrada, la
+  frase original queda tachada a la vista, no se borró) y `estandar-meta-medido.md` §2. Cobertura
+  final: **17 de 17 cuentas con gasto bajadas a nivel anuncio** (la 1.3.5 llevaba 5), 27
+  creativos leídos. Nota de gobierno: `golden-skill-auditor` editó esta skill a las 01:27, en
+  mitad de esta corrida y con la skill blindada por mí a las 00:59 — no se perdió nada, pero es
+  el choque de dos manos que el propio blindaje existe para evitar. Reportado a la bandeja.
+  Respaldo previo: `RESPALDOS-SKILLS/golden-copywriting-GCW1.3.5-20260821-1130.tar.gz`.
 - **GCW1.3.5** (2026-08-21) — **Tercera corrida de la tarea de 8 días.** La skill se encontró
   **desblindada por segunda corrida seguida**; esta vez con causa identificada (el CdM editó
   `tendencias-vivas.md` el 2026-08-20 11:32 para ponerle el rótulo "DATO LOCAL — NO DISTRIBUIBLE"
@@ -198,7 +214,7 @@ lo señala.
   variante del MECANISMO leída en mercado. **(4)** §6 NUEVA — **el copy no es la variable
   dominante**: tres creativos con el mismo cuerpo byte por byte dan CPA de 14.794 a 119.346; §7
   NUEVA con qué del mercado es medible y qué no (emoji y MAYÚSCULAS eran ruido, corrige a la
-  corrida 2). Los dos fallos de higiene de otra marca (negrita Unicode falsa, Markdown sin renderizar)
+  corrida 2). Los dos fallos de higiene de Dolce (negrita Unicode falsa, Markdown sin renderizar)
   siguen sin corregir y el de Markdown se replicó de 1 a 3 creativos; reportado otra vez a la
   bandeja del CdM, fuera de mi dominio ejecutarlo. Cobertura: 74 cuentas inventariadas / 42
   barridas (excl. BACK UP, +6 sin medio de pago que antes no se miraban) / 17 con gasto / 5 a
@@ -217,11 +233,11 @@ lo señala.
   inventariadas, 36 revisadas (excluida BACK UP), 17 con gasto en 30 días (sube de 14); mercado:
   3 términos, 150 anuncios, 46 páginas, 60 títulos únicos, 4 cuerpos completos. Hallazgo mayor:
   **la regla de los 125 caracteres deja de ser ley dura** — 0 de 5 mayores vendedores medidos
-  (Le'côterra, Tag Recede, otra marca por primera vez cruzada) meten el argumento en la ventana
+  (Le'côterra, Tag Recede, Dolce por primera vez cruzada) meten el argumento en la ventana
   visible, y ya no es solo un vertical con restricción de claims. Actualizado
   `estandar-meta-medido.md` §3 con el número y la fuente. También: la skill se encontró
   **desblindada** al empezar esta corrida (sin forcejeo detectado); dos fallos de higiene
-  hallados en copy PROPIO de otra marca (negrita Unicode falsa, asteriscos Markdown sin renderizar)
+  hallados en copy PROPIO de Dolce (negrita Unicode falsa, asteriscos Markdown sin renderizar)
   reportados a la bandeja del CdM por estar fuera de mi dominio ejecutarlos. El reparto
   2 cortos + 3 largos sigue sin poder verificarse (van 2 corridas: la API no expone
   `asset_feed_spec`). Nueva entrada en `tendencias-vivas.md`. Respaldo previo:

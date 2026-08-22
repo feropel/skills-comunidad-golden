@@ -84,8 +84,15 @@ def espacio_roto():
                        "keyW": "Quiero el producto 🔥,,",
                        "idAd": ",,,,,,", "estado": "activo"})
 
-    # --- D3: cargado y HUERFANO (sin entrada en el disparador)
+    # --- D3: cargado y HUERFANO **CON** anuncios cargados = plata de pauta que no
+    # convierte (el default de producto() trae ids_de_anuncio)
     campos.append(campo("[Producto Ventas Wp] 4", producto("HUERFANO")))
+
+    # --- D3: huerfano SIN anuncios = no cuesta nada hoy. La severidad la decide el
+    # negocio, no la estructura: este NO puede salir en rojo.
+    p8 = producto("HUERFANO SIN PAUTA")
+    p8["activadores_del_flujo"]["ids_de_anuncio"] = ",,,,,,"
+    campos.append(campo("[Producto Ventas Wp] 8", p8))
 
     # --- D3: entrada del disparador que apunta a un campo que no existe
     disparador.append({"producto": "FANTASMA", "name": "[Producto Ventas Wp] 44",
@@ -243,6 +250,7 @@ ESPERADOS = {
     "F13": "signos de apertura y marcador dentro de las tareas de IA",
     "I3": "zonas del DUMP que no mira ningun control",
     "B3": "campos que no pertenecen a ningun asistente",
+    "B6": "asistentes esperados que NO estan instalados",
 }
 
 
@@ -270,6 +278,54 @@ def main():
               or h["titulo"].endswith("[Producto Ventas Wp] 1")]
     if falsos:
         print(f"  AVISO: {len(falsos)} hallazgos contra el producto SANO (falso positivo)")
+
+    # --- prueba 2: la severidad la decide el NEGOCIO
+    # El huerfano CON anuncios tiene que salir MUERTO y el que no tiene pauta, no.
+    d3 = [h for h in a.hallazgos if h["control"] == "D3"]
+    con = [h for h in d3 if h.get("clave") == "D3|huerfanos-con-pauta"]
+    sin = [h for h in d3 if h.get("clave") == "D3|huerfanos-sin-pauta"]
+    print()
+    if con and con[0]["severidad"] == "MUERTO":
+        print("  OK    D3   el huerfano CON pauta sale en rojo")
+    else:
+        print("  FALLA D3   el huerfano CON pauta deberia salir MUERTO")
+        faltan.append("D3-con-pauta")
+    if sin and sin[0]["severidad"] == "DUDA":
+        print("  OK    D3   el huerfano SIN pauta NO alarma")
+    else:
+        print("  FALLA D3   el huerfano SIN pauta no deberia salir en rojo")
+        faltan.append("D3-sin-pauta")
+
+    # --- prueba 3: el libro de decisiones silencia lo ya resuelto, sin borrarlo
+    b = Auditoria(espacio_roto())
+    b.decisiones = {"D3|huerfanos-sin-pauta": {
+        "motivo": "sin pauta activa, se registran cuando se les ponga",
+        "fecha": "2026-08-20", "reabrir_si": "se les carga un id de anuncio"}}
+    b.correr()
+    decididos = [h for h in b.hallazgos if h["severidad"] == "DECIDIDO"]
+    otros = [h for h in b.hallazgos if h["control"] == "D3"
+             and h["clave"] == "D3|huerfanos-con-pauta"]
+    if len(decididos) == 1 and otros and otros[0]["severidad"] == "MUERTO":
+        print("  OK    LD   el libro silencia SOLO lo decidido y deja el resto intacto")
+    else:
+        print(f"  FALLA LD   el libro deberia silenciar 1 y dejo {len(decididos)}")
+        faltan.append("libro-de-decisiones")
+
+    # --- prueba 4: el diff ve lo que se movio
+    import copy
+    anterior = copy.deepcopy(espacio_roto())
+    anterior["/flow/bot-fields"] = [c for c in anterior["/flow/bot-fields"]
+                                    if c["name"] != "TOKEN DROPI"]
+    for c in anterior["/flow/bot-fields"]:
+        if c["name"] == "[Carritos] Configuracion":
+            c["value"] = "{}"
+    c2 = Auditoria(espacio_roto()); c2.correr(); c2.comparar(anterior)
+    tipos = {t for t, _, _ in c2.cambios}
+    if {"NUEVO", "EDITADO"} <= tipos:
+        print("  OK    J1   el diff detecta campos nuevos y editados")
+    else:
+        print(f"  FALLA J1   el diff solo vio {tipos}")
+        faltan.append("diff")
 
     if faltan:
         print(f"\nAUTOPRUEBA FALLIDA · el auditor NO detecta: {faltan}")

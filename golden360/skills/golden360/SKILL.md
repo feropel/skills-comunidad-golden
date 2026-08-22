@@ -7,7 +7,7 @@ description: >
   que lo frenan si el producto no viabiliza, si un claim no tiene respaldo, si los precios no
   salen del sistema vivo, o si no pasa QA.
 
-  SIEMPRE usa este skill cuando el usuario quiera el LANZAMIENTO COMPLETO, o lo llame por su nombre:
+  SIEMPRE usa esta skill cuando el usuario quiera el LANZAMIENTO COMPLETO, o lo llame por su nombre:
   "Golden360", "golden 360", "corre la 360", "ruta 360", "la ruta", "lanza este
   producto", "de la foto a vender", "monta todo el producto", "producto completo de cero", "hazme
   todo el sistema de este producto", "quiero vender esto", "arranquemos este producto", "de cero a
@@ -15,14 +15,24 @@ description: >
   llevarlo a la venta. También cuando pida RETOMAR un lanzamiento a medias ("sigamos con el producto
   X", "en qué quedamos con este producto"): lee el PRODUCTO.json y continúa en su fase actual.
 
-  NO usar para una pieza suelta — deriva a la hermana: SOLO investigación/estudio de mercado →
-  golden-investigacion-mercado; solo la página → golden-shopify; solo pauta → golden-ads; solo
-  imágenes → golden-imagen-arena; solo video UGC → golden-ugc-avatar; solo el bot → familia
-  golden-chatea-pro. Esta skill es el DIRECTOR DE ORQUESTA, no un instrumento.
+  NO para una pieza suelta — deriva: estudio de mercado → golden-investigacion-mercado; página →
+  golden-shopify; pauta → golden-ads; imágenes → golden-imagen-arena; video UGC →
+  golden-ugc-avatar; bot → familia golden-chatea-pro. Es el DIRECTOR DE ORQUESTA, no un
+  instrumento.
 ---
 
 # GOLDEN 360 — la ruta de producto de Golden Group (`golden360`)
 
+<!-- GR360_VERSION: R1.8 — 2026-08-21 — Auditoría golden-skill-auditor (959→1000 ORO). Arreglos: (1)
+     concordancia de género en la línea disparadora del description ("este skill" → "esta skill",
+     único hueco de gramática detectado en las 22 skills que citan a esta). (2) Fase 9 traía el
+     README.md como obligatorio en candado.py y en el texto, pero sin plantilla — cada corrida
+     inventaba su propio formato; se agregó la plantilla exacta (índice + compuertas + pendientes)
+     bajo la Fase 9, que es la sección donde `candado.py` la exige. Todo lo demás verificado en
+     vivo y sin hallazgos: `candado.py --skills` corrido de verdad → 15/15 hijas instaladas + 2
+     auxiliares + 1 extra del dueño, 0 faltantes; `ast.parse` limpio; 4 referencias a hermanas
+     verificadas contra archivo real; 0 huérfanos, 0 rotas, 0 secretos, sin signos de apertura. Fábrica:
+     chat exclusivo golden360. -->
 <!-- GR360_VERSION: R1.7 — 2026-08-11 — MINERÍA DE LOCUCIÓN recogida en la orquestación (aviso de la red sináptica del Centro de Mando). El Bloque 1 ya no solo mina comentarios: transcribe el audio de los videos ganadores en LOCAL. Verificado ejecutando en esta máquina, no citando: yt-dlp 2026.07.04 + ffmpeg + whisper-cli presentes, 6,8 s de audio en español transcritos en 1,9 s. Se apunta a la receta canónica (§1.6 de golden-investigacion-mercado) sin duplicarla, para que no envejezca en dos sitios. Se exige la locución de los 3-5 videos top ANTES de la Compuerta 1, y el guion UGC de la Fase 5 parte de ella. NO se halló en esta skill la limitación vieja que el CdM pedía revisar: nunca dijo que el video fuera ilegible, simplemente no lo mencionaba. -->
 <!-- GR360_VERSION: R1.3 — 2026-07-31 — CONVIVENCIA horneada en AUTO-MEJORA tras el visto bueno del Centro de Mando: quién puede cambiar qué (ruta = esta fábrica con changelog+re-blindaje; estándares transversales — protocolos, esquema PRODUCTO.json, numeración de fases/compuertas — = aviso PREVIO al Centro de Mando para difusión; hija a fondo = su fábrica) + la ley de sistema para splits/renombres (gaceta 5c-bis) nacida de la auditoría R1.1. Se escribe en la skill porque lo que solo vive en un mensaje entre chats se pierde. -->
 
@@ -208,6 +218,31 @@ python3 ~/.claude/skills/golden360/scripts/candado.py "PROYECTOS/<PRODUCTO>"
 PRODUCTO.json · estudio `.docx` · página · PAUTA (o ADS/) · ORGANICO · CHATEA-PRO (2 piezas) ·
 /creativos (con GIF) · README · **PDF Golden** (`golden-pdf-check`, APROBADO, tarjetas numeradas).
 Coherencia contra el expediente: keyword única, precios idénticos, verbo consistente, un WhatsApp.
+
+**Plantilla exacta de `README.md`** (el índice + checklist que exige `candado.py`; sin esto cada
+corrida inventa su propio formato y el candado no tiene contra qué leer):
+```markdown
+# <PRODUCTO> — Paquete de lanzamiento
+
+## Índice de archivos
+- PRODUCTO.json — expediente único
+- <nombre>.docx — estudio de mercado (Bloque 1)
+- product.<tema>.json — destino de venta (Fase 4)
+- PAUTA.md (o ADS/) — pauta Meta+TikTok+Google (Fase 7)
+- ORGANICO-REDES.md — contenido orgánico (Fase 6)
+- CHATEA-PRO.md — venta WhatsApp + comentarios (Fase 8)
+- /creativos — piezas o prompts (Fase 5)
+- <PRODUCTO>.pdf — PDF Golden (Fase 9)
+
+## Compuertas
+- [ ] C1 Viabilidad — ✅/❌ + por qué
+- [ ] C2 Veracidad — ✅/❌ + claims auditados
+- [ ] C3 Montaje — pendiente hasta el OK con datos reales
+- [ ] C4 QA — pendiente hasta el pre-encendido
+
+## Pendientes [PENDIENTE]/[PARCIAL]
+- <dato> — quién lo resuelve
+```
 
 ## 🚪 COMPUERTA 3 · MONTAJE
 Generar ≠ montar. Cerrar SIEMPRE preguntando "Deseas que lo monte?" + los datos que solo el dueño

@@ -21,11 +21,12 @@ description: >-
 
 # Golden Video Editor — de grabación cruda a anuncio publicable
 
+<!-- skill versión GVE1.3 · auditoría golden-skill-auditor 2026-08-21: cierra la inconsistencia de versión (el cuerpo ya traía los cambios de GVE1.2 pero la línea "Versión:" y el Changelog se habían quedado en GVE1.1 — ahora coinciden); documenta el blindaje (chflags uchg) en el propio SKILL.md, no solo en el filesystem; completa el ejemplo de tts con --output -->
 <!-- skill versión GVE1.2 · auditoría 2026-07-25: transcribe SIN --output (ese flag es solo para sidecar SRT/VTT; el transcript.json se escribe solo); añadido el andamio real del pipeline (npx hyperframes init --video y npx hyperframes render con quality/fps/format), que era el esqueleto que faltaba; voz em_alex marcada como no verificada; puntero a transcript-guide.md para filtrar tokens basura -->
 <!-- skill versión GVE1.1 · ruta completa a captions.md de hyperframes, transcribe con --model small --language es, dependencias TTS declaradas, estado honesto del stack, manejo de errores por paso, caso borde de producto sin claims -->
 <!-- skill versión GVE1.0 · creación: destilado del tutorial Horizontes IA + stack Golden (Whisper local, claims, checklist) -->
 
-**Versión:** `GVE1.1` · Fábrica: chat centro de mando.
+**Versión:** `GVE1.3` · Fábrica: chat centro de mando. · Blindada con `chflags uchg` (desbloquear con `chflags -R nouchg` antes de editar, volver a blindar con `chflags -R uchg` al cerrar).
 
 Graba con el celular sin preocuparte por trabarte, repetir o quedarte callado. Esta skill
 se encarga del resto. Pensada para **anuncios COD y contenido orgánico de Golden**, no para
@@ -130,9 +131,13 @@ Reglas: un visual no compite con la voz, la refuerza. El producto siempre se ve 
   mano, arma una carpeta `sfx/` con archivos nombrados por su uso (`pop.wav`, `whoosh.wav`)
   y la skill los coloca por nombre.
 - **Música** de fondo baja, que no tape la voz. Puede ser propia o generada.
-- **Voz en off** cuando haga falta: `npx hyperframes tts` con voz española `ef_dora` (la
-  única que trae la CLI verificada; `em_alex`, masculina, es un ID válido de Kokoro pero
-  conviene probarlo antes de prometerlo). Lista las voces con `npx hyperframes tts --list`.
+- **Voz en off** cuando haga falta:
+  ```bash
+  npx hyperframes tts "texto del guion" --voice ef_dora --output narracion.wav
+  ```
+  `ef_dora` es la voz española verificada en el stack Golden (`em_alex`, masculina, es un ID
+  válido de Kokoro pero conviene probarlo antes de prometerlo). Lista las voces con
+  `npx hyperframes tts --list`.
   El TTS necesita dependencias que NO vienen con el paquete: `pip3 install kokoro-onnx soundfile`
   y, para fonemas en español, `brew install espeak-ng`. Si faltan, instálalas primero (una vez);
   si la instalación no es posible en ese momento, sigue el pipeline SIN voz en off e informa
@@ -186,6 +191,15 @@ identidad Golden, nunca con la marca ajena (regla de referencias).
 - `hyperframes` + `hyperframes-media` + `hyperframes-cli` → el motor por debajo.
 
 ## Changelog
+- **GVE1.3** (2026-08-21) — Re-auditoría con golden-skill-auditor: la línea "Versión" y este
+  Changelog se habían quedado en GVE1.1 mientras el cuerpo del pipeline ya traía los cambios
+  de GVE1.2 (andamio `init --video`, `transcribe` sin `--output`, voz `em_alex` marcada como
+  no verificada) — ahora todo coincide. Se documenta el blindaje (`chflags uchg`) en la línea
+  de versión y se completa el ejemplo de `tts` con `--voice`/`--output`.
+- **GVE1.2** (2026-07-25) — Andamio real del pipeline: `npx hyperframes init --video` para
+  scaffoldar y transcribir de una, `transcribe` sin `--output` (ese flag es solo para sidecar
+  SRT/VTT), ejemplos de `render` con `--quality`/`--fps`/`--format`, voz `em_alex` marcada
+  como no verificada, puntero a `transcript-guide.md` para filtrar tokens basura.
 - **GVE1.1** (2026-07-23) — Auditoría con golden-skill-auditor: ruta completa a
   `captions.md` de la skill `hyperframes`, `transcribe` con `--model small --language es`
   (los modelos `.en` traducen, no transcriben), estado honesto del stack (npx descarga al

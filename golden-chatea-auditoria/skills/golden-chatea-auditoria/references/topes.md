@@ -31,6 +31,16 @@ según cuántas tildes y emojis tenga.
 escapado = len(json.dumps(valor)[1:-1])   # y que quede por debajo de 19.000
 ```
 
+**Los dos umbrales, y por qué son dos.** 19.000 es la alerta prudente; el último valor que se
+vio **disparar** es 19.895 y el primero que se vio **no disparar** es 23.266. Entre 19.895 y
+23.266 no hay medición: por eso el auditor declara 🔴 solo por encima de 19.895 y 🟠 entre
+19.000 y 19.895. Tratar los dos casos igual es gritar muerte donde hay riesgo, y el dueño deja
+de creerle al informe.
+
+Los números no viven en el código: están en **`assets/topes-nativos.json`**, que es de donde
+los lee `auditar.py`. Si Chatea cambia de versión, se corrige ese archivo y no hay que tocar
+ningún script.
+
 Los emojis decorativos son los que más pesan: 12 escapados cada uno. Compactarlos es la forma
 más barata de bajar un campo que está contra el techo.
 

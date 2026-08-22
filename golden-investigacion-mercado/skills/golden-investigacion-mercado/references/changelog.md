@@ -9,7 +9,7 @@ G5.9 · G5.8.1 · G5.8 · G5.7 · G5.6 · G5.5 · G5.4 · G5.3 · G5.2 · G5.1 �
 > después de G1.0 — rompían el orden cronológico descendente que respeta el resto del changelog.
 > Reubicadas aquí, entre G4.3 (2026-07-30) y G4.1 (2026-07-27), que es donde su fecha las ubica.
 
-## G5.7 — 2026-08-07 — Cosecha del chat "un estudio de producto(Chile)" (6 ítems)
+## G5.7 — 2026-08-07 — Cosecha del chat "ESTUDIO 360 DENTAL CAVITY HEALING (Chile)" (6 ítems)
 Repartido por el Centro de Mando desde la bandeja (orden de FER: "sin omitir detalle"). Todo salió
 de una corrida real de la skill sobre una tienda real de gotas dentales COD en Chile (dominio
 omitido a propósito — no es información que aporte a la lección técnica):
@@ -19,7 +19,8 @@ omitido a propósito — no es información que aporte a la lección técnica):
   declara nano-hidroxiapatita. Regla: rastrear el original (Amazon/eBay/AliExpress) para costo
   real, ml e ingredientes, y PROHIBIDO escribir un claim de ingrediente sin la foto macro de la
   etiqueta del frasco que el dueño va a despachar.
-- **El NOMBRE del producto es un ítem de compliance** (forense + compliance): "Dental el producto del estudio" promete curación y era el mayor pasivo legal del negocio; ninguna revisión lo detectaba
+- **El NOMBRE del producto es un ítem de compliance** (forense + compliance): "Dental Cavity
+  Healing" promete curación y era el mayor pasivo legal del negocio; ninguna revisión lo detectaba
   porque el mapa miraba el copy, no el nombre. Si promete cura → proponer renombre (caso real:
   "Dental Shield / Escudo Dental").
 - **Vertical SALUD BUCAL** en `compliance-por-vertical.md` con la redacción probada en campo

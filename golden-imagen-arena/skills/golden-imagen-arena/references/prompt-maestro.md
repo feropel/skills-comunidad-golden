@@ -65,7 +65,7 @@ the product to be composited later; no rectangle, no panel, no block of flat col
 
 ## Reglas de arte para SALUD (dental y afines) — norma del Centro de Mando 2026-08-07
 
-Probadas en campo en el un estudio de producto. Aplican a todo prompt de imagen cuando el
+Probadas en campo en el estudio dental de Chile. Aplican a todo prompt de imagen cuando el
 vertical es salud bucal o parecido (suplementos, piel, capilar con claim sensible):
 
 **PROHIBIDO en la imagen:**

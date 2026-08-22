@@ -33,7 +33,7 @@ const orden = i => ({
   total_order: '69900.00', shipping_company: 'ENVIA',
   distribution_company: { id: 1, name: 'ENVIA' },
   shipping_guide: 'G' + i, notes: 'Bolso: Negro Azabache ***',
-  created_at: '2026-08-01 10:00:00', warehouse: { name: 'SUPPLI' }, shop: { name: 'Dolce' },
+  created_at: '2026-08-01 10:00:00', warehouse: { name: 'SUPPLI' }, shop: { name: 'otra marca' },
   orderdetails: [{ product: { name: 'Bolso' }, product_id: null, variation_id: 829674,
                    variation: { values: [] } }]
 });

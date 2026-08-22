@@ -77,7 +77,7 @@ con Veloces daba 33% con un rango de 0 a 87. Se usa solo agregada, para el facto
 La tienda entrega por debajo de su municipio, y eso sí es medible en agregado. Corrige el
 **nivel**, no el **orden**: se aplica igual a todas las candidatas.
 
-**El número no se escribe en este documento.** Vive en `CALIBRACION-DOLCE.json`, con sus
+**El número no se escribe en este documento.** Vive en `CALIBRACION-otra marca.json`, con sus
 insumos al lado y — desde el 2026-08-10 — **con su fuente declarada dentro del archivo**.
 
 Esa declaración nació de este mismo error. El factor se había calculado contra

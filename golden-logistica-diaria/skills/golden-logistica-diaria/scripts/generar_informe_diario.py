@@ -30,7 +30,7 @@ from comun import (contacto_de, tel10, miles, miles_seguro, pesos, nom_de,
 from cruzar_chat_orden import cruzar, uf  # noqa: E402
 
 # LOS ESTADOS SON POR CUENTA, NO POR CODIGO.
-# Medido: la cuenta de Dolce tiene 15 estados y NO tiene GUIA_GENERADA; la de Golden
+# Medido: la cuenta de otra marca tiene 15 estados y NO tiene GUIA_GENERADA; la de Golden
 # tiene ~28 y SI lo tiene. Quemar la lista aqui garantiza que la segunda tienda que
 # use la skill pierda pedidos en silencio. Estos son los VALORES POR DEFECTO — el
 # config los pisa con 'estados' cuando la cuenta trae otros.

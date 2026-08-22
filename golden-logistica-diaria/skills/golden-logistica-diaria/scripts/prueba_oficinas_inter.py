@@ -56,7 +56,7 @@ def main():
     caso("un barrio sin numeros", "Barrio El Jardin casa 3", "QUINCHIA", "no")
 
     # 2b · UNA CASA CON SENAS DE CASA NO SE PARECE A NADA.
-    #      Los dos casos son TEXTUALES de la primera corrida real (Dolce, 2026-08-17):
+    #      Los dos casos son TEXTUALES de la primera corrida real (otra marca, 2026-08-17):
     #      fueron las dos unicas «parecidas» de 78 pedidos y las dos eran falsa alarma.
     #      Con «misma via y mismo primer numero», en un pueblo cuya oficina esta en la
     #      calle 9 **media calle 9 sale sospechosa**. Una regla que grita en cada cuadra

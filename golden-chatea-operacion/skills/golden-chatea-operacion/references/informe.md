@@ -21,6 +21,14 @@ vuelve a correr el mismo día (estado vivo, nunca respaldos numerados).
 | Hilos que no se pudieron traer | N (con el motivo de cada uno) |
 | Contactos excluidos del denominador de conversión (`opted_in_through: dropi`) | N |
 | Mensajes totales en el día (excluidas notas de pixel) | N |
+| Denominador de la Fase 1 | cuadra / no_cuadra / no_medible (ver `clasificacion.md`, control `INV`) |
+| Listado de contactos truncado por el tope de páginas | Sí/No/no_medible (control `P-listado-truncado`) |
+| Zona horaria usada para acotar R2/R3/R4/Q4 al día (`zona_horas_usada`) y si el acotado quedó activo (`acotado_al_dia_activo`) | offset en horas · Sí/No (si es No, ver el hallazgo `P-sin-fecha-auditada`) |
+| Compuerta de cordura, lado alto y lado bajo | % medido, activada Sí/No en cada lado (ver sección propia más abajo) |
+
+Esta tabla es un RESUMEN — `clasificar.py --json` guarda el diccionario `universo` completo,
+con más claves que las de esta tabla (plantillas detectadas, endpoint de listado usado, etc.);
+la tabla no reemplaza esa salida, la resume para el lector humano.
 
 ## 2. La empresa se fue de último — PRIMERO, siempre
 Lista completa, no muestra. Un contacto por fila: nombre/`user_ns`, último mensaje del cliente
@@ -83,6 +91,15 @@ verificable.
 ```
 
 ## Si se activó la compuerta de cordura (o el denominador de la Fase 1 no cuadra)
+
+**El denominador de la Fase 1 tiene TRES estados** (F6, corregido tras verificación
+2026-08-22 — esta sección solo describía el caso de aborto y no distinguía los tres):
+`cuadra` sigue sin aviso; `no_cuadra` (los dos números existen y son distintos) es el único
+que activa lo que describe esta sección — el informe normal no se escribe; `no_medible` (el
+servidor no da un total con el que comparar, caso real de `/subscribers`) **NO** activa nada
+de esto — avisa con un hallazgo `INV`/`DUDA` y el informe normal se escribe igual, con la
+Fase 1 declarada como no medible. Detalle exacto del criterio en
+`references/clasificacion.md` (control `INV`).
 
 El informe normal **no se escribe, y `clasificar.py` tampoco lo IMPRIME**: `imprimir()`
 verifica el aborto antes de tocar la sección de hallazgos, así que ni la evidencia citada del

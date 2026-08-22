@@ -333,7 +333,7 @@ def _sin_tildes(s):
 def _como_suena(s):
     """El nombre de la transportadora como lo escribe quien lo dicta por WhatsApp.
 
-    MEDIDO sobre las 12 direcciones de Dolce que hablan de recoger: dos de ellas — una
+    MEDIDO sobre las 12 direcciones de otra marca que hablan de recoger: dos de ellas — una
     de cada seis — traen el nombre roto, y no de cualquier forma:
       · «Oficina de Inter rapidisimo»  -> partido por un espacio
       · «Oficina interrapidicimo ...»  -> escrito como suena (c por s)
@@ -360,7 +360,7 @@ _ES_DIRECCION = re.compile(
 def pide_oficina(direccion, transportadoras=()):
     """TRES ESTADOS: «punto», «direccion» o «dudoso». Nunca dos.
 
-    POR QUE EXISTE, y el caso es de FER via LOGISTICA DOLCE (2026-08-11): el detector
+    POR QUE EXISTE, y el caso es de FER via LOGISTICA otra marca (2026-08-11): el detector
     viejo era `re.search(r"oficina|reclame", dir)` — la palabra suelta, sin mirar nada
     mas. Con eso:
       · «Oficina InterRapidisimo» -> recogida en punto. CORRECTO.
@@ -556,7 +556,7 @@ def es_oficina_de_inter(direccion, ciudad, oficinas):
             return "igual", f"misma puerta que la oficina de Interrapidisimo ({od})"
     # UNA CASA CON SENAS DE CASA NO SE PARECE A NADA, aunque comparta la calle.
     #
-    # MEDIDO en la primera corrida real (Dolce, 78 pedidos vivos, 2026-08-17): las DOS
+    # MEDIDO en la primera corrida real (otra marca, 78 pedidos vivos, 2026-08-17): las DOS
     # unicas «parecidas» eran falsas alarmas, y las dos se delataban solas —
     # «...urbanizacion reservas de San Juan torre 5 apto 33» y una calle 9 contra una
     # oficina en la 9 B. El criterio de semejanza era «misma via y mismo primer numero»,
@@ -619,7 +619,7 @@ def ventana_accionable(D):
 
     y el volcado oficial de la API trae **`accionables: null`** (ausencia DECLARADA a
     proposito). Con null el `if` no dispara y **el informe barre la cuenta entera**:
-    medido sobre el volcado real de Dolce, **124 «direcciones malas» de las que 120 eran
+    medido sobre el volcado real de otra marca, **124 «direcciones malas» de las que 120 eran
     pedidos ya cerrados** — direcciones que nadie puede ni debe corregir. Con la ventana
     derivada son **4**.
 
@@ -660,7 +660,7 @@ def se_puede_reasignar(orden):
     confirmar los pedidos, tiene que estar perfecto»*, y un informe que propone acciones
     imposibles **invita al error**.
 
-    MEDIDO en el canonico: de los pedidos en NOVEDAD de Dolce, **los 5 tenian guia y ya
+    MEDIDO en el canonico: de los pedidos en NOVEDAD de otra marca, **los 5 tenian guia y ya
     habian despachado, y a 3 el informe les decia «pasar a otra transportadora»**. No es
     una recomendacion discutible: es una instruccion que no se puede ejecutar. Quien la
     lee pierde el tiempo, y quien la lee dos veces deja de confiar en la seccion entera.
@@ -733,7 +733,7 @@ def aviso_default_bodega(cfg):
         "por pedido y **no lee ese default**, asi que si lo que dice aqui difiere de lo "
         "que muestra el panel, **puede ser el default y no un error**. Leer el default y "
         "declarar cada diferencia como excepcion entra en una ronda proxima. "
-        "(En cuentas sin default escrito — Dolce hoy — este aviso no aplica todavia.)")
+        "(En cuentas sin default escrito — otra marca hoy — este aviso no aplica todavia.)")
 
 
 def exigir_presente(texto, aguja, que, minimo=1):

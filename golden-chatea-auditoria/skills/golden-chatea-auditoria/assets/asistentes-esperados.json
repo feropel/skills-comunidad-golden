@@ -1,7 +1,7 @@
 {
   "_para_que": "Detectar lo que FALTA, no solo lo que hay. Contar prefijos presentes nunca puede contestar 'esta completa la instalacion de este cliente'.",
   "_como_se_usa": "campos_firma = campos que SIEMPRE existen si ese asistente esta instalado. Ninguno presente = no instalado. Algunos = instalado a medias.",
-  "_medido_contra": "Golden Colombia f218311 (vende a diario) y el workspace plantilla de Mexico f251977, 2026-08",
+  "_medido_contra": "el espacio de tu tienda (vende a diario) y el un workspace plantilla de otro pais, 2026-08",
   "asistentes": {
     "Comentarios": {
       "campos_firma": ["[Comentarios] Configuracion General", "[Comentarios IA] Tipo de actividad"],

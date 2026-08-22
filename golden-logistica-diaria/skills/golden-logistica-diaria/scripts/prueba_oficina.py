@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Banco del detector de recogida en punto. Los DOS primeros casos son ajenos y reales.
 
-LOS MIDIO LOGISTICA DOLCE contra la sesion viva el 2026-08-11, y son complementarios:
+LOS MIDIO LOGISTICA otra marca contra la sesion viva el 2026-08-11, y son complementarios:
 uno es el acierto que hay que conservar y el otro es el falso positivo que costaba plata.
 El detector viejo (`oficina|reclame` a secas) daba VERDE en los dos, o sea: no detectaba
 nada, solo repetia la palabra. Un detector que dice que si a todo no es un detector.
@@ -22,7 +22,7 @@ import os, sys
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from comun import pide_oficina   # noqa: E402
 
-# Las de la cuenta de Dolce el dia de la medicion.
+# Las de la cuenta de otra marca el dia de la medicion.
 OPER = ["ENVIA", "INTERRAPIDISIMO", "VELOCES"]
 FALLOS = []
 
@@ -59,7 +59,7 @@ def main():
          "Av Siempreviza 100 oficina torre B", "direccion")
 
     # ---- EL NOMBRE ROTO SIGUE SIENDO EL NOMBRE ----
-    # Los dos casos son textuales de las 12 direcciones de Dolce que hablan de recoger:
+    # Los dos casos son textuales de las 12 direcciones de otra marca que hablan de recoger:
     # 1 de cada 6 trae la transportadora partida o escrita como suena. Con comparacion
     # literal caian en «dudoso», que es seguro pero deja plata en la mesa sin motivo.
     caso("nombre partido por un espacio", "Oficina de Inter rapidísimo", "punto")

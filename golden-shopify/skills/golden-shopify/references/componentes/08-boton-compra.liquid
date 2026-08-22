@@ -121,9 +121,39 @@ window.RELEASIT_BUTTON_CONFIG = {
   if(c.animation==="pulse") b.style.animation=`pulse ${c.animationSpeed} infinite`;
   if(c.animation==="shake") b.style.animation=`shake ${c.animationSpeed} infinite`;
 
+  // Fallback REGLA #2 / releasit-cod.md (G4.2): el CTA NUNCA se queda mudo si Releasit
+  // no está (app caída, bloque desactivado, bloqueada por el navegador, inyección tardía).
+  function nativeCartFallback(){
+    b.disabled = true;
+    var span = b.querySelector("span");
+    var prevText = span ? span.innerText : "";
+    if(span) span.innerText = "Agregando…";
+    fetch("/cart/add.js", {
+      method: "POST",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify({
+        items: [{ id: {{ product.selected_or_first_available_variant.id | json }}, quantity: 1 }]
+      })
+    }).then(function(res){
+      if(!res.ok) throw new Error("cart/add failed");
+      window.location.href = "/cart";
+    }).catch(function(){
+      b.disabled = false;
+      if(span) span.innerText = prevText;
+      window.location.href = "/cart";
+    });
+  }
   b.addEventListener("click",function(){
     const r=document.querySelector("#_rsi-buy-now-button-overwrite, ._rsi-buy-now-button");
-    if(r) r.click();
+    if(r){ r.click(); return; }
+    // No está aún: espera ~1.5s por si Releasit inyecta tarde, luego cae al flujo nativo.
+    var waited = 0, step = 150;
+    var iv = setInterval(function(){
+      var r2 = document.querySelector("#_rsi-buy-now-button-overwrite, ._rsi-buy-now-button");
+      if(r2){ clearInterval(iv); r2.click(); return; }
+      waited += step;
+      if(waited >= 1500){ clearInterval(iv); nativeCartFallback(); }
+    }, step);
   });
 })();
 </script>

@@ -1,6 +1,6 @@
 # CONTRATO DEL INFORME DIARIO · golden-logistica-diaria
 
-**Versión de la skill: la que declara `SKILL.md` (hoy `GLD1.28`). Este contrato no lleva número propio: tenía uno y quedó tres versiones atrás.** Construido y corrido contra datos reales de Dolce.
+**Versión de la skill: la que declara `SKILL.md` (hoy `GLD1.28`). Este contrato no lleva número propio: tenía uno y quedó tres versiones atrás.** Construido y corrido contra datos reales de otra marca.
 
 ## EL FORMATO ES CORTO · construido, no pendiente
 

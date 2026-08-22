@@ -42,8 +42,8 @@ if "var(--cta)" not in allcl: fallos.append("falta var(--cta) (botón de compra)
 if "GOLDEN SHOPIFY" not in allcl and "GFS_VERSION" not in allcl:
     fallos.append("falta el sello de versión")
 
-# 6) Intro Ignition presente (bloque 1) — salvo que el usuario lo haya quitado a propósito
-if "ignition" not in allcl.lower(): fallos.append("falta el intro IGNITION del bloque 1")
+# 6) Intro Ignition presente (sec-ignition.liquid, bloque independiente desde G4.0) — salvo que el usuario lo haya quitado a propósito
+if "ignition" not in allcl.lower(): fallos.append("falta el intro IGNITION (sec-ignition.liquid)")
 
 # 7) Releasit motor presente
 if "releasit" not in allcl.lower() and "_rsi-buy-now" not in allcl:
@@ -115,7 +115,7 @@ if "ignition" in allcl.lower() or "gfs-ign" in allcl.lower():
 # 21) G4.2 — OBLIGATORIO: TOPE SHOPIFY DE 50 KB POR SETTING custom_liquid (bytes UTF-8, NO caracteres).
 #     Aplica a TODOS los temas. Shopify rechaza el guardado del template con:
 #     "Setting 'custom_liquid' is invalid. ['Liquid file size cannot exceed 50 kilobytes.']"
-#     (FileSaveError descubierto en tienda real, chat Insulinum 2026-08-07.)
+#     (FileSaveError descubierto en tienda real, chat otro producto 2026-08-07.)
 #     Se mide CADA valor por separado (jamás el total concatenado) y en BYTES UTF-8: los acentos,
 #     emojis y símbolos ocupan más de 1 byte, así que len(texto) en caracteres MIENTE.
 for skey, s in d["sections"].items():

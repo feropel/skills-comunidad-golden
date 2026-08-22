@@ -28,8 +28,9 @@ humana obligatoria (H).
 | B2 | A | **Campos de usuario contra su límite.** Hay un tope por workspace (visto `412/200` en rojo en el panel). Pasado el límite, dejan de crearse campos nuevos en silencio. |
 | B3 | A | **Asistentes detectados por prefijo de campo**, no por lo que se supone instalado. Los prefijos conocidos son `[Comentarios]`, `[Ventas Wp]` / `[Producto Ventas Wp]`, `[Logistico]` / `[Logistica]`, `[Carritos IA]`, `[Remarketing IA]`, `[WhatsApp IA]`, `[Novedades]`, `[Minimax]`, `[Meta]`, `[Integraciones]`. **Un prefijo desconocido es un hallazgo, no ruido**: significa que hay un asistente o una versión que la skill todavía no sabe auditar, y hay que declararlo. |
 | B4 | A | **Subflujos, tags, agentes IA, tareas IA y webhooks entrantes** contados. |
-| B6 | A | **Lo que FALTA, no solo lo que hay.** Contar prefijos presentes nunca puede contestar "está completa la instalación de este cliente". Se cruza contra la lista de esperados de `assets/asistentes-esperados.json`, que trae los campos firma de cada asistente: **ninguno presente = no instalado · algunos = instalado a medias**, que se comporta distinto según el camino que tome el flujo. Los opcionales del archivo (`[Remarketing IA]`, `[Minimax]`…) no se reportan como faltantes: aparecen en unos espacios y en otros no. |
+| B7 | A | **Un endpoint que respondió con error se DECLARA, no tumba la auditoría.** El extractor guarda el error del servidor tal cual, así que el valor deja de ser una lista y pasa a ser un diccionario de error. Iterarlo como lista revienta la corrida entera con un traceback, y **un 500 puntual de la API no puede costar el informe completo**. Se degrada: esa zona se marca como no medida, con su error citado, y el resto sigue. |
 | B5 | A | **Ranuras de producto ocupadas.** Campos `[Producto Ventas Wp] N` con contenido. No se asume cuáles: se cuentan. El volcado de la semana pasada no sirve, esa cuenta cambia de un día para otro. |
+| B6 | A | **Lo que FALTA, no solo lo que hay.** Contar prefijos presentes nunca puede contestar "está completa la instalación de este cliente". Se cruza contra la lista de esperados de `assets/asistentes-esperados.json`, que trae los campos firma de cada asistente: **ninguno presente = no instalado · algunos = instalado a medias**, que se comporta distinto según el camino que tome el flujo. Los opcionales del archivo (`[Remarketing IA]`, `[Minimax]`…) no se reportan como faltantes: aparecen en unos espacios y en otros no. |
 
 ## Bloque C · Los dos techos
 
@@ -158,7 +159,7 @@ de abrirla. Estos dos controles son los que la vuelven algo que se mira a diario
 
 ```json
 {
-  "espacio": "f218311",
+  "espacio": "fXXXXXX",
   "decisiones": [
     {
       "clave": "D3|huerfanos-sin-pauta",
@@ -171,8 +172,13 @@ de abrirla. Estos dos controles son los que la vuelven algo que se mira a diario
 ```
 
 `reabrir_si` es la parte que impide que el libro se vuelva una alfombra: dice en qué condición
-la decisión deja de valer. Una decisión sin motivo y sin fecha no se acepta — sin ellos, dentro
-de tres meses nadie sabe si sigue vigente.
+la decisión deja de valer.
+
+**Esto lo aplica el código, no la buena voluntad.** Una decisión sin `motivo` o sin `fecha`
+**detiene la corrida** con el mensaje de cuáles están incompletas: silenciar un hallazgo sin
+dejar rastro de quién lo decidió ni cuándo es exactamente el abuso que el libro podría habilitar.
+Una decisión sin `reabrir_si` sí se acepta, pero el informe avisa que queda silenciada para
+siempre.
 
 ### Handoff · `--handoff <archivo.md>`
 
@@ -180,3 +186,7 @@ Esta skill no escribe en Chatea, pero dejar el arreglo en prosa obliga al siguie
 reconstruir el contexto entero. El handoff agrupa los hallazgos accionables **por la skill
 dueña del campo** (inferida del prefijo) y encabeza cada paquete con las dos reglas que se
 pagan caro: medir el escapado antes de escribir, y releer del servidor después.
+
+Abre con **las preguntas que hay que contestar antes de tocar**: los hallazgos 🔵 que traen
+acción concreta no se corrigen a ciegas ni se tiran a la basura — se contestan, y cada uno viene
+con su `clave` lista para escribir la respuesta en el libro de decisiones.

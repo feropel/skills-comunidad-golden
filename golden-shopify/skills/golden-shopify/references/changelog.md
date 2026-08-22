@@ -3,6 +3,51 @@
 Registro de versiones de la skill. Cada vez que se absorbe una mejora de una página
 real, se sube una versión aquí (ver el ritual de auto-mejora en SKILL.md).
 
+## G4.4 — 2026-08-22 — Cierre de auditoría golden-skill-auditor (críticos reparados)
+Auditoría verificó 9 hallazgos críticos contra el archivo real; los 9 se confirmaron y se repararon:
+1. **GFS_VERSION desincronizado** — el config center declaraba `"G3.14"` (~15 versiones atrás de la
+   skill real, entonces G4.3) en `assets/config-center.liquid` y `references/componentes/00-config-center.liquid`.
+   Corregido a `"G4.3"`.
+2. **`imagenes.md` enseñaba el bug de comentario Liquid** — el ejemplo de "convención de slot de
+   imagen" usaba `{# ... #}`, que NO es un comentario válido en Liquid (se imprime como texto) y es
+   exactamente lo que caza `auto-check.md` check #17. Corregido a `{% comment %}...{% endcomment %}`
+   con nota de advertencia explícita.
+3. **`checklist-producto.md` con instrucción fósil de Ignition** — decía que vivía embebido en
+   `01-propuesta.liquid`; desde G4.0 es `sec-ignition.liquid`, bloque independiente. Corregido, junto
+   con el mismo lenguaje "bloque 1" fósil en los comentarios de `auto-check.md`.
+5. **`sistema.md` con el inventario incompleto** — le faltaban 18 de los 46 `.liquid` reales de
+   `references/componentes/` (incluyendo obligatorios de G4.0/G4.3: sec-seguridad, sec-disclaimer,
+   sec-es-para-ti, sec-combos, sec-seo-aio-schema, sec-cta-suelto, sec-lock-landing, efx-reveal-seguro,
+   efx-video-lazy, sec-bloque-alternado, sec-cine, sec-dolor-segmentado, sec-escenas, sec-ficha-tecnica,
+   sec-fondo-cine, sec-timeline, sec-ya-lo-intentaste, 05b-rating-simple). Tabla completada a 46/46.
+6. **Fallback real a `/cart/add` ausente** — REGLA #2 del SKILL.md y `releasit-cod.md` (desde G4.2)
+   describían el fallback como si ya estuviera implementado, pero `08-boton-compra.liquid` solo
+   disparaba el botón de Releasit si existía (`if(r) r.click();`) y no hacía nada si no aparecía.
+   Implementado de verdad: reintento de 1.5s buscando el botón de Releasit y, si sigue sin aparecer,
+   `POST /cart/add.js` con el `variant id` actual + redirect a `/cart`.
+7. **`12-sticky-bar.liquid` con `aria-hidden="true"` fijo** — el JS solo alternaba la clase visual
+   `gfs-visible` al hacer scroll, nunca el atributo de accesibilidad: el CTA quedaba inalcanzable por
+   teclado/lector de pantalla cuando SÍ estaba visible (bug WCAG 2.2). Corregido: `aria-hidden`/`inert`
+   ahora se togglean junto con la visibilidad real.
+8. **Colisión de CSS `.gfs-why`** — `sec-beneficios.liquid` y `sec-por-que-elegir.liquid` usaban el
+   mismo prefijo con marcado distinto; si un `product.json` cargaba ambos bloques, los estilos se
+   pisaban. `sec-beneficios.liquid` renombrado a `.gfs-bnf` (y sumado a los selectores de layout PC /
+   `content-visibility` del config center para no perder el tratamiento de escritorio).
+9. **5 secciones reinventaban su propio `IntersectionObserver` sin red de seguridad** —
+   `sec-cine`, `sec-escalera`, `sec-escenas`, `sec-manifiesto`, `sec-ya-lo-intentaste` arrancan con
+   `opacity:0` y solo se revelan si su observer local dispara; a diferencia de
+   `efx-reveal-seguro.liquid` no tenían el timeout de ~1.2s que fuerza la visibilidad si el observer
+   falla, así que el contenido podía quedar invisible para siempre. Se les agregó el mismo patrón de
+   red de seguridad por tiempo (no se migró el motor completo a `efx-reveal-seguro.liquid` porque cada
+   sección tiene su propia coreografía de stagger — eso queda como mejora futura, no crítico).
+
+**Sin cerrar en esta pasada (mejorables, no críticos):** `changelog.md` sin tabla de contenido (839+
+líneas); orden de lectura de `reglas-de-oro.md` (0-C/0-D antes que 0-A/0-B "PRIORIDAD MÁXIMA" y que la
+Regla 0 base); mayoría de `.liquid` usan `var(--brand-*)` sin fallback (si falta el bloque Paleta,
+rompen); `sec-piramide.liquid` y `dawn-titulo.liquid` con color fijo `#0F6F5C` fuera del sistema de
+Paleta; `content-visibility:auto` del config center solo cubre 7 clases (faltan `.gfs-cmb`, `.gfs-tl`,
+`.gfs-sc`, `.gfs-try`, `.gfs-cine`, `.gfs-alt`, `.gfs-spec`, `.gfs-ship`, `.gfs-fit`).
+
 ## G4.0 — 2026-07-25 — PERFILES + embudo de 24 secciones (absorción de la página real en producción)
 **Versión mayor: cambia la arquitectura, no solo el detalle.** Motivo: la skill documentaba un embudo
 de 17 secciones mientras la página real que ya estaba corriendo iba en **24** y con otra estructura.
@@ -801,8 +846,8 @@ faltaba eran las **secciones de persuasión narrativa** y la **estrategia de cop
 ## G4.1b — 2026-07-29 — Media: tema+descripción, poster obligatorio, GIF→MP4 (lección chat TOPPIK, parche 23,5→3,3 MB)
 ## G4.1c — 2026-07-29 — REGLA #3 con matiz PAUTA: display propio se queda; porcentajes-estudio, testimonios en imagen y atribución a terceros jamás (gaceta 4f p.3).
 
-## G4.2 — 2026-08-07 — Límites duros de Shopify + receta Horizon/Pitch + fallback del CTA (fuente: chat INSULINUM/Nuut)
-Paquete de hallazgos horneado por el Centro de Mando desde la entrada del chat Insulinum en la bandeja
+## G4.2 — 2026-08-07 — Límites duros de Shopify + receta Horizon/Pitch + fallback del CTA (fuente: chat otro producto/otro producto)
+Paquete de hallazgos horneado por el Centro de Mando desde la entrada del chat otro producto en la bandeja
 (3 `FileSaveError` consecutivos en tienda real descubrieron límites que no están en la documentación oficial).
 - **TOPE 50 KB por setting `custom_liquid` (aplica a TODOS los temas):** el guardado del template revienta
   con *"Setting 'custom_liquid' is invalid. ['Liquid file size cannot exceed 50 kilobytes.']"*. Entró como
@@ -823,7 +868,7 @@ Paquete de hallazgos horneado por el Centro de Mando desde la entrada del chat I
   el orden de 17 secciones vs las 24 del embudo canónico G4.0 — pendiente de sesión dedicada. Hasta
   regenerarlo, el ORDEN canónico es la tabla del SKILL.md, no el base.
 
-## G4.3 — 2026-08-07 — Componente "LO QUE ESTE PRODUCTO NO HACE" (cosecha del chat ESTUDIO 360 DENTAL CAVITY HEALING, Chile)
+## G4.3 — 2026-08-07 — Componente "LO QUE ESTE PRODUCTO NO HACE" (cosecha del chat un estudio de producto, Chile)
 Repartido por el Centro de Mando desde la bandeja (orden de FER: "sin omitir detalle"). Invención del
 estudio dental y probablemente lo más valioso que salió de él:
 - **Componente estándar para verticales de SALUD**, descrito en el SKILL.md junto a `sec-disclaimer` /

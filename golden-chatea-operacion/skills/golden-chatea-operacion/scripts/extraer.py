@@ -40,19 +40,34 @@ import urllib.request
 from datetime import datetime
 from pathlib import Path
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from secretos import redactar_texto, quedan_secretos as _quedan_secretos_texto  # noqa: E402
+
 BASE = "https://chateapro.app/api"
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
 
 # CONFIRMADO contra un token real (espacio LIBIDOUP, 2026-08-21): el endpoint que existe es
-# `/subscribers` (sin prefijo /subscriber ni /flow). Los tres candidatos originales
-# (/subscriber/list, /flow/subscribers, /subscriber/get-list) dan 404 en el servidor real -- se
-# dejan aqui abajo solo como fallback por si otro espacio/version los tiene.
+# `/subscribers` (sin prefijo /subscriber ni /flow), y ESE es el unico dato confirmado contra
+# el servidor real -- que el DUMP se construyo con `/subscribers` (200, universo=486
+# contactos totales del espacio ese dia, ver `_listado_universo_completo_del_espacio` en el
+# propio DUMP). Los otros tres (/subscriber/list, /flow/subscribers, /subscriber/get-list) NO
+# se probaron contra ningun servidor real en esa corrida (F8, golden-verificador 2026-08-22:
+# la frase anterior aqui decia que "dan 404 en el servidor real", una afirmacion sin artefacto
+# que la respalde -- se corrige: no confirmado, se dejan como fallback por si otro
+# espacio/version los necesita, sin asumir que fallan.
 #
-# TRAMPA P14 (nueva, medida): `/subscribers` NO filtra por `from_date`/`to_date` ni por ninguna
-# variante probada (`date_from/date_to`, `start_date/end_date`, `subscribed_from/to`) -- las
-# cuatro devuelven el MISMO total sin filtrar. No hay ventana de fecha en el servidor para este
-# endpoint. `listar_contactos_del_dia` compensa: pagina el universo COMPLETO (barato, 10 por
+# TRAMPA-LISTADO (nueva, medida; renombrada para no colisionar con la "trampa 14" documental
+# de references/api.md, que es otra cosa -- la API sin saldo/consumo): `/subscribers` NO
+# filtra por `from_date`/`to_date` en el servidor -- CONFIRMADO: pedir con y sin esos dos
+# parametros devuelve el mismo total. F8 (golden-verificador 2026-08-22): la version anterior
+# de este comentario afirmaba "probadas 4 variantes de nombre de parametro, las 4 devuelven el
+# mismo total" -- esa medicion de las otras 3 variantes (`date_from/date_to`,
+# `start_date/end_date`, `subscribed_from/to`) NO tiene artefacto que la respalde, se retira la
+# cifra inventada. Lo confirmado es `from_date`/`to_date` sin filtrar; las demas variantes
+# quedan como NO PROBADAS, pendientes de correr contra un token real antes de citarlas como
+# medicion. No hay ventana de fecha confirmada en el servidor para este endpoint.
+# `listar_contactos_del_dia` compensa: pagina el universo COMPLETO (barato, 10 por
 # pagina) y filtra en cliente por actividad ese dia, usando `last_message_at` primero (la senal
 # mas cercana a "hubo conversacion ese dia"), con `last_interaction` y `subscribed` como
 # respaldo si `last_message_at` viene vacio. Queda declarado en el DUMP cual campo decidio cada
@@ -67,32 +82,14 @@ CANDIDATOS_LISTADO = [
     "/subscriber/get-list",
 ]
 
-PATRONES = [
-    ("OpenAI", re.compile(r"sk-(?:proj-)?[A-Za-z0-9_\-]{20,}")),
-    ("ElevenLabs", re.compile(r"sk_[A-Za-z0-9]{24,}")),
-    ("StripeLive", re.compile(r"sk_live_[A-Za-z0-9]{10,}")),
-    ("StripeRestricted", re.compile(r"rk_live_[A-Za-z0-9]{10,}")),
-    ("MercadoPago", re.compile(r"APP_USR-[A-Za-z0-9\-]{10,}")),
-    ("JWT", re.compile(r"eyJ[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-]{8,}")),
-    ("Meta", re.compile(r"EAA[A-Za-z0-9]{40,}")),
-    ("Shopify", re.compile(r"shpat_[A-Fa-f0-9]{20,}")),
-    ("xAI", re.compile(r"xai-[A-Za-z0-9]{20,}")),
-    ("Google", re.compile(r"AIza[A-Za-z0-9_\-]{30,}")),
-    # Bearer con forma Sanctum (id|hash) — el framework de Chatea Pro es Laravel, y
-    # esa es la forma de token que emite Sanctum. Medido en verificacion adversarial:
-    # sin este patron, un token de ese formato pegado por error en un chat se filtraba
-    # entero al DUMP.
-    ("SanctumBearer", re.compile(r"\b\d+\|[A-Za-z0-9]{32,}\b")),
-]
-
 SENSIBLE = ("token", "api_key", "apikey", "secret", "password", "access_token",
             "key", "client_secret", "authorization")
 
-
-def redactar_texto(t):
-    for etiqueta, patron in PATRONES:
-        t = patron.sub(lambda m: f"<<REDACTADO {etiqueta} len={len(m.group(0))}>>", t)
-    return t
+# F3 (CRITICO SEGURIDAD, golden-verificador 2026-08-22): la lista de patrones ANTES vivia
+# DUPLICADA aqui (11 familias) y en clasificar.py (17 familias) -- references/api.md afirmaba
+# que estaban sincronizadas y no era cierto. Ahora las dos importan la MISMA lista de
+# `secretos.py` (ver arriba, `from secretos import PATRONES_SECRETO, redactar_texto`); ya no
+# hay copia local que redactar_texto() defina aqui.
 
 
 def redactar(obj):
@@ -112,12 +109,10 @@ def redactar(obj):
 
 
 def quedan_secretos(obj):
-    crudo = json.dumps(obj, ensure_ascii=False)
-    encontrados = []
-    for etiqueta, patron in PATRONES:
-        for m in patron.finditer(crudo):
-            encontrados.append(f"{etiqueta} ({len(m.group(0))} caracteres)")
-    return encontrados
+    """F3: compuerta final antes de escribir el DUMP a disco. Usa la MISMA lista de
+    `secretos.py` que redacta la evidencia citada en clasificar.py -- una fuente unica,
+    no dos listas que se puedan desincronizar."""
+    return _quedan_secretos_texto(json.dumps(obj, ensure_ascii=False))
 
 
 def pedir(token, path, **params):
@@ -142,7 +137,7 @@ def pedir(token, path, **params):
 
 
 def _fecha_de(contacto):
-    """P14: `last_message_at` primero (mas cerca de 'hubo charla ese dia'), luego
+    """TRAMPA-LISTADO: `last_message_at` primero (mas cerca de 'hubo charla ese dia'), luego
     `last_interaction`, luego `subscribed` como ultimo respaldo. Devuelve (fecha_AAAA-MM-DD,
     campo_usado) o (None, None) si los tres vienen vacios."""
     for campo in ("last_message_at", "last_interaction", "subscribed"):
@@ -154,13 +149,15 @@ def _fecha_de(contacto):
 
 def listar_contactos_del_dia(token, fecha):
     """Prueba los candidatos de endpoint hasta encontrar uno que responda 200 con una lista.
-    Para `/subscribers` (P14: no filtra por fecha en el servidor), pagina el universo COMPLETO
+    Para `/subscribers` (TRAMPA-LISTADO: no filtra por fecha en el servidor), pagina el universo COMPLETO
     y filtra en cliente por actividad de `fecha`. Para los demas candidatos (si alguno llega a
     responder), respeta el filtro de servidor via from_date/to_date como antes.
     Devuelve (contactos_del_dia, endpoint_usado, total_declarado_por_servidor_para_el_dia,
-    campo_fecha_por_ns, universo_completo_declarado_por_servidor). El 3er valor es None cuando
-    el servidor no da un total POR DIA (caso /subscribers); el 5to siempre lleva el total bruto
-    que sí dio el servidor, para declarar contexto sin usarlo como denominador del día."""
+    campo_fecha_por_ns, universo_completo_declarado_por_servidor, paginacion). El 3er valor es
+    None cuando el servidor no da un total POR DIA (caso /subscribers); el 5to siempre lleva el
+    total bruto que sí dio el servidor, para declarar contexto sin usarlo como denominador del
+    día. El 6to (F9) declara si la paginación del LISTADO se truncó por el tope de 500 páginas
+    y cuántas páginas se trajeron de verdad — nunca implícito."""
     for ep in CANDIDATOS_LISTADO:
         sin_filtro_de_servidor = (ep == "/subscribers")
         params = {"page": 1} if sin_filtro_de_servidor else {
@@ -175,7 +172,17 @@ def listar_contactos_del_dia(token, fecha):
             meta = r.get("meta") or {}
             total = meta.get("total")
             ultima = meta.get("last_page")
-            while ultima and pagina <= ultima and pagina <= 500:
+            # F9 (HUECO, corregido tras verificacion 2026-08-22): el tope de 500 paginas
+            # cortaba la paginacion EN SILENCIO -- si un espacio algun dia tiene mas de 500
+            # paginas de contactos (5.000 con 10 por pagina), el DUMP quedaba incompleto sin
+            # que nada lo declarara. Se registra cuantas paginas se trajeron de verdad y si
+            # se llego al tope, para que `clasificar.py` pueda emitir un hallazgo.
+            paginas_traidas = 1
+            trunco_por_tope_500 = False
+            while ultima and pagina <= ultima:
+                if pagina > 500:
+                    trunco_por_tope_500 = True
+                    break
                 params2 = {"page": pagina} if sin_filtro_de_servidor else {
                     "from_date": fecha, "to_date": fecha, "page": pagina}
                 r2 = pedir(token, ep, **params2)
@@ -183,9 +190,20 @@ def listar_contactos_del_dia(token, fecha):
                 if not isinstance(lote2, list) or not lote2:
                     break
                 filas += lote2
+                paginas_traidas += 1
                 pagina += 1
+            paginacion = {
+                "paginas_traidas": paginas_traidas,
+                "ultima_pagina_declarada_por_servidor": ultima,
+                "truncado_por_tope_500": trunco_por_tope_500,
+                # Limitacion conocida y DECLARADA (F9), no implicita: si el servidor no
+                # manda meta.last_page, este bucle NUNCA pagina mas alla de la primera
+                # pagina (la condicion `while ultima and ...` es falsy sin `ultima`) --
+                # se trae solo lo que venga en la primera respuesta.
+                "sin_meta_last_page_no_pagina": not bool(ultima),
+            }
             if not sin_filtro_de_servidor:
-                return filas, ep, total, {}, total
+                return filas, ep, total, {}, total, paginacion
             # filtro en cliente por actividad del dia pedido. El servidor no declara un total
             # POR DIA para este endpoint (total=meta.total es el universo completo, no el del
             # dia) -- devolver ese numero como "declarado" haria que clasificar.py comparara
@@ -200,8 +218,8 @@ def listar_contactos_del_dia(token, fecha):
                     del_dia.append(c)
                     ns = c.get("user_ns") or c.get("ns") or c.get("id")
                     campo_por_ns[ns] = campo
-            return del_dia, ep, None, campo_por_ns, total
-    return None, None, None, {}, None
+            return del_dia, ep, None, campo_por_ns, total, paginacion
+    return None, None, None, {}, None, {}
 
 
 MAX_PAG_HILO = 12   # golden-logistica-diaria midio: con 5 se truncaba el 5% de los hilos
@@ -288,11 +306,18 @@ def main():
     print(f"  /flow/bot-users-count  -> {dump['/flow/bot-users-count']}")
 
     (contactos, endpoint_usado, total_declarado, campo_fecha_por_ns,
-     universo_completo) = listar_contactos_del_dia(token, fecha)
+     universo_completo, paginacion_listado) = listar_contactos_del_dia(token, fecha)
     dump["_listado_endpoint_usado"] = endpoint_usado
     dump["_listado_filtra_fecha_en_servidor"] = endpoint_usado != "/subscribers"
     dump["_listado_campo_fecha_por_ns"] = campo_fecha_por_ns
     dump["_listado_universo_completo_del_espacio"] = universo_completo
+    dump["_listado_paginacion"] = paginacion_listado
+    if paginacion_listado.get("truncado_por_tope_500"):
+        print("  AVISO: el listado de contactos se TRUNCO en el tope de 500 paginas -- "
+              f"se trajeron {paginacion_listado.get('paginas_traidas')} de "
+              f"{paginacion_listado.get('ultima_pagina_declarada_por_servidor')} declaradas "
+              "por el servidor. El DUMP queda incompleto, declarado en "
+              "_listado_paginacion.")
     if contactos is None:
         sys.exit(
             "No se pudo listar contactos del dia con ninguno de los endpoints candidatos "

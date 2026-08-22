@@ -6,7 +6,7 @@
 > Para la adaptación general entre temas (Shrine→Dawn/Sense/fallback) ver `references/temas.md`;
 > este doc cubre SOLO lo específico de Horizon (no lo dupliques con temas.md).
 
-## 🔴 ADVERTENCIA DURA — 3 límites no documentados de Horizon/Pitch (G4.2, chat Insulinum 2026-08-07)
+## 🔴 ADVERTENCIA DURA — 3 límites no documentados de Horizon/Pitch (G4.2, chat otro producto 2026-08-07)
 
 Descubiertos con **3 `FileSaveError` consecutivos en una tienda real** (tema Pitch, familia
 Horizon), uno por intento. Ninguno aparece en la documentación oficial. LEER ANTES de tocar
@@ -23,7 +23,7 @@ también como punto 9 del RESUMEN DURO del SKILL.md y como check obligatorio (nr
 `references/auto-check.md`. Los límites 1 y 2 significan que **en Horizon/Pitch no se pelea
 con la sección nativa de producto: se la rodea** — ver la receta probada de abajo.
 
-## 🟠 RECETA PROBADA Horizon/Pitch (G4.2 — funcionó en tienda real, chat Insulinum)
+## 🟠 RECETA PROBADA Horizon/Pitch (G4.2 — funcionó en tienda real, chat otro producto)
 
 Patrón nuevo, probado, con el que **ninguno de los 3 errores puede darse**:
 

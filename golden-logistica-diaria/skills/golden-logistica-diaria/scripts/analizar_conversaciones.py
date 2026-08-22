@@ -46,7 +46,7 @@ PREGUNTA = re.compile(r"\?|cuanto|como|donde|cuando|que |sirve|tiene")
 # AQUI VIVIA `PIDIO_DATOS`, y se murio a proposito.
 # Era una regex sobre lo que decia EL BOT ("nombre completo", "direccion", "ciudad"...)
 # y de ella salia el cubo "se le pidieron los datos y no los completo". Medido sobre el
-# universo entero de Dolce, 743 de 743: se tragaba 623, el 83,8%. Claro que si — el bot
+# universo entero de otra marca, 743 de 743: se tragaba 623, el 83,8%. Claro que si — el bot
 # pide los datos SIEMPRE, asi que la regex acertaba siempre y por eso no distinguia nada.
 # Un cubo que se lleva ocho de cada diez no es una clasificacion, es el guion del bot
 # escrito al reves. Se reemplaza por `etapa_de_caida`, que pregunta por el CLIENTE.
@@ -55,7 +55,7 @@ PREGUNTA = re.compile(r"\?|cuanto|como|donde|cuando|que |sirve|tiene")
 def canal_de(tel):
     """Sin telefono no es WhatsApp: es un comentario publico de Facebook o Instagram.
 
-    Medido: 84 de 743 contactos de Dolce (11%) no tienen telefono, y 3 de los 9 clientes
+    Medido: 84 de 743 contactos de otra marca (11%) no tienen telefono, y 3 de los 9 clientes
     que quedaron esperando respuesta estaban ahi. A esos, "llamar" no es una accion
     posible; la accion es responder el comentario, y URGE MAS, porque un mensaje sin
     responder lo lee una persona y un comentario sin responder debajo de un anuncio vivo
@@ -65,7 +65,7 @@ def canal_de(tel):
 
 
 def etapa_de_caida(ciudad, direccion, n_del_cliente, n_propios):
-    """Hasta donde llego el cliente. Formulacion de LOGISTICA DOLCE, adoptada con credito.
+    """Hasta donde llego el cliente. Formulacion de LOGISTICA otra marca, adoptada con credito.
 
     LA PRIORIDAD ES PARTE DE LA DEFINICION, no un detalle de implementacion: un contacto
     cae en varias a la vez y gana la de mas arriba, porque es la que manda la ACCION.
@@ -92,7 +92,7 @@ def etapa_de_caida(ciudad, direccion, n_del_cliente, n_propios):
 # como "lo ultimo que escribio el cliente".
 #
 # AQUI HABIA UNA REGEX (`BOTON` + `es_del_boton`) Y SE MURIO CON EVIDENCIA.
-# La undecima verificacion la adjudico contra la implementacion de LOGISTICA DOLCE
+# La undecima verificacion la adjudico contra la implementacion de LOGISTICA otra marca
 # sobre datos reales: perdia en LAS DOS DIRECCIONES, 7 casos de 7.
 #   (a) Se tragaba hasta seis palabras TECLEADAS despues del boton — "...y precio 2x1",
 #       "...cuanto sale" daban boton=True. Cinco personas que SI escribieron, borradas.
@@ -104,7 +104,7 @@ def etapa_de_caida(ciudad, direccion, n_del_cliente, n_propios):
 # autor ya sabia; las clases que no se le ocurrieron no estan, y su verde no dice nada
 # sobre ellas. Los 7 casos reales que fallaron entraron al banco COMO CASOS.
 #
-# SE REEMPLAZA POR EL CRITERIO DE LOGISTICA DOLCE: se MIDE que textos son plantilla
+# SE REEMPLAZA POR EL CRITERIO DE LOGISTICA otra marca: se MIDE que textos son plantilla
 # en vez de adivinarlos con un patron, y se combinan los dos criterios porque cada uno
 # ve solo la mitad (medido: discrepabamos en 13 contactos, y los dos estabamos flojos).
 MIN_PERSONAS_FORMA = 3      # una frase identica en 3 personas distintas no la escribio nadie
@@ -393,7 +393,7 @@ def main():
     # conversacion" — y no tenia ninguno para "conversacion sin contacto".
     # Una conversacion que llega y no esta en la lista NO se contaba, NO se
     # declaraba y NO existia: se caia del universo sin dejar rastro.
-    # Medido cuando lo destapo el chat LOGISTICA DOLCE: de 100 conversaciones que
+    # Medido cuando lo destapo el chat LOGISTICA otra marca: de 100 conversaciones que
     # entregaron, 57 no estaban en la lista de contactos — la lista era de 17 horas
     # antes. El analisis dijo "42 con conversacion" sobre 100 reales, y ningun
     # numero del informe lo delataba.
@@ -434,12 +434,12 @@ def main():
         """Lo escribio la persona: ni plantilla del anuncio, ni mensaje sin texto.
 
         UN MENSAJE VACIO NO ES SILENCIO, ES UN DATO QUE FALTA. Medido: 58 entrantes
-        vacios en Dolce, y el barrido no guarda `msg_type`, asi que un AUDIO, una foto
+        vacios en otra marca, y el barrido no guarda `msg_type`, asi que un AUDIO, una foto
         y un mensaje borrado se ven identicos — una comilla vacia. Uno de esos vacios
         resulto ser una nota de voz de una clienta que llevaba ocho dias sin respuesta,
         con su transcripcion esperando en el API. Por eso no se descarta: cuenta como
         mensaje y la fila lo DECLARA. Equivocarse llamando a alguien cuesta un mensaje;
-        equivocarse borrandolo cuesta la venta (formulacion de LOGISTICA DOLCE).
+        equivocarse borrandolo cuesta la venta (formulacion de LOGISTICA otra marca).
         """
         return norm((m.get("c") or "").strip()) not in PLANTILLAS
 
@@ -534,11 +534,11 @@ def main():
             por_motivo.setdefault(m, []).append(item)
             continue
 
-        # ETAPA DE CAIDA · formulacion del chat LOGISTICA DOLCE, adoptada con credito.
+        # ETAPA DE CAIDA · formulacion del chat LOGISTICA otra marca, adoptada con credito.
         #
         # QUE REEMPLAZA: aqui habia un cubo "se le pidieron los datos y no los completo"
         # que se disparaba con lo que decia EL BOT. Medido sobre el universo entero de
-        # Dolce (743 de 743): se tragaba 623, el 83,8%. Un cubo que se lleva ocho de cada
+        # otra marca (743 de 743): se tragaba 623, el 83,8%. Un cubo que se lleva ocho de cada
         # diez no clasifica nada — describe el guion del bot, que pide los datos siempre.
         #
         # LA CLASE: el motivo no se busca en lo que el bot dijo, sino en HASTA DONDE
@@ -566,7 +566,7 @@ def main():
         motivos[m] += 1
         por_motivo.setdefault(m, []).append(item)
 
-    # COMPUERTA DE CORDURA (idea del chat LOGISTICA DOLCE, que la pago primero).
+    # COMPUERTA DE CORDURA (idea del chat LOGISTICA otra marca, que la pago primero).
     # Si casi todas las conversaciones "cierran con el cliente", no es que la empresa
     # nunca conteste: es que el hilo viene al reves y se esta leyendo el saludo inicial
     # como si fuera el ultimo mensaje. A ellos les dio 369 de 374 — 98,7% — y el
@@ -648,7 +648,7 @@ def main():
         "quien_habla_de_ultimo": dict(quien_cierra),
         "hilos_sin_tiempo": sin_tiempo,
         "motivos": dict(motivos.most_common()),
-        "_orden_de_los_cubos": ("etapa_de_caida, formulacion de LOGISTICA DOLCE. Un contacto "
+        "_orden_de_los_cubos": ("etapa_de_caida, formulacion de LOGISTICA otra marca. Un contacto "
                                 "cae en varios cubos a la vez y gana el de mas arriba, porque "
                                 "es el que manda la accion. Orden: objecion declarada > ciudad "
                                 "sin direccion > datos completos sin pedido > nunca escribio > "

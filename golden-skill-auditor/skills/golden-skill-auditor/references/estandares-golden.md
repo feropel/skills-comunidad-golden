@@ -45,5 +45,5 @@ Reglas globales del ecosistema de FER / Golden Group. Toda skill propia se mide 
 ## 8. Ecosistema y delegación
 
 - Cada tool/skill nueva se adapta al ecosistema: trigger preciso, se encadena SOLO donde potencia, documentada. No llamar por llamar.
-- Fronteras conocidas del ecosistema (para verificar delegaciones): páginas de producto Shopify → golden-shopify · imágenes de producto → golden-imagen-arena · video UGC → golden-ugc-avatar · pauta → golden-ads · PDFs → golden-pdf-check · investigación 360° → golden-investigacion-mercado · Chatea PRO → familia golden-chatea-pro-* (orquestador full-configuracion + 4 asistentes + 2 hijas).
+- Fronteras conocidas del ecosistema (para verificar delegaciones): páginas de producto Shopify → golden-shopify · imágenes de producto → golden-imagen-arena · video UGC → golden-ugc-avatar · pauta → golden-ads · PDFs → golden-pdf-check · investigación 360° → golden-investigacion-mercado · Chatea PRO → la familia golden-chatea-* COMPLETA según el arsenal vivo (verificarla al auditar con `ls ~/.claude/skills/golden-chatea*`; aquí no se fija censo porque la familia crece — ejemplos, no censo: golden-chatea-pro-full-configuracion como orquestador, golden-chatea-auditoria, golden-chatea-operacion).
 - Popups y CTAs sin texto negativo ("No gracias" prohibido) — aplica a skills que generen UI o copys.

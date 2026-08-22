@@ -193,10 +193,32 @@ class Auditoria:
                 return None
         return v
 
+    def filas(self, clave):
+        """Las filas de un endpoint paginado, o [] si respondio con error.
+
+        El extractor guarda el error del servidor TAL CUAL cuando la primera pagina falla:
+        el valor deja de ser una lista y pasa a ser un diccionario de error. Iterarlo como
+        si fuera lista revienta la auditoria entera con un traceback, y un 500 puntual de
+        la API no puede costar el informe completo. Aqui se degrada: se declara la zona
+        como no medida y se sigue.
+        """
+        v = self.d.get(clave)
+        if isinstance(v, list):
+            return v
+        if isinstance(v, dict) and ("_ERROR" in v or "_ERROR_HTTP" in v):
+            self.falla("B1", "DUDA",
+                       f"`{clave}` no se pudo leer del servidor",
+                       f"{json.dumps(v, ensure_ascii=False)[:160]}",
+                       "Esa zona queda sin medir: su silencio NO es salud.",
+                       "Repetir la extraccion de ese endpoint antes de concluir sobre el.",
+                       objetivo=f"ilegible-{clave}")
+            return []
+        return []
+
     def campos_pre(self):
         """Los campos indexados, disponibles ya en el bloque A."""
         if not self.campos:
-            self.campos = {c["name"]: c for c in (self.d.get("/flow/bot-fields") or [])
+            self.campos = {c["name"]: c for c in self.filas("/flow/bot-fields")
                            if isinstance(c, dict) and "name" in c}
         return self.campos
 
@@ -212,9 +234,10 @@ class Auditoria:
 
         # La identidad sale del servidor: el prefijo del var_ns de los campos, nunca el
         # nombre del archivo del token.
-        campos = self.d.get("/flow/bot-fields") or []
+        campos = self.filas("/flow/bot-fields")
         ns = {re.match(r"^(f\d+)", c.get("var_ns", "")).group(1)
-              for c in campos if re.match(r"^(f\d+)", c.get("var_ns", ""))}
+              for c in campos if isinstance(c, dict)
+              and re.match(r"^(f\d+)", c.get("var_ns", "") or "")}
         self.universo["espacios_ns"] = sorted(ns)
         if len(ns) > 1:
             self.falla("A2", "DUDA", "Los campos vienen de mas de un espacio",
@@ -266,7 +289,7 @@ class Auditoria:
 
     # ---------------------------------------------------------- B · inventario
     def bloque_b(self):
-        campos = self.d.get("/flow/bot-fields") or []
+        campos = self.filas("/flow/bot-fields")
         self.campos = {c["name"]: c for c in campos if isinstance(c, dict) and "name" in c}
         conteo = (self.d.get("_conteos") or {}).get("/flow/bot-fields") or {}
         traidos, declarados = conteo.get("traidos"), conteo.get("declarados_por_servidor")
@@ -300,8 +323,8 @@ class Auditoria:
         self.cubre("B1b", "corrido", len(self.d.get("_conteos") or {}),
                    f"{incompletos} listados incompletos")
 
-        uf = self.d.get("/flow/user-fields")
-        self.universo["campos_usuario"] = len(uf) if isinstance(uf, list) else None
+        uf = self.filas("/flow/user-fields")
+        self.universo["campos_usuario"] = len(uf) if uf else None
         dec_uf = ((self.d.get("_conteos") or {}).get("/flow/user-fields") or {}
                   ).get("declarados_por_servidor")
         completo = (dec_uf is None) or (self.universo["campos_usuario"] == dec_uf)
@@ -335,7 +358,22 @@ class Auditoria:
 
         # B6 · lo que FALTA, no solo lo que hay. Detectar prefijos presentes nunca puede
         # contestar "esta completa la instalacion": para eso hace falta la lista de esperados.
-        esperados = json.loads((RAIZ / "assets" / "asistentes-esperados.json").read_text())
+        ruta_esp = RAIZ / "assets" / "asistentes-esperados.json"
+        if not ruta_esp.exists():
+            self.falla("B6", "DUDA", "Falta la lista de asistentes esperados",
+                       f"no existe {ruta_esp}",
+                       "Sin ella no se puede decir si la instalacion esta completa.",
+                       "Restaurar el asset desde el backup de la skill.",
+                       objetivo="asset-esperados")
+            self.cubre("B6", "no_corrido", 0, "falta assets/asistentes-esperados.json")
+            for clave in ("/flow/subflows", "/flow/tags", "/flow/ai-agents",
+                          "/flow/ai-tasks", "/flow/inbound-webhooks"):
+                v = self.d.get(clave)
+                self.universo[clave] = len(v) if isinstance(v, list) else None
+            self.cubre("B4", "corrido")
+            self._productos()
+            return
+        esperados = json.loads(ruta_esp.read_text())
         faltan = []
         for nombre, firma in esperados["asistentes"].items():
             presentes = [f for f in firma["campos_firma"] if f in self.campos]
@@ -368,6 +406,9 @@ class Auditoria:
             self.universo[clave] = len(v) if isinstance(v, list) else None
         self.cubre("B4", "corrido")
 
+        self._productos()
+
+    def _productos(self):
         self.productos = {}
         for n, c in self.campos.items():
             m = re.match(r"^\[Producto Ventas Wp\] (\d+)$", n)
@@ -1148,9 +1189,15 @@ def escribir_handoff(a, destino):
     Esta skill no escribe en Chatea a proposito, pero dejar el arreglo en prosa obliga al
     siguiente chat a reconstruir el contexto entero. Aqui sale ya masticado.
     """
-    porskill = {}
+    porskill, preguntas = {}, []
     for h in a.hallazgos:
-        if h["severidad"] in ("DECIDIDO", "DUDA") or not h.get("accion"):
+        if h["severidad"] == "DECIDIDO" or not h.get("accion"):
+            continue
+        if h["severidad"] == "DUDA":
+            # Una duda con accion concreta no es basura: es una pregunta que hay que
+            # contestar ANTES de tocar. Tirarla dejaba fuera del paquete cosas como
+            # "hay entradas activas sin id de anuncio".
+            preguntas.append(h)
             continue
         porskill.setdefault(h.get("skill_duena") or "(por determinar)", []).append(h)
     lineas = [f"# Paquete de correccion · {a.d.get('_etiqueta')}",
@@ -1164,6 +1211,18 @@ def escribir_handoff(a, destino):
               "releer del servidor y comparar, porque un `200 ok` puede haber guardado el "
               "contenido cortado.",
               ""]
+    if preguntas:
+        lineas.append("## Antes de tocar nada · preguntas que hay que contestar")
+        lineas.append("")
+        lineas.append("Una duda con accion concreta no se corrige a ciegas: se contesta, y la "
+                      "respuesta se escribe en el libro de decisiones para que no vuelva a "
+                      "levantarse en la proxima corrida.")
+        lineas.append("")
+        for h in preguntas:
+            lineas.append(f"- **{h['control']} · {h['titulo']}** — {h['accion']}")
+            lineas.append(f"  - clave para el libro: `{h['clave']}`")
+        lineas.append("")
+
     for skill, hs in sorted(porskill.items()):
         lineas.append(f"## {skill}")
         lineas.append("")
@@ -1177,7 +1236,7 @@ def escribir_handoff(a, destino):
             lineas.append(f"- **Que hacer:** {h['accion']}")
             lineas.append("")
     Path(destino).write_text("\n".join(lineas))
-    return sum(len(v) for v in porskill.values())
+    return sum(len(v) for v in porskill.values()) + len(preguntas)
 
 
 def main():
@@ -1199,8 +1258,21 @@ def main():
         if espacio and not str(medido).startswith(str(espacio)):
             sys.exit(f"El libro de decisiones es del espacio {espacio} y este DUMP es de "
                      f"{medido[:8]}. Un libro de otro espacio silenciaria hallazgos reales.")
+        flojas = [d.get("clave", "(sin clave)") for d in libro.get("decisiones", [])
+                  if not d.get("motivo") or not d.get("fecha")]
+        if flojas:
+            sys.exit("El libro tiene decisiones sin motivo o sin fecha: "
+                     + ", ".join(flojas)
+                     + "\nUna decision sin motivo y sin fecha silencia un hallazgo sin dejar "
+                       "rastro de quien lo decidio ni cuando: dentro de tres meses nadie sabe "
+                       "si sigue vigente. Completa esos campos y vuelve a correr.")
         a.decisiones = {d["clave"]: d for d in libro.get("decisiones", [])}
-        print(f"Libro de decisiones: {len(a.decisiones)} resueltas por el dueno\n")
+        sin_reabrir = [c for c, d in a.decisiones.items() if not d.get("reabrir_si")]
+        print(f"Libro de decisiones: {len(a.decisiones)} resueltas por el dueno")
+        if sin_reabrir:
+            print(f"  aviso: {len(sin_reabrir)} sin `reabrir_si` "
+                  f"({', '.join(sin_reabrir)}) — quedan silenciadas para siempre")
+        print()
     elif ruta_dec:
         print(f"(no existe {ruta_dec}: se audita sin libro de decisiones)\n")
 

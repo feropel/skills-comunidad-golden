@@ -8,7 +8,7 @@ y se lleva por delante el previo, que era la unica copia. La compuerta que detec
 "previo corrupto" evita el rebarrido silencioso, que es el segundo daño; **no evita
 el primero**. Para cuando la compuerta habla, el dato ya no esta.
 
-LA CLASE, formulada por el chat LOGISTICA DOLCE al reportarlo:
+LA CLASE, formulada por el chat LOGISTICA otra marca al reportarlo:
 **un banco de pruebas comprueba que hace el codigo cuando TERMINA; nadie comprueba
 que queda en disco si NO termina.** Son dos preguntas distintas, y la segunda es la
 unica que importa cuando algo se corta.

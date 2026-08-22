@@ -327,6 +327,38 @@ def main():
         print(f"  FALLA J1   el diff solo vio {tipos}")
         faltan.append("diff")
 
+    # --- prueba 5: degradacion elegante. Un endpoint que respondio con error NO puede
+    # tumbar la auditoria entera: un 500 puntual de la API costaria el informe completo.
+    roto = espacio_roto()
+    roto["/flow/user-fields"] = {"_ERROR_HTTP": 500, "_detalle": "server error"}
+    try:
+        e = Auditoria(roto).correr()
+        ileg = [h for h in e.hallazgos if h["clave"].startswith("B1|ilegible")]
+        if ileg:
+            print("  OK    DEG  un endpoint con error se declara y la auditoria sigue")
+        else:
+            print("  FALLA DEG  el endpoint ilegible paso en silencio")
+            faltan.append("degradacion")
+    except Exception as ex:                                       # noqa: BLE001
+        print(f"  FALLA DEG  la auditoria REVIENTA: {type(ex).__name__}")
+        faltan.append("degradacion")
+
+    # --- prueba 6: el paquete de correccion no puede tirar las dudas accionables
+    import tempfile, os
+    from auditar import escribir_handoff
+    f = Auditoria(espacio_roto()); f.correr()
+    tmp = Path(tempfile.gettempdir()) / "autoprueba-handoff.md"
+    escribir_handoff(f, tmp)
+    texto = tmp.read_text()
+    dudas_con_accion = [h for h in f.hallazgos
+                        if h["severidad"] == "DUDA" and h.get("accion")]
+    if not dudas_con_accion or "preguntas que hay que contestar" in texto:
+        print("  OK    HO   las dudas accionables salen en el paquete, no a la basura")
+    else:
+        print(f"  FALLA HO   {len(dudas_con_accion)} dudas con accion quedaron fuera")
+        faltan.append("handoff-dudas")
+    os.unlink(tmp)
+
     if faltan:
         print(f"\nAUTOPRUEBA FALLIDA · el auditor NO detecta: {faltan}")
         print("El auditor esta roto. No se corre contra datos reales hasta arreglarlo.")

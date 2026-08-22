@@ -19,7 +19,8 @@ archivo. Depósito de tokens de Golden: `PROYECTOS/CHATEA-PRO-ASISTENTES-MAPA/.s
 | Endpoint | Para qué | Trampa |
 |---|---|---|
 | `GET /flow/bot-users-count` | tamaño del universo del espacio | Da el total, no la ventana de fecha por sí solo — se cruza contra el listado de contactos. |
-| listado de contactos con ventana de fecha | el universo del DÍA (el denominador) | **No confirmado contra el servidor real en este entorno** (aquí no hay token vivo). El encargo no fija el nombre exacto del endpoint de listado. `extraer.py` prueba una lista de candidatos razonables (`/subscriber/list`, `/flow/subscribers`, `/subscriber/get-list`) con paginación agotada y `from_date`/`to_date`, usa el primero que responda `200` con una lista, y **declara en el DUMP cuál usó**. Antes de la primera corrida real, FER confirma el endpoint correcto viendo la pestaña de red del panel y, si difiere, se ajusta la constante `CANDIDATOS_LISTADO` al inicio de `extraer.py` — no se corrige a ciegas. |
+| listado de contactos con ventana de fecha | el universo del DÍA (el denominador) | **Confirmado contra un token real en UN espacio** (LIBIDOUP, 2026-08-21): el endpoint que existe es `/subscribers` (sin prefijo `/subscriber` ni `/flow`), responde `200`, y el universo total que declaró en esa corrida fue 486 contactos. Confirmación de UN espacio, no universal — otro plan/versión de Chatea puede exponer un endpoint distinto; `extraer.py` prueba la lista de candidatos, usa el primero que responda `200` con una lista, y **declara en el DUMP cuál usó**. Si un espacio nuevo no calza con ninguno, se confirma viendo la pestaña de red del panel y se ajusta `CANDIDATOS_LISTADO` — no se corrige a ciegas. **F8 (corregido tras verificación 2026-08-22 — las dos frases siguientes antes afirmaban una medición sin artefacto que la respalde):** los otros tres candidatos (`/subscriber/list`, `/flow/subscribers`, `/subscriber/get-list`) **no se confirmó que dieran 404** contra ningún servidor real en esa corrida — se quedan como fallback declarado, sin la afirmación de que fallan. **Trampa medida (esta sí, confirmada):** `/subscribers` NO filtra por `from_date`/`to_date` en el servidor — pedir con y sin esos dos parámetros da el mismo total. Las otras variantes de nombre de parámetro (`date_from/date_to`, `start_date/end_date`, `subscribed_from/to`) **no se probaron contra un token real**; la cifra "4 variantes probadas" de una versión anterior de este documento no tenía artefacto que la respalde y se retira. `extraer.py` compensa paginando el universo COMPLETO y filtrando en cliente por `last_message_at` (con `last_interaction`/`subscribed` de respaldo), y declara en el DUMP qué campo decidió cada contacto. Limitación declarada: un contacto cuya conversación cruza más de un día, con `last_message_at` cayendo en un día POSTERIOR al pedido, no aparece en el universo de un día anterior aunque haya tenido mensajes ese día — el servidor no expone actividad por día, solo el último momento. **Desfase de reloj UTC↔local, con un mitigante DECLARADO, no cerrado del todo (tercera ronda de verificación, 2026-08-22):** `extraer.py` filtra el día comparando la fecha de `last_message_at` tal cual la declara el servidor (hora local, sin zona confirmada), mientras `clasificar.py` convierte todo `ts` a UTC (`_epoch_a_fecha`). Medido en los 4 DUMPs reales: desfase de **-5h EXACTAS y CONSTANTES en 161 de 161 pares comparables** (consistente con hora Colombia). Sin ajustar ese offset, `_mensajes_del_dia` (el filtro que acota R2/R3/R4/Q4 al día auditado, ver `clasificacion.md`) perdía 111 mensajes reales del día y colaba 78 de otro día — la MISMA clase de fallo que motivó ese control. Mitigado: `Clasificador` acepta `zona_horas` (default `ZONA_HORAS_DEFAULT_NO_CONFIRMADA = -5` en `clasificar.py`), declarado siempre en `universo['zona_horas_usada']`, nunca aplicado en silencio. **Lo que sigue sin cerrar:** ese -5 es la medición de UN espacio (Colombia); la plataforma sirve 7 países con offsets distintos, y no se confirmó contra el panel de Chatea cuál es la zona real que declara `last_message_at` — para un espacio de otro país, pasar `zona_horas=` explícito hasta confirmar el offset real de ese servidor. |
+| listado — paginación | F9, corregido tras verificación 2026-08-22 | El bucle que pagina `/subscribers` (u otro candidato) tenía un tope de 500 páginas que cortaba en SILENCIO si un espacio algún día lo cruza; ahora `extraer.py` declara en el DUMP (`_listado_paginacion`) cuántas páginas se trajeron de verdad, si se truncó por el tope, y si el servidor no dio `meta.last_page` (en ese caso el bucle **no pagina**, limitación conocida y declarada, no implícita — se trae solo la primera página). `clasificar.py` convierte el truncado en un hallazgo `P-listado-truncado`/RIESGO. |
 | `GET /subscriber/get-info?user_ns=<ns>` | el registro de un contacto | Trae `opted_in_through` (el marcador de si nació de la integración de Dropi) y los campos de usuario propios de ese contacto. Mismo endpoint que usa la hermana. |
 | `GET /subscriber/chat-messages?user_ns=<ns>&include_bot=1&include_note=1&include_system=1&page=N` | el hilo COMPLETO de la conversación | Ver las 13 trampas abajo. Es el corazón de esta skill. **Pagina** (`meta.last_page`): un hilo largo sin agotar la paginación queda truncado con un `200 ok` que no lo delata — `extraer.py` pagina hasta `MAX_PAG_HILO=12` (medido por `golden-logistica-diaria`: con 5 se truncaba el 5% de los hilos) y declara el truncado en `_avisos_de_hilo` si lo hubo. |
 
@@ -117,16 +118,25 @@ FER lo pide, se declara como no disponible, no se estima ni se inventa.
 
 Aunque esta skill lee conversaciones y no las integraciones con credenciales, un cliente puede
 pegar por error un token o una contraseña dentro del chat. `extraer.py` y `clasificar.py`
-corren el mismo barrido de redacción por patrón (misma lista, mantenida sincronizada entre los
-dos archivos: OpenAI, ElevenLabs, Stripe secreto y webhook —live y test—, Mercado Pago,
-JWT, Meta, Shopify, xAI, Google, refresh token de Google OAuth, bearer Sanctum, GitHub, AWS,
-Slack, SendGrid, y un bearer hexadecimal genérico de 64 caracteres como red de última malla)
-sobre el contenido de los mensajes antes de escribir el DUMP y sobre toda evidencia citada en un
-hallazgo, con la misma compuerta final que bloquea la escritura si queda un secreto reconocible.
-Ampliada dos veces tras verificación adversarial: la primera ronda cubrió los tres strings que
-se nombraron (Stripe live, Mercado Pago, un Sanctum largo) y no la familia completa de cada
-proveedor; la segunda ronda cubrió la familia entera y además el camino de `_atribucion` (el
-único dato que sale al `--json` sin pasar por la función de hallazgos). Nunca se pega una
-credencial en un informe, aunque el cliente la haya escrito él mismo — y ninguna lista de
-patrones es exhaustiva por definición: si aparece una familia nueva, se añade aquí y al código
-a la vez, nunca solo a uno de los dos.
+corren el mismo barrido de redacción por patrón sobre el contenido de los mensajes antes de
+escribir el DUMP y sobre toda evidencia citada en un hallazgo, con la misma compuerta final que
+bloquea la escritura si queda un secreto reconocible.
+
+**F3 (CRÍTICO SEGURIDAD, corregido tras verificación 2026-08-22):** esta lista **antes vivía
+duplicada** en cada script (11 familias en `extraer.py`, 17 en `clasificar.py`, con el umbral de
+`SanctumBearer` distinto en cada copia — `{32,}` vs `{20,}`) y este mismo párrafo afirmaba, en
+una versión anterior, que estaban "mantenidas sincronizadas" — no era cierto, y el defecto real
+(un secreto de una familia que `clasificar.py` sabía redactar podía llegar sin redactar al DUMP
+que escribe `extraer.py`) no lo vio la autoprueba anterior porque su única prueba directa
+importaba `redactar_texto` de `clasificar.py`, nunca del camino real que escribe a disco. Ahora
+hay una **fuente única**: `scripts/secretos.py`, con las 17 familias (OpenAI, ElevenLabs, Stripe
+secreto y webhook —live y test—, Mercado Pago, JWT, Meta, Shopify, xAI, Google, refresh token de
+Google OAuth, bearer Sanctum con el umbral más estricto `{20,}`, GitHub —PAT clásico y
+fine-grained—, AWS access key, Slack, SendGrid, y un bearer hexadecimal genérico de 64
+caracteres como red de última malla), y los dos scripts la importan — no hay copia local que
+pueda desincronizarse. `autoprueba.py` prueba las 17 familias contra `secretos.redactar_texto`
+directamente, y por separado contra el camino real de un hallazgo (`Clasificador` → `falla()`) y
+el camino real de `extraer.py` (`quedan_secretos`), para que un defecto en cualquiera de los dos
+caminos sea visible. Nunca se pega una credencial en un informe, aunque el cliente la haya
+escrito él mismo — y ninguna lista de patrones es exhaustiva por definición: si aparece una
+familia nueva, se añade SOLO en `secretos.py`, nunca en los scripts que la importan.

@@ -155,12 +155,17 @@ PAS**: dolor → problema → mecanismo → prueba → ingredientes → garantí
 Cuando un bloque necesite una imagen real, dejar la variable Liquid arriba y un placeholder
 visible si está vacía, p.ej.:
 ```liquid
-{% assign IMG_HERO = "" %}  {# pega aquí la URL de Shopify Archivos #}
+{% assign IMG_HERO = "" %}  {% comment %} pega aquí la URL de Shopify Archivos {% endcomment %}
 ...
 {% if IMG_HERO != "" %}<img src="{{ IMG_HERO }}" alt="..." loading="lazy" decoding="async" width="..." height="...">
 {% else %}<div class="img-slot">[IMG: hero del producto — pega la URL]</div>{% endif %}
 ```
 Así la página queda lista y el usuario solo pega URLs, sin imágenes falsas.
+
+⚠️ **Nunca uses `{# ... #}` como comentario.** No es sintaxis válida de Liquid (Liquid solo respeta
+`{% comment %}...{% endcomment %}`); si `{# ... #}` queda en un `custom_liquid`, Shopify lo IMPRIME
+como texto visible en la página. Es justo el bug que caza `auto-check.md` (check #17, "fuga de
+comentario Liquid") — no lo enseñes como convención en ningún ejemplo de este archivo.
 
 ## Lo que NO se hace
 - No generar una foto "realista" del producto desde texto (inventa el producto).

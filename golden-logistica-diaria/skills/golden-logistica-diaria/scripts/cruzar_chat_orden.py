@@ -53,7 +53,7 @@ COLORES = {
 # Y AQUI NO SE AMPLIA LA LISTA QUEMADA, aunque seria lo rapido. Una lista literal
 # dentro de un validador es la clase que esta misma skill legislo: refleja los
 # formularios que su autor conocia el dia que la escribio. Golden tiene opciones que
-# Dolce no tiene, y la tienda que entre mañana tendra otras. **Un formulario nuevo no
+# otra marca no tiene, y la tienda que entre mañana tendra otras. **Un formulario nuevo no
 # puede exigir tocar el codigo.**
 #
 # Por eso: hay una BASE COMUN (lo que se ha visto en todas las tiendas) y cada tienda

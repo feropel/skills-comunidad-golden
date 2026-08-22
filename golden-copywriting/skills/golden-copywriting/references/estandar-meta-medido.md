@@ -114,12 +114,12 @@ Lo que sí obliga: **cuando el producto no puede prometer, la regla no aplica; n
 oferta al copy solo para cumplirla.**
 
 **Actualizado 2026-08-16, ya no es un caso aislado.** Se leyeron los 5 anuncios de mayor
-volumen de tres cuentas distintas —Le'côterra CP2, Tag Recede BLUE CP1 y Dolce CP1 (por
+volumen de tres cuentas distintas —Le'côterra CP2, Tag Recede BLUE CP1 y otra marca CP1 (por
 primera vez cruzado)— y **ninguno de los cinco mete el argumento de venta en los primeros
 125 caracteres, y los cinco venden**: V6·15 copys (332 car., 3 compras, CPA 15.030), V6
 Bergamot (221 car., 14 compras, CPA 40.765), Tag Recede VIDEO 8 (185 car., 31 compras, CPA
-24.381), Dolce Anuncio 3 (361 car., 35 compras, CPA 24.496) y Dolce Anuncio 3 Drive (485
-car., 9 compras, CPA 16.569). **Le'côterra y Dolce no tienen restricción de claims de salud**
+24.381), otra marca Anuncio 3 (361 car., 35 compras, CPA 24.496) y otra marca Anuncio 3 Drive (485
+car., 9 compras, CPA 16.569). **Le'côterra y otra marca no tienen restricción de claims de salud**
 — el escudo que protegía la excepción de Tag Recede ya no aplica a los otros dos. La regla
 sigue siendo el consejo por defecto (y Meta la respalda en el artículo oficial), pero **deja
 de tratarse como ley dura sin excepción: se sostiene en 0 de 5 de los mayores vendedores
@@ -129,8 +129,8 @@ corriendo en paralelo para comparar contra estos cinco. Detalle completo en la e
 
 **Actualizado 2026-08-21, tercera corrida: 0 de 8, y ya hay explicación.** Ocho anuncios con
 cuerpo legible y ventas, en cuatro cuentas y cuatro verticales, **ninguno** mete el argumento
-en los primeros 125: Dolce Anuncio 3 Drive (485 car., 16 compras, CPA 14.794), Dolce Anuncio 3
-(361, 41, 22.946), Tag Recede VIDEO 8 (185, 21, 23.779), Dolce Anuncio 19 Drive (485, 13,
+en los primeros 125: otra marca Anuncio 3 Drive (485 car., 16 compras, CPA 14.794), otra marca Anuncio 3
+(361, 41, 22.946), Tag Recede VIDEO 8 (185, 21, 23.779), otra marca Anuncio 19 Drive (485, 13,
 33.622), Le'côterra V6 vigente (221, 8, 37.344), V6 15 copys (332, 13, 38.165), V6 CP1 (221,
 14, 40.765) y OPEN 7 V5 (33, 2, 42.174).
 
@@ -147,7 +147,7 @@ cuerpo. Y el titular **no se corta nunca**; los primeros 125 del cuerpo sí desa
 3. Si la oferta **no** está en el título, entonces sí: métela en los primeros 125 del cuerpo.
 4. Producto que no puede prometer (claims restringidos): no le inventes una oferta para cumplir.
 
-**Contraste medido, con su límite:** en Dolce CP1, mismo producto y misma cuenta, título-oferta
+**Contraste medido, con su límite:** en otra marca CP1, mismo producto y misma cuenta, título-oferta
 (`🚛Envío gratis y Pago Contraentrega📦`, 41 compras, CPA 22.946) contra título-beneficio (`Usa
 tu celular sin sacarlo del bolso`, 16 compras, CPA 14.794). Gana el beneficio, **pero el CTA
 también cambia entre los dos**, así que no aísla la variable. No lo cites como prueba de que el
@@ -268,7 +268,7 @@ esas **14 tuvieron gasto en 30 días**. Ese embudo 75 → 36 → 14 es el denomi
 
 Antes de reescribir un copy que rinde mal, **descarta primero destino y creativo.**
 
-En Dolce CP1, tres creativos llevan el **mismo cuerpo byte por byte** (485 caracteres), mismo
+En otra marca CP1, tres creativos llevan el **mismo cuerpo byte por byte** (485 caracteres), mismo
 producto, misma cuenta, mismos 30 días:
 
 | CTA | Gasto | Compras | CPA | ROAS |

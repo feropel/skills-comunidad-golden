@@ -6,13 +6,20 @@ Corre los controles del catalogo (references/clasificacion.md) sobre un DUMP pro
 extraer.py y emite hallazgos con evidencia citada del hilo real, mas cobertura medida.
 
 Uso:
-    python3 clasificar.py <DUMP.json> [--json salida.json] [--modo cod|prepago]
+    python3 clasificar.py <DUMP.json> --modo cod|prepago [--json salida.json] [--zona-horas N]
 
 NO escribe nada en Chatea. Clasifica y reporta.
 
 `--modo` declara si el espacio vende contra entrega (cod) o con pago anticipado (prepago). Sin
 declararlo, cualquier mencion de pago anticipado en boca del bot se reporta como DUDA en vez de
 como fallo confirmado -- nunca se asume el modelo de pago.
+
+`--zona-horas` (entero, offset UTC en horas, ej. -5) declara la zona horaria del espacio para
+acotar R2/R3/R4/Q4 al dia auditado (ver ZONA_HORAS_DEFAULT_NO_CONFIRMADA y
+references/api.md). Sin declararlo, usa el default -5 -- medido SOLO contra el espacio de
+Colombia validado (LIBIDO-UP); la plataforma sirve 7 paises con offsets distintos, asi que un
+espacio de otro pais debe declarar su propio offset hasta confirmarlo contra el panel de
+Chatea.
 
 Si la COMPUERTA DE CORDURA se activa, o si el denominador de la Fase 1 no cuadra, el script
 NO IMPRIME el informe normal (universo + hallazgos + cobertura completos): imprime solo el
@@ -36,14 +43,25 @@ integraciones tipo uChat como respaldo SECUNDARIO, nunca al reves.
 import json
 import re
 import sys
-from datetime import datetime
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
+
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from secretos import PATRONES_SECRETO, redactar_texto  # noqa: E402
 
 SEV = {"MUERTO": "🔴", "RIESGO": "🟠", "HUECO": "🟡", "DUDA": "🔵"}
 
 UMBRAL_TARDANZA_MIN = 30
 UMBRAL_SIN_RESPUESTA_MUERTO_MIN = 120     # SKILL.md: MUERTO es "> 2 horas"
 UMBRAL_COMPUERTA = 0.90
+UMBRAL_UNIVERSO_COMPUERTA_BAJA = 10   # F5: lado bajo de la compuerta, ver clasificacion.md
+# ROTO NUEVO (tercera ronda de verificacion, 2026-08-22): offset UTC del "dia" que declara
+# `last_message_at` en extraer.py, medido en UN espacio (LIBIDOUP, Colombia): -5h EXACTAS y
+# CONSTANTES en 161 de 161 pares comparables de los 4 DUMPs reales. NO confirmado contra el
+# panel de Chatea, y NO universal -- la plataforma sirve 7 paises con offsets distintos. Se usa
+# como DEFAULT declarado (nunca silencioso: ver `universo['zona_horas_usada']`), pasable como
+# `zona_horas=` a `Clasificador` para un espacio de otro pais.
+ZONA_HORAS_DEFAULT_NO_CONFIRMADA = -5
 
 MODOS_VALIDOS = ("cod", "prepago")
 
@@ -115,13 +133,16 @@ CANON_COLOR = {
 }
 _ALTERNATIVAS_COLOR = "|".join(sorted(CANON_COLOR.keys(), key=len, reverse=True))
 # LEAD-IN obligatorio ("color X" / "en X" / "a X", p.ej. "cambialo a rojo"): medido contra
-# produccion (verificacion
-# adversarial 2026-08-21) -- sin el lead-in, colores que tambien son palabras corrientes del
-# espanol ("vino" el verbo, "cafe" la bebida, "rosa" un nombre de persona, "gris" el clima,
-# "naranja" la fruta) generaban MUERTO falso sobre hilos reales (0 aciertos, varios falsos
-# positivos en 1.829 hilos medidos). Costo declarado: baja el recall (un "mandeme el negro"
-# suelto, sin "en"/"color" antes, ya no se lee) a cambio de no acusar en falso -- mismo
-# criterio de la skill en general (preferir DUDA/silencio a una acusacion sin base).
+# produccion (verificacion adversarial 2026-08-21) -- sin el lead-in, colores que tambien son
+# palabras corrientes del espanol ("vino" el verbo, "cafe" la bebida, "rosa" un nombre de
+# persona, "gris" el clima, "naranja" la fruta) generaban MUERTO falso sobre hilos reales (0
+# aciertos, varios falsos positivos). La cifra especifica de hilos de esa ronda ("1.829") es
+# una cifra citada de una ronda de verificacion anterior cuyo artefacto no se conservo -- se
+# retira el numero puntual, se mantiene declarado el hallazgo cualitativo (falsos positivos
+# reales sin lead-in) que SI sigue siendo la razon de este diseno. Costo declarado: baja el
+# recall (un "mandeme el negro" suelto, sin "en"/"color" antes, ya no se lee) a cambio de no
+# acusar en falso -- mismo criterio de la skill en general (preferir DUDA/silencio a una
+# acusacion sin base).
 PATRON_COLOR = re.compile(
     r"\b(?:color|en|a)\s+(" + _ALTERNATIVAS_COLOR + r")\b", re.IGNORECASE)
 # Talla: SOLO valores reconocidos de la vida real (letras de talla de ropa o numero de 1-2
@@ -131,8 +152,17 @@ PATRON_COLOR = re.compile(
 _VALORES_TALLA = r"xxxl|xxl|xl|xs|s|m|l|\d{1,2}"
 PATRON_TALLA = re.compile(r"\btalla\s*[:\s]?\s*(" + _VALORES_TALLA + r")\b", re.IGNORECASE)
 PATRON_NUMERO_CALZADO = re.compile(r"\bn[uú]mero\s*[:\s]?\s*(\d{2,3})\b", re.IGNORECASE)
+# F4 (RIESGO, golden-verificador 2026-08-22, recall=0 contra 165 conversaciones reales de
+# LIBIDO-UP): el vocabulario original ("unidades|pares|combos|paquetes") no reconocia NINGUNA
+# de las FORMAS reales medidas (parafraseadas aqui, nunca el texto literal de un cliente
+# real -- regla del encargo): cantidad en SINGULAR ("1" + la unidad sin plural), cantidad
+# mencionada dentro de una frase mas larga sobre querer probar el producto, cantidad SIN
+# unidad explicita con un articulo antes del numero, y una PREGUNTA del cliente sobre cuanto
+# trae cada unidad (esta ultima SI debe seguir sin capturar como cantidad pedida -- ver el
+# filtro de PALABRAS_PEDIDO_CANTIDAD mas abajo). Se amplia en 3 frentes.
 PATRON_CANTIDAD_UNIDAD = re.compile(
-    r"\b(\d{1,3})\s*(unidades?|pares?|combos?|paquetes?)\b", re.IGNORECASE)
+    r"\b(\d{1,3})\s*(unidad(?:es)?|par(?:es)?|combo(?:s)?|paquete(?:s)?|frasco(?:s)?|"
+    r"botella(?:s)?|caja(?:s)?|kit(?:s)?|pote(?:s)?)\b", re.IGNORECASE)
 PATRON_CANTIDAD_DECLARADA = re.compile(r"\bcantidad\s*[:\s]?\s*(\d{1,3})\b", re.IGNORECASE)
 # Cantidad escrita en palabras (1-10): "quiero dos unidades" no tenia cobertura -- declarado
 # como limite en clasificacion.md para lo que quede fuera (mas de 10, u otras formas).
@@ -141,8 +171,54 @@ NUMEROS_ESCRITOS = {
     "cinco": "5", "seis": "6", "siete": "7", "ocho": "8", "nueve": "9", "diez": "10",
 }
 PATRON_CANTIDAD_ESCRITA = re.compile(
-    r"\b(" + "|".join(NUMEROS_ESCRITOS.keys()) + r")\s*(unidades?|pares?|combos?|paquetes?)\b",
+    r"\b(" + "|".join(NUMEROS_ESCRITOS.keys()) + r")\s*(unidad(?:es)?|par(?:es)?|combo(?:s)?|"
+    r"paquete(?:s)?|frasco(?:s)?|botella(?:s)?|caja(?:s)?|kit(?:s)?|pote(?:s)?)\b",
     re.IGNORECASE)
+# Cantidad SIN unidad explicita, con un verbo/articulo de pedido antes del numero (formas
+# SINTETICAS de ejemplo, no texto literal de cliente real: "necesito 1", "dame 3", "quiero
+# llevarme 2") -- la forma "articulo/verbo + numero suelto, sin unidad" es la que ningun
+# patron anterior cubria, medido en produccion F4. Deliberadamente NO incluye "cuanto"/"cual"
+# antes del numero (evita capturar preguntas del cliente, tipo "cual de los 2 es mejor", como
+# si fueran una cantidad pedida).
+PALABRAS_PEDIDO_CANTIDAD = ("quiero", "dame", "mandame", "mándame", "enviame", "envíame",
+                            "necesito", "los", "las", "llevo", "pido", "ordeno", "envíeme",
+                            "envieme")
+PATRON_CANTIDAD_SIN_UNIDAD = re.compile(
+    r"\b(?:" + "|".join(PALABRAS_PEDIDO_CANTIDAD) + r")\s+(\d{1,3})\b", re.IGNORECASE)
+# Cantidad implicita por el NOMBRE DEL PRODUCTO usado como unidad (ejemplo sintetico: "1
+# producto-x"): no hay lista cerrada de nombres de producto (cada tienda tiene el suyo).
+# VERSION ANTERIOR (rota, hallazgo de golden-verificador en la ronda de verificacion de
+# GCO1.4, medido contra los 4 DUMPs reales de LIBIDO-UP -- cifras agregadas citadas aqui,
+# nunca el texto literal de un cliente real): "cualquier palabra de 4+ letras inmediatamente
+# despues de un numero, en cualquier parte del mensaje" -- contra 625 mensajes de cliente
+# reales, 17 dispararon cantidad y 13 de los 17 (76%) eran un NUMERO DE DIRECCION (el numero
+# de una torre, apartamento o casa seguido de la palabra siguiente de la direccion): en un
+# espacio COD, CADA cliente escribe su direccion con numeros seguidos de palabras, asi que
+# ese patron era estructuralmente ruido, no una excepcion rara. Corregido: el patron SOLO
+# dispara cuando el numero+palabra ocupa la LINEA COMPLETA del mensaje (anclado a inicio de
+# mensaje o de renglon, y a fin de renglon o de mensaje) -- la forma real que SI hay que
+# capturar llega como su propia linea al final de un mensaje con la direccion arriba, nunca
+# embebida en medio de la direccion misma. Se pierde el caso de un nombre de producto escrito
+# en medio de una frase sin verbo de pedido antes (ya cubierto por PATRON_CANTIDAD_SIN_UNIDAD
+# si el cliente escribe "quiero"/"necesito"/etc. antes del numero) -- limite declarado,
+# preferible al 76% de falsos positivos medido.
+STOPLIST_CANTIDAD_GENERICA = {
+    "dias", "día", "días", "dia", "semana", "semanas", "mes", "meses", "hora", "horas",
+    "minuto", "minutos", "año", "años", "ano", "anos", "veces", "vez", "pesos", "dolares",
+    "dólares", "cuotas", "personas", "kilometros", "kilómetros", "cuadras", "años,",
+    # Defensa en profundidad (F4, segunda ronda): vocabulario de DIRECCION que el anclaje a
+    # linea completa ya bloquea en el 76% medido, pero se deja como segunda barrera por si
+    # algun dia una direccion SI llega como linea propia con esta forma.
+    "apto", "apartamento", "torre", "piso", "interior", "bloque", "casa", "manzana",
+    "barrio", "local", "oficina", "edificio", "urbanizacion", "urbanización", "conjunto",
+    "sur", "norte", "oriente", "occidente", "centro", "sector", "vereda", "corregimiento",
+}
+# fullmatch (no finditer) contra cada LINEA por separado -- ver extraer_atributos, que
+# recorre `texto.split("\n")` en vez de trabajar sobre el texto normalizado de una sola
+# linea (normalizar() colapsa saltos de linea a espacio, y ese colapso es justo lo que
+# habria vuelto inutil el anclaje "linea completa" que corrige el 76% de falsos positivos).
+PATRON_CANTIDAD_PRODUCTO_IMPLICITO = re.compile(
+    r"(\d{1,3})\s+([a-záéíóúñ]{4,})", re.IGNORECASE)
 
 # Marcadores del "resumen/confirmacion final" (elemento 1: mencion de producto; elemento 3:
 # direccion o frase de cierre). El elemento 2 (atributo) se calcula con extraer_atributos.
@@ -150,10 +226,12 @@ PATRON_CANTIDAD_ESCRITA = re.compile(
 # amplio: R6 no exige un cierre literal, exige 2 de 3 señales genericas en el mismo mensaje.
 # SOLO frases de varias palabras -- medido en produccion (verificacion adversarial
 # 2026-08-21): las versiones sueltas "tu pedido", "confirmamos" y "direccion"/"dirección"
-# (sin mas contexto) hacian que 847 de 6.911 mensajes de 2 dias reales calzaran como
-# "resumen final" (una pregunta como "cual es tu direccion?" ya sumaba este elemento),
-# inundando el informe de DUDA sin señal real. Se retiran las sueltas, se dejan solo frases
-# completas de cierre real.
+# (sin mas contexto) hacian que una porcion grande de los mensajes reales medidos calzaran
+# como "resumen final" (una pregunta como "cual es tu direccion?" ya sumaba este elemento),
+# inundando el informe de DUDA sin señal real. La cifra especifica ("847 de 6.911") es una
+# cifra citada de esa ronda de verificacion cuyo artefacto no se conservo -- se retira el
+# numero puntual, se mantiene declarado el hallazgo cualitativo que sigue siendo la razon de
+# este diseno. Se retiran las sueltas, se dejan solo frases completas de cierre real.
 MARCADORES_PRODUCTO_R6 = ("pedido", "producto", "orden", "compra")
 MARCADORES_CIERRE_R6 = (
     "pedido confirmado", "confirmamos tu pedido", "tu pedido va en camino",
@@ -175,12 +253,55 @@ def extraer_atributos(texto):
         out.append(("talla", m.group(1).upper()))
     for m in PATRON_NUMERO_CALZADO.finditer(t):
         out.append(("talla", m.group(1)))
+
+    # F4: cantidad -- varios patrones que pueden solapar el mismo tramo de texto ("1
+    # frasco" calza con UNIDAD y tambien con PRODUCTO_IMPLICITO). Se recorren en orden de
+    # especificidad y se marcan los caracteres ya cubiertos (`ocupado`) para no duplicar
+    # el mismo numero dos veces por el mismo motivo.
+    ocupado = [False] * len(t)
+
+    def _marcar(inicio, fin):
+        for i in range(inicio, fin):
+            ocupado[i] = True
+
+    def _libre(inicio, fin):
+        return not any(ocupado[inicio:fin])
+
     for m in PATRON_CANTIDAD_UNIDAD.finditer(t):
         out.append(("cantidad", m.group(1)))
+        _marcar(*m.span())
     for m in PATRON_CANTIDAD_DECLARADA.finditer(t):
         out.append(("cantidad", m.group(1)))
+        _marcar(*m.span())
     for m in PATRON_CANTIDAD_ESCRITA.finditer(t):
         out.append(("cantidad", NUMEROS_ESCRITOS[m.group(1).lower()]))
+        _marcar(*m.span())
+    for m in PATRON_CANTIDAD_SIN_UNIDAD.finditer(t):
+        if _libre(*m.span()):
+            out.append(("cantidad", m.group(1)))
+            _marcar(*m.span())
+
+    # PRODUCTO_IMPLICITO opera por LINEA sobre el texto ORIGINAL, con `fullmatch` (la linea
+    # COMPLETA debe ser "numero + palabra", nada mas) -- ver el comentario junto al patron.
+    # `normalizar(texto)` (usado por todos los patrones de arriba) colapsa saltos de linea a
+    # espacio, asi que este control necesita su propia pasada sobre `texto.split("\n")` para
+    # que el anclaje "linea completa" tenga saltos de linea reales que anclar.
+    ya_vistos = {(tipo, valor) for tipo, valor in out}
+    for linea in (texto or "").split("\n"):
+        linea_norm = normalizar(linea)
+        if not linea_norm:
+            continue
+        m = PATRON_CANTIDAD_PRODUCTO_IMPLICITO.fullmatch(linea_norm)
+        if not m:
+            continue
+        palabra = m.group(2).lower()
+        if palabra in STOPLIST_CANTIDAD_GENERICA:
+            continue
+        par = ("cantidad", m.group(1))
+        if par in ya_vistos:
+            continue          # ya capturado por UNIDAD/DECLARADA/ESCRITA/SIN_UNIDAD
+        out.append(par)
+        ya_vistos.add(par)
     return out
 
 
@@ -202,33 +323,15 @@ MIN_PERSONAS_FORMA = 3
 CUOTA_FRECUENCIA = 0.03
 MIN_FRECUENCIA = 5
 
-# Patrones de secretos que NUNCA pueden llegar a un hallazgo citado. Ampliados dos veces
-# tras verificacion adversarial: la primera vuelta parcheo los 3 strings que se nombraron
-# (Stripe live, Mercado Pago, Sanctum) y no la FAMILIA -- leccion de la propia clase
-# "se parchea el caso, no la clase" que este mismo ecosistema ya tiene documentada. Esta
-# lista cubre la familia completa de cada proveedor nombrado, no solo el ambiente "live".
-PATRONES_SECRETO = [
-    ("OpenAI", re.compile(r"sk-(?:proj-)?[A-Za-z0-9_\-]{20,}")),           # cubre sk-ant- tambien
-    ("ElevenLabs", re.compile(r"sk_[A-Za-z0-9]{24,}")),
-    ("StripeSecret", re.compile(r"(?:sk|rk)_(?:live|test)_[A-Za-z0-9]{10,}")),
-    ("StripeWebhook", re.compile(r"whsec_[A-Za-z0-9]{10,}")),
-    ("MercadoPago", re.compile(r"(?:APP_USR|TEST)-[A-Za-z0-9\-]{10,}")),
-    ("JWT", re.compile(r"eyJ[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-]{8,}\.[A-Za-z0-9_\-]{8,}")),
-    ("Meta", re.compile(r"EAA[A-Za-z0-9]{40,}")),
-    ("Shopify", re.compile(r"shp(?:at|ss|ca)_[A-Fa-f0-9]{20,}")),
-    ("xAI", re.compile(r"xai-[A-Za-z0-9]{20,}")),
-    ("Google", re.compile(r"AIza[A-Za-z0-9_\-]{30,}")),
-    ("GoogleOAuthRefresh", re.compile(r"1//0[A-Za-z0-9_\-]{20,}")),
-    ("SanctumBearer", re.compile(r"\b\d+\|[A-Za-z0-9]{20,}\b")),
-    ("GitHubToken", re.compile(r"(?:ghp|gho|ghu|ghs|ghr|github_pat)_[A-Za-z0-9_]{20,}")),
-    ("AWSAccessKey", re.compile(r"\bAKIA[0-9A-Z]{16}\b")),
-    ("SlackToken", re.compile(r"xox[baprs]-[A-Za-z0-9\-]{10,}")),
-    ("SendGrid", re.compile(r"SG\.[A-Za-z0-9_\-]{16,}\.[A-Za-z0-9_\-]{16,}")),
-    # Bearer generico hexadecimal largo (64 caracteres, forma comun de un token opaco de
-    # sesion o de API): mas ancho que los anteriores a proposito, va AL FINAL para no
-    # tapar coincidencias mas especificas primero.
-    ("HexBearerGenerico", re.compile(r"\b[0-9a-fA-F]{64}\b")),
-]
+# F3 (CRITICO SEGURIDAD, golden-verificador 2026-08-22): PATRONES_SECRETO y redactar_texto
+# YA NO se definen aqui -- vivian duplicados entre este archivo (17 familias) y extraer.py
+# (11 familias), y references/api.md afirmaba (falso) que estaban sincronizados. Ahora los
+# dos scripts importan la MISMA lista de `secretos.py` (ver el import al inicio de este
+# archivo). Ampliados dos veces tras verificacion adversarial ANTES de unificarse aqui: la
+# primera vuelta parcheo los 3 strings que se nombraron (Stripe live, Mercado Pago, Sanctum)
+# y no la FAMILIA -- leccion de la propia clase "se parchea el caso, no la clase" que este
+# mismo ecosistema ya tiene documentada; la lista en `secretos.py` cubre la familia completa
+# de cada proveedor nombrado, no solo el ambiente "live".
 
 # Candidatos de campo para un valor monetario dentro de get-info. Ninguno esta confirmado
 # contra el servidor real (mismo caso que el endpoint de listado en extraer.py): se
@@ -236,26 +339,70 @@ PATRONES_SECRETO = [
 CAMPOS_VALOR_CANDIDATOS = ("Valor pedido", "Total", "Valor", "Precio", "Total pedido")
 
 
-def redactar_texto(t):
-    for etiqueta, patron in PATRONES_SECRETO:
-        t = patron.sub(lambda m: f"<<REDACTADO {etiqueta} len={len(m.group(0))}>>", t)
-    return t
-
-
 # ------------------------------------------------------------------ utilidades de parseo
 
-def parse_fecha(valor):
-    """Parsea fechas con ESPACIO ('2026-08-10 11:25:39') o con 'T' (ISO). Nunca se
-    compara como texto (P9): el espacio (0x20) es menor que 'T' (0x54) y una comparacion
-    textual deja todo contacto nuevo por debajo de una marca ISO, siempre, en silencio."""
-    if valor is None:
+UMBRAL_EPOCH_MS = 10 ** 11    # por debajo: segundos (hasta ~2286); por encima: milisegundos
+
+
+def _epoch_a_fecha(numero):
+    """Convierte un epoch (segundos o milisegundos, detectado por MAGNITUD) a datetime
+    naive en UTC -- naive a proposito, para poder compararse sin romper contra el resto
+    de fechas de este archivo (P9/P4), que tambien son naive salvo que la cadena ISO
+    traiga un offset explicito."""
+    try:
+        segundos = numero / 1000 if numero > UMBRAL_EPOCH_MS else numero
+        return datetime.fromtimestamp(segundos, tz=timezone.utc).replace(tzinfo=None)
+    except (ValueError, OSError, OverflowError):
         return None
+
+
+def parse_fecha(valor):
+    """Parsea fechas con ESPACIO ('2026-08-10 11:25:39'), con 'T' (ISO), o EPOCH (F1,
+    hallazgo critico de golden-verificador 2026-08-22): la forma REAL que trae `ts` en
+    los 4 DUMPs de produccion medidos (LIBIDO-UP, 165 conversaciones, 100% de los
+    mensajes con `ts` entero) es un epoch, no texto -- exactamente como lo trata
+    `golden-logistica-diaria/scripts/barrer_chats.py` (`x.get("ts") or 0`, linea ~134).
+    Antes de este fix, un `ts` epoch nunca se parseaba: R1 nunca podia medir el gap real
+    (todo caia en RIESGO por 'no medible', nunca en MUERTO) y R2 (respuesta tardia) no
+    disparaba jamas, porque `_tardanzas` exige ambos `ts` parseados. Acepta:
+      - int/float: epoch en segundos o milisegundos (se distingue por MAGNITUD, ver
+        `UMBRAL_EPOCH_MS` -- un epoch en ms de una fecha real es varios ordenes de
+        magnitud mayor que uno en segundos, no hay ambiguedad real en el rango de
+        fechas que esta skill procesa).
+      - cadena TODO-digitos de 9 a 13 caracteres ('1787114990'): mismo epoch, pero
+        serializado como texto (algunos DUMPs/JSON lo entregan asi). Fuera de ese
+        rango de longitud NO se trata como epoch -- una fecha real de pocos digitos
+        (como un dia del mes suelto) no se adivina como timestamp.
+      - ESPACIO o 'T' (ISO): la trampa original (P9), intacta -- no se toca.
+    Nunca se compara como texto (P9): el espacio (0x20) es menor que 'T' (0x54) y una
+    comparacion textual deja todo contacto nuevo por debajo de una marca ISO, siempre,
+    en silencio."""
+    if valor is None or isinstance(valor, bool):
+        return None
+    if isinstance(valor, (int, float)):
+        return _epoch_a_fecha(valor)
     s = str(valor).strip()
     if not s:
         return None
+    if re.fullmatch(r"\d{9,13}", s):
+        return _epoch_a_fecha(float(s))
     try:
         if "T" in s:
-            return datetime.fromisoformat(s.replace("Z", "+00:00"))
+            dt = datetime.fromisoformat(s.replace("Z", "+00:00"))
+            # ROTO NUEVO 5b (cuarta ronda de verificacion, 2026-08-22): una fecha ISO CON
+            # offset (p.ej. terminada en "Z" o "+02:00") vuelve `dt` AWARE, mientras el
+            # epoch (`_epoch_a_fecha`) y el formato con ESPACIO siempre devuelven NAIVE. Un
+            # DUMP que mezclara ambas formas (nunca visto en produccion -- 100% epoch
+            # medido, pero `parse_fecha` declara aceptar las tres formas) hacia que
+            # cualquier resta/comparacion entre una fecha epoch y una ISO-con-offset
+            # reventara con `TypeError: can't compare offset-naive and offset-aware
+            # datetimes` -- sin capturar, tumbaba TODA la corrida. Se normaliza a UTC y se
+            # vuelve NAIVE aqui mismo (mismo criterio que `_epoch_a_fecha`), para que las
+            # tres formas de `ts` sean SIEMPRE comparables entre si sin importar cual trajo
+            # el DUMP.
+            if dt.tzinfo is not None:
+                dt = dt.astimezone(timezone.utc).replace(tzinfo=None)
+            return dt
         return datetime.strptime(s[:19], "%Y-%m-%d %H:%M:%S")
     except ValueError:
         return None
@@ -429,7 +576,7 @@ def plantillas_de(primeros_mensajes):
 # ------------------------------------------------------------------------ el clasificador
 
 class Clasificador:
-    def __init__(self, dump, modo=None):
+    def __init__(self, dump, modo=None, zona_horas=None):
         self.d = dump
         if modo is not None:
             modo = modo.lower()
@@ -443,6 +590,40 @@ class Clasificador:
         self.conversaciones = []
         self.excluidos_dropi = []
         self.plantillas = set()
+        # F1-FALLA-1: fecha declarada por extraer.py en el DUMP (`_fecha`, "AAAA-MM-DD").
+        # Usada para acotar R2/R3/R4/Q4 al dia auditado -- ver `_mensajes_del_dia`.
+        # ROTO NUEVO 5a (cuarta ronda de verificacion, 2026-08-22): una `_fecha` PRESENTE
+        # pero con formato distinto a AAAA-MM-DD (o de un dia que no calza con ningun
+        # mensaje real) hacia que `_mensajes_del_dia` filtrara TODO a una lista vacia --
+        # R2/R3/R4/Q4 corrian sobre cero mensajes, en silencio total, con
+        # `acotado_al_dia_activo` declarado `True` (formalmente cierto, pero enganoso: el
+        # acotado esta "activo" y a la vez inutil). Medido: 2 hallazgos R4 MUERTO reales
+        # (el bot mencionando pago anticipado) desaparecian sin ningun aviso con una
+        # `_fecha` malformada. Se valida el FORMATO aqui (no el contenido: una fecha bien
+        # formada pero que no calza con ningun mensaje real sigue produciendo cero
+        # coincidencias, y eso SI es una lectura legitima de "no hay actividad ese dia") --
+        # una `_fecha` mal formada se trata como AUSENTE, con el mismo hallazgo declarado
+        # que la ausencia total.
+        cruda = dump.get("_fecha") if isinstance(dump, dict) else None
+        self.fecha_auditada = (
+            cruda if isinstance(cruda, str) and re.fullmatch(r"\d{4}-\d{2}-\d{2}", cruda)
+            else None)
+        self._fecha_auditada_malformada = bool(cruda) and self.fecha_auditada is None
+        # ROTO NUEVO (golden-verificador, TERCERA ronda de verificacion, 2026-08-22): la
+        # primera version de `_mensajes_del_dia` comparaba `dt.date()` (parse_fecha/
+        # _epoch_a_fecha convierte SIEMPRE a UTC) contra `self.fecha_auditada` (que viene de
+        # `last_message_at[:10]` en extraer.py -- hora LOCAL del servidor, sin zona
+        # declarada). Medido contra los 4 DUMPs reales: desfase de 5h EXACTAS y CONSTANTE en
+        # 161 de 161 pares comparables (hora Colombia, UTC-5) -- con el bug, 111 mensajes
+        # reales del dia se descartaban en silencio y 78 mensajes de OTRO dia se colaban como
+        # si fueran del dia auditado, la MISMA clase de fallo que este fix decia haber
+        # cerrado. `zona_horas` (horas de offset respecto a UTC, ej. -5 para Colombia)
+        # permite declarar la zona real del espacio -- default None usa
+        # `ZONA_HORAS_DEFAULT_NO_CONFIRMADA` (medida en UN espacio, Colombia, no confirmada
+        # contra el panel de Chatea ni universal a los 7 paises que sirve la plataforma: SKILL.md
+        # exige tratarla como una limitacion declarada, no una verdad general). Se declara
+        # explicitamente en el informe (`universo['zona_horas_usada']`), nunca en silencio.
+        self.zona_horas = zona_horas if zona_horas is not None else ZONA_HORAS_DEFAULT_NO_CONFIRMADA
 
     def falla(self, control, sev, titulo, evidencia, consecuencia="", accion=""):
         evidencia = redactar_texto(evidencia)
@@ -530,14 +711,29 @@ class Clasificador:
                        "Cliente esperando respuesta.",
                        "Va primero en el informe. MUERTO si el gap es >= 2 horas.")
 
-        tardanzas = self._tardanzas(mensajes_privados)
+        # FALLA 1 (golden-verificador, ronda 2 sobre GCO1.4, 2026-08-22): `mensajes_privados`
+        # trae el HISTORICO COMPLETO del contacto (extraer.py descarga todo el hilo, no solo
+        # el dia pedido) -- R2/R3/R4/Q4 recorrian ese historico entero y podian acusar al bot
+        # de una demora, un bucle o una frase de DIAS ANTERIORES al dia que encabeza el
+        # informe, contradiciendo la promesa de "el informe del DIA" (medido: los 7
+        # hallazgos R2 de la corrida real caian, los 7, fuera de la fecha auditada). Se
+        # filtra a `mensajes_del_dia` (mismo dia que `_fecha` en el DUMP) ANTES de correr
+        # estos cuatro controles -- R1 (sin respuesta) y R6 (coherencia intra-chat) siguen
+        # usando el hilo completo a proposito: R1 mide el ESTADO actual de la conversacion
+        # (una pregunta sin responder sigue sin responder sin importar cuando se hizo), y R6
+        # compara contra el resumen final de UN pedido que puede legitimamente cruzar dias
+        # antes de cerrarse -- frontera declarada, no un descuido igual al de R2/R3/R4.
+        mensajes_del_dia = self._mensajes_del_dia(mensajes_privados)
+        msgs_empresa_del_dia = [m for m in mensajes_del_dia if direccion(m) == "empresa"]
+
+        tardanzas = self._tardanzas(mensajes_del_dia)
         for gap_min, cita in tardanzas:
             if gap_min > UMBRAL_TARDANZA_MIN:
                 self.falla("R2", "RIESGO",
                            f"`{contacto.get('user_ns')}` - respuesta tardia ({gap_min:.0f} min)",
                            cita, "El cliente pudo enfriarse o irse a otro lado.")
 
-        bucle = self._detectar_bucle(mensajes_privados)
+        bucle = self._detectar_bucle(mensajes_del_dia)
         if bucle:
             self.falla("R3", "RIESGO",
                        f"`{contacto.get('user_ns')}` - el bot repite la misma respuesta",
@@ -545,7 +741,7 @@ class Clasificador:
                        "cliente entre medio",
                        "Senal de flujo roto, quedo repitiendo el mismo nodo.")
 
-        frases_encontradas = self._frases_prohibidas(msgs_empresa)
+        frases_encontradas = self._frases_prohibidas(msgs_empresa_del_dia)
         for frase, cita in frases_encontradas:
             sev = "MUERTO" if self.modo == "cod" else "DUDA"
             self.falla("R4", sev,
@@ -556,7 +752,7 @@ class Clasificador:
                        "Modo de pago no declarado (--modo). Se reporta como duda, no como "
                        "fallo confirmado.")
 
-        preguntas_sin_cobertura = self._preguntas_sin_cobertura(mensajes_privados)
+        preguntas_sin_cobertura = self._preguntas_sin_cobertura(mensajes_del_dia)
         for pregunta, respuesta in preguntas_sin_cobertura:
             self.falla("Q4", "HUECO",
                        f"`{contacto.get('user_ns')}` - pregunta sin cobertura en el prompt",
@@ -609,6 +805,35 @@ class Clasificador:
         return conv
 
     # -------------------------------------------------------------------- sub-controles
+    def _mensajes_del_dia(self, mensajes_privados):
+        """FALLA 1 (ronda 2) + ROTO NUEVO corregido (ronda 3), ambas de golden-verificador,
+        2026-08-22: el hilo descargado por extraer.py trae el HISTORICO COMPLETO del
+        contacto, no solo el dia auditado -- sin acotar, R2/R3/R4/Q4 podian citar evidencia
+        de OTRO dia (medido: hasta 818 min de un intercambio de dias antes, en un informe
+        fechado distinto). Filtra a los mensajes cuyo `ts` cae en `self.fecha_auditada`
+        (declarado por extraer.py en `_fecha`) -- pero la comparacion NO puede hacerse en UTC
+        a secas: `_epoch_a_fecha` convierte `ts` a UTC, mientras `_fecha` viene de
+        `last_message_at[:10]` en hora LOCAL del servidor (medido: -5h constante en el unico
+        espacio confirmado, `self.zona_horas`). Se le resta el offset a `dt` ANTES de comparar
+        el dia -- sin este ajuste, un mensaje cerca de medianoche local caia del lado
+        equivocado del calendario en UTC (medido: 111 mensajes reales del dia se perdian, 78
+        de otro dia se colaban, en los 4 DUMPs reales).
+        Si `self.fecha_auditada` NO esta declarado, el acotado se DESACTIVA -- declarado con
+        su propio hallazgo DUDA (ver `correr()`, nunca en silencio: la version anterior de
+        este metodo devolvia todo sin avisar, la misma clase de fallo "ausencia de dato leida
+        como sano" que el control INV le prohibe al resto de la skill). Un mensaje puntual sin
+        `ts` parseable se MANTIENE (preferible a perder evidencia real por un `ts` roto de un
+        solo mensaje aislado)."""
+        if not self.fecha_auditada:
+            return mensajes_privados
+        offset = timedelta(hours=self.zona_horas)
+        out = []
+        for m in mensajes_privados:
+            dt = parse_fecha(obtener_ts(m))
+            if dt is None or (dt + offset).date().isoformat() == self.fecha_auditada:
+                out.append(m)
+        return out
+
     def _motivo_no_compra(self, msgs_cliente_reales):
         """P7: SOLO sobre mensajes de direccion 'cliente' y sin la plantilla del anuncio."""
         motivos = []
@@ -897,11 +1122,87 @@ class Clasificador:
     # --------------------------------------------------------------------------- correr
     def correr(self):
         contactos = self.d.get("contactos") or []
+        # FALLA 3 (golden-verificador, ronda 2 sobre GCO1.4, 2026-08-22): la version
+        # anterior hacia `self.d.get("_listado_paginacion") or {}` y declaraba
+        # `listado_truncado_por_tope_500: False` cuando la CLAVE NI SIQUIERA venia en el
+        # DUMP (los 4 DUMPs reales de LIBIDO-UP, extraidos ANTES de que extraer.py
+        # declarara este campo, no la traen) -- exactamente la regla I4 que esta misma
+        # skill exige en el control INV ("ausencia de dato nunca es prueba de que el
+        # universo este completo"), incumplida aqui mismo. Ahora se distinguen los DOS
+        # casos: la clave NO vino (DUMP viejo, o de una version anterior de extraer.py) ->
+        # "no_medible", declarado con su propio hallazgo DUDA, nunca leido como "no se
+        # trunco"; la clave SI vino -> se usa el valor real.
+        paginacion_listado = self.d.get("_listado_paginacion")
+        paginacion_no_medible = paginacion_listado is None
+        paginacion_listado = paginacion_listado or {}
         self.universo = {
             "contactos_en_dump": len(contactos),
             "endpoint_listado_usado": self.d.get("_listado_endpoint_usado"),
             "hilos_no_descargados": len(self.d.get("_hilos_no_descargados") or []),
+            "listado_truncado_por_tope_500": (
+                "no_medible" if paginacion_no_medible
+                else bool(paginacion_listado.get("truncado_por_tope_500"))),
+            # ROTO NUEVO (ronda 3): declarada SIEMPRE, nunca en silencio -- la zona horaria
+            # que decide el acotado de R2/R3/R4/Q4 al dia (ver _mensajes_del_dia).
+            "zona_horas_usada": self.zona_horas,
+            "acotado_al_dia_activo": bool(self.fecha_auditada),
         }
+        if not self.fecha_auditada:
+            # Misma clase de fallo que P-listado-truncado (I4, ausencia de dato leida como
+            # sano): la version anterior de _mensajes_del_dia se desactivaba en silencio sin
+            # declararlo -- ahora queda como hallazgo, no como una llave que simplemente no
+            # aparece. ROTO NUEVO 5a (ronda 4): distingue AUSENTE de MALFORMADA -- una
+            # `_fecha` con formato invalido (ej. "18/08/2026") producia el peor de los dos
+            # mundos: `acotado_al_dia_activo=True` (formalmente cierto, "algo" habia en
+            # `_fecha`) pero CERO mensajes calzaban nunca con esa cadena, asi que R2/R3/R4/Q4
+            # corrian sobre una lista vacia en silencio -- 2 hallazgos R4 MUERTO reales
+            # desaparecian sin aviso en la medicion de esta ronda. Ambos casos (ausente y
+            # malformada) llevan el MISMO hallazgo declarado.
+            motivo = ("el DUMP trae `_fecha` con un formato distinto a AAAA-MM-DD (DUMP de "
+                      "otra fuente, o con el campo corrompido)" if self._fecha_auditada_malformada
+                      else "falta `_fecha` en el DUMP (DUMP de una versión de extraer.py "
+                      "anterior a que este campo se declarara, o de otra fuente)")
+            self.falla("P-sin-fecha-auditada", "DUDA",
+                       "El DUMP no declara una `_fecha` utilizable -- R2/R3/R4/Q4 NO se "
+                       "acotan al día",
+                       motivo,
+                       "Sin `_fecha` utilizable no hay con qué acotar el hilo al día "
+                       "auditado: R2/R3/R4/Q4 corren sobre el HISTÓRICO COMPLETO del "
+                       "contacto, con el mismo riesgo que motivó el acotado (evidencia de "
+                       "otro día citada como si fuera del día del informe) -- o, si la "
+                       "`_fecha` estaba malformada, corren sobre una lista VACÍA (peor: "
+                       "pierden evidencia real en silencio).",
+                       "Repetir la extracción con la versión actual de extraer.py, que sí "
+                       "declara `_fecha` en formato AAAA-MM-DD.")
+        if paginacion_no_medible:
+            self.falla("P-listado-truncado", "DUDA",
+                       "No se puede saber si el listado de contactos se truncó",
+                       "el DUMP no trae la clave `_listado_paginacion` (DUMP extraído con "
+                       "una versión de extraer.py anterior a que este campo se declarara, "
+                       "o de otra fuente)",
+                       "Ausencia de dato no es prueba de que el listado esté completo -- "
+                       "no se lee como 'no se truncó' sin evidencia.",
+                       "Repetir la extracción con la versión actual de extraer.py para "
+                       "confirmar si hubo truncado.")
+        # F9 (HUECO): el listado de contactos puede truncarse en el tope de 500 paginas sin
+        # que nada lo avise -- ahora extraer.py lo declara en `_listado_paginacion` y aqui se
+        # convierte en hallazgo, nunca queda implicito en un DUMP que solo dice "22 contactos"
+        # sin decir si esos 22 son TODOS los del dia o solo lo que cupo antes del tope.
+        if paginacion_listado.get("truncado_por_tope_500"):
+            self.falla("P-listado-truncado", "RIESGO",
+                       "El listado de contactos se truncó en el tope de 500 páginas",
+                       f"se trajeron {paginacion_listado.get('paginas_traidas')} de "
+                       f"{paginacion_listado.get('ultima_pagina_declarada_por_servidor')} "
+                       "páginas que declaró el servidor",
+                       "El universo del día puede estar incompleto: contactos que existen "
+                       "en páginas posteriores al tope no entraron a esta corrida.",
+                       "Espacio con un volumen de contactos fuera de lo medido hasta ahora "
+                       "-- confirmar con el panel si el universo real es mayor al traído.")
+        if paginacion_listado.get("sin_meta_last_page_no_pagina"):
+            self.cubre("P-listado-paginacion", "LIMITACION_CONOCIDA",
+                      nota="el servidor no declaró meta.last_page en esta corrida: "
+                           "extraer.py NO paginó el listado más allá de la primera "
+                           "página (comportamiento actual, declarado, no implícito)")
         if not contactos:
             self.falla("P1", "MUERTO", "El DUMP no trae contactos",
                        "sin contactos no hay nada que clasificar")
@@ -1070,6 +1371,33 @@ class Clasificador:
                        "todos los dias.",
                        "Revisar el patron de deteccion de cierre o los ejemplos citados "
                        "antes de confiar en esta corrida.")
+
+        # F5 (RIESGO, golden-verificador 2026-08-22): la compuerta ANTES solo miraba el lado
+        # ALTO (>90%). Contra los 4 dias reales de LIBIDO-UP el cierre medido fue 0%, 0%, 0%
+        # y 6.67% -- igual de absurdo de cara que un 95% (ningun espacio real cierra el 0% de
+        # sus conversaciones TODOS los dias sin que algo este mal calibrado), y nada lo
+        # detectaba. Umbral elegido (documentado tambien en clasificacion.md): 0% EXACTO con
+        # un universo de 10+ conversaciones no-dropi -- no un rango arbitrario, el limite mas
+        # defendible sin datos de mas espacios para calibrar un umbral intermedio. A
+        # diferencia del lado alto, el lado bajo NO aborta la corrida (un dia real sin ningun
+        # cierre es posible, a diferencia de un 95%+ que es matematicamente inverosimil) --
+        # SI declara la anomalia como hallazgo, para que no quede en silencio.
+        self.universo["compuerta_baja_activada"] = (
+            total >= UMBRAL_UNIVERSO_COMPUERTA_BAJA and pct == 0.0)
+        if self.universo["compuerta_baja_activada"]:
+            self.falla("P13", "RIESGO",
+                       "COMPUERTA DE CORDURA - lado BAJO: 0% de cierre en un universo "
+                       "suficiente",
+                       f"0 de {total} conversaciones no-dropi cerraron con el cliente "
+                       f"(0.0%), universo >= {UMBRAL_UNIVERSO_COMPUERTA_BAJA}",
+                       "Puede ser un dia real muy malo (posible, a diferencia del lado "
+                       "alto), o un bug de clasificacion de Q6: el patron de cierre "
+                       "(MARCADORES_CIERRE_R6 / patrones_cierre en _cierra_con_cliente) "
+                       "puede no calzar con las frases de cierre reales de este espacio.",
+                       "Revisar a mano 3-5 conversaciones donde el bot SI parecio cerrar "
+                       "un pedido, para confirmar si el patron de cierre esta calzando "
+                       "con el texto real de este espacio antes de asumir que el dia fue "
+                       "asi de malo. No aborta la corrida (a diferencia del lado alto).")
         return self
 
     def abortado(self):
@@ -1119,12 +1447,17 @@ def imprimir(c):
 
 def _parsear_argv(argv):
     """Parser manual, chico a proposito: separa el DUMP posicional de las banderas con
-    valor (`--modo X`, `--json Y`) SIN asumir que el primer argumento crudo es la ruta.
-    `--modo cod archivo.json` y `archivo.json --modo cod` deben dar el mismo resultado;
-    antes de este fix el primero rompia con FileNotFoundError('--modo')."""
+    valor (`--modo X`, `--json Y`, `--zona-horas N`) SIN asumir que el primer argumento
+    crudo es la ruta. `--modo cod archivo.json` y `archivo.json --modo cod` deben dar el
+    mismo resultado; antes de este fix el primero rompia con FileNotFoundError('--modo').
+    `--zona-horas` (tercera ronda de verificacion, 2026-08-22): offset UTC en horas del
+    espacio auditado, para el acotado de R2/R3/R4/Q4 al dia real -- ver
+    `ZONA_HORAS_DEFAULT_NO_CONFIRMADA`. Sin declararlo, se usa el default (-5, medido SOLO
+    en el espacio de Colombia validado; otro pais puede necesitar otro valor)."""
     ruta = None
     modo = None
     json_salida = None
+    zona_horas = None
     i = 0
     while i < len(argv):
         a = argv[i]
@@ -1140,22 +1473,31 @@ def _parsear_argv(argv):
             json_salida = argv[i + 1]
             i += 2
             continue
+        if a == "--zona-horas":
+            if i + 1 >= len(argv):
+                sys.exit("--zona-horas requiere un valor entero (offset UTC en horas, ej. -5)")
+            try:
+                zona_horas = int(argv[i + 1])
+            except ValueError:
+                sys.exit(f"--zona-horas debe ser un entero, no {argv[i + 1]!r}")
+            i += 2
+            continue
         if ruta is None:
             ruta = a
         i += 1
     if ruta is None:
         sys.exit(__doc__)
-    return ruta, modo, json_salida
+    return ruta, modo, json_salida, zona_horas
 
 
 def main():
-    ruta_arg, modo, json_salida = _parsear_argv(sys.argv[1:])
+    ruta_arg, modo, json_salida, zona_horas = _parsear_argv(sys.argv[1:])
     ruta = Path(ruta_arg)
     if not ruta.exists():
         sys.exit(f"No existe el DUMP: {ruta}")
     dump = json.loads(ruta.read_text())
     try:
-        c = Clasificador(dump, modo=modo).correr()
+        c = Clasificador(dump, modo=modo, zona_horas=zona_horas).correr()
     except ValueError as e:
         sys.exit(str(e))
     imprimir(c)

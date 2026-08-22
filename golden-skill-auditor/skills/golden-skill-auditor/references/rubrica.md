@@ -107,6 +107,7 @@ En skills de terceros (no golden-): se evalúan solo datos privados, secretos y 
 
 ## Cálculo y veredicto
 
-- Puntaje = suma de las 7 dimensiones tras restas (mínimo 0 por dimensión).
+Regla de puntaje (ÚNICA, escrita idéntica en SKILL.md Fase 2 y en references/rubrica.md, Cálculo y veredicto): la BASE del puntaje es determinista — la suma de las 7 dimensiones tras las restas con evidencia (mínimo 0 por dimensión). Sobre esa base se admite UN ajuste holístico, declarado APARTE con su porqué (ej. una reserva que solo cierra el uso real, o un defecto transversal que las dimensiones no capturan); el informe reporta base, ajuste y veredicto final. Nunca se infla la base con features de relleno ni se mueve el ajuste para alcanzar un número redondo.
+
 - **ORO** 950–1000 · **PLATA** 850–949 · **BRONCE** 700–849 · **EN OBRA** <700.
 - Un 🔴 crítico (secretos, datos privados, referencia rota en el camino principal, contradicción que cambia el resultado) impide veredicto ORO aunque el número alcance.

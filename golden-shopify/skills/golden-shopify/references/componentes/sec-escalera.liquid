@@ -103,5 +103,7 @@
   if(!('IntersectionObserver' in window)){rows.forEach(function(r){r.classList.add('gfs-in');});return;}
   var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){e.target.classList.add('gfs-in');io.unobserve(e.target);}});},{threshold:.15});
   rows.forEach(function(r){io.observe(r);});
+  /* red de seguridad: si el observer nunca dispara, no se queda invisible para siempre (G4.3) */
+  setTimeout(function(){rows.forEach(function(r){if(!r.classList.contains('gfs-in')){io.unobserve(r);r.classList.add('gfs-in');}});},1200);
 })();
 </script>

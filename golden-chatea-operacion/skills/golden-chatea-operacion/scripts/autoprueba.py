@@ -34,6 +34,8 @@ from clasificar import (                                          # noqa: E402
     plantillas_de, MIN_PERSONAS_FORMA, _parsear_argv,
     extraer_atributos, es_resumen_final_r6,
 )
+from secretos import PATRONES_SECRETO, redactar_texto as redactar_texto_compartida  # noqa: E402
+import extraer as _extraer_modulo                                 # noqa: E402
 
 RESULTADOS = {}   # codigo -> (paso: bool, detalle: str)
 
@@ -58,9 +60,9 @@ def test_p3_p4():
     P4: si TODOS los ts son None, el fallback invierte -- nunca un sort() no-op."""
     # P3: servidor entrega en un orden CUALQUIERA con ts reales; se debe reordenar por ts.
     crudo = [
-        {"content": "c3 (mas nuevo)", "direction": "cliente", "ts": "2026-08-19 10:03:00"},
-        {"content": "c1 (mas viejo)", "direction": "cliente", "ts": "2026-08-19 10:01:00"},
-        {"content": "c2 (medio)", "direction": "empresa", "ts": "2026-08-19 10:02:00"},
+        {"content": "c3 (mas nuevo)", "type": "in", "ts": "2026-08-19 10:03:00"},
+        {"content": "c1 (mas viejo)", "type": "in", "ts": "2026-08-19 10:01:00"},
+        {"content": "c2 (medio)", "type": "out", "ts": "2026-08-19 10:02:00"},
     ]
     resultado = invertir_hilo(crudo)
     orden_ok = [m["content"] for m in resultado] == ["c1 (mas viejo)", "c2 (medio)",
@@ -69,9 +71,9 @@ def test_p3_p4():
 
     # P4: TODOS los ts en None. El servidor entrega reciente->viejo (raw[0] es el mas nuevo).
     raw_reciente_a_viejo = [
-        {"content": "el mas nuevo", "direction": "empresa", "ts": None},
-        {"content": "medio", "direction": "cliente", "ts": None},
-        {"content": "el mas viejo", "direction": "cliente", "ts": None},
+        {"content": "el mas nuevo", "type": "out", "ts": None},
+        {"content": "medio", "type": "in", "ts": None},
+        {"content": "el mas viejo", "type": "in", "ts": None},
     ]
     resultado2 = invertir_hilo(raw_reciente_a_viejo)
     esperado = list(reversed(raw_reciente_a_viejo))
@@ -136,14 +138,14 @@ def test_p6_p7():
 
 # ---------------------------------------------------------------------- P8 (audio y feed)
 def test_p8():
-    audio_con_texto = {"content": "", "direction": "cliente", "msg_type": "audio",
+    audio_con_texto = {"content": "", "type": "in", "msg_type": "audio",
                        "ts": "2026-08-19 11:00:00",
                        "payload": {"transcribed_text": "hola quiero saber el precio"}}
-    audio_sin_texto = {"content": "", "direction": "cliente", "msg_type": "audio",
+    audio_sin_texto = {"content": "", "type": "in", "msg_type": "audio",
                        "ts": "2026-08-19 11:05:00"}
-    comentario_feed = {"content": "que bonito producto", "direction": "cliente",
+    comentario_feed = {"content": "que bonito producto", "type": "in",
                        "msg_type": "feed", "ts": "2026-08-19 11:10:00"}
-    saludo_empresa = {"content": "hola, en que te ayudo", "direction": "empresa",
+    saludo_empresa = {"content": "hola, en que te ayudo", "type": "out",
                       "msg_type": "text", "ts": "2026-08-19 10:59:00"}
 
     texto_ok = contenido_real(audio_con_texto) == "hola quiero saber el precio"
@@ -189,12 +191,12 @@ def test_p10():
 def test_p11():
     contactos = [
         {"user_ns": "f1dropi", "get_info": {"data": {"opted_in_through": "dropi"}},
-         "mensajes": [{"content": "hola", "direction": "cliente", "msg_type": "text",
+         "mensajes": [{"content": "hola", "type": "in", "msg_type": "text",
                       "ts": "2026-08-19 08:00:00"}]},
         {"user_ns": "f1normal", "get_info": {"data": {"opted_in_through": "chat"}},
-         "mensajes": [{"content": "hola", "direction": "cliente", "msg_type": "text",
+         "mensajes": [{"content": "hola", "type": "in", "msg_type": "text",
                       "ts": "2026-08-19 08:00:00"},
-                     {"content": "hola, en que te ayudo", "direction": "empresa",
+                     {"content": "hola, en que te ayudo", "type": "out",
                       "msg_type": "text", "ts": "2026-08-19 08:01:00"}]},
     ]
     c = Clasificador({"contactos": contactos}).correr()
@@ -226,18 +228,18 @@ def test_p13():
     def contacto_cierre(n):
         return {"user_ns": f"cierre{n}", "get_info": {},
                "mensajes": [
-                   {"content": "quiero comprarlo", "direction": "cliente", "msg_type": "text",
+                   {"content": "quiero comprarlo", "type": "in", "msg_type": "text",
                     "ts": "2026-08-19 09:00:00"},
                    {"content": "listo, pedido confirmado, gracias por tu compra",
-                    "direction": "empresa", "msg_type": "text", "ts": "2026-08-19 09:01:00"},
+                    "type": "out", "msg_type": "text", "ts": "2026-08-19 09:01:00"},
                ]}
 
     def contacto_abierto(n):
         return {"user_ns": f"abierto{n}", "get_info": {},
                "mensajes": [
-                   {"content": "hola, en que te ayudo", "direction": "empresa",
+                   {"content": "hola, en que te ayudo", "type": "out",
                     "msg_type": "text", "ts": "2026-08-19 09:00:00"},
-                   {"content": "cuanto cuesta el envio a mi ciudad", "direction": "cliente",
+                   {"content": "cuanto cuesta el envio a mi ciudad", "type": "in",
                     "msg_type": "text", "ts": "2026-08-19 09:05:00"},
                ]}
 
@@ -263,9 +265,9 @@ def test_p13():
 def test_p1():
     contacto = {"user_ns": "f1p1", "get_info": {},
                "mensajes": [
-                   {"content": "hola", "direction": "cliente", "msg_type": "text",
+                   {"content": "hola", "type": "in", "msg_type": "text",
                     "ts": "2026-08-19 08:00:00"},
-                   {"content": "estoy interesado", "direction": "cliente", "msg_type": "text",
+                   {"content": "estoy interesado", "type": "in", "msg_type": "text",
                     "ts": "2026-08-19 08:01:00"},
                ]}
     c = Clasificador({"contactos": [contacto]}).correr()
@@ -278,43 +280,43 @@ def test_p1():
 def test_calidad():
     # R1: sin respuesta
     c1 = {"user_ns": "fR1", "get_info": {},
-         "mensajes": [{"content": "hola, cuanto cuesta?", "direction": "cliente",
+         "mensajes": [{"content": "hola, cuanto cuesta?", "type": "in",
                       "msg_type": "text", "ts": "2026-08-19 14:00:00"}]}
     # R2: respuesta tardia (61 min de verdad entre el mensaje del cliente y la respuesta)
     c2 = {"user_ns": "fR2", "get_info": {},
          "mensajes": [
-             {"content": "cuanto cuesta", "direction": "cliente", "msg_type": "text",
+             {"content": "cuanto cuesta", "type": "in", "msg_type": "text",
               "ts": "2026-08-19 12:00:00"},
-             {"content": "disculpa la demora, cuesta 74900", "direction": "empresa",
+             {"content": "disculpa la demora, cuesta 74900", "type": "out",
               "msg_type": "text", "ts": "2026-08-19 13:01:00"},
          ]}
     # R3: bucle (3 iguales seguidas)
     c3 = {"user_ns": "fR3", "get_info": {},
          "mensajes": [
-             {"content": "no entendi, puedes reformular?", "direction": "empresa",
+             {"content": "no entendi, puedes reformular?", "type": "out",
               "msg_type": "text", "ts": "2026-08-19 13:03:00"},
-             {"content": "no entendi, puedes reformular?", "direction": "empresa",
+             {"content": "no entendi, puedes reformular?", "type": "out",
               "msg_type": "text", "ts": "2026-08-19 13:02:00"},
-             {"content": "no entendi, puedes reformular?", "direction": "empresa",
+             {"content": "no entendi, puedes reformular?", "type": "out",
               "msg_type": "text", "ts": "2026-08-19 13:01:00"},
-             {"content": "hola necesito ayuda con mi pedido", "direction": "cliente",
+             {"content": "hola necesito ayuda con mi pedido", "type": "in",
               "msg_type": "text", "ts": "2026-08-19 13:00:00"},
          ]}
     # R4: frase prohibida, modo cod
     c4 = {"user_ns": "fR4", "get_info": {},
          "mensajes": [
              {"content": "para procesar tu pedido necesitas hacer un pago anticipado",
-              "direction": "empresa", "msg_type": "text", "ts": "2026-08-19 15:01:00"},
-             {"content": "hola quiero el producto", "direction": "cliente", "msg_type": "text",
+              "type": "out", "msg_type": "text", "ts": "2026-08-19 15:01:00"},
+             {"content": "hola quiero el producto", "type": "in", "msg_type": "text",
               "ts": "2026-08-19 15:00:00"},
          ]}
     # Q4: pregunta sin cobertura
     c5 = {"user_ns": "fQ4", "get_info": {},
          "mensajes": [
-             {"content": "no entendi tu mensaje", "direction": "empresa", "msg_type": "text",
+             {"content": "no entendi tu mensaje", "type": "out", "msg_type": "text",
               "ts": "2026-08-19 16:01:00"},
              {"content": "que garantia tiene el producto si llega defectuoso?",
-              "direction": "cliente", "msg_type": "text", "ts": "2026-08-19 16:00:00"},
+              "type": "in", "msg_type": "text", "ts": "2026-08-19 16:00:00"},
          ]}
 
     c = Clasificador({"contactos": [c1, c2, c3, c4, c5]}, modo="cod").correr()
@@ -576,25 +578,122 @@ def test_dropi_normalizado():
           f"{len(variantes)} (deben ser todas)")
 
 
-def test_ts_ilegible_no_engana_al_orden():
-    """Ronda 2: un ts PRESENTE pero que parse_fecha no puede leer (epoch numerico, por
-    ejemplo) debe tratarse como 'no parseable' -> se invierte la lista completa, igual
-    que si faltara -- nunca un sort() estable que deja todo tal cual llego."""
+def test_ts_epoch_ordena_correctamente():
+    """F1 (CRITICO, golden-verificador 2026-08-22): ANTES de este fix, `parse_fecha` no leia
+    epoch -- un `ts` epoch (la forma REAL de los 4 DUMPs de produccion medidos, 100% de los
+    mensajes de LIBIDO-UP) se trataba como 'no parseable' y esta prueba (entonces llamada
+    TS-ILEGIBLE) EXIGIA que se comportara asi. Ahora que `parse_fecha` SI lee epoch, la
+    expectativa se invierte: con epoch parseable, `invertir_hilo` debe ORDENAR
+    cronologicamente (rama TODO-parseable de P4), no limitarse a invertir la lista cruda.
+    Server entrega mas-reciente-primero (descendente); se mezcla el orden crudo a proposito
+    para confirmar que se ORDENA, no que casualmente coincide con invertir."""
     crudo = [
         {"type": "out", "content": "ULTIMO_BOT", "ts": 1755000300},
+        {"type": "in", "content": "PRIMERO_CLIENTE", "ts": 1755000100},   # fuera de orden
         {"type": "in", "content": "MEDIO_CLIENTE", "ts": 1755000200},
-        {"type": "in", "content": "PRIMERO_CLIENTE", "ts": 1755000100},
     ]
     hilo = invertir_hilo(crudo)
-    # Con ts epoch ilegible por parse_fecha, se espera la lista INVERTIDA tal cual
-    # llego (comportamiento P4), no el orden original ni un intento de ordenar por el
-    # epoch crudo.
+    orden_obtenido = [m["content"] for m in hilo]
+    paso = orden_obtenido == ["PRIMERO_CLIENTE", "MEDIO_CLIENTE", "ULTIMO_BOT"]
+    marcar("TS-EPOCH-ORDENA", paso,
+          f"orden obtenido: {orden_obtenido} (se espera "
+          "['PRIMERO_CLIENTE', 'MEDIO_CLIENTE', 'ULTIMO_BOT'] -- ORDENADO por el epoch "
+          "parseado, no invertido a ciegas ni dejado en el orden crudo desordenado que "
+          "trae este fixture a proposito)")
+
+
+def test_ts_no_numerico_sigue_ilegible():
+    """F1: un `ts` que NO es epoch ni fecha valida (texto arbitrario) debe seguir tratandose
+    como no parseable -> P4 (fallback: invertir la lista cruda tal cual). Confirma que el fix
+    de F1 amplio lo que se ACEPTA como fecha, sin ampliar de mas lo que se acepta como tal."""
+    crudo = [
+        {"type": "out", "content": "ULTIMO_BOT", "ts": "no-es-una-fecha"},
+        {"type": "in", "content": "MEDIO_CLIENTE", "ts": "tampoco"},
+        {"type": "in", "content": "PRIMERO_CLIENTE", "ts": ""},
+    ]
+    hilo = invertir_hilo(crudo)
     esperado = list(reversed(crudo))
     paso = hilo == esperado
-    marcar("TS-ILEGIBLE", paso,
+    marcar("TS-NO-NUMERICO-ILEGIBLE", paso,
           f"orden obtenido: {[m['content'] for m in hilo]} (se espera "
-          f"{[m['content'] for m in esperado]} -- invertido, no ordenado por el epoch "
-          "crudo ni dejado tal cual)")
+          f"{[m['content'] for m in esperado]} -- invertido tal cual, un ts basura sigue "
+          "siendo no parseable)")
+
+
+def test_ts_epoch_milisegundos_se_detecta():
+    """F1: un epoch en MILISEGUNDOS (13 digitos, ~1000x el valor en segundos de la misma
+    fecha) debe detectarse por MAGNITUD y dar la MISMA fecha que su equivalente en segundos
+    -- no una fecha en el año 58000 por dividir de mas, ni una fecha en 1970 por no dividir."""
+    segundos = 1755000200
+    milisegundos = segundos * 1000
+    d_seg = parse_fecha(segundos)
+    d_ms = parse_fecha(milisegundos)
+    paso = d_seg is not None and d_ms is not None and d_seg == d_ms
+    marcar("TS-EPOCH-MS-DETECTADO", paso,
+          f"parse_fecha({segundos}) = {d_seg} · parse_fecha({milisegundos}) = {d_ms} "
+          "(deben dar la MISMA fecha -- la magnitud del numero, no un flag aparte, decide "
+          "si son segundos o milisegundos)")
+
+
+def test_ts_epoch_como_cadena_se_parsea():
+    """F1: el mismo epoch, pero serializado como CADENA de digitos ('1787114990' en vez de
+    1787114990), tambien debe parsearse -- algunos DUMPs/JSON lo entregan asi."""
+    d_int = parse_fecha(1787114990)
+    d_str = parse_fecha("1787114990")
+    paso = d_int is not None and d_str is not None and d_int == d_str
+    marcar("TS-EPOCH-CADENA", paso,
+          f"parse_fecha(1787114990) = {d_int} · parse_fecha('1787114990') = {d_str} "
+          "(deben coincidir -- epoch como int o como cadena numerica es la misma fecha)")
+
+
+def test_r1_r2_r3_con_ts_epoch_real():
+    """F1: R1 (sin respuesta, con gap MEDIBLE), R2 (respuesta tardia) y R3 (bucle) deben
+    funcionar con `ts` en formato epoch real -- exactamente la forma de los 4 DUMPs de
+    produccion (LIBIDO-UP, 2026-08-21). Ambos epoch tomados de un rango real de esos DUMPs.
+    ANTES del fix de F1, ninguno de los tres disparaba con epoch: R1 caia siempre en RIESGO
+    por 'gap no medible', R2 nunca calculaba el gap (ambos ts deben parsear), R3 no dependia
+    de fechas pero se agrega aqui para dejar los tres juntos, con la forma real del DUMP."""
+    epoch_base = 1787114980
+    # R1: cliente pregunta y nadie responde, corte del dia 3 horas (10800s) despues ->
+    # gap medible y >= 120 min -> debe ser MUERTO, no RIESGO.
+    c_r1 = {"user_ns": "fepoch-r1", "get_info": {},
+           "mensajes": [{"type": "in", "content": "cuanto cuesta?",
+                        "ts": epoch_base}]}
+    c_ancla_corte = {"user_ns": "fepoch-ancla", "get_info": {},
+                     "mensajes": [{"type": "out", "content": "ancla del corte del dia",
+                                  "ts": epoch_base + 10800}]}
+    # R2: respuesta tardia, 61 minutos (3660s) despues, con epoch real.
+    c_r2 = {"user_ns": "fepoch-r2", "get_info": {},
+           "mensajes": [
+               {"type": "in", "content": "cuanto cuesta", "ts": epoch_base},
+               {"type": "out", "content": "disculpa la demora, cuesta 74900",
+                "ts": epoch_base + 3660},
+           ]}
+    # R3: bucle, 3 respuestas identicas seguidas con epoch creciente.
+    c_r3 = {"user_ns": "fepoch-r3", "get_info": {},
+           "mensajes": [
+               {"type": "in", "content": "hola necesito ayuda", "ts": epoch_base},
+               {"type": "out", "content": "no entendi, puedes reformular?",
+                "ts": epoch_base + 60},
+               {"type": "out", "content": "no entendi, puedes reformular?",
+                "ts": epoch_base + 120},
+               {"type": "out", "content": "no entendi, puedes reformular?",
+                "ts": epoch_base + 180},
+           ]}
+    c = Clasificador({"contactos": [c_r1, c_ancla_corte, c_r2, c_r3]}, modo="cod").correr()
+    r1 = next((h for h in c.hallazgos
+              if h["control"] == "R1" and "fepoch-r1" in h["titulo"]), None)
+    r2 = next((h for h in c.hallazgos
+              if h["control"] == "R2" and "fepoch-r2" in h["titulo"]), None)
+    r3 = next((h for h in c.hallazgos
+              if h["control"] == "R3" and "fepoch-r3" in h["titulo"]), None)
+    r1_es_muerto = r1 is not None and r1["severidad"] == "MUERTO"
+    paso = r1_es_muerto and r2 is not None and r3 is not None
+    marcar("EPOCH-R1-R2-R3-REALES", paso,
+          f"R1 con gap medible por epoch, severidad {r1['severidad'] if r1 else None} "
+          "(debe ser MUERTO, no RIESGO -- antes de F1 SIEMPRE caia en RIESGO con epoch) · "
+          f"R2 disparado: {r2 is not None} (antes de F1 nunca disparaba con epoch) · "
+          f"R3 disparado: {r3 is not None}")
 
 
 def test_corte_del_dia_ignora_notas():
@@ -692,11 +791,16 @@ def test_parse_dinero_rechaza_no_str():
 
 def test_main_args_orden_independiente():
     """Ronda 2: '--modo cod archivo.json' y 'archivo.json --modo cod' deben dar el
-    mismo resultado. Antes, el primer orden rompia con FileNotFoundError('--modo')."""
+    mismo resultado. Antes, el primer orden rompia con FileNotFoundError('--modo').
+    Ronda 3 agrega '--zona-horas' (4-tupla en vez de 3, con zona_horas=None por default
+    cuando no se declara)."""
     r1 = _parsear_argv(["--modo", "cod", "archivo.json"])
     r2 = _parsear_argv(["archivo.json", "--modo", "cod"])
-    paso = r1 == r2 == ("archivo.json", "cod", None)
-    marcar("MAIN-ARGS-ORDEN", paso, f"orden 1: {r1} · orden 2: {r2} (deben ser iguales)")
+    r3 = _parsear_argv(["archivo.json", "--modo", "cod", "--zona-horas", "-5"])
+    paso = (r1 == r2 == ("archivo.json", "cod", None, None) and
+           r3 == ("archivo.json", "cod", None, -5))
+    marcar("MAIN-ARGS-ORDEN", paso,
+          f"orden 1: {r1} · orden 2: {r2} (deben ser iguales) · con --zona-horas -5: {r3}")
 
 
 def test_plantilla_solo_frecuencia_se_declara():
@@ -820,8 +924,12 @@ def test_r6_no_requiere_dropi():
 
 
 # ---------------------------------------------------- fixes de la verificacion adversarial R6
-# Cada uno reproduce un defecto REAL que golden-verificador encontro corriendo R6 contra 1.829
-# hilos reales de dos espacios de produccion (2026-08-21) -- no un caso hipotetico.
+# Cada uno reproduce un defecto REAL que golden-verificador encontro corriendo R6 contra hilos
+# reales de produccion (2026-08-21) -- no un caso hipotetico. La cifra especifica de esa ronda
+# ("1.829 hilos de dos espacios") es una cifra citada de una verificacion anterior cuyo
+# artefacto no se conservo -- se declara honestamente sin el numero puntual; el hallazgo
+# cualitativo (los defectos reales que reproducen las pruebas de abajo) sigue siendo la razon
+# de estas pruebas.
 
 def test_r6_talla_no_captura_basura():
     """El verificador midio 'no se cual es mi talla' -> talla='LA', 'que talla me
@@ -892,13 +1000,297 @@ def test_r6_correccion_post_resumen():
           f"severidad: {h['severidad'] if h else None} (debe ser DUDA, no silencio)")
 
 
+def test_credenciales_extraer_py_camino_real():
+    """F3 (CRITICO SEGURIDAD, golden-verificador 2026-08-22): el defecto de raiz de la ronda
+    anterior (CREDENCIALES-AMPLIADAS) fue que su UNICA prueba directa importaba
+    `redactar_texto` de `clasificar.py` -- nunca del camino real que escribe el DUMP a disco
+    (`extraer.py`). Esta prueba corre las 17 familias de `secretos.PATRONES_SECRETO` contra
+    `extraer.redactar()` (la funcion que limpia cada campo del DUMP) y contra
+    `extraer.quedan_secretos()` (la compuerta final que bloquea la escritura) -- el camino
+    REAL, no una funcion suelta."""
+    casos = {
+        "sk_live_" + "A" * 24: "StripeLive",
+        "whsec_" + "A" * 20: "StripeWebhook",
+        "APP_USR-1234567890123456-081020-abcdef1234567890abcdef1234567890-123456789":
+            "MercadoPagoLive",
+        "12345|" + "a" * 25: "SanctumBearer-umbral-20",   # {20,}: antes 32 en extraer.py
+        "ghp_" + "c" * 36: "GitHubPAT",
+        "github_pat_" + "d" * 60: "GitHubFineGrained",
+        "AKIA" + "E" * 16: "AWSAccessKey",
+        "xoxb-" + "1" * 20: "SlackToken",
+        "SG." + "f" * 20 + "." + "g" * 20: "SendGrid",
+        "1//0" + "h" * 30: "GoogleOAuthRefresh",
+        "a" * 64: "HexBearerGenerico",
+    }
+    fallos_redactar = []
+    fallos_compuerta = []
+    for secreto, etiqueta in casos.items():
+        objeto = {"campo_cualquiera": f"el cliente escribio {secreto} en el chat"}
+        limpio = _extraer_modulo.redactar(objeto)
+        if secreto in json.dumps(limpio, ensure_ascii=False):
+            fallos_redactar.append(etiqueta)
+        if secreto in json.dumps(objeto, ensure_ascii=False):
+            encontrados = _extraer_modulo.quedan_secretos(objeto)
+            if not encontrados:
+                fallos_compuerta.append(etiqueta)
+    paso = not fallos_redactar and not fallos_compuerta
+    marcar("CREDENCIALES-EXTRAER-PY-REAL", paso,
+          f"familias sin redactar por extraer.redactar(): {fallos_redactar or 'ninguna'} · "
+          f"familias que la compuerta extraer.quedan_secretos() NO detecto: "
+          f"{fallos_compuerta or 'ninguna'} (probado por el camino REAL de extraer.py, no "
+          "por una funcion suelta importada de clasificar.py)")
+
+
+def test_cantidad_vocabulario_ampliado():
+    """F4 (RIESGO, golden-verificador 2026-08-22): el vocabulario original de cantidad
+    ('unidades|pares|combos|paquetes') tenia recall=0 contra 165 conversaciones reales
+    medidas. Las FORMAS reales que quedaban sin cobertura (no el texto literal de ningun
+    cliente -- regla del encargo, fixtures SINTETICOS inspirados en la forma general):
+    cantidad singular sin plural, "N frasco(s)/similar", cantidad con verbo/articulo de
+    pedido sin unidad explicita, y el nombre de un producto generico usado como unidad
+    implicita. Se prueba que esas formas ahora capturan cantidad, y que las condiciones que
+    YA pasaban antes de ampliar (no pide Dropi, no acusa cambio de opinion legitimo, declara
+    DUDA en ambiguos) siguen pasando -- ver CONTROL_R6 mas arriba, no se repiten aqui."""
+    casos = {
+        "necesito 1 unidad nada mas": "1",
+        "me interesa probar un frasco antes de pedir mas": "1",
+        "me llevo 2, muchas gracias": "2",
+        "dame 3 cajas": "3",
+        # nombre de producto GENERICO/ficticio, EN SU PROPIA LINEA -- forma real medida en
+        # produccion (direccion en una linea, "N producto" solo en la ultima linea). Ronda 2
+        # de verificacion (golden-verificador, 2026-08-22): la version anterior de este
+        # patron no exigia linea completa y el 76% de sus disparos reales eran numeros de
+        # direccion (un numero de torre o apartamento seguido de la palabra siguiente de la
+        # direccion) -- ahora exige que la linea ENTERA sea "numero + palabra", nada mas, por
+        # eso el fixture simula una direccion en una linea y la cantidad en la siguiente.
+        "Calle 10 # 20-30 apto 402\n1 crematonica": "1",
+    }
+    fallos = []
+    for texto, esperado in casos.items():
+        atributos = extraer_atributos(texto)
+        cantidades = [v for t, v in atributos if t == "cantidad"]
+        if esperado not in cantidades:
+            fallos.append((texto, cantidades))
+    # No debe capturar cantidad en frases de TIEMPO (falso positivo del stoplist).
+    falso_positivo_tiempo = extraer_atributos("llega en 3 dias habiles")
+    tiene_cantidad_falsa = any(t == "cantidad" for t, _ in falso_positivo_tiempo)
+    # Ronda 2 de verificacion (golden-verificador, 2026-08-22): direcciones REALES medidas
+    # que antes disparaban cantidad falsa (formas SINTETICAS aqui, misma estructura que las
+    # que fallaron en produccion: numero de torre/apto/interior/piso seguido de una palabra,
+    # y un numero de casa seguido del nombre del barrio) -- ahora NINGUNA debe disparar,
+    # porque el patron de producto implicito exige que la LINEA COMPLETA sea "numero +
+    # palabra" y una direccion nunca es eso.
+    direcciones_sinteticas = [
+        "Diagonal 61 # 20-19 torre 3 apto 501",
+        "Kra 88 # 9c - 41 barrio villanueva",
+        "Avenida 30 # 71-8 barrio san jose",
+        "Circular 12 # 40b - 3 piso 5 oficina",
+    ]
+    falsos_direccion = [(t, extraer_atributos(t)) for t in direcciones_sinteticas
+                        if any(tp == "cantidad" for tp, _ in extraer_atributos(t))]
+    paso = not fallos and not tiene_cantidad_falsa and not falsos_direccion
+    marcar("CANTIDAD-VOCABULARIO-AMPLIADO", paso,
+          f"casos reales sin capturar: {fallos or 'ninguno'} · falso positivo en "
+          f"'3 dias habiles' (no debe capturar cantidad): {tiene_cantidad_falsa} · "
+          f"falsos positivos de DIRECCION (no deben capturar cantidad, hallazgo de la "
+          f"ronda 2 de verificacion — 76% de los disparos reales eran direcciones): "
+          f"{falsos_direccion or 'ninguno'}")
+
+
+def test_r2_r3_r4_acotan_al_dia_auditado():
+    """FALLA 1 (golden-verificador, ronda 2 sobre GCO1.4, 2026-08-22): el hilo descargado
+    trae el HISTORICO COMPLETO del contacto, no solo el dia auditado -- R2/R3/R4/Q4 recorrian
+    el hilo completo y podian acusar al bot de una demora, un bucle o una frase de OTRO DIA.
+    Contacto sintetico con dos gaps de mas de 30 min: uno el dia ANTERIOR al auditado (no debe
+    disparar R2), otro el dia auditado (SI debe disparar R2). `_fecha` del dump = el dia
+    auditado."""
+    dia_anterior = "2026-08-18"
+    dia_auditado = "2026-08-19"
+    contacto = {"user_ns": "facota-dia", "get_info": {},
+               "mensajes": [
+                   # gap de 61 min el dia ANTERIOR -- NO debe generar R2.
+                   {"type": "in", "content": "cuanto cuesta",
+                    "ts": f"{dia_anterior} 08:00:00"},
+                   {"type": "out", "content": "cuesta 74900",
+                    "ts": f"{dia_anterior} 09:01:00"},
+                   # gap de 61 min el dia AUDITADO -- SI debe generar R2.
+                   {"type": "in", "content": "y el envio cuanto vale",
+                    "ts": f"{dia_auditado} 10:00:00"},
+                   {"type": "out", "content": "el envio es gratis",
+                    "ts": f"{dia_auditado} 11:01:00"},
+               ]}
+    dump = {"_fecha": dia_auditado, "contactos": [contacto]}
+    c = Clasificador(dump, modo="cod").correr()
+    r2 = [h for h in c.hallazgos if h["control"] == "R2"]
+    solo_dia_auditado = len(r2) == 1 and dia_auditado in r2[0]["evidencia"]
+    otro_dia_ausente = not any(dia_anterior in h["evidencia"] for h in r2)
+    paso = solo_dia_auditado and otro_dia_ausente
+    marcar("R2-ACOTA-AL-DIA", paso,
+          f"hallazgos R2: {len(r2)} (debe ser 1, solo el gap del {dia_auditado}) · "
+          f"cita el dia auditado: {solo_dia_auditado} · NO cita el gap del "
+          f"{dia_anterior}: {otro_dia_ausente}")
+
+
+def test_listado_paginacion_no_medible_se_declara():
+    """FALLA 3 (golden-verificador, ronda 2 sobre GCO1.4, 2026-08-22): si el DUMP no trae la
+    clave `_listado_paginacion` (DUMP extraido con una version de extraer.py anterior a este
+    campo, como los 4 DUMPs reales de LIBIDO-UP usados para validar F1-F11), la version
+    anterior de este fix declaraba `listado_truncado_por_tope_500: False` -- ausencia de dato
+    leida como 'no se trunco', exactamente la regla I4 que esta misma skill prohibe en el
+    control INV. Ahora debe declararse 'no_medible' con un hallazgo DUDA propio."""
+    contacto = {"user_ns": "fsinpaginacion", "get_info": {},
+               "mensajes": [{"type": "in", "content": "hola", "ts": "2026-08-19 09:00:00"}]}
+    dump_sin_clave = {"contactos": [contacto]}          # sin _listado_paginacion
+    dump_con_clave = {"contactos": [contacto],
+                      "_listado_paginacion": {"truncado_por_tope_500": False}}
+    c_sin = Clasificador(dump_sin_clave).correr()
+    c_con = Clasificador(dump_con_clave).correr()
+    no_medible_declarado = c_sin.universo["listado_truncado_por_tope_500"] == "no_medible"
+    hallazgo_no_medible = any(h["control"] == "P-listado-truncado" and h["severidad"] == "DUDA"
+                              for h in c_sin.hallazgos)
+    con_clave_da_false = c_con.universo["listado_truncado_por_tope_500"] is False
+    paso = no_medible_declarado and hallazgo_no_medible and con_clave_da_false
+    marcar("LISTADO-PAGINACION-NO-MEDIBLE", paso,
+          f"sin la clave en el DUMP: listado_truncado_por_tope_500="
+          f"{c_sin.universo['listado_truncado_por_tope_500']!r} (debe ser 'no_medible', no "
+          f"False) · hallazgo DUDA disparado: {hallazgo_no_medible} · con la clave presente "
+          f"(False real): {con_clave_da_false} (debe seguir siendo False, no 'no_medible')")
+
+
+def test_acotado_al_dia_respeta_zona_horaria():
+    """ROTO NUEVO (golden-verificador, TERCERA ronda de verificacion sobre GCO1.4,
+    2026-08-22): el fix de FALLA 1 comparaba `dt.date()` en UTC (de `_epoch_a_fecha`) contra
+    `self.fecha_auditada` (hora LOCAL del servidor, medido -5h/Colombia en el unico espacio
+    confirmado) -- sin ajustar el offset, un mensaje real cerca de medianoche local caia del
+    lado equivocado del calendario en UTC. Medido contra los 4 DUMPs reales: 111 mensajes
+    reales del dia se perdian, 78 de otro dia se colaban -- la MISMA clase de fallo que FALLA
+    1 decia haber cerrado. Fixture: un mensaje a las 23:30 hora Colombia del dia auditado (por
+    lo tanto 04:30 UTC del dia SIGUIENTE) debe seguir contando como del dia auditado."""
+    dia_auditado = "2026-08-19"
+    # 2026-08-20 04:30:00 UTC == 2026-08-19 23:30:00 hora Colombia (UTC-5).
+    ts_medianoche_local = 1787200200
+    ts_respuesta = 1787200260   # +1 min, 04:31:00 UTC == 23:31:00 local, mismo dia local
+    contacto = {"user_ns": "fzona-horaria", "get_info": {},
+               "mensajes": [
+                   {"type": "in", "content": "todavia estan disponibles",
+                    "ts": ts_medianoche_local},
+                   {"type": "out", "content": "no entendi, puedes reformular?",
+                    "ts": ts_respuesta},
+                   {"type": "out", "content": "no entendi, puedes reformular?",
+                    "ts": ts_respuesta + 60},
+                   {"type": "out", "content": "no entendi, puedes reformular?",
+                    "ts": ts_respuesta + 120},
+               ]}
+    dump = {"_fecha": dia_auditado, "contactos": [contacto]}
+    c_con_zona = Clasificador(dump, modo="cod").correr()
+    r3_con_zona = any(h["control"] == "R3" for h in c_con_zona.hallazgos)
+    c_sin_ajuste = Clasificador(dump, modo="cod", zona_horas=0).correr()
+    r3_sin_ajuste = any(h["control"] == "R3" for h in c_sin_ajuste.hallazgos)
+    zona_declarada = c_con_zona.universo.get("zona_horas_usada") == -5
+    paso = r3_con_zona and not r3_sin_ajuste and zona_declarada
+    marcar("ACOTADO-RESPETA-ZONA-HORARIA", paso,
+          f"con zona_horas=-5 (default): R3 disparado (mensajes cerca de medianoche local "
+          f"reconocidos como del dia auditado): {r3_con_zona} · con zona_horas=0 (UTC a "
+          f"secas, el bug): R3 NO disparado (mensajes descartados por caer del lado UTC "
+          f"equivocado): {not r3_sin_ajuste} (debe ser True -- confirma que el offset SI "
+          f"hace la diferencia) · zona_horas_usada declarada en universo: {zona_declarada}")
+
+
+def test_sin_fecha_auditada_se_declara():
+    """ROTO NUEVO (golden-verificador, TERCERA ronda, 2026-08-22): si el DUMP no trae
+    `_fecha`, `_mensajes_del_dia` se desactivaba EN SILENCIO (sin hallazgo, sin clave en
+    `universo`) -- la misma clase de fallo 'ausencia de dato leida como sano' que la propia
+    skill prohibe en el control INV y que ya corrige para `_listado_paginacion`. Ahora debe
+    declararse con un hallazgo DUDA y con `universo['acotado_al_dia_activo'] = False`."""
+    contacto = {"user_ns": "fsinfecha", "get_info": {},
+               "mensajes": [{"type": "in", "content": "hola", "ts": "2026-08-19 09:00:00"}]}
+    dump_sin_fecha = {"contactos": [contacto]}          # sin _fecha
+    dump_con_fecha = {"_fecha": "2026-08-19", "contactos": [contacto]}
+    c_sin = Clasificador(dump_sin_fecha).correr()
+    c_con = Clasificador(dump_con_fecha).correr()
+    hallazgo_disparado = any(h["control"] == "P-sin-fecha-auditada" and h["severidad"] == "DUDA"
+                             for h in c_sin.hallazgos)
+    universo_declara_false = c_sin.universo.get("acotado_al_dia_activo") is False
+    con_fecha_no_dispara = not any(h["control"] == "P-sin-fecha-auditada"
+                                   for h in c_con.hallazgos)
+    universo_declara_true = c_con.universo.get("acotado_al_dia_activo") is True
+    paso = (hallazgo_disparado and universo_declara_false and con_fecha_no_dispara and
+           universo_declara_true)
+    marcar("SIN-FECHA-AUDITADA-DECLARADA", paso,
+          f"sin `_fecha`: hallazgo DUDA disparado: {hallazgo_disparado} · "
+          f"acotado_al_dia_activo=False declarado: {universo_declara_false} · con `_fecha`: "
+          f"NO dispara el hallazgo: {con_fecha_no_dispara} · acotado_al_dia_activo=True: "
+          f"{universo_declara_true}")
+
+
+def test_fecha_auditada_malformada_se_declara():
+    """ROTO NUEVO 5a (golden-verificador, CUARTA ronda de verificacion, 2026-08-22): una
+    `_fecha` PRESENTE pero con formato distinto a AAAA-MM-DD (o corrompida) hacia que
+    `_mensajes_del_dia` filtrara TODO a una lista vacia, con `acotado_al_dia_activo=True`
+    (formalmente cierto, enganoso: el 'acotado' esta activo pero es inutil) -- R2/R3/R4/Q4
+    corrian en silencio sobre cero mensajes. Medido: 2 hallazgos R4/MUERTO reales (pago
+    anticipado mencionado por el bot) desaparecian sin aviso con una `_fecha` malformada en
+    la corrida real. Ahora una `_fecha` malformada se trata IGUAL que una `_fecha` ausente:
+    mismo hallazgo DUDA, `acotado_al_dia_activo=False`."""
+    contacto = {"user_ns": "ffechamal", "get_info": {},
+               "mensajes": [
+                   {"type": "in", "content": "necesito pago anticipado o contra entrega",
+                    "ts": "2026-08-19 09:00:00"},
+                   {"type": "out", "content": "para procesar tu pedido necesitas hacer un "
+                    "pago anticipado", "ts": "2026-08-19 09:01:00"},
+               ]}
+    dump = {"_fecha": "19/08/2026", "contactos": [contacto]}   # formato NO AAAA-MM-DD
+    c = Clasificador(dump, modo="cod").correr()
+    r4_sobrevive = any(h["control"] == "R4" for h in c.hallazgos)
+    hallazgo_disparado = any(h["control"] == "P-sin-fecha-auditada" and h["severidad"] == "DUDA"
+                             for h in c.hallazgos)
+    acotado_correcto = c.universo.get("acotado_al_dia_activo") is False
+    paso = r4_sobrevive and hallazgo_disparado and acotado_correcto
+    marcar("FECHA-AUDITADA-MALFORMADA-DECLARADA", paso,
+          f"con `_fecha` malformada ('19/08/2026'): el hallazgo R4 real SIGUE saliendo "
+          f"(no se pierde en silencio): {r4_sobrevive} · hallazgo P-sin-fecha-auditada "
+          f"disparado: {hallazgo_disparado} · acotado_al_dia_activo=False (no True "
+          f"enganoso): {acotado_correcto}")
+
+
+def test_ts_mezclado_epoch_e_iso_no_revienta():
+    """ROTO NUEVO 5b (golden-verificador, CUARTA ronda de verificacion, 2026-08-22):
+    `parse_fecha` devolvia NAIVE para epoch pero AWARE para ISO-con-offset (ej. terminado en
+    'Z') -- un DUMP que mezclara ambas formas (nunca visto en produccion, pero declarado
+    como aceptado) hacia que cualquier resta/comparacion entre las dos reventara con
+    `TypeError: can't compare offset-naive and offset-aware datetimes`, tumbando TODA la
+    corrida sin capturar. Ahora ambas formas se normalizan a NAIVE (UTC)."""
+    epoch_dt = parse_fecha(1787114990)
+    iso_z_dt = parse_fecha("2026-08-19T04:49:50Z")
+    ambos_naive = epoch_dt.tzinfo is None and iso_z_dt.tzinfo is None
+    coinciden = epoch_dt == iso_z_dt
+    # Camino REAL: un contacto con un ts epoch y otro ts ISO-con-Z en el MISMO hilo no debe
+    # levantar excepcion al invertir/clasificar (antes de este fix, reventaba aqui).
+    contacto = {"user_ns": "fmixed", "get_info": {},
+               "mensajes": [
+                   {"type": "in", "content": "hola", "ts": 1787114980},
+                   {"type": "out", "content": "hola, en que te ayudo",
+                    "ts": "2026-08-19T04:49:50Z"},
+               ]}
+    exploto = False
+    try:
+        Clasificador({"contactos": [contacto]}).correr()
+    except TypeError:
+        exploto = True
+    paso = ambos_naive and coinciden and not exploto
+    marcar("TS-MEZCLADO-EPOCH-ISO-NO-REVIENTA", paso,
+          f"epoch y ISO-Z ambos naive: {ambos_naive} · fechas coinciden: {coinciden} "
+          f"({epoch_dt} vs {iso_z_dt}) · Clasificador con un hilo mezclado NO lanza "
+          f"TypeError: {not exploto}")
+
+
 TRAMPAS_DEL_ENCARGO = ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11",
                       "P12", "P13"]
 EXTRA_CALIDAD = ["R1", "R2", "R3", "R4", "Q4"]
 FIXES_ADVERSARIALES = ["TYPE-REAL", "DESCONOCIDOS", "COMPUERTA-SILENCIA",
                        "DROPI-EXCLUIDO-PCT", "MODO-INVALIDO", "BUCLE-FALSO-POSITIVO",
                        "Q4-FALSO-POSITIVO", "INVENTARIO-ABORTA", "CREDENCIALES-AMPLIADAS"]
-FIXES_RONDA_2 = ["DROPI-NORMALIZADO", "TS-ILEGIBLE", "CORTE-IGNORA-NOTAS",
+FIXES_RONDA_2 = ["DROPI-NORMALIZADO", "CORTE-IGNORA-NOTAS",
                 "DENOMINADOR-3-ESTADOS", "PLANTILLA-NO-BORRA-OBJECION",
                 "PLANTILLA-CHICO-DECLARADO", "DINERO-RECHAZA-NO-STR", "MAIN-ARGS-ORDEN",
                 "PLANTILLA-FRECUENCIA-DECLARADA"]
@@ -906,6 +1298,21 @@ CONTROL_R6 = ["R6-INCOHERENCIA-REAL", "R6-CAMBIO-OPINION-NO-MARCA", "R6-AMBIGUO-
              "R6-SIN-ATRIBUTO", "R6-SIN-DROPI"]
 FIXES_R6_VERIFICACION = ["R6-TALLA-NO-CAPTURA-BASURA", "R6-COLOR-SIN-LEADIN-NO-DISPARA",
                          "R6-CORRECCION-POST-RESUMEN"]
+# F1/F2 (golden-verificador 2026-08-22): `ts` epoch es la forma REAL de los 4 DUMPs de
+# produccion medidos (LIBIDO-UP, 100% de los mensajes). TS-ILEGIBLE (ronda 2) EXIGIA que un
+# epoch se tratara como no parseable -- expectativa invertida ahora que SI se parsea; ver
+# `test_ts_epoch_ordena_correctamente` (reemplaza a la vieja TS-ILEGIBLE) y las 4 fixtures
+# nuevas que la acompañan.
+FIXES_F1_EPOCH = ["TS-EPOCH-ORDENA", "TS-NO-NUMERICO-ILEGIBLE", "TS-EPOCH-MS-DETECTADO",
+                  "TS-EPOCH-CADENA", "EPOCH-R1-R2-R3-REALES"]
+FIXES_GCO14 = FIXES_F1_EPOCH + ["CREDENCIALES-EXTRAER-PY-REAL", "CANTIDAD-VOCABULARIO-AMPLIADO"]
+# Ronda 2 de verificacion sobre GCO1.4 (golden-verificador, 2026-08-22): FALLA 1 (R2/R3/R4/Q4
+# sin acotar al dia auditado) y FALLA 3 (paginacion no medible leida como "no se trunco").
+FIXES_GCO14_RONDA2 = ["R2-ACOTA-AL-DIA", "LISTADO-PAGINACION-NO-MEDIBLE",
+                      "ACOTADO-RESPETA-ZONA-HORARIA", "SIN-FECHA-AUDITADA-DECLARADA"]
+# Cuarta ronda de verificacion sobre GCO1.4 (golden-verificador, 2026-08-22): ROTO NUEVO 5a
+# (`_fecha` malformada leida como sana) y 5b (mezcla epoch/ISO-Z revienta con TypeError).
+FIXES_GCO14_RONDA3 = ["FECHA-AUDITADA-MALFORMADA-DECLARADA", "TS-MEZCLADO-EPOCH-ISO-NO-REVIENTA"]
 
 
 def main():
@@ -935,7 +1342,6 @@ def main():
     test_credenciales_ampliadas_en_evidencia()
 
     test_dropi_normalizado()
-    test_ts_ilegible_no_engana_al_orden()
     test_corte_del_dia_ignora_notas()
     test_denominador_tres_estados()
     test_plantilla_forma_no_borra_objecion_real()
@@ -953,6 +1359,21 @@ def main():
     test_r6_talla_no_captura_basura()
     test_r6_color_sin_leadin_no_dispara()
     test_r6_correccion_post_resumen()
+
+    test_ts_epoch_ordena_correctamente()
+    test_ts_no_numerico_sigue_ilegible()
+    test_ts_epoch_milisegundos_se_detecta()
+    test_ts_epoch_como_cadena_se_parsea()
+    test_r1_r2_r3_con_ts_epoch_real()
+
+    test_credenciales_extraer_py_camino_real()
+    test_cantidad_vocabulario_ampliado()
+    test_r2_r3_r4_acotan_al_dia_auditado()
+    test_listado_paginacion_no_medible_se_declara()
+    test_acotado_al_dia_respeta_zona_horaria()
+    test_sin_fecha_auditada_se_declara()
+    test_fecha_auditada_malformada_se_declara()
+    test_ts_mezclado_epoch_e_iso_no_revienta()
 
     print("Las 13 trampas del encargo (ENCARGO-golden-chatea-operacion.md):")
     fallidas = []
@@ -1007,8 +1428,9 @@ def main():
             fallidas_r6.append(codigo)
 
     print("\nFixes de la verificacion adversarial de golden-verificador sobre R6 "
-         "(2026-08-21, 1.829 hilos reales de dos espacios de produccion) -- cada uno "
-         "reproduce un defecto real que encontro:")
+         "(2026-08-21, hilos reales de produccion -- cifra especifica de esa ronda no "
+         "conservada, ver comentario en el codigo) -- cada uno reproduce un defecto real "
+         "que encontro:")
     fallidas_r6_verif = []
     for codigo in FIXES_R6_VERIFICACION:
         paso, detalle = RESULTADOS.get(codigo, (False, "no se corrio ninguna prueba"))
@@ -1017,24 +1439,64 @@ def main():
         if not paso:
             fallidas_r6_verif.append(codigo)
 
+    print("\nFixes de la verificacion adversarial de golden-verificador GCO1.4 (2026-08-22, "
+         "4 DUMPs reales de LIBIDO-UP, 165 conversaciones) -- F1 (epoch en `ts`), F3 "
+         "(camino real de extraer.py) y F4 (vocabulario de cantidad ampliado):")
+    fallidas_gco14 = []
+    for codigo in FIXES_GCO14:
+        paso, detalle = RESULTADOS.get(codigo, (False, "no se corrio ninguna prueba"))
+        marca = "OK   " if paso else "FALLA"
+        print(f"  {marca} {codigo:30} {detalle}")
+        if not paso:
+            fallidas_gco14.append(codigo)
+
+    print("\nFixes de la SEGUNDA verificacion adversarial sobre GCO1.4 (golden-verificador, "
+         "2026-08-22, misma corrida contra los 4 DUMPs reales) -- FALLA 1 (R2/R3/R4/Q4 sin "
+         "acotar al dia auditado) y FALLA 3 (paginacion no medible leida como 'no se "
+         "trunco'):")
+    fallidas_gco14_r2 = []
+    for codigo in FIXES_GCO14_RONDA2:
+        paso, detalle = RESULTADOS.get(codigo, (False, "no se corrio ninguna prueba"))
+        marca = "OK   " if paso else "FALLA"
+        print(f"  {marca} {codigo:30} {detalle}")
+        if not paso:
+            fallidas_gco14_r2.append(codigo)
+
+    print("\nFixes de la CUARTA verificacion adversarial sobre GCO1.4 (golden-verificador, "
+         "2026-08-22) -- ROTO NUEVO 5a (`_fecha` malformada leida como sana) y 5b (mezcla "
+         "epoch/ISO-Z revienta con TypeError):")
+    fallidas_gco14_r3 = []
+    for codigo in FIXES_GCO14_RONDA3:
+        paso, detalle = RESULTADOS.get(codigo, (False, "no se corrio ninguna prueba"))
+        marca = "OK   " if paso else "FALLA"
+        print(f"  {marca} {codigo:30} {detalle}")
+        if not paso:
+            fallidas_gco14_r3.append(codigo)
+
     if (fallidas or fallidas_extra or fallidas_fixes or fallidas_ronda2 or fallidas_r6 or
-            fallidas_r6_verif):
+            fallidas_r6_verif or fallidas_gco14 or fallidas_gco14_r2 or fallidas_gco14_r3):
         print(f"\nAUTOPRUEBA FALLIDA. Trampas del encargo sin detectar: {fallidas or 'ninguna'}. "
              f"Controles de calidad sin detectar: {fallidas_extra or 'ninguno'}. "
              f"Fixes adversariales (ronda 1) sin confirmar: {fallidas_fixes or 'ninguno'}. "
              f"Fixes (ronda 2) sin confirmar: {fallidas_ronda2 or 'ninguno'}. "
              f"Control R6 sin confirmar: {fallidas_r6 or 'ninguno'}. "
-             f"Fixes de verificacion R6 sin confirmar: {fallidas_r6_verif or 'ninguno'}.")
+             f"Fixes de verificacion R6 sin confirmar: {fallidas_r6_verif or 'ninguno'}. "
+             f"Fixes GCO1.4 sin confirmar: {fallidas_gco14 or 'ninguno'}. "
+             f"Fixes GCO1.4 (ronda 2) sin confirmar: {fallidas_gco14_r2 or 'ninguno'}. "
+             f"Fixes GCO1.4 (ronda 3) sin confirmar: {fallidas_gco14_r3 or 'ninguno'}.")
         print("El clasificador esta roto. No se corre contra un DUMP real hasta arreglarlo.")
         return 1
 
     total_controles = (len(TRAMPAS_DEL_ENCARGO) + len(EXTRA_CALIDAD) +
                        len(FIXES_ADVERSARIALES) + len(FIXES_RONDA_2) + len(CONTROL_R6) +
-                       len(FIXES_R6_VERIFICACION))
+                       len(FIXES_R6_VERIFICACION) + len(FIXES_GCO14) + len(FIXES_GCO14_RONDA2) +
+                       len(FIXES_GCO14_RONDA3))
     print(f"\n  {total_controles} de {total_controles} controles confirmados en total "
          f"({len(TRAMPAS_DEL_ENCARGO)} trampas del encargo + {len(EXTRA_CALIDAD)} calidad + "
          f"{len(FIXES_ADVERSARIALES)} fixes ronda 1 + {len(FIXES_RONDA_2)} fixes ronda 2 + "
-         f"{len(CONTROL_R6)} control R6 + {len(FIXES_R6_VERIFICACION)} fixes verificacion R6)")
+         f"{len(CONTROL_R6)} control R6 + {len(FIXES_R6_VERIFICACION)} fixes verificacion R6 + "
+         f"{len(FIXES_GCO14)} fixes GCO1.4 + {len(FIXES_GCO14_RONDA2)} fixes GCO1.4 ronda 2 + "
+         f"{len(FIXES_GCO14_RONDA3)} fixes GCO1.4 ronda 3)")
     print("\nAutoprueba pasada. Esto valida el DETECTOR contra casos que se SABEN rotos, no "
          "valida ningun dia real.")
     return 0

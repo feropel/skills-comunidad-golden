@@ -2,7 +2,7 @@
 """Banco de la VENTANA ACCIONABLE y de lo que todavia se puede reasignar.
 
 DOS DEFECTOS REALES DEL CANONICO, medidos el 2026-08-17 sobre el volcado oficial de
-Dolce (3.458 ordenes, `accionables: null`):
+otra marca (3.458 ordenes, `accionables: null`):
 
   1. `acc = set(D.get("accionables") or []); if acc:` — con `null` el filtro NO dispara
      y el informe barre la cuenta entera: **124 «direcciones malas», 120 de pedidos ya

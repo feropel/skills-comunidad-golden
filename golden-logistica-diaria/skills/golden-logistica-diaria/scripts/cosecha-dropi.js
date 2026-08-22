@@ -51,7 +51,7 @@
      este comentario: "OJO: 'GUIA_GENERADA' NO existe en este panel". Se midio el
      2026-08-11 contra dos volcados reales y la afirmacion es FALSA:
        · volcado de GOLDEN del 11-ago: 54 pedidos en GUIA_GENERADA, de 3.426.
-       · volcado de DOLCE del 10-ago: cero.
+       · volcado de otra marca del 10-ago: cero.
      Se midio en la unica cuenta donde daba cero y se escribio como ley del sistema.
      Contra los accionables REALES de Golden, esta lista habria conservado 49 de 132
      y perdido 83 — **$8.516.104 desaparecidos en silencio**, entre ellos los 54 con
@@ -61,7 +61,7 @@
      pedido invisible. La lista de lo que ya esta CERRADO, en cambio, es corta y
      estable, y un estado nuevo cae del lado visible: molesta, pero se ve. Se prefiere
      el ruido al silencio.
-     Comprobado: por negacion salen exactamente los 78 accionables de Dolce y los 132
+     Comprobado: por negacion salen exactamente los 78 accionables de otra marca y los 132
      de Golden, mas 'EN PUNTO DROOP', que ninguna lista escrita a mano tenia. */
   const CERRADOS = ['ENTREGADO', 'CANCELADO', 'RECHAZADO', 'SINIESTRO', 'DEVOLUCION',
                     'DEVOLUCION EN BODEGA', 'EN PROCESO DE DEVOLUCION',

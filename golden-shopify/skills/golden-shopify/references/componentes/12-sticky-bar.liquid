@@ -29,8 +29,16 @@ TEXTOS EDITABLES
 @keyframes gfsStickyPulse{0%{transform:scale(1)}50%{transform:scale(1.03)}100%{transform:scale(1)}}
 @media(min-width:990px){#gfs-sticky-bar{justify-content:center;gap:24px;}#gfs-sticky-btn{flex:0 0 auto;width:340px;max-width:340px;}.gfs-sticky-price{align-items:flex-end;}} @media(max-width:749px){#gfs-sticky-bar{padding:8px 12px}.gfs-sticky-price .gfs-now{font-size:17px}#gfs-sticky-btn{height:48px;font-size:15px}}
 </style>
-<div id="gfs-sticky-bar" aria-hidden="true">
+<div id="gfs-sticky-bar" aria-hidden="true" inert="">
   <div class="gfs-sticky-price"><span class="gfs-now">{{ product.selected_or_first_available_variant.price | money }}</span>{% if product.selected_or_first_available_variant.compare_at_price > product.selected_or_first_available_variant.price %}<span class="gfs-was">{{ product.selected_or_first_available_variant.compare_at_price | money }}</span>{% endif %}</div>
   <button id="gfs-sticky-btn" type="button"><span>{{ BTN_TEXT }}</span></button>
 </div>
-<script>(function(){var bar=document.getElementById('gfs-sticky-bar');var btn=document.getElementById('gfs-sticky-btn');if(!bar||!btn)return;if(bar.parentNode!==document.body){document.body.appendChild(bar);}/* ancla al body: position:fixed siempre relativo al viewport (un ancestro con transform lo rompía) */document.body.style.paddingBottom='80px';try{var c=window.RELEASIT_BUTTON_CONFIG;if(c&&c.text){var sp=btn.querySelector('span');if(sp)sp.textContent=c.text;}}catch(e){}function onScroll(){if(window.scrollY>{{ SHOW_AFTER_SCROLL }}){bar.classList.add('gfs-visible');}else{bar.classList.remove('gfs-visible');}}window.addEventListener('scroll',onScroll,{passive:true});onScroll();btn.addEventListener('click',function(){var main=document.getElementById('custom-releasit-btn');if(main){main.click();}});})();</script>
+<script>(function(){var bar=document.getElementById('gfs-sticky-bar');var btn=document.getElementById('gfs-sticky-btn');if(!bar||!btn)return;if(bar.parentNode!==document.body){document.body.appendChild(bar);}/* ancla al body: position:fixed siempre relativo al viewport (un ancestro con transform lo rompía) */document.body.style.paddingBottom='80px';try{var c=window.RELEASIT_BUTTON_CONFIG;if(c&&c.text){var sp=btn.querySelector('span');if(sp)sp.textContent=c.text;}}catch(e){}
+/* A11y (WCAG 2.2): aria-hidden/inert deben seguir la visibilidad real, si no el CTA queda
+   inalcanzable para teclado/lector de pantalla cuando está VISIBLE, o focuseable cuando NO lo está. */
+function setVisible(v){
+  if(v){bar.classList.add('gfs-visible');bar.removeAttribute('aria-hidden');bar.removeAttribute('inert');}
+  else{bar.classList.remove('gfs-visible');bar.setAttribute('aria-hidden','true');bar.setAttribute('inert','');}
+}
+function onScroll(){setVisible(window.scrollY>{{ SHOW_AFTER_SCROLL }});}
+window.addEventListener('scroll',onScroll,{passive:true});onScroll();btn.addEventListener('click',function(){var main=document.getElementById('custom-releasit-btn');if(main){main.click();}});})();</script>

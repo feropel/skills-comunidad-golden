@@ -338,7 +338,7 @@ def main():
         # a los pedidos del embudo. Pero cuando el analisis corre sobre un RECORTE, ese
         # numero es el tamaño del recorte, no el de los no compradores reales: daba
         # «157 llegaron a ser pedido» cuando eran 94. El arreglo y su diagnostico son
-        # de LOGISTICA DOLCE (scripts/dolce/informe_360.py:151), adoptados con credito:
+        # de LOGISTICA otra marca (scripts/otra marca/informe_360.py:151), adoptados con credito:
         # LOS QUE COMPRARON SALEN DEL EMBUDO, que si mira el universo entero.
         #
         # Y la frase abria con "son TODOS los contactos, no una muestra" en literal,

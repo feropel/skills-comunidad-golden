@@ -80,7 +80,7 @@ encontrándola abierta** — el ritual de re-blindaje no se está cumpliendo fue
 **Cobertura:** 74 cuentas inventariadas (`limit:100`, mismo número que la corrida anterior),
 **42 barridas una por una** a nivel cuenta — las 36 consultables con medio de pago sin contar
 `GOLDEN CP BACK UP` (excluida por orden del CdM, ni se lee) **más 6 sin medio de pago que las
-corridas anteriores no miraban** (Lecoterra CP4/CP5, Dolce CP4/CP5, Vantta GUATE CP3, 2 CP
+corridas anteriores no miraban** (Lecoterra CP4/CP5, otra marca CP4/CP5, Vantta GUATE CP3, 2 CP
 ORGANIC USA — las seis en cero, confirmado, ya no quedan como hueco). **17 con gasto en 30
 días**, igual que la corrida pasada. 5 cuentas bajadas a nivel anuncio, 14 creativos leídos con
 cuerpo completo. Mercado: 3 términos, 150 anuncios traídos, 57 páginas, 62 títulos medibles,
@@ -98,7 +98,7 @@ pierde por 23%. La frase original que celebraba su ROAS era cherry-picking.)**
 **Dos compras no son un veredicto**, y hay que decirlo así: es la primera ejecución del pico 1,
 no su prueba. Pero deja de ser un hueco imposible de medir y pasa a ser una muestra que crece.
 
-**2) El texto NO es la variable dominante — y ahora hay número.** En Dolce CP1, tres creativos
+**2) El texto NO es la variable dominante — y ahora hay número.** En otra marca CP1, tres creativos
 llevan el **mismo cuerpo byte por byte** (485 caracteres, "Usa tu celular sin sacarlo del bolso"),
 mismo producto, misma cuenta, mismos 30 días:
 
@@ -141,10 +141,10 @@ Ocho anuncios con cuerpo legible y ventas, cuatro cuentas, cuatro verticales:
 
 | Anuncio | Largo | Compras | CPA | ¿Argumento en 125? |
 |---|---|---|---|---|
-| Dolce · Anuncio 3 Drive (WhatsApp) | 485 | 16 | 14.794 | NO |
-| Dolce · Anuncio 3 | 361 | 41 | 22.946 | NO |
+| otra marca · Anuncio 3 Drive (WhatsApp) | 485 | 16 | 14.794 | NO |
+| otra marca · Anuncio 3 | 361 | 41 | 22.946 | NO |
 | Tag Recede · VIDEO 8 | 185 | 21 | 23.779 | NO |
-| Dolce · Anuncio 19 Drive | 485 | 13 | 33.622 | NO |
+| otra marca · Anuncio 19 Drive | 485 | 13 | 33.622 | NO |
 | Le'côterra · Video 6 vigente (CP2) | 221 | 8 | 37.344 | NO |
 | Le'côterra · V6 15 copys | 332 | 13 | 38.165 | NO |
 | Le'côterra · Video 6 (CP1) | 221 | 14 | 40.765 | NO |
@@ -158,12 +158,12 @@ Recibir + Envió Gratis"*), Laboratorio special xs (*"💰 $130.000 · Solo paga
 título es siempre visible; los primeros 125 del cuerpo no lo son si el lector no abre "Ver más".**
 Poner la oferta donde nunca se corta es mejor solución que meterla a la fuerza en los primeros 125.
 
-**Contraste medido dentro de una sola cuenta y un solo producto** (Dolce CP1, bolso portacelular):
+**Contraste medido dentro de una sola cuenta y un solo producto** (otra marca CP1, bolso portacelular):
 oferta en el título (`🚛Envío gratis y Pago Contraentrega📦`, 41 compras, CPA 22.946) contra
 beneficio en el título (`Usa tu celular sin sacarlo del bolso`, 16 compras, **CPA 14.794**). Gana
 el beneficio. **Ojo: también cambia el CTA entre los dos, así que no aísla la variable título.**
 
-### Los dos fallos de higiene de Dolce SIGUEN VIVOS, y uno se replicó
+### Los dos fallos de higiene de otra marca SIGUEN VIVOS, y uno se replicó
 
 Reportados a la bandeja el 16-ago, no corregidos, y verificados hoy en el creativo en vivo:
 - **Negrita Unicode falsa** (`𝐔𝐬𝐚 𝐭𝐮 𝐜𝐞𝐥𝐮𝐥𝐚𝐫…`, Mathematical Bold, 4 bytes por carácter) sigue en
@@ -217,7 +217,7 @@ recencia. No los reportes como tendencia.** El largo sí.
   consolida **precio + envío + contra entrega en UNA sola línea** (`💰 $130.000 · Envío gratis ·
   Contra entrega`) y cierra hacia conversación, no hacia compra: *"¿Tienes preguntas? Escríbenos
   antes de comprar 👇"* con destino WhatsApp. **Vale mirarla de cerca**: es el mismo destino
-  WhatsApp que en Dolce da el mejor CPA de todo el conjunto.
+  WhatsApp que en otra marca da el mejor CPA de todo el conjunto.
 
 **La prueba social numérica antes del hook** (Levin Store 10-ago, Wonder Store 16-ago) **no
 apareció en esta muestra.** Dos corridas con el patrón y una sin él: no lo des por asentado.
@@ -244,7 +244,7 @@ No se tocó ni se leyó (`408753721820872`) — orden del Centro de Mando respet
 - **19 de las 42 cuentas barridas no tuvieron gasto** — sin resultado que cruzar, fuera del análisis
   por diseño, no por omisión.
 - **El cuerpo de mercado de Regalados colombia** no se pudo leer (sin impresiones). 3 de 4 leídos.
-- **No se aisló la variable título** en el contraste de Dolce: el CTA cambia junto con el titular.
+- **No se aisló la variable título** en el contraste de otra marca: el CTA cambia junto con el titular.
 - No se bajó a nivel anuncio en 12 de las 17 cuentas con gasto (CP1/CP3/CP5/CP6/CP8/CP9, INTER
   CP1-CP5, BLUE CP5). Se priorizaron las cinco que deciden las preguntas abiertas del estándar.
 
@@ -267,7 +267,7 @@ títulos únicos por página, 4 cuerpos completos leídos por firecrawl.
 
 La corrida pasada solo Tag Recede (uñas, vertical con restricción de claims) rompía la regla de
 meter el argumento de venta en los primeros 125 caracteres. Esta corrida se leyeron los 5
-anuncios de mayor volumen de tres cuentas distintas — Le'côterra, Tag Recede y **Dolce por
+anuncios de mayor volumen de tres cuentas distintas — Le'côterra, Tag Recede y **otra marca por
 primera vez** — y **ninguno de los cinco cumple la regla, y los cinco venden**:
 
 | Anuncio | Cuenta | Largo | Compras (30d) | CPA | Argumento en 125 |
@@ -275,10 +275,10 @@ primera vez** — y **ninguno de los cinco cumple la regla, y los cinco venden**
 | V6 · 15 copys | Le'côterra CP2 | 332 | 3 | 15.030 COP | NO |
 | V6 Bergamot | Le'côterra CP2 | 221 | 14 | 40.765 COP | NO |
 | VIDEO 8 | Tag Recede BLUE CP1 | 185 | 31 | 24.381 COP | NO |
-| Anuncio 3 | Dolce CP1 | 361 | 35 | 24.496 COP | NO |
-| Anuncio 3 Drive | Dolce CP1 | 485 | 9 | 16.569 COP | NO |
+| Anuncio 3 | otra marca CP1 | 361 | 35 | 24.496 COP | NO |
+| Anuncio 3 Drive | otra marca CP1 | 485 | 9 | 16.569 COP | NO |
 
-Le'côterra y Dolce **no tienen restricción de claims de salud** — el escudo que protegía la
+Le'côterra y otra marca **no tienen restricción de claims de salud** — el escudo que protegía la
 excepción de Tag Recede ya no aplica. **Actualizado `estandar-meta-medido.md`** con este dato:
 la regla de los 125 sigue siendo el consejo por defecto (y el artículo oficial de Meta la
 respalda: *"el texto principal debe ocupar 1 a 3 líneas"*), pero **ya no se sostiene como ley
@@ -300,9 +300,9 @@ compras/CPA 40.765. El nuevo gana 63% más barato, **pero sobre 3 compras — mu
 chica para veredicto.** Sigue sin poder probarse el estándar de verdad mientras los "cortos"
 no salgan al aire.
 
-### Hallazgo nuevo, en copy PROPIO no de mercado: dos fallos de higiene en Dolce CP1
+### Hallazgo nuevo, en copy PROPIO no de mercado: dos fallos de higiene en otra marca CP1
 
-Al leer el cuerpo del segundo mayor vendedor de Dolce (Anuncio 3, 35 compras) apareció:
+Al leer el cuerpo del segundo mayor vendedor de otra marca (Anuncio 3, 35 compras) apareció:
 - **64 caracteres en negrita Unicode falsa** (`𝐔𝐬𝐚 𝐭𝐮 𝐜𝐞𝐥𝐮𝐥𝐚𝐫...`, rango Mathematical Bold,
   caracteres de 4 bytes) — rompe copiar y pegar, lectores de pantalla, y búsqueda de texto.
 - El creativo "Anuncio 3 Drive" (9 compras, CPA 16.569) lleva `**asteriscos**` de Markdown
@@ -468,7 +468,7 @@ no se está haciendo (ver arriba). `estandar-meta-medido.md` no necesita correcc
   `{{product.name}}` y ningún `body`. El texto vive en el catálogo, no en el creativo.
 - **No se pudo confirmar si algún anuncio lleva múltiples textos** (opciones por campo): la API
   de creativos expone un solo `body` y no el `asset_feed_spec`.
-- **Dolce CP 1** (5.349.836 COP, el segundo mayor gasto) usa nombres genéricos "Anuncio 1..22
+- **otra marca CP 1** (5.349.836 COP, el segundo mayor gasto) usa nombres genéricos "Anuncio 1..22
   Drive" y no se le cruzó el copy contra el resultado. Queda para la próxima corrida.
 - Las cuentas **GOLDEN CP2 y CP4 (UNSETTLED)** y 10 más DISABLED no son consultables: 13 de 75
   quedaron fuera por completo.

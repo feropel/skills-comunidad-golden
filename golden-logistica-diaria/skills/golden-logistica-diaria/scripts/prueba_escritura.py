@@ -3,7 +3,7 @@
 
 Esa es la pregunta que ningun otro banco de esta skill hacia. Los demas comprueban
 que hace el codigo **cuando termina**; este mata la escritura a la mitad y mira el
-disco. La formulacion es del chat LOGISTICA DOLCE, que lo reporto despues de perder
+disco. La formulacion es del chat LOGISTICA otra marca, que lo reporto despues de perder
 datos con el comando que esta misma fabrica habia recomendado.
 
   python3 prueba_escritura.py

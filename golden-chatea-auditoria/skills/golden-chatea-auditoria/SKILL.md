@@ -20,6 +20,17 @@ description: |
 
 # golden-chatea-auditoria · la salud de un espacio de Chatea Pro
 
+<!-- skill v1.3 (GCA1.3) — 2026-08-21 — re-auditoria: los arreglos de GCA1.2 metieron sus
+propios defectos, encontrados probando la skill contra casos que se saben malos. (1) ROBUSTEZ:
+un endpoint que respondia con error (dict en vez de lista) tumbaba la auditoria entera con un
+traceback — un 500 puntual de la API costaba el informe completo; ahora se declara la zona como
+no medida y se sigue (control B7). (2) El asset de asistentes esperados ausente reventaba igual:
+ahora degrada. (3) La regla escrita "una decision sin motivo y sin fecha no se acepta" NO la
+aplicaba el codigo: se aceptaba en silencio y se imprimia "(sin motivo)". Ahora detiene la
+corrida, y avisa de las decisiones sin `reabrir_si`. (4) El handoff descartaba las dudas
+accionables: 5 hallazgos con accion concreta quedaban fuera del paquete; ahora abren el
+documento como "preguntas que hay que contestar antes de tocar", con su clave para el libro.
+Autoprueba: 30 defectos + 6 pruebas de comportamiento. -->
 <!-- skill v1.2 (GCA1.2) — 2026-08-21 — auditoria golden-skill-auditor (874/1000) mas
 simulacion de cliente: la skill diagnosticaba bien y COMUNICABA mal. Seis arreglos.
 (1) LIBRO DE DECISIONES `--decisiones`: cada hallazgo tiene clave estable control|objetivo y lo
@@ -43,7 +54,7 @@ numérico. Ver detalle completo debajo. -->
 skill nació sin CHANGELOG y sin número, y sin versión el censo diario no puede ver que alguien
 la editó. -->
 
-**Versión:** `GCA1.2`
+**Versión:** `GCA1.3`
 
 Auditar aquí significa **medir el estado real del servidor contra el estándar**, no leer la
 configuración y opinar. Nada se da por bueno sin haberlo contado, y el informe se entrega en
@@ -213,7 +224,7 @@ Cuando dictaminas sobre un hallazgo — "eso no es problema", "eso es a propósi
 viaja con el espacio.
 
 ```json
-{"espacio": "f218311", "decisiones": [
+{"espacio": "fXXXXXX", "decisiones": [
   {"clave": "D3|huerfanos-sin-pauta",
    "motivo": "sin pauta activa no llegan mensajes; se registran cuando se les ponga",
    "fecha": "2026-08-20",

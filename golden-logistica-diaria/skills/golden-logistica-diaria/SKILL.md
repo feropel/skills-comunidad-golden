@@ -52,7 +52,7 @@ la corrida completa de un día, sola, y entrega **un solo informe** con lo que h
 | `margen` | Utilidad bruta sobre el ticket | `0.40` |
 | `factor_tienda` | Cuánto entrega esta tienda frente a su municipio | del archivo de calibración |
 
-Dolce Incanto es su primer caso, no su contenido. **Cada tienda mide su propio `factor_tienda`.**
+otra marca es su primer caso, no su contenido. **Cada tienda mide su propio `factor_tienda`.**
 
 Los ejemplos de arriba van como `{MARCADOR}` a propósito: llevaban quemados los IDs reales de
 la casa. Un ejemplo con un ID que existe se copia tal cual — y el día que esta skill la use
@@ -133,7 +133,7 @@ es un matiz: es que uno de los dos documentos miente.
 
 **`GUIA_GENERADA` SÍ EXISTE. Corrección de una afirmación falsa, medida el 2026-08-11.**
 Aquí decía «`GUIA_GENERADA` NO existe en el panel de Dropi». Se midió contra dos volcados reales:
-en la cuenta de **Golden del 11-ago hay 54 pedidos** en ese estado, de 3.426; en la de **Dolce del
+en la cuenta de **Golden del 11-ago hay 54 pedidos** en ese estado, de 3.426; en la de **otra marca del
 10-ago, cero**. Se midió en la única cuenta donde daba cero y se escribió como ley del sistema —
 la clase es **«una afirmación sobre un sistema externo lleva fecha y lleva cuenta, o no es una
 afirmación»**. La factura de haberla creído: contra los 132 accionables reales de Golden, la lista
@@ -144,7 +144,7 @@ Por eso el cosechador ya **no** lleva una lista de lo que entra: lleva la lista 
 **cerrado** (entregado, cancelado, rechazado, siniestro y la familia de devolución) y todo lo demás
 es accionable. Una lista de lo que sí entra convierte cada estado nuevo en un pedido invisible; la
 de lo cerrado es corta, estable, y un estado nuevo cae del lado que se ve. Se prefiere el ruido al
-silencio. Comprobado: por negación salen exactos los 78 accionables de Dolce y los 132 de Golden,
+silencio. Comprobado: por negación salen exactos los 78 accionables de otra marca y los 132 de Golden,
 más `EN PUNTO DROOP`, que ninguna lista escrita a mano tenía.
 
 ### El identificador impreso es el TELÉFONO, nunca el número de pedido (FER, 2026-08-11)
@@ -185,7 +185,7 @@ sola creerá que la otra no existe:
 
 **LO QUE LA EVIDENCIA SOSTIENE, Y LO QUE NO.** Medido el 2026-08-11 sobre los dos volcados:
 **30 de 30 puntos de recogida son de Interrapidísimo**, que es exactamente el `oficina_solo` que
-declaran las dos cuentas. Sobre los 78 pedidos de Dolce **las dos capas dan el mismo resultado**;
+declaran las dos cuentas. Sobre los 78 pedidos de otra marca **las dos capas dan el mismo resultado**;
 el único cambio de decisión (Pereira, CAMBIAR → DEJAR) **lo produce el detector, no la capa 2**.
 
 Así que la capa 2 es, hoy, una **guarda de un caso que no se ha observado nunca**: un punto de
@@ -246,7 +246,7 @@ para que nadie lea el cero de esas ciudades como «ahí no pasa».
 trabajo de una clienta de Pereira, falso positivo medido). Si al lado está el nombre de una
 transportadora, es un punto; si al lado hay un número, un piso o una torre, es donde vive o
 trabaja el cliente. El nombre se reconoce **como suena** —«Inter rapidísimo» partido, o
-«interrapidicimo» con c— porque 1 de cada 6 direcciones de recogida de Dolce lo traía roto.
+«interrapidicimo» con c— porque 1 de cada 6 direcciones de recogida de otra marca lo traía roto.
 
 Y hay **tres estados, no dos**: `punto`, `dirección` y `dudoso`. Una dirección que dice «reclamar
 en oficina» a secas no es ninguna de las dos: es una que nadie ha medido. Devolverla como
@@ -346,7 +346,7 @@ que no se pueden probar: 5/6 contra 9/9 son estadísticamente indistinguibles.
 Meta prellena el primer mensaje cuando alguien toca el botón del anuncio. Distinguir eso de lo
 que la persona escribió decide **a quién se llama**: al que solo tocó el botón no hay a quién
 llamar. Esta skill lo hacía con una regex y **la cambió por medición**, tras una adjudicación
-con la implementación de LOGISTICA DOLCE sobre los mismos 743 contactos.
+con la implementación de LOGISTICA otra marca sobre los mismos 743 contactos.
 
 **Las dos implementaciones discrepaban en 13 contactos y las dos estaban flojas, en casos
 distintos.** Por frecuencia se cazan los prellenados comunes y se escapan los raros; por forma
@@ -491,17 +491,17 @@ Se escriben aquí, no solo en el chat, porque quien lee la skill no lee el chat.
 | Llamar a `golden-despachos` y `golden-logistica` | **CUMPLIDA** *(2026-08-21)* | pasos 2 y 8 de «Flujo operativo · la corrida de hoy» instruyen el punto exacto de invocación y qué declarar si la hermana no está disponible. Cablear en INSTRUCCIÓN, no en código: esta skill no tiene runtime propio para invocar otra skill — lo que faltaba era decírselo al Claude que la ejecuta, y ya está dicho |
 | **Corrida contra el API VIVO de Dropi** | PENDIENTE | la cadena cosechar → detallar → descargar → motor → informe está probada contra un Dropi **simulado** con la forma real. Lo que queda probado es el contrato entre piezas, **no** la respuesta viva del servidor. Falta una corrida con sesión de Dropi abierta |
 | Los 11 municipios añadidos a la Torre el 2026-08-10 | INCOMPLETOS *(medido 2026-08-10)* | les falta el campo `flete` que los 122 originales sí traen; hay que recapturarlos con el mismo método, y necesita sesión viva de Dropi |
-| **El barrido no guarda el TIPO de mensaje** | ABIERTO *(medido 2026-08-11)* | el API entrega `msg_type` (`text`, `audio`, `feed`…) y hasta `payload.transcribed_text`, y el barrido guarda solo el texto. Un audio llega como comilla vacía, idéntico a un mensaje borrado. Medido: 58 entrantes vacíos en Dolce, **20 de ellos el último del cliente** — y uno era una nota de voz de hace 8 días en la lista de "responder hoy". Mientras no se capture, un vacío se cuenta como mensaje y la fila lo declara |
+| **El barrido no guarda el TIPO de mensaje** | ABIERTO *(medido 2026-08-11)* | el API entrega `msg_type` (`text`, `audio`, `feed`…) y hasta `payload.transcribed_text`, y el barrido guarda solo el texto. Un audio llega como comilla vacía, idéntico a un mensaje borrado. Medido: 58 entrantes vacíos en otra marca, **20 de ellos el último del cliente** — y uno era una nota de voz de hace 8 días en la lista de "responder hoy". Mientras no se capture, un vacío se cuenta como mensaje y la fila lo declara |
 | **Dos transportadoras rotuladas como "la bodega no despacha"** | ABIERTO *(medido 2026-08-11)* | medido sobre la corrida del 2026-08-11: **14 pedidos** (COORDINADORA 11, JAMV-DRIVE 3). El criterio tiene TRES estados (vetada / marginal-confirmar / **nunca usada**) y el informe los pinta con uno solo. Una "nunca usada" tiene cero de no-mirado, no un veto — y JAMV-DRIVE tiene 250 pedidos cerrados al 75,2%. *(Este número decía "3 transportadoras y 13 pedidos" y estaba vencido: un pendiente con cifra se vuelve mentira solo, así que la cifra lleva la fecha de su medición.)* |
 | **`cruzar()` valida la FORMA de sus argumentos** | NO CONSTRUIDA *(concedida 2026-08-18)* | recibe dos listas y no lo comprueba: si le llegan los contactos como diccionario por teléfono —que es como los tiene medio ecosistema— muere con `AttributeError` dentro de un `max(...)`, lejos de la causa. **Lo pisé yo mismo escribiendo el banco del defecto del universo, media hora después de arreglar esa misma trampa**: si el que acaba de taparla cae en ella, el problema no es el descuido, es que **la firma no se defiende sola**. Se arregla como el universo: normalizar lo que se entiende, morir nombrando el argumento y el archivo con lo que no |
 | **Ficha individual por pendiente de confirmación** (paso 4 de FER) | NO CONSTRUIDA *(dictado 2026-08-14)* | FER la pidió con cuatro cosas por pendiente: dirección, transportadora, **coherencia con el chat** (color y cantidad) y **métricas del cliente** («si devuelve mucho, no sale sin anticipo»). Las cuatro piezas ya existen sueltas —`dir_mala`, el motor, `cruzar_chat_orden` y ahora `huella_base`—; lo que falta es la ficha que las junta por pedido en vez de repartirlas en cuatro tablas |
 | **El informe en el ORDEN de 8 pasos de FER** | PARCIAL *(dictado 2026-08-14)* | hecho: el Paso 1 va primero y **dentro va ordenado por causa** — las guías con error de oficina («lo primordial»: devolución segura) antes que las de mal balance, con la causa impresa en la primera columna. Falta el resto del orden dictado: direcciones malas al puesto 3, los pendientes al 4, y novedades/oficina/varados agrupados en el 5 como «solo llamar». Es una reestructuración del ensamble, no un ajuste — se hace entera o no se hace |
-| **«Días sin moverse» por pedido** | NO SE PUEDE HOY *(medido 2026-08-17)* | lo pidió FER y el valor es claro (un `GUIA_GENERADA` de 20 días no es la misma urgencia que uno de hoy; DOLCE midió uno en INDEMNIZADA con **442 días** quieto). **Pero el volcado no trae `updated_at`** — solo `created`, que es justo el que no sirve: el creado no dice si se movió. Hacen falta DOS pasos: comprobar contra el API vivo que Dropi entrega el campo, y capturarlo en la cosecha. **No se cablea con `created`**: daría un número plausible y falso, que es el `.get(campo, 0)` que ya nos costó una rotura. Va con la ronda de migración a API, que es donde se rediseña la cosecha |
+| **«Días sin moverse» por pedido** | NO SE PUEDE HOY *(medido 2026-08-17)* | lo pidió FER y el valor es claro (un `GUIA_GENERADA` de 20 días no es la misma urgencia que uno de hoy; otra marca midió uno en INDEMNIZADA con **442 días** quieto). **Pero el volcado no trae `updated_at`** — solo `created`, que es justo el que no sirve: el creado no dice si se movió. Hacen falta DOS pasos: comprobar contra el API vivo que Dropi entrega el campo, y capturarlo en la cosecha. **No se cablea con `created`**: daría un número plausible y falso, que es el `.get(campo, 0)` que ya nos costó una rotura. Va con la ronda de migración a API, que es donde se rediseña la cosecha |
 | **Toda corrida imprime la EDAD de cada insumo, no solo su existencia** | NO CONSTRUIDA *(dictado 2026-08-16)* | fecha del insumo (`generado`, `rango` o `mtime`) contra la fecha de la corrida, y un insumo de más de N días se declara **VIEJO en la tabla de cobertura**. Cierra una familia entera que dio **tres casos el mismo día**: la Torre regenerada sin aviso, un caché de tandas reusado de otro día, y un informe fechado el 14 corrido el 16 sobre una base sin refrescar. Las compuertas de hoy preguntan *si el insumo existe*, y los tres existían — **lo que ninguna pregunta es contra qué reloj**. La Parte 2 ya imprime la fecha de la Torre (GLD1.31); falta generalizarlo a todos los insumos y llevarlo a la tabla de cobertura |
 | **El listado de oficinas de Interrapidísimo** | **CUMPLIDA** *(2026-08-17)* | `FLETES-DROPI-COLOMBIA/datos/OFICINAS-INTERRAPIDISIMO.json` — **1.377 oficinas, 32 departamentos**. Lo cosechó el chat de fletes por la misma consulta pública; esta fábrica lo había medido por su cuenta en tres corridas y dio **idéntico** (1.377/32/92 páginas). **Dos productores independientes que coinciden ES la verificación cruzada** — recosechar sería repetir, no comprobar. Pasa la compuerta por FORMA (91 páginas de 15 + una de 12). Procedencia y md5 del origen van dentro del archivo; el original no se movió. Se activa poniendo `oficinas_inter` en el config |
-| **Compuerta de bodega única por color** (Dolce, con bodega propia) | NO CONSTRUIDA *(dictado 2026-08-11)* | con bodega propia el **color es una restricción PREVIA al balance**, no un dato del pedido: no se parte un pedido entre dos bodegas porque **se pagan dos guías**, así que un color no importado arrastra el pedido entero a la bodega vieja. Hoy el motor cotiza sin mirar de dónde sale la mercancía. Es pariente de **multi-bodega (GLD2.0)** y se resuelve con ella: por eso hoy es fila y no código — construirla suelta sería cablear media regla |
+| **Compuerta de bodega única por color** (otra marca, con bodega propia) | NO CONSTRUIDA *(dictado 2026-08-11)* | con bodega propia el **color es una restricción PREVIA al balance**, no un dato del pedido: no se parte un pedido entre dos bodegas porque **se pagan dos guías**, así que un color no importado arrastra el pedido entero a la bodega vieja. Hoy el motor cotiza sin mirar de dónde sale la mercancía. Es pariente de **multi-bodega (GLD2.0)** y se resuelve con ella: por eso hoy es fila y no código — construirla suelta sería cablear media regla |
 | **¿Los contactos sin teléfono cuentan en el denominador?** | DECISIÓN DE FER, pendiente *(medido 2026-08-11)* | son **94 de 857 (11%)**: llegan por comentario de Facebook e Instagram y el cruce contra Dropi es por teléfono, así que **no pueden aparecer en el numerador ni aunque compren**. Con ellos dentro la conversión sale sesgada a la baja; fuera, deja de ser «de la cuenta» y pasa a ser «de WhatsApp». Es regla de negocio: la skill los declara y no los toca |
-| **`opciones_no_producto` se RE-MIDE, no se declara una vez** | DISEÑO VIGENTE *(2026-08-11)* | la bandera tiene **tres** estados: ausente = nadie miró · `[]` = medido, ninguna · lista = filtra. Pero **un `[]` de hace seis meses vuelve a ser un «ausente» disfrazado**: los formularios cambian y la medición envejece sola. Por eso el `[]` va con la fecha y el tamaño de la muestra en el config (Dolce: 81 contactos, 2026-08-11) y **se re-mide cuando cambie el formulario o cada trimestre**. Un «medido» sin cuándo es una afirmación sin fecha, que es lo que esta skill lleva veintitrés rondas prohibiendo |
+| **`opciones_no_producto` se RE-MIDE, no se declara una vez** | DISEÑO VIGENTE *(2026-08-11)* | la bandera tiene **tres** estados: ausente = nadie miró · `[]` = medido, ninguna · lista = filtra. Pero **un `[]` de hace seis meses vuelve a ser un «ausente» disfrazado**: los formularios cambian y la medición envejece sola. Por eso el `[]` va con la fecha y el tamaño de la muestra en el config (otra marca: 81 contactos, 2026-08-11) y **se re-mide cuando cambie el formulario o cada trimestre**. Un «medido» sin cuándo es una afirmación sin fecha, que es lo que esta skill lleva veintitrés rondas prohibiendo |
 | **Multi-bodega** | GLD2.0 · diseño mayor aparte *(medido 2026-08-11, corrida de Golden)* | reparto real de ese día: **Suppli Cali 107 · eshoppi Bogotá 9 · La Herramienta Hogar 8 · Bodega Principal Medellín 4 · GoldBox 3 · Punto Barato 1**. Y la vuelta que cambia el modelo: **la tabla de fletes correcta depende de la CIUDAD DE ORIGEN de cada bodega, no de la tienda** — hoy el config toma UNA sola tabla, así que un pedido que sale de Cali se cotiza con los fletes de otro origen. No es un parámetro más: cada bodega tiene su origen, sus fletes y sus transportadoras operativas. LOGISTICA GOLDEN queda disponible para la consulta de diseño cuando llegue esa ronda |
 | **Recogida en oficina: falta la regla** | ABIERTO *(medido 2026-08-11, corrida de Golden)* | cuando la dirección dice «oficina de X», lo que manda es **el punto de recogida**, no el costo — hoy la skill marca esos pedidos como SIN COBERTURA. Caso real: pedido {PEDIDO_EJEMPLO_6}, Timaná |
 | **Análisis de transportadoras propias** | ABIERTO *(2026-08-11)* | comparar la efectividad **de la tienda** contra la Torre **sobre la misma muestra**, y medir el costo de devolución real por transportadora en vez de tomarlo del config |
@@ -518,7 +518,7 @@ Se escriben aquí, no solo en el chat, porque quien lee la skill no lee el chat.
 | **«No se entrega» no cubre el `.md`** | ABIERTO *(2026-08-11)* | cuando el verificador falla, el markdown YA está escrito en disco; solo se frena el PDF |
 | **`-corrida-de-fabrica` vive solo en la prosa** | ABIERTO *(2026-08-11)* | el nombre que evita colisionar con el entregable del chat de la tienda no lo pone el código: hay que acordarse — la clase de `pisar_pdf` |
 | **El chequeo de ámbito de coberturas es flojo** | ABIERTO *(2026-08-11)* | detecta «tiene un ·» en el título; una tabla con un punto medio decorativo pasa como si declarara su ámbito |
-| **`DROPI-LOGISTICA/salidas/DECISIONES-DOLCE.json`** | HISTÓRICO, no se pisa *(medido 2026-08-11)* | difiere en **DOS pedidos**, no en uno. Es **anterior al arreglo de `HUELLA_MALA`**: en el {PEDIDO_EJEMPLO_1} ({CLIENTA_A}, Bogotá) dice `VELOCES` por criterio CLARO y el motor de hoy dice `ENVIA` por HUELLA_MALA — Veloces le entregó 3 de 8 (38%) y Envía 54 de 72 (75%); y el **{PEDIDO_EJEMPLO_4}** también cambia. *(Yo declaré «un pedido» mirando la última línea del diff en vez de contarlas: el diff imprime los casos y el que se queda en pantalla es el último.)* **No se regenera desde aquí: ese archivo lo produce el chat de la tienda, y pisar el entregable de otro chat está prohibido.** Queda declarado como foto vieja, con su diferencia medida |
+| **`DROPI-LOGISTICA/salidas/DECISIONES-otra marca.json`** | HISTÓRICO, no se pisa *(medido 2026-08-11)* | difiere en **DOS pedidos**, no en uno. Es **anterior al arreglo de `HUELLA_MALA`**: en el {PEDIDO_EJEMPLO_1} ({CLIENTA_A}, Bogotá) dice `VELOCES` por criterio CLARO y el motor de hoy dice `ENVIA` por HUELLA_MALA — Veloces le entregó 3 de 8 (38%) y Envía 54 de 72 (75%); y el **{PEDIDO_EJEMPLO_4}** también cambia. *(Yo declaré «un pedido» mirando la última línea del diff en vez de contarlas: el diff imprime los casos y el que se queda en pantalla es el último.)* **No se regenera desde aquí: ese archivo lo produce el chat de la tienda, y pisar el entregable de otro chat está prohibido.** Queda declarado como foto vieja, con su diferencia medida |
 
 
 ## EL CONTRATO · el informe es 360, en dos partes y en este orden (FER, 2026-08-10)
@@ -580,7 +580,7 @@ ajeno a propósito, se borra a mano.)*
 ## EL REPARTO · quién hace qué (arbitraje del Centro, 2026-08-10)
 
 **La cosecha es única y la hace esta skill**, una vez al día, a
-`DROPI-LOGISTICA/datos/volcado-dolce-<fecha>.json`. Todos los demás **consumen ese archivo**.
+`DROPI-LOGISTICA/datos/volcado-otra marca-<fecha>.json`. Todos los demás **consumen ese archivo**.
 Está prohibido volver a bajar las órdenes desde otro chat: dos cosechas son dos verdades que
 pueden discrepar sin que nadie lo note, y el que se equivoque despacha un paquete mal.
 
@@ -625,7 +625,7 @@ escribiendo, el archivo queda truncado y se lleva por delante la única copia. L
 detecta «previo corrupto» evita el rebarrido silencioso — que es el **segundo** daño — pero
 para cuando habla, el dato ya no está.
 
-**La clase, formulada por el chat LOGISTICA DOLCE al reportarla:** *un banco de pruebas
+**La clase, formulada por el chat LOGISTICA otra marca al reportarla:** *un banco de pruebas
 comprueba qué hace el código cuando TERMINA; nadie comprueba qué queda en disco si NO termina.*
 Los cinco bancos de esta skill hacían la primera pregunta. `scripts/prueba_escritura.py` hace
 la segunda: mata la escritura a la mitad y verifica que el archivo anterior sigue intacto.

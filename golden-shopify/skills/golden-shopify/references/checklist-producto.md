@@ -38,9 +38,10 @@ Los 5 elementos que separan una landing que vende de una ficha cruda (ver `arque
 - [ ] La paleta y tipografía se identifican con el producto, no heredadas por inercia.
 
 ## Bloque 1 / Intro
-- [ ] **El intro IGNITION** (cortina cinematográfica 100% CSS del bloque 1 / propuesta) está
-      presente — NO se quita al reescribir el copy, salvo que el usuario lo pida. Vive embebido
-      en `01-propuesta.liquid`; verifica que `gfs-ignition` siga en el JSON.
+- [ ] **El intro IGNITION** (cortina cinematográfica) está presente — NO se quita al reescribir
+      el copy, salvo que el usuario lo pida. Desde G4.0 vive en su propio bloque independiente
+      `sec-ignition.liquid` (ya NO embebido en `01-propuesta.liquid`); verifica que la clase
+      `gfs-ignition` siga en el JSON, como bloque aparte antes de `01-propuesta.liquid`.
 
 ## Contenido
 - [ ] Revisé la URL del producto y **no dupliqué** reseñas / cómo-usar / beneficios

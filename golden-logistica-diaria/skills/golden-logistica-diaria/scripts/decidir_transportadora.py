@@ -245,7 +245,7 @@ class Motor:
         # (todos traian el campo): la diferencia media contra el 0,35 supuesto fue de
         # **$14.085 por pedido**, y en el pedido {PEDIDO_EJEMPLO_5} la decision CAMBIA —
         # con la ganancia real gana una transportadora y con el supuesto, otra.
-        # (En el volcado de Dolce del mismo dia el campo no venia en ninguno de sus 23
+        # (En el volcado de otra marca del mismo dia el campo no venia en ninguno de sus 23
         # accionables: por eso el respaldo importa tanto como el dato.)
         #
         # El margen del config queda como RESPALDO DECLARADO: se usa cuando el pedido

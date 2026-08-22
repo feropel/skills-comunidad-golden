@@ -1,0 +1,19 @@
+{
+  "name": "golden-logistica-diaria",
+  "version": "1.0.0",
+  "description": "La corrida diaria de logística: qué pedido despachar y por cuál transportadora, qué frenar, qué llamada hacer por novedad, y qué chat de WhatsApp se quedó sin procesar.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "dropi",
+    "logistica",
+    "chatea-pro",
+    "cod",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-logistica-diaria/"
+  ]
+}

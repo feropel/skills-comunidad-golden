@@ -1,6 +1,6 @@
 # Skills de la Comunidad Golden
 
-El **arsenal completo** de la Comunidad Golden para **Claude Code**: 33 skills que investigan tu
+El **arsenal completo** de la Comunidad Golden para **Claude Code**: 34 skills que investigan tu
 mercado, montan tu tienda, escriben tu copy, arman tu pauta, configuran tu bot de WhatsApp y
 ordenan tu logística. Ninguna guarda datos privados: cada una te pide lo suyo cuando la usas.
 
@@ -26,7 +26,7 @@ Y ya la puedes usar. Repite el comando con el nombre de cualquier otra.
 
 ---
 
-## Las 33 skills
+## Las 34 skills
 
 ### 🧠 Producto e investigación
 
@@ -73,6 +73,7 @@ Y ya la puedes usar. Repite el comando con el nombre de cualquier otra.
 | `golden-despachos` | Califica cada pedido ANTES de despachar: duplicados, dirección, huella del cliente y la mejor transportadora por efectividad real. |
 | `golden-dropi-analisis` | Convierte tus informes de Dropi en dos maestros: logística y base de clientes. |
 | `golden-logistica` | Rescate de novedades y control de devoluciones para COD. |
+| `golden-logistica-diaria` | La corrida diaria: qué pedido despachar y por cuál transportadora, qué frenar, qué llamada hacer por novedad, y qué chat de WhatsApp se quedó sin procesar. |
 
 ### 🎨 Visual y web
 

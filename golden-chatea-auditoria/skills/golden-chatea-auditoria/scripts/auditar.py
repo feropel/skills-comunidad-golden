@@ -45,6 +45,12 @@ PREFIJOS_CONOCIDOS = [
 
 # Secuencias que delatan un texto que se guardo con la codificacion rota. El acento se
 # verifica EN EL RENDER: aqui se mira el valor tal como quedo guardado en el servidor.
+# El escapado se mide SIEMPRE asi, en linea, sobre el valor tal como lo guarda el servidor:
+#     len(json.dumps(valor)[1:-1])
+# Hubo un helper `escapado()` que hacia doble codificacion para los no-str y devolvia otro
+# numero; se borro en GCA1.4 porque un helper que mide distinto que el codigo real es una
+# trampa para el proximo editor, no una comodidad.
+
 MOJIBAKE = ["Ã¡", "Ã©", "Ã­", "Ã³", "Ãº", "Ã±", "Ã‘", "â€™", "â€œ", "â€\x9d",
             "Â¿", "Â¡", "Ã\x81", "ï¿½", "�"]
 
@@ -139,12 +145,6 @@ class Auditoria:
     def cubre(self, control, estado, revisados=None, nota=""):
         self.cobertura.append({"control": control, "estado": estado,
                                "revisados": revisados, "nota": nota})
-
-    @staticmethod
-    def escapado(valor):
-        """El techo real: el flujo copia la config ESCAPADA. Tilde=6, emoji=12."""
-        return len(json.dumps(valor if isinstance(valor, str) else
-                              json.dumps(valor, ensure_ascii=False))[1:-1])
 
     @staticmethod
     def contenedores(obj, ruta=""):
@@ -322,6 +322,9 @@ class Auditoria:
                            "Repetir la extraccion de ese endpoint antes de concluir nada sobre el.")
         self.cubre("B1b", "corrido", len(self.d.get("_conteos") or {}),
                    f"{incompletos} listados incompletos")
+        ilegibles = [h for h in self.hallazgos if h["clave"].startswith("B1|ilegible")]
+        self.cubre("B7", "corrido", len(self.d.get("_conteos") or {}),
+                   f"{len(ilegibles)} endpoints ilegibles declarados en vez de reventar")
 
         uf = self.filas("/flow/user-fields")
         self.universo["campos_usuario"] = len(uf) if uf else None
@@ -1120,6 +1123,13 @@ class Auditoria:
         self.bloque_g()
         self.bloque_h()
         self.bloque_i()
+        # J2 · el libro de decisiones tambien se declara: si no aparece en la cobertura,
+        # nadie sabe si esta corrida silencio hallazgos ni cuantos.
+        self.cubre("J2", "corrido" if self.decisiones else "no_corrido",
+                   len(self.decisiones),
+                   f"{sum(1 for h in self.hallazgos if h['severidad'] == 'DECIDIDO')} "
+                   "hallazgos silenciados por decision del dueno"
+                   if self.decisiones else "sin libro de decisiones en esta corrida")
         return self
 
 
@@ -1172,6 +1182,12 @@ def imprimir(a):
                 print(f"       reabre si: {d['reabrir_si']}")
 
     print("\nCOBERTURA")
+
+    def orden_control(c):
+        m = re.match(r"([A-Z]+)(\d+)([a-z]?)", c["control"])
+        return (m.group(1), int(m.group(2)), m.group(3)) if m else (c["control"], 0, "")
+
+    a.cobertura.sort(key=orden_control)
     corridos = sum(1 for c in a.cobertura if c["estado"] == "corrido")
     sin_ver = [c for c in a.cobertura if c["estado"] == "NO_VERIFICADO"]
     for c in a.cobertura:

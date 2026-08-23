@@ -20,6 +20,22 @@ description: |
 
 # golden-chatea-auditoria · la salud de un espacio de Chatea Pro
 
+<!-- skill v1.4 (GCA1.4) — 2026-08-22 — auditoria golden-skill-auditor (850 PLATA), pasada
+fresca. Lo grave era del MISMO tipo que esta skill le prohibe a los demas: (1) B7 y J2 estaban
+declarados en el catalogo como controles automaticos y NO aparecian en la tabla de cobertura —
+invisibles en el informe, gemelo exacto del hallazgo I4 que arreglo el Centro de Mando en
+GCA1.1; ahora los dos se declaran, y J2 dice cuantos hallazgos silencio el libro. (2) La
+plantilla de references/informe.md estaba VIEJA respecto al codigo: no contemplaba las secciones
+"que cambio desde la corrida anterior" ni "ya decidido por el dueno", asi que quien la siguiera
+entregaba un informe sin el diff ni las decisiones. (3) El helper `escapado()` estaba muerto Y
+media DISTINTO que el codigo real (doble codificacion) — un helper que mide distinto es una
+trampa para el proximo editor, no una comodidad: borrado, con la formula unica documentada.
+(4) La cifra de la autoprueba decia 29 en SKILL.md y en controles.md y son 30 + 6. (5) El ns
+real del espacio de Golden salio de los ejemplos (estandar 5: nada de IDs de cuenta en una skill
+que se comparte) y la receta del libro de decisiones dejo de estar duplicada: vive solo en el
+bloque J. (6) Nueva seccion "Conexion con el ecosistema" (estandar 9): cada cierre se reporta al
+Centro de Mando, haya hallazgos o no, y se declaran las dependencias. (7) La cobertura se
+imprime ordenada por control, e `import subprocess` muerto fuera. -->
 <!-- skill v1.3 (GCA1.3) — 2026-08-21 — re-auditoria: los arreglos de GCA1.2 metieron sus
 propios defectos, encontrados probando la skill contra casos que se saben malos. (1) ROBUSTEZ:
 un endpoint que respondia con error (dict en vez de lista) tumbaba la auditoria entera con un
@@ -54,7 +70,7 @@ numérico. Ver detalle completo debajo. -->
 skill nació sin CHANGELOG y sin número, y sin versión el censo diario no puede ver que alguien
 la editó. -->
 
-**Versión:** `GCA1.3`
+**Versión:** `GCA1.4`
 
 Auditar aquí significa **medir el estado real del servidor contra el estándar**, no leer la
 configuración y opinar. Nada se da por bueno sin haberlo contado, y el informe se entrega en
@@ -154,9 +170,9 @@ Las cuatro banderas son opcionales y ninguna es decorativa:
 | `--handoff` | El **paquete de corrección** agrupado por la skill dueña de cada campo, listo para pasarlo al chat que sí escribe. |
 | `--json` | Todo en crudo, para encadenar con otra herramienta. |
 
-**La autoprueba va primero y no se salta.** Fabrica un espacio que se SABE roto (29 defectos
-sembrados, entre ellos los cinco falsos negativos que una verificación adversarial encontró) y
-exige que el auditor los encuentre todos. Un auditor que sale en verde contra un
+**La autoprueba va primero y no se salta.** Fabrica un espacio que se SABE roto (**30 defectos
+sembrados más 6 pruebas de comportamiento**, entre ellos los cinco falsos negativos que una
+verificación adversarial encontró) y exige que el auditor los encuentre todos. Un auditor que sale en verde contra un
 espacio sano no prueba nada: prueba que no mira. Si la autoprueba falla, el auditor está roto y
 no se corre contra datos reales.
 
@@ -199,12 +215,27 @@ Se reporta como DUDA y se pregunta, no se "arregla".
 
 **No escribe.** Audita y reporta. Cuando hay que corregir, `--handoff` deja el paquete
 agrupado por la skill dueña de cada campo, con la evidencia y la acción, listo para el chat que
-sí escribe. La razón es dura y
-está medida: escribir con POST en vez de PUT devuelve `200` con un mensaje que no contiene la
+sí escribe.
+
+La razón de no escribir es dura y está medida: escribir con POST en vez de PUT devuelve `200` con un mensaje que no contiene la
 palabra "error", y pasarse del techo devuelve `200 ok` guardando el contenido cortado. Una skill
 que audita y escribe en la misma pasada puede reportar "corregido" sobre algo que nunca se
 escribió. Si el usuario pide corregir, se corrige con la skill dueña y **se vuelve a auditar
 desde el DUMP nuevo**, releyendo del servidor y comparando.
+
+## Conexión con el ecosistema
+
+**Cada cierre de esta skill se reporta al Centro de Mando** (`🧠 GOLDEN - CENTRO DE MANDO - NO
+BORRAR`), haya hallazgos o no. Lo reporta quien la EJECUTA, no la skill: al terminar una
+auditoría se manda qué espacio se midió, la cobertura (N de N), qué está muerto, qué se decidió
+y desde qué chat se corrió. Una corrida limpia también se reporta — confirma que el ecosistema
+está sano, y sin ese dato el Centro de Mando no puede coordinar.
+
+Los cambios a esta skill se reportan igual, con su número de versión.
+
+**Dependencias:** `python3` (solo librería estándar, sin paquetes externos) y acceso de red a
+`chateapro.app`. El token del espacio lo entrega el usuario o vive en el depósito de secretos
+del proyecto; esta skill nunca lo trae horneado.
 
 ## Cuándo correrla
 
@@ -223,15 +254,15 @@ Cuando dictaminas sobre un hallazgo — "eso no es problema", "eso es a propósi
 **se escribe en el libro de decisiones**, no se deja en el chat. Un chat se cierra; el libro
 viaja con el espacio.
 
-```json
-{"espacio": "fXXXXXX", "decisiones": [
-  {"clave": "D3|huerfanos-sin-pauta",
-   "motivo": "sin pauta activa no llegan mensajes; se registran cuando se les ponga",
-   "fecha": "2026-08-20",
-   "reabrir_si": "se les carga un id de anuncio"}]}
-```
+El formato exacto, la guarda de espacio y las reglas de `motivo`, `fecha` y `reabrir_si` viven
+en **el bloque J de `references/controles.md`** — ahí y en un solo sitio, para que no se
+desincronicen. Lo que hay que retener aquí:
 
-`reabrir_si` es lo que impide que el libro se vuelva una alfombra para esconder hallazgos: dice
-en qué condición la decisión deja de valer. **Sin motivo y sin fecha no se acepta una decisión**,
-porque dentro de tres meses nadie sabría si sigue vigente. El detalle está en el bloque J de
-`references/controles.md`.
+- **Sin `motivo` y sin `fecha` el código DETIENE la corrida.** Silenciar un hallazgo sin dejar
+  rastro de quién lo decidió ni cuándo es el abuso que el libro podría habilitar.
+- **`reabrir_si` dice en qué condición la decisión deja de valer.** Sin él la decisión se acepta,
+  pero el informe avisa que ese hallazgo queda silenciado para siempre.
+- **El libro es de UN espacio.** Si su `espacio` no coincide con el del DUMP, la corrida se
+  detiene: un libro ajeno silenciaría fallas reales.
+
+El archivo se llama `<espacio>-decisiones.json` y vive junto a los DUMP de ese espacio.

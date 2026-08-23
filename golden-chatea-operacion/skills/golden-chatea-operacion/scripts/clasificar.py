@@ -17,7 +17,7 @@ como fallo confirmado -- nunca se asume el modelo de pago.
 `--zona-horas` (entero, offset UTC en horas, ej. -5) declara la zona horaria del espacio para
 acotar R2/R3/R4/Q4 al dia auditado (ver ZONA_HORAS_DEFAULT_NO_CONFIRMADA y
 references/api.md). Sin declararlo, usa el default -5 -- medido SOLO contra el espacio de
-Colombia validado (LIBIDO-UP); la plataforma sirve 7 paises con offsets distintos, asi que un
+Colombia validado (ESPACIO-REF); la plataforma sirve 7 paises con offsets distintos, asi que un
 espacio de otro pais debe declarar su propio offset hasta confirmarlo contra el panel de
 Chatea.
 
@@ -56,7 +56,7 @@ UMBRAL_SIN_RESPUESTA_MUERTO_MIN = 120     # SKILL.md: MUERTO es "> 2 horas"
 UMBRAL_COMPUERTA = 0.90
 UMBRAL_UNIVERSO_COMPUERTA_BAJA = 10   # F5: lado bajo de la compuerta, ver clasificacion.md
 # ROTO NUEVO (tercera ronda de verificacion, 2026-08-22): offset UTC del "dia" que declara
-# `last_message_at` en extraer.py, medido en UN espacio (LIBIDOUP, Colombia): -5h EXACTAS y
+# `last_message_at` en extraer.py, medido en UN espacio (ESPACIO-REF, Colombia): -5h EXACTAS y
 # CONSTANTES en 161 de 161 pares comparables de los 4 DUMPs reales. NO confirmado contra el
 # panel de Chatea, y NO universal -- la plataforma sirve 7 paises con offsets distintos. Se usa
 # como DEFAULT declarado (nunca silencioso: ver `universo['zona_horas_usada']`), pasable como
@@ -97,8 +97,13 @@ CAMPOS_TS = ("ts", "timestamp", "created_at", "date", "fecha", "sent_at")
 
 # Colores comunes en espanol, canonizados (variantes de genero/acento -> una sola forma).
 # Incluye la paleta de canas/cabello (castano/rubio/caoba/canoso/cobrizo/ceniza) porque el
-# catalogo real medido en produccion (Fibra Capilar Toppik, ver verificacion adversarial
-# 2026-08-21) usa esos nombres, no los colores "de ropa" que trae la lista base. Diccionario
+# catalogo real medido en produccion en ESPACIO-REF (producto capilar, ver verificacion
+# adversarial 2026-08-21) usa esos nombres, no los colores "de ropa" que trae la lista base.
+# FALLA 5 (golden-verificador, re-auditoria 2026-08-22): esta linea nombraba el producto y
+# la marca real vendidos en ese espacio -- inconsistente con la anonimizacion de GCO1.5, que
+# cambio el nombre del espacio a ESPACIO-REF pero dejo pasar el nombre del producto/marca.
+# Se generaliza a "producto capilar", suficiente para explicar por que la paleta existe, sin
+# nombrar la marca real. Diccionario
 # razonable, NO exhaustivo -- declarado como heuristica en clasificacion.md, no como catalogo
 # cerrado: una tienda con su propia paleta puede tener nombres que esta lista no cubre.
 CANON_COLOR = {
@@ -153,7 +158,7 @@ _VALORES_TALLA = r"xxxl|xxl|xl|xs|s|m|l|\d{1,2}"
 PATRON_TALLA = re.compile(r"\btalla\s*[:\s]?\s*(" + _VALORES_TALLA + r")\b", re.IGNORECASE)
 PATRON_NUMERO_CALZADO = re.compile(r"\bn[uú]mero\s*[:\s]?\s*(\d{2,3})\b", re.IGNORECASE)
 # F4 (RIESGO, golden-verificador 2026-08-22, recall=0 contra 165 conversaciones reales de
-# LIBIDO-UP): el vocabulario original ("unidades|pares|combos|paquetes") no reconocia NINGUNA
+# ESPACIO-REF): el vocabulario original ("unidades|pares|combos|paquetes") no reconocia NINGUNA
 # de las FORMAS reales medidas (parafraseadas aqui, nunca el texto literal de un cliente
 # real -- regla del encargo): cantidad en SINGULAR ("1" + la unidad sin plural), cantidad
 # mencionada dentro de una frase mas larga sobre querer probar el producto, cantidad SIN
@@ -188,7 +193,7 @@ PATRON_CANTIDAD_SIN_UNIDAD = re.compile(
 # Cantidad implicita por el NOMBRE DEL PRODUCTO usado como unidad (ejemplo sintetico: "1
 # producto-x"): no hay lista cerrada de nombres de producto (cada tienda tiene el suyo).
 # VERSION ANTERIOR (rota, hallazgo de golden-verificador en la ronda de verificacion de
-# GCO1.4, medido contra los 4 DUMPs reales de LIBIDO-UP -- cifras agregadas citadas aqui,
+# GCO1.4, medido contra los 4 DUMPs reales de ESPACIO-REF -- cifras agregadas citadas aqui,
 # nunca el texto literal de un cliente real): "cualquier palabra de 4+ letras inmediatamente
 # despues de un numero, en cualquier parte del mensaje" -- contra 625 mensajes de cliente
 # reales, 17 dispararon cantidad y 13 de los 17 (76%) eran un NUMERO DE DIRECCION (el numero
@@ -359,7 +364,7 @@ def _epoch_a_fecha(numero):
 def parse_fecha(valor):
     """Parsea fechas con ESPACIO ('2026-08-10 11:25:39'), con 'T' (ISO), o EPOCH (F1,
     hallazgo critico de golden-verificador 2026-08-22): la forma REAL que trae `ts` en
-    los 4 DUMPs de produccion medidos (LIBIDO-UP, 165 conversaciones, 100% de los
+    los 4 DUMPs de produccion medidos (ESPACIO-REF, 165 conversaciones, 100% de los
     mensajes con `ts` entero) es un epoch, no texto -- exactamente como lo trata
     `golden-logistica-diaria/scripts/barrer_chats.py` (`x.get("ts") or 0`, linea ~134).
     Antes de este fix, un `ts` epoch nunca se parseaba: R1 nunca podia medir el gap real
@@ -470,7 +475,20 @@ def invertir_hilo(mensajes):
     # el hilo tal cual llego del servidor -- descendente -- sin invertir, y sin avisar.
     todos_parseables = all(parse_fecha(obtener_ts(m)) is not None for m in mensajes)
     if todos_parseables:
-        return sorted(mensajes, key=lambda m: parse_fecha(obtener_ts(m)))
+        # FALLA 1 (golden-verificador, re-auditoria 2026-08-22, hallazgo real medido
+        # end-to-end): `sorted()` es ESTABLE -- dos mensajes con el MISMO `ts` (epoch en
+        # SEGUNDOS, la forma real medida en produccion) conservaban el orden de ENTRADA, que
+        # es DESCENDENTE (P3, el servidor entrega mas-reciente-primero). Eso deja al mensaje
+        # MAS NUEVO de un empate ANTES del mas viejo en el hilo "ya ordenado" -- invierte
+        # "quien hablo de ultimo" justo en el caso mas barato de reproducir (bot y cliente
+        # cerrando en el mismo segundo). Medido: 12 hallazgos R1/MUERTO falsos sobre 13
+        # contactos sinteticos donde el bot SI cerraba el pedido en el mismo segundo. Se
+        # rompe el empate con el INDICE original: por P3, un indice MAYOR en la lista
+        # descendente del servidor es un mensaje MAS VIEJO, y debe listarse primero en el
+        # orden cronologico de salida -- de ahi el `-indice` como desempate.
+        return [m for _, m in sorted(
+            enumerate(mensajes),
+            key=lambda par: (parse_fecha(obtener_ts(par[1])), -par[0]))]
     return list(reversed(mensajes))
 
 
@@ -500,6 +518,21 @@ def contenido_real(msg):
     return msg.get("content") or ""
 
 
+def _valor_verdadero(v):
+    """FALLA 7 (golden-verificador, re-auditoria 2026-08-22): `is_bot`/`from_bot` son
+    campos de RESPALDO (solo se usan si `type` no vino -- ver `direccion`), pero un `bool`
+    de Python nativo no es la unica forma en que llegan por una API PHP/Laravel: '0'/'1',
+    'false'/'true' como TEXTO son una serializacion habitual. Antes, `if msg["is_bot"]`
+    trataba CUALQUIER cadena no vacia (incluida '0' o 'false') como verdadera -- Python no
+    hace conversion de texto a booleano, `bool("0")` es `True`. Medido: un mensaje de
+    CLIENTE con `is_bot: '0'` se clasificaba como 'empresa', en SILENCIO (no cae en
+    'desconocido', asi que el control P-desc -- disenado para hacer visible un cambio de
+    campo del proveedor -- nunca dispara)."""
+    if isinstance(v, str):
+        return v.strip().lower() not in ("", "0", "false", "no", "null", "none")
+    return bool(v)
+
+
 def direccion(msg):
     """Campo PRIMARIO confirmado contra el servidor real: `type` con valores "in"
     (cliente) / "out" (empresa). Si `type` no vino (DUMP de otra fuente, u otra
@@ -524,9 +557,9 @@ def direccion(msg):
         if dl in ("outgoing", "out", "sent", "bot", "empresa", "outbound"):
             return "empresa"
     if "is_bot" in msg:
-        return "empresa" if msg["is_bot"] else "cliente"
+        return "empresa" if _valor_verdadero(msg["is_bot"]) else "cliente"
     if "from_bot" in msg:
-        return "empresa" if msg["from_bot"] else "cliente"
+        return "empresa" if _valor_verdadero(msg["from_bot"]) else "cliente"
     s = msg.get("sender")
     if isinstance(s, str):
         sl = s.lower()
@@ -1125,7 +1158,7 @@ class Clasificador:
         # FALLA 3 (golden-verificador, ronda 2 sobre GCO1.4, 2026-08-22): la version
         # anterior hacia `self.d.get("_listado_paginacion") or {}` y declaraba
         # `listado_truncado_por_tope_500: False` cuando la CLAVE NI SIQUIERA venia en el
-        # DUMP (los 4 DUMPs reales de LIBIDO-UP, extraidos ANTES de que extraer.py
+        # DUMP (los 4 DUMPs reales de ESPACIO-REF, extraidos ANTES de que extraer.py
         # declarara este campo, no la traen) -- exactamente la regla I4 que esta misma
         # skill exige en el control INV ("ausencia de dato nunca es prueba de que el
         # universo este completo"), incumplida aqui mismo. Ahora se distinguen los DOS
@@ -1174,6 +1207,47 @@ class Clasificador:
                        "pierden evidencia real en silencio).",
                        "Repetir la extracción con la versión actual de extraer.py, que sí "
                        "declara `_fecha` en formato AAAA-MM-DD.")
+        # Re-auditoria 2026-08-22 (segunda pasada, en frio): este control SIEMPRE se evalua
+        # (la comprobacion de `self.fecha_auditada` corre en cada llamada a `correr()`), pero
+        # antes de esta linea solo dejaba rastro en `self.cobertura` cuando SI disparaba un
+        # hallazgo -- un DUMP sano (con `_fecha` bien formada) hacia que la tabla de cobertura
+        # de la Fase 3 del informe (`references/informe.md`, seccion 3) no mencionara
+        # "P-sin-fecha-auditada" en absoluto, aunque el control si se hubiera corrido y hubiera
+        # confirmado que todo estaba bien. Se declara SIEMPRE, con el estado real.
+        self.cubre("P-sin-fecha-auditada",
+                  "corrido" if self.fecha_auditada else "DUDA_DECLARADA",
+                  nota=("`_fecha` bien formada, acotado al día activo" if self.fecha_auditada
+                        else "sin `_fecha` utilizable -- ver hallazgo P-sin-fecha-auditada"))
+
+        # FALLA 4 (golden-verificador, re-auditoria 2026-08-22): `extraer.py` SI declara
+        # `_avisos_de_hilo` cuando un hilo quedo TRUNCADO (mas de MAX_PAG_HILO paginas) o
+        # trae mensajes sin `ts` -- pero ANTES de este fix, nadie en `clasificar.py` leia esa
+        # clave: grep en toda la skill confirmo 0 apariciones fuera de `extraer.py`. Un hilo
+        # truncado se clasificaba y se reportaba como si estuviera COMPLETO, con exactamente
+        # el mismo riesgo que ya tiene su propio control para el LISTADO
+        # (`P-listado-truncado`) pero sin el equivalente para el HILO. Se convierte cada
+        # aviso en un hallazgo declarado -- RIESGO si el hilo quedo truncado (puede faltar
+        # evidencia real de "quien hablo de ultimo"), DUDA si el aviso es por mensajes sin
+        # `ts` (el orden de ese hilo especifico no es de fiar).
+        avisos_de_hilo = self.d.get("_avisos_de_hilo") or []
+        for aviso in avisos_de_hilo:
+            razon = (aviso or {}).get("razon", "")
+            ns_aviso = (aviso or {}).get("ns", "?")
+            sev_aviso = "RIESGO" if "TRUNC" in razon.upper() else "DUDA"
+            self.falla("P-hilo-truncado", sev_aviso,
+                       f"`{ns_aviso}` - aviso de extracción del hilo",
+                       razon,
+                       "Un hilo truncado puede estar reportando 'quién habló de último' o "
+                       "un gap sobre evidencia incompleta; un hilo con mensajes sin `ts` "
+                       "tiene un orden que no es de fiar." if sev_aviso == "RIESGO" else
+                       "Ese hilo específico puede tener el orden de mensajes invertido o "
+                       "parcial.",
+                       "Repetir la extracción de este contacto, o subir MAX_PAG_HILO si el "
+                       "espacio tiene hilos consistentemente largos (extraer.py).")
+        self.cubre("P-hilo-truncado", "corrido", len(avisos_de_hilo),
+                  nota=f"{len(avisos_de_hilo)} aviso(s) de extracción de hilo declarados "
+                       "por extraer.py (`_avisos_de_hilo`)")
+
         if paginacion_no_medible:
             self.falla("P-listado-truncado", "DUDA",
                        "No se puede saber si el listado de contactos se truncó",
@@ -1198,6 +1272,16 @@ class Clasificador:
                        "en páginas posteriores al tope no entraron a esta corrida.",
                        "Espacio con un volumen de contactos fuera de lo medido hasta ahora "
                        "-- confirmar con el panel si el universo real es mayor al traído.")
+        # Re-auditoria 2026-08-22 (segunda pasada, en frio), mismo criterio que el fix de
+        # arriba para P-sin-fecha-auditada: este control SIEMPRE se evalua, pero antes solo
+        # dejaba rastro en `self.cobertura` cuando disparaba un hallazgo -- un listado que NO
+        # se trunco no aparecia como "corrido" en la tabla de cobertura del informe.
+        self.cubre("P-listado-truncado",
+                  "no_medible" if paginacion_no_medible else "corrido",
+                  nota=("no se pudo confirmar si el listado se trunco -- ver hallazgo "
+                        "P-listado-truncado/DUDA" if paginacion_no_medible
+                        else f"truncado_por_tope_500="
+                             f"{paginacion_listado.get('truncado_por_tope_500', False)}"))
         if paginacion_listado.get("sin_meta_last_page_no_pagina"):
             self.cubre("P-listado-paginacion", "LIMITACION_CONOCIDA",
                       nota="el servidor no declaró meta.last_page en esta corrida: "
@@ -1373,7 +1457,7 @@ class Clasificador:
                        "antes de confiar en esta corrida.")
 
         # F5 (RIESGO, golden-verificador 2026-08-22): la compuerta ANTES solo miraba el lado
-        # ALTO (>90%). Contra los 4 dias reales de LIBIDO-UP el cierre medido fue 0%, 0%, 0%
+        # ALTO (>90%). Contra los 4 dias reales de ESPACIO-REF el cierre medido fue 0%, 0%, 0%
         # y 6.67% -- igual de absurdo de cara que un 95% (ningun espacio real cierra el 0% de
         # sus conversaciones TODOS los dias sin que algo este mal calibrado), y nada lo
         # detectaba. Umbral elegido (documentado tambien en clasificacion.md): 0% EXACTO con

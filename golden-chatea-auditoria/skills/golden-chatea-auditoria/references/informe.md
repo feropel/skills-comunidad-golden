@@ -22,7 +22,13 @@ proyecto, sobre el mismo archivo si es del mismo día (estado vivo, nunca respal
 | Subflujos | N |
 | Integraciones con credencial cargada | N |
 
-## 2. Cobertura
+## 2. Qué cambió desde la corrida anterior
+Solo si se corrió con `--anterior`. Campos creados, borrados y editados con su delta de
+escapados. Un campo **borrado** se nombra aunque no falle nada hoy: un flujo que lo referencie
+por `var_ns` queda apuntando al vacío. Si no hubo cambios, se dice — "nada se movió en los
+campos de bot" es información, no relleno.
+
+## 3. Cobertura
 | Bloque | Controles | Corridos | Objetos revisados | Sin verificar |
 |---|---|---|---|---|
 | A · Identidad | 5 | 4 | — | A5 (necesita panel) |
@@ -30,7 +36,7 @@ proyecto, sobre el mismo archivo si es del mismo día (estado vivo, nunca respal
 
 **Lo que NO se verificó y por qué** — lista explícita. Un bloque sin correr se nombra.
 
-## 3. Hallazgos
+## 4. Hallazgos
 Ordenados por severidad. Uno por bloque, con esta forma:
 
 ### 🔴 MUERTO · D3 · Ocho productos cargados que el bot no puede disparar
@@ -42,14 +48,19 @@ Ordenados por severidad. Uno por bloque, con esta forma:
 declararlos inactivos si es a propósito.
 **Confianza:** medido contra el servidor el <fecha>.
 
-## 4. Lo que está sano y cómo se comprobó
+## 5. Ya decidido por el dueño
+Solo si se corrió con `--decisiones`. Los hallazgos que el dueño ya dictaminó, **con su motivo y
+su fecha**, y la condición que los reabre. Van aquí y NO entre los pendientes: repetir cada
+corrida algo que ya se resolvió es lo que hace que el informe deje de leerse.
+
+## 6. Lo que está sano y cómo se comprobó
 Se nombra lo verificado con su método, sin adjetivos: "los 12 campos de producto parsean como
 JSON válido y ninguno supera el techo escapado; máximo medido 18.807 sobre 19.000".
 
-## 5. Preguntas para FER
+## 7. Preguntas para FER
 Los hallazgos 🔵 DUDA. Un hallazgo contra la configuración no es un bug hasta contrastarlo.
 
-## 6. Verificación adversarial
+## 8. Verificación adversarial
 Resultado de `golden-verificador`: qué intentó romper, qué encontró, y qué declaró como no
 verificable.
 ```
@@ -74,3 +85,7 @@ verificable.
 - Corregido algo, **se vuelve a extraer y a auditar**. La respuesta de escritura no prueba nada.
 - Si el hallazgo cambia el estándar de trabajo, se registra en memoria canónica y se avisa al
   Centro de Mando.
+- **El cierre se reporta SIEMPRE al Centro de Mando**, haya hallazgos o no: qué espacio se
+  auditó, cobertura medida, qué está muerto y qué se decidió. Que una auditoría salga sin
+  hallazgos nuevos también es información — confirma que el ecosistema está sano. Ver la
+  sección "Conexión con el ecosistema" de `SKILL.md`.

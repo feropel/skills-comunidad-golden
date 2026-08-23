@@ -47,7 +47,7 @@ BASE = "https://chateapro.app/api"
 UA = ("Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 "
       "(KHTML, like Gecko) Chrome/126.0 Safari/537.36")
 
-# CONFIRMADO contra un token real (espacio LIBIDOUP, 2026-08-21): el endpoint que existe es
+# CONFIRMADO contra un token real (espacio ESPACIO-REF, 2026-08-21): el endpoint que existe es
 # `/subscribers` (sin prefijo /subscriber ni /flow), y ESE es el unico dato confirmado contra
 # el servidor real -- que el DUMP se construyo con `/subscribers` (200, universo=486
 # contactos totales del espacio ese dia, ver `_listado_universo_completo_del_espacio` en el
@@ -96,8 +96,17 @@ def redactar(obj):
     if isinstance(obj, dict):
         out = {}
         for k, v in obj.items():
-            if isinstance(v, str) and v and any(s in k.lower() for s in SENSIBLE):
-                out[k] = f"<<REDACTADO len={len(v)}>>"
+            # FALLA 6 (golden-verificador, re-auditoria 2026-08-22): antes solo redactaba
+            # por nombre de llave sensible cuando el VALOR ademas era `str` -- un secreto
+            # bajo una llave sensible (token/api_key/password/...) que llegara como lista,
+            # dict o numero (medido: {"token": ["..."]}, {"api_key": {"v": "..."}},
+            # {"password": 12345678901234567890}) se saltaba esta rama, caia en el
+            # `redactar(v)` recursivo, y salia SIN redactar si su forma no calzaba ademas
+            # con una de las 17 familias de `secretos.py` -- la compuerta `quedan_secretos`
+            # tampoco lo detectaba (busca por PATRON, no por llave). Ahora cualquier valor
+            # no vacio bajo una llave sensible se redacta, sea cual sea su tipo.
+            if v not in (None, "", [], {}) and any(s in k.lower() for s in SENSIBLE):
+                out[k] = f"<<REDACTADO len={len(str(v))}>>"
             else:
                 out[k] = redactar(v)
         return out
@@ -139,10 +148,20 @@ def pedir(token, path, **params):
 def _fecha_de(contacto):
     """TRAMPA-LISTADO: `last_message_at` primero (mas cerca de 'hubo charla ese dia'), luego
     `last_interaction`, luego `subscribed` como ultimo respaldo. Devuelve (fecha_AAAA-MM-DD,
-    campo_usado) o (None, None) si los tres vienen vacios."""
+    campo_usado) o (None, None) si los tres vienen vacios.
+
+    FALLA 8 (golden-verificador, re-auditoria 2026-08-22): la version anterior hacia
+    `v[:10]` sin comprobar el tipo -- confirmado contra produccion, estos tres campos
+    llegan como TEXTO ('AAAA-MM-DD HH:MM:SS', ver api.md), pero un valor NUMERICO (la misma
+    forma epoch que SI se confirmo para `ts` en el hilo de mensajes) hacia `v[:10]` reventar
+    con `TypeError: 'int' object is not subscriptable`, sin capturar -- tumbaba TODA la
+    Fase 1 (el listado de contactos del dia) por un solo contacto con un campo en un formato
+    no visto aun. Ahora un valor no-texto se trata como 'no utilizable para este campo' (se
+    prueba el siguiente campo de respaldo) en vez de adivinar un slice sobre un numero o
+    reventar la corrida entera."""
     for campo in ("last_message_at", "last_interaction", "subscribed"):
         v = contacto.get(campo)
-        if v:
+        if isinstance(v, str) and v:
             return v[:10], campo
     return None, None
 
@@ -238,8 +257,17 @@ def descargar_hilo(token, user_ns):
         return None, base, None
     mensajes = list(base.get("data") or []) if isinstance(base, dict) else []
     meta = (base.get("meta") or {}) if isinstance(base, dict) else {}
-    ultima_pagina = meta.get("last_page") or 1
-    truncado = ultima_pagina and ultima_pagina > MAX_PAG_HILO
+    # FALLA 4 (golden-verificador, re-auditoria 2026-08-22): `meta.get("last_page") or 1`
+    # colapsaba DOS casos distintos en el mismo numero -- "el servidor SI declaro 1 pagina"
+    # (hilo real de una sola pagina) y "el servidor NO declaro last_page en absoluto" (dato
+    # ausente). El listado de contactos (`listar_contactos_del_dia`) SI distingue ese caso
+    # (`sin_meta_last_page_no_pagina`, declarado en `_listado_paginacion`); el hilo no tenia
+    # el equivalente -- si el servidor omitia `last_page`, este bucle se quedaba en la
+    # primera pagina EN SILENCIO, sin ningun aviso que lo declarara.
+    ultima_pagina_declarada = meta.get("last_page")
+    sin_last_page = not bool(ultima_pagina_declarada)
+    ultima_pagina = ultima_pagina_declarada or 1
+    truncado = bool(ultima_pagina_declarada) and ultima_pagina > MAX_PAG_HILO
     for pagina in range(2, min(ultima_pagina, MAX_PAG_HILO) + 1):
         r = pedir(token, "/subscriber/chat-messages", user_ns=user_ns,
                  include_bot=1, include_note=1, include_system=1, page=pagina)
@@ -252,6 +280,12 @@ def descargar_hilo(token, user_ns):
         aviso = {"ns": user_ns,
                  "razon": f"conversacion de {ultima_pagina} paginas, se leyeron "
                           f"{MAX_PAG_HILO}: el hilo quedo TRUNCADO"}
+    elif sin_last_page:
+        aviso = {"ns": user_ns,
+                 "razon": "el servidor no declaro meta.last_page para este hilo: no se "
+                          "pagino mas alla de la primera pagina (limitacion conocida, "
+                          "mismo criterio que sin_meta_last_page_no_pagina del listado de "
+                          "contactos) -- puede haber mas mensajes sin traer"}
     sin_ts = sum(1 for m in mensajes if not m.get("ts"))
     if sin_ts and not aviso:
         aviso = {"ns": user_ns,

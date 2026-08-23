@@ -119,7 +119,7 @@ omiten en silencio.
 
 | # | auto | Control |
 |---|---|---|
-| I1 | A | **La autoprueba pasó.** `autoprueba.py` siembra 29 defectos conocidos y exige encontrarlos todos. Si un auditor sale en verde a la primera contra datos reales, lo primero que se sospecha es el auditor. |
+| I1 | A | **La autoprueba pasó.** `autoprueba.py` siembra **30 defectos conocidos más 6 pruebas de comportamiento** (severidad por negocio, libro de decisiones, diff, degradación, handoff) y exige que los detecte todos. La cifra vive aquí y en el changelog de `SKILL.md`: al agregar un defecto se actualizan los dos, o el informe siguiente miente sobre su propia cobertura. Si un auditor sale en verde a la primera contra datos reales, lo primero que se sospecha es el auditor. |
 | I2 | A | **Cero solo prueba algo si cubrió todo.** Un bloque con cero hallazgos y cobertura parcial no se reporta como sano: se reporta la cobertura. |
 | I3 | A | **Todo lo que entra al DUMP se audita o se declara.** Se cruzan las zonas extraídas contra las que tienen control. Una zona extraída y sin auditar no es una zona sana: es una zona sobre la que no se midió nada, y su silencio se lee como salud. |
 | I4 | A | **Ausencia no es prueba.** Que un campo no aparezca en el DUMP no significa que no exista: puede ser paginación sin agotar o un endpoint que devuelve vacío. Se distingue "medido y vacío" de "no medido". |
@@ -159,7 +159,7 @@ de abrirla. Estos dos controles son los que la vuelven algo que se mira a diario
 
 ```json
 {
-  "espacio": "fXXXXXX",
+  "espacio": "<user_ns del espacio, ej. f000000>",
   "decisiones": [
     {
       "clave": "D3|huerfanos-sin-pauta",

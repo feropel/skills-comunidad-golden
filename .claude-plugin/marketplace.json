@@ -201,7 +201,7 @@
       "name": "golden-skill-auditor",
       "source": "./golden-skill-auditor",
       "description": "Lee una skill completa, la califica sobre 1000 y la deja funcionando.",
-      "version": "1.13.0",
+      "version": "1.16.0",
       "category": "education"
     },
     {
@@ -257,14 +257,14 @@
       "name": "golden-chatea-auditoria",
       "source": "./golden-chatea-auditoria",
       "description": "Revisa tu espacio de Chatea entero y te dice campo por campo qué está sano y qué está roto.",
-      "version": "1.3.0",
+      "version": "1.4.0",
       "category": "marketing"
     },
     {
       "name": "golden-chatea-operacion",
       "source": "./golden-chatea-operacion",
       "description": "Revisa las conversaciones del día y te dice dónde se murió cada venta y qué no supo responder el bot.",
-      "version": "1.0.0",
+      "version": "1.7.0",
       "category": "marketing"
     }
   ]

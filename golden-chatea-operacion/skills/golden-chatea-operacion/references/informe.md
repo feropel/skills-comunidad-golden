@@ -38,7 +38,7 @@ cobertura.
 ## 3. Cobertura
 | Bloque | Controles | Corridos | Conversaciones revisadas | Sin verificar |
 |---|---|---|---|---|
-| P · trampas de parseo | 13 | N | — | — |
+| P · trampas de parseo (P1-P13 + P-desc + INV + P-listado-truncado + P-sin-fecha-auditada + P-hilo-truncado) | 18 | N | — | — |
 | Q · clasificación | 6 | N | N de N | Q2 es heurística, declarada |
 | R · calidad de respuesta | 6 | N | N de N | R5 (necesita ficha de producto real) · R6 solo intra-chat, sin Dropi |
 

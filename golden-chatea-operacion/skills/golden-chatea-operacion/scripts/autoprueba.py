@@ -22,6 +22,7 @@ Uso:
 
 import io
 import json
+import re
 import sys
 from contextlib import redirect_stdout
 from pathlib import Path
@@ -46,12 +47,31 @@ def marcar(codigo, paso, detalle=""):
 
 # ---------------------------------------------------------------------- P2 (estructural)
 def test_p2():
-    """El parametro de contacto es user_ns, nunca subscriber_id (encargo trampa 2)."""
-    fuente = (AQUI / "extraer.py").read_text()
-    usa_user_ns = "user_ns=user_ns" in fuente
-    usa_include_bot = "include_bot=1" in fuente
-    marcar("P2", usa_user_ns and usa_include_bot,
-          f"user_ns=user_ns presente: {usa_user_ns} · include_bot=1 presente: {usa_include_bot}")
+    """El parametro de contacto es user_ns, nunca subscriber_id (encargo trampa 2).
+
+    FALLA 2 (golden-verificador, re-auditoria 2026-08-22, hallazgo real): la version
+    anterior hacia un `in` de texto sobre el ARCHIVO ENTERO -- un comentario mentiroso en
+    cualquier parte del archivo bastaba para dejar la prueba en verde aunque la funcion real
+    (`descargar_hilo`) hubiera perdido `include_bot=1` o cambiado a `subscriber_id`. Medido
+    por el verificador: borro las tres llamadas reales y dejo un comentario con las dos
+    cadenas -- la prueba anterior seguia en OK. Ahora se lee el CODIGO FUENTE REAL de
+    `descargar_hilo` via `inspect.getsource` (no el archivo completo) y se le quitan los
+    comentarios antes de buscar, para que un comentario no pueda sustituir al codigo real."""
+    fuente_completa = (AQUI / "extraer.py").read_text()
+    import inspect
+    fuente_funcion = inspect.getsource(_extraer_modulo.descargar_hilo)
+    # quita comentarios de linea (no hay comentarios multilinea en Python) -- suficiente
+    # para que una linea "# user_ns=user_ns include_bot=1" mentirosa no cuente como codigo.
+    sin_comentarios = "\n".join(re.sub(r"#.*", "", ln) for ln in fuente_funcion.splitlines())
+    usa_user_ns = "user_ns=user_ns" in sin_comentarios
+    usa_include_bot = "include_bot=1" in sin_comentarios
+    no_usa_subscriber_id = "subscriber_id" not in sin_comentarios
+    paso = usa_user_ns and usa_include_bot and no_usa_subscriber_id
+    marcar("P2", paso,
+          f"en el CODIGO REAL de descargar_hilo (sin comentarios): user_ns=user_ns "
+          f"presente: {usa_user_ns} · include_bot=1 presente: {usa_include_bot} · "
+          f"subscriber_id AUSENTE: {no_usa_subscriber_id} · (archivo completo, referencia: "
+          f"{len(fuente_completa)} bytes)")
 
 
 # ---------------------------------------------------------------------- P3 / P4 (inversion)
@@ -524,6 +544,18 @@ def test_credenciales_ampliadas_en_evidencia():
         "1//0" + "h" * 30: "GoogleOAuthRefresh",
         "sk-ant-" + "i" * 30: "AnthropicComoOpenAI",
         "a" * 64: "HexBearerGenerico",
+        # Re-auditoria golden-skill-auditor 2026-08-22 (segunda pasada, en frio): de las 17
+        # familias que declara `secretos.py`, 6 nunca se ejercian en ninguna prueba de este
+        # archivo (confirmado con grep antes de agregarlas) -- un hueco real de cobertura de
+        # Recursos/Robustez, no una sospecha: la lista de patrones puede tener una familia con
+        # una regex rota y ningun test lo notaria. Se agregan las 6, con un valor que SI calza
+        # con su patron real en `secretos.py` (verificado contra la regex antes de sembrarlo).
+        "sk_" + "A" * 24: "ElevenLabs",
+        "eyJ" + "A" * 10 + "." + "B" * 10 + "." + "C" * 10: "JWT",
+        "EAA" + "D" * 45: "Meta",
+        "shpat_" + "a1b2c3d4e5f6a1b2c3d4e5f6": "Shopify",
+        "xai-" + "X" * 25: "xAI",
+        "AIza" + "Y" * 35: "Google",
     }
     fallos_directos = []
     for secreto, etiqueta in casos.items():
@@ -581,7 +613,7 @@ def test_dropi_normalizado():
 def test_ts_epoch_ordena_correctamente():
     """F1 (CRITICO, golden-verificador 2026-08-22): ANTES de este fix, `parse_fecha` no leia
     epoch -- un `ts` epoch (la forma REAL de los 4 DUMPs de produccion medidos, 100% de los
-    mensajes de LIBIDO-UP) se trataba como 'no parseable' y esta prueba (entonces llamada
+    mensajes de ESPACIO-REF) se trataba como 'no parseable' y esta prueba (entonces llamada
     TS-ILEGIBLE) EXIGIA que se comportara asi. Ahora que `parse_fecha` SI lee epoch, la
     expectativa se invierte: con epoch parseable, `invertir_hilo` debe ORDENAR
     cronologicamente (rama TODO-parseable de P4), no limitarse a invertir la lista cruda.
@@ -649,7 +681,7 @@ def test_ts_epoch_como_cadena_se_parsea():
 def test_r1_r2_r3_con_ts_epoch_real():
     """F1: R1 (sin respuesta, con gap MEDIBLE), R2 (respuesta tardia) y R3 (bucle) deben
     funcionar con `ts` en formato epoch real -- exactamente la forma de los 4 DUMPs de
-    produccion (LIBIDO-UP, 2026-08-21). Ambos epoch tomados de un rango real de esos DUMPs.
+    produccion (ESPACIO-REF, 2026-08-21). Ambos epoch tomados de un rango real de esos DUMPs.
     ANTES del fix de F1, ninguno de los tres disparaba con epoch: R1 caia siempre en RIESGO
     por 'gap no medible', R2 nunca calculaba el gap (ambos ts deben parsear), R3 no dependia
     de fechas pero se agrega aqui para dejar los tres juntos, con la forma real del DUMP."""
@@ -1010,9 +1042,12 @@ def test_credenciales_extraer_py_camino_real():
     REAL, no una funcion suelta."""
     casos = {
         "sk_live_" + "A" * 24: "StripeLive",
+        "sk_test_" + "A" * 24: "StripeTest",
         "whsec_" + "A" * 20: "StripeWebhook",
         "APP_USR-1234567890123456-081020-abcdef1234567890abcdef1234567890-123456789":
             "MercadoPagoLive",
+        "TEST-1234567890123456-081020-abcdef1234567890abcdef1234567890-123456789":
+            "MercadoPagoTest",
         "12345|" + "a" * 25: "SanctumBearer-umbral-20",   # {20,}: antes 32 en extraer.py
         "ghp_" + "c" * 36: "GitHubPAT",
         "github_pat_" + "d" * 60: "GitHubFineGrained",
@@ -1020,7 +1055,19 @@ def test_credenciales_extraer_py_camino_real():
         "xoxb-" + "1" * 20: "SlackToken",
         "SG." + "f" * 20 + "." + "g" * 20: "SendGrid",
         "1//0" + "h" * 30: "GoogleOAuthRefresh",
+        "sk-ant-" + "i" * 30: "AnthropicComoOpenAI",
         "a" * 64: "HexBearerGenerico",
+        # Re-auditoria 2026-08-22 (segunda pasada): el docstring de esta funcion ya afirmaba
+        # "las 17 familias" pero solo se ejercian 11 -- una afirmacion que no calzaba con el
+        # codigo real. Se completan las 6 que faltaban (mismos valores verificados contra la
+        # regex real que en test_credenciales_ampliadas_en_evidencia, arriba) para que el
+        # docstring deje de prometer una cobertura que el codigo no tenia.
+        "sk_" + "A" * 24: "ElevenLabs",
+        "eyJ" + "A" * 10 + "." + "B" * 10 + "." + "C" * 10: "JWT",
+        "EAA" + "D" * 45: "Meta",
+        "shpat_" + "a1b2c3d4e5f6a1b2c3d4e5f6": "Shopify",
+        "xai-" + "X" * 25: "xAI",
+        "AIza" + "Y" * 35: "Google",
     }
     fallos_redactar = []
     fallos_compuerta = []
@@ -1134,7 +1181,7 @@ def test_r2_r3_r4_acotan_al_dia_auditado():
 def test_listado_paginacion_no_medible_se_declara():
     """FALLA 3 (golden-verificador, ronda 2 sobre GCO1.4, 2026-08-22): si el DUMP no trae la
     clave `_listado_paginacion` (DUMP extraido con una version de extraer.py anterior a este
-    campo, como los 4 DUMPs reales de LIBIDO-UP usados para validar F1-F11), la version
+    campo, como los 4 DUMPs reales de ESPACIO-REF usados para validar F1-F11), la version
     anterior de este fix declaraba `listado_truncado_por_tope_500: False` -- ausencia de dato
     leida como 'no se trunco', exactamente la regla I4 que esta misma skill prohibe en el
     control INV. Ahora debe declararse 'no_medible' con un hallazgo DUDA propio."""
@@ -1284,6 +1331,160 @@ def test_ts_mezclado_epoch_e_iso_no_revienta():
           f"TypeError: {not exploto}")
 
 
+# ============================================================================
+# Re-auditoria golden-skill-auditor 2026-08-22 (segunda pasada, en frio, sobre GCO1.5).
+# Un hallazgo real, no una sospecha: P-sin-fecha-auditada y P-listado-truncado SIEMPRE se
+# evaluan dentro de `correr()`, pero antes de este fix solo dejaban rastro en
+# `self.cobertura` cuando disparaban un hallazgo -- un DUMP sano (fecha bien formada,
+# listado sin truncar) hacia que la tabla de cobertura de la Fase 3 del informe
+# (references/informe.md, seccion 3) no mencionara esos dos controles en absoluto, aunque SI
+# se hubieran corrido y hubieran confirmado que todo estaba bien.
+# ============================================================================
+
+def test_cobertura_declara_sin_fecha_y_paginacion_siempre():
+    """Con un DUMP SANO (fecha bien formada, paginacion sin truncar), ambos controles deben
+    aparecer en `self.cobertura` con estado 'corrido' -- no deben faltar de la lista solo
+    porque no dispararon ningun hallazgo."""
+    contacto = {"user_ns": "fcobertura-sana", "get_info": {},
+               "mensajes": [{"type": "in", "content": "hola",
+                            "ts": "2026-08-19 09:00:00"}]}
+    dump = {"_fecha": "2026-08-19",
+           "_listado_paginacion": {"truncado_por_tope_500": False},
+           "contactos": [contacto]}
+    c = Clasificador(dump).correr()
+    controles_cubiertos = {x["control"] for x in c.cobertura}
+    fecha_declarada = "P-sin-fecha-auditada" in controles_cubiertos
+    paginacion_declarada = "P-listado-truncado" in controles_cubiertos
+    estado_fecha = next((x["estado"] for x in c.cobertura
+                        if x["control"] == "P-sin-fecha-auditada"), None)
+    estado_paginacion = next((x["estado"] for x in c.cobertura
+                             if x["control"] == "P-listado-truncado"), None)
+    paso = (fecha_declarada and paginacion_declarada and
+           estado_fecha == "corrido" and estado_paginacion == "corrido")
+    marcar("COBERTURA-SIEMPRE-DECLARA", paso,
+          f"con DUMP sano: P-sin-fecha-auditada en cobertura: {fecha_declarada} "
+          f"(estado={estado_fecha!r}, debe ser 'corrido') · P-listado-truncado en "
+          f"cobertura: {paginacion_declarada} (estado={estado_paginacion!r}, debe ser "
+          "'corrido') -- antes del fix, un dia sano los dejaba fuera de la tabla por "
+          "completo, no solo en estado distinto")
+
+
+def test_empate_de_ts_no_invierte_orden():
+    """FALLA 1 (golden-verificador, re-auditoria 2026-08-22, hallazgo real medido
+    end-to-end): dos mensajes con el MISMO `ts` (epoch en segundos) deben quedar en su
+    orden real -- el `sorted()` estable anterior dejaba el mensaje MAS NUEVO de un empate
+    ANTES del mas viejo (porque el servidor entrega descendente y el sort estable conserva
+    esa sub-relacion). Fixture: cliente pregunta, bot responde y cierra el pedido en el
+    MISMO segundo -- tras invertir, el ULTIMO mensaje del hilo debe ser el del bot (cierre),
+    no el del cliente (lo que generaria un R1 falso)."""
+    ts_empatado = 1787200000
+    crudo = [
+        # servidor entrega descendente: el MAS NUEVO primero.
+        {"type": "out", "content": "listo, pedido confirmado, gracias por tu compra",
+         "ts": ts_empatado},
+        {"type": "in", "content": "quiero comprarlo", "ts": ts_empatado},
+    ]
+    hilo = invertir_hilo(crudo)
+    ultimo_es_empresa = hilo[-1]["type"] == "out"
+    marcar("EMPATE-TS-NO-INVIERTE", ultimo_es_empresa,
+          f"con ts empatado, orden final: {[m['type'] for m in hilo]} (el ultimo debe ser "
+          f"'out' -- la empresa cerro el pedido en el mismo segundo, no debe leerse como "
+          "que el cliente se quedo sin respuesta)")
+    # Camino real: contacto completo, no debe generar R1 (la empresa NO se fue de ultimo).
+    contacto = {"user_ns": "fempate", "get_info": {}, "mensajes": crudo}
+    c = Clasificador({"contactos": [contacto]}).correr()
+    sin_r1_falso = not any(h["control"] == "R1" for h in c.hallazgos)
+    marcar("EMPATE-TS-SIN-R1-FALSO", sin_r1_falso,
+          f"con el mismo fixture, via Clasificador completo: hallazgo R1 disparado "
+          f"(debe ser False, el bot SI cerro): {not sin_r1_falso}")
+
+
+def test_direccion_reconoce_booleano_como_texto():
+    """FALLA 7 (golden-verificador, re-auditoria 2026-08-22): `is_bot`/`from_bot` como
+    TEXTO ('0'/'false') deben leerse como falso, no como verdadero por el solo hecho de
+    ser una cadena no vacia (`bool("0")` es `True` en Python)."""
+    casos = [
+        ({"is_bot": "0", "content": "hola"}, "cliente"),
+        ({"is_bot": "false", "content": "hola"}, "cliente"),
+        ({"is_bot": "1", "content": "hola"}, "empresa"),
+        ({"is_bot": True, "content": "hola"}, "empresa"),
+        ({"from_bot": "0", "content": "hola"}, "cliente"),
+    ]
+    fallos = [(m, esperado, direccion(m)) for m, esperado in casos if direccion(m) != esperado]
+    paso = not fallos
+    marcar("DIRECCION-BOOLEANO-TEXTO", paso,
+          f"casos con is_bot/from_bot como texto '0'/'false'/'1', mal clasificados: "
+          f"{fallos or 'ninguno'} (todos deben leer el valor de texto como booleano real, "
+          "no como 'cualquier cadena no vacia es verdadera')")
+
+
+def test_avisos_de_hilo_se_reportan():
+    """FALLA 4 (golden-verificador, re-auditoria 2026-08-22, hallazgo real confirmado por
+    grep: `_avisos_de_hilo` no lo leia nadie fuera de extraer.py): un DUMP con un aviso de
+    hilo truncado debe producir un hallazgo `P-hilo-truncado`, no quedar en silencio."""
+    contacto = {"user_ns": "favisado", "get_info": {},
+               "mensajes": [{"type": "in", "content": "hola", "ts": "2026-08-19 09:00:00"}]}
+    dump = {"contactos": [contacto],
+           "_avisos_de_hilo": [{"ns": "favisado",
+                                "razon": "conversacion de 20 paginas, se leyeron 12: el "
+                                         "hilo quedo TRUNCADO"}]}
+    c = Clasificador(dump).correr()
+    hallazgo = next((h for h in c.hallazgos if h["control"] == "P-hilo-truncado"), None)
+    paso = hallazgo is not None and hallazgo["severidad"] == "RIESGO"
+    marcar("AVISOS-DE-HILO-SE-REPORTAN", paso,
+          f"aviso de hilo truncado en el DUMP -> hallazgo P-hilo-truncado disparado: "
+          f"{hallazgo is not None} · severidad: {hallazgo['severidad'] if hallazgo else None} "
+          "(debe ser RIESGO)")
+
+
+def test_redactar_cubre_valores_no_str_bajo_llave_sensible():
+    """FALLA 6 (golden-verificador, re-auditoria 2026-08-22): un secreto bajo una llave
+    SENSIBLE (token/api_key/password/...) que llega como lista, dict o numero -- no como
+    `str` -- debe redactarse igual que uno que llega como texto. Se prueba el camino REAL
+    de `extraer.redactar()`."""
+    casos = [
+        {"token": ["mi-token-en-una-lista-1234567890"]},
+        {"api_key": {"v": "valor-plano-que-no-deberia-quedar-en-claro"}},
+        {"password": 12345678901234567890},
+    ]
+    fallos = []
+    for objeto in casos:
+        limpio = _extraer_modulo.redactar(objeto)
+        if json.dumps(limpio, ensure_ascii=False) == json.dumps(objeto, ensure_ascii=False):
+            fallos.append(objeto)
+    paso = not fallos
+    marcar("REDACTAR-NO-STR-BAJO-LLAVE-SENSIBLE", paso,
+          f"objetos que SIGUIERON igual tras `extraer.redactar()` (debian quedar "
+          f"redactados por su llave sensible, sin importar el tipo del valor): "
+          f"{fallos or 'ninguno'}")
+
+
+def test_fecha_de_no_revienta_con_epoch():
+    """FALLA 8 (golden-verificador, re-auditoria 2026-08-22): `_fecha_de` no debe reventar
+    con TypeError si `last_message_at` (o los otros dos campos de respaldo) llega como
+    numero (epoch) en vez de texto -- debe tratarlo como 'no utilizable para este campo' y
+    probar el siguiente respaldo, o devolver (None, None) si los tres fallan."""
+    casos_no_revienta = [
+        {"last_message_at": 1787114990},
+        {"last_message_at": 1787114990, "last_interaction": "2026-08-19 09:00:00"},
+        {"last_message_at": None, "last_interaction": None, "subscribed": None},
+    ]
+    exploto = False
+    resultados = []
+    for contacto in casos_no_revienta:
+        try:
+            resultados.append(_extraer_modulo._fecha_de(contacto))
+        except TypeError:
+            exploto = True
+    # con respaldo de texto disponible, debe usarlo (saltando el epoch no utilizable).
+    usa_respaldo = resultados[1] == ("2026-08-19", "last_interaction")
+    paso = not exploto and usa_respaldo
+    marcar("FECHA-DE-NO-REVIENTA-EPOCH", paso,
+          f"exploto con TypeError ante un last_message_at numerico: {exploto} (debe ser "
+          f"False) · con epoch en el campo primario y texto en el respaldo, usa el "
+          f"respaldo: {usa_respaldo} (resultados: {resultados})")
+
+
 TRAMPAS_DEL_ENCARGO = ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11",
                       "P12", "P13"]
 EXTRA_CALIDAD = ["R1", "R2", "R3", "R4", "Q4"]
@@ -1299,7 +1500,7 @@ CONTROL_R6 = ["R6-INCOHERENCIA-REAL", "R6-CAMBIO-OPINION-NO-MARCA", "R6-AMBIGUO-
 FIXES_R6_VERIFICACION = ["R6-TALLA-NO-CAPTURA-BASURA", "R6-COLOR-SIN-LEADIN-NO-DISPARA",
                          "R6-CORRECCION-POST-RESUMEN"]
 # F1/F2 (golden-verificador 2026-08-22): `ts` epoch es la forma REAL de los 4 DUMPs de
-# produccion medidos (LIBIDO-UP, 100% de los mensajes). TS-ILEGIBLE (ronda 2) EXIGIA que un
+# produccion medidos (ESPACIO-REF, 100% de los mensajes). TS-ILEGIBLE (ronda 2) EXIGIA que un
 # epoch se tratara como no parseable -- expectativa invertida ahora que SI se parsea; ver
 # `test_ts_epoch_ordena_correctamente` (reemplaza a la vieja TS-ILEGIBLE) y las 4 fixtures
 # nuevas que la acompañan.
@@ -1313,6 +1514,14 @@ FIXES_GCO14_RONDA2 = ["R2-ACOTA-AL-DIA", "LISTADO-PAGINACION-NO-MEDIBLE",
 # Cuarta ronda de verificacion sobre GCO1.4 (golden-verificador, 2026-08-22): ROTO NUEVO 5a
 # (`_fecha` malformada leida como sana) y 5b (mezcla epoch/ISO-Z revienta con TypeError).
 FIXES_GCO14_RONDA3 = ["FECHA-AUDITADA-MALFORMADA-DECLARADA", "TS-MEZCLADO-EPOCH-ISO-NO-REVIENTA"]
+# Re-auditoria golden-skill-auditor 2026-08-22, segunda pasada sobre GCO1.5: la tabla de
+# cobertura no declaraba P-sin-fecha-auditada/P-listado-truncado cuando el dia era sano, y 6
+# de las 17 familias de secretos.py nunca se ejercian en ninguna prueba (ver los casos
+# agregados a CREDENCIALES-AMPLIADAS y CREDENCIALES-EXTRAER-PY-REAL, arriba).
+FIXES_REAUDITORIA_2 = ["COBERTURA-SIEMPRE-DECLARA", "EMPATE-TS-NO-INVIERTE",
+                       "EMPATE-TS-SIN-R1-FALSO", "DIRECCION-BOOLEANO-TEXTO",
+                       "AVISOS-DE-HILO-SE-REPORTAN", "REDACTAR-NO-STR-BAJO-LLAVE-SENSIBLE",
+                       "FECHA-DE-NO-REVIENTA-EPOCH"]
 
 
 def main():
@@ -1374,6 +1583,12 @@ def main():
     test_sin_fecha_auditada_se_declara()
     test_fecha_auditada_malformada_se_declara()
     test_ts_mezclado_epoch_e_iso_no_revienta()
+    test_cobertura_declara_sin_fecha_y_paginacion_siempre()
+    test_empate_de_ts_no_invierte_orden()
+    test_direccion_reconoce_booleano_como_texto()
+    test_avisos_de_hilo_se_reportan()
+    test_redactar_cubre_valores_no_str_bajo_llave_sensible()
+    test_fecha_de_no_revienta_con_epoch()
 
     print("Las 13 trampas del encargo (ENCARGO-golden-chatea-operacion.md):")
     fallidas = []
@@ -1440,7 +1655,7 @@ def main():
             fallidas_r6_verif.append(codigo)
 
     print("\nFixes de la verificacion adversarial de golden-verificador GCO1.4 (2026-08-22, "
-         "4 DUMPs reales de LIBIDO-UP, 165 conversaciones) -- F1 (epoch en `ts`), F3 "
+         "4 DUMPs reales de ESPACIO-REF, 165 conversaciones) -- F1 (epoch en `ts`), F3 "
          "(camino real de extraer.py) y F4 (vocabulario de cantidad ampliado):")
     fallidas_gco14 = []
     for codigo in FIXES_GCO14:
@@ -1473,8 +1688,19 @@ def main():
         if not paso:
             fallidas_gco14_r3.append(codigo)
 
+    print("\nFixes de la re-auditoria golden-skill-auditor 2026-08-22 (segunda pasada, en "
+         "frio, sobre GCO1.5) -- cobertura que faltaba declarar en un dia sano:")
+    fallidas_reaud2 = []
+    for codigo in FIXES_REAUDITORIA_2:
+        paso, detalle = RESULTADOS.get(codigo, (False, "no se corrio ninguna prueba"))
+        marca = "OK   " if paso else "FALLA"
+        print(f"  {marca} {codigo:30} {detalle}")
+        if not paso:
+            fallidas_reaud2.append(codigo)
+
     if (fallidas or fallidas_extra or fallidas_fixes or fallidas_ronda2 or fallidas_r6 or
-            fallidas_r6_verif or fallidas_gco14 or fallidas_gco14_r2 or fallidas_gco14_r3):
+            fallidas_r6_verif or fallidas_gco14 or fallidas_gco14_r2 or fallidas_gco14_r3 or
+            fallidas_reaud2):
         print(f"\nAUTOPRUEBA FALLIDA. Trampas del encargo sin detectar: {fallidas or 'ninguna'}. "
              f"Controles de calidad sin detectar: {fallidas_extra or 'ninguno'}. "
              f"Fixes adversariales (ronda 1) sin confirmar: {fallidas_fixes or 'ninguno'}. "
@@ -1483,20 +1709,22 @@ def main():
              f"Fixes de verificacion R6 sin confirmar: {fallidas_r6_verif or 'ninguno'}. "
              f"Fixes GCO1.4 sin confirmar: {fallidas_gco14 or 'ninguno'}. "
              f"Fixes GCO1.4 (ronda 2) sin confirmar: {fallidas_gco14_r2 or 'ninguno'}. "
-             f"Fixes GCO1.4 (ronda 3) sin confirmar: {fallidas_gco14_r3 or 'ninguno'}.")
+             f"Fixes GCO1.4 (ronda 3) sin confirmar: {fallidas_gco14_r3 or 'ninguno'}. "
+             f"Fixes re-auditoria 2 sin confirmar: {fallidas_reaud2 or 'ninguno'}.")
         print("El clasificador esta roto. No se corre contra un DUMP real hasta arreglarlo.")
         return 1
 
     total_controles = (len(TRAMPAS_DEL_ENCARGO) + len(EXTRA_CALIDAD) +
                        len(FIXES_ADVERSARIALES) + len(FIXES_RONDA_2) + len(CONTROL_R6) +
                        len(FIXES_R6_VERIFICACION) + len(FIXES_GCO14) + len(FIXES_GCO14_RONDA2) +
-                       len(FIXES_GCO14_RONDA3))
+                       len(FIXES_GCO14_RONDA3) + len(FIXES_REAUDITORIA_2))
     print(f"\n  {total_controles} de {total_controles} controles confirmados en total "
          f"({len(TRAMPAS_DEL_ENCARGO)} trampas del encargo + {len(EXTRA_CALIDAD)} calidad + "
          f"{len(FIXES_ADVERSARIALES)} fixes ronda 1 + {len(FIXES_RONDA_2)} fixes ronda 2 + "
          f"{len(CONTROL_R6)} control R6 + {len(FIXES_R6_VERIFICACION)} fixes verificacion R6 + "
          f"{len(FIXES_GCO14)} fixes GCO1.4 + {len(FIXES_GCO14_RONDA2)} fixes GCO1.4 ronda 2 + "
-         f"{len(FIXES_GCO14_RONDA3)} fixes GCO1.4 ronda 3)")
+         f"{len(FIXES_GCO14_RONDA3)} fixes GCO1.4 ronda 3 + {len(FIXES_REAUDITORIA_2)} fixes "
+         "re-auditoria 2)")
     print("\nAutoprueba pasada. Esto valida el DETECTOR contra casos que se SABEN rotos, no "
          "valida ningun dia real.")
     return 0

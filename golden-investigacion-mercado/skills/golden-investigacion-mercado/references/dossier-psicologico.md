@@ -54,7 +54,7 @@ Cada capa se trabaja en este orden:
 28. **Insights psicológicos clave** — la "tesis" de por qué compra (el insight que ordena toda la campaña).
 29. **Resumen** — síntesis accionable de todo el dossier.
 30. **Públicos objetivos múltiples** — TODOS los perfiles que se benefician, lo más específicos posible
-    (cada uno con su dolor/deseo/disparador) → base directa de la **segmentación de ads** (Fase 4).
+    (cada uno con su dolor/deseo/disparador) → base directa de la **segmentación de ads** que hará `golden-ads` (vía `golden360`).
 
 ## De cada capa → a la ejecución (para qué se usa)
 - 8/9/10/20 → **hooks y agitación** de ads y hero (PAS).

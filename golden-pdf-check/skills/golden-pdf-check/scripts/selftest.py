@@ -1,13 +1,20 @@
 #!/usr/bin/env python3
 """
 GOLDEN PDF · selftest.py
-Prueba de regresión de la skill. Construye la muestra
-assets/selftest-sample.md y verifica lo que importa:
+Prueba de regresión de la skill: 13 comprobaciones sobre PDFs construidos de
+verdad (nada simulado). Hay una prueba por cada versión que cambió el
+comportamiento, para que una regresión no pase en verde:
 
-  1. Construye sin errores.
-  2. Genera las 3 tarjetas esperadas.
-  3. COMPUERTA VERBATIM: el texto de los prompts sale idéntico.
-  4. ANTI-CORTE: la auditoría no reporta bloques al filo del borde.
+  1. Construye sin errores · 2. Cuenta de tarjetas · 3. COMPUERTA VERBATIM
+  (texto idéntico) · 4. ANTI-CORTE (nada al filo del borde) · 5. Motor con
+  numeración · 6. Fuente de marca incrustada · 7-8. Detectores ADVERSARIALES
+  (un PDF feo y uno cortado DEBEN ser cazados) · 9. Anti-falso-positivo: dos
+  tarjetas seguidas no son un corte · 10-11. Figuras (v5.6) · 12. Bloque con
+  estilo ::: (v5.7) · 13. Aviso de líneas largas (v5.8).
+
+Regla de la casa: toda versión que cambie comportamiento entra con su prueba
+aquí. Si tocas el CSS, el parser o el auto-fit, corre esto antes de usar la
+skill en material real.
 
 Uso:  python selftest.py
 Salida: PASS (exit 0) o FAIL (exit 1) con el detalle.
@@ -88,8 +95,12 @@ def main():
                     engine))
 
     # 5) fuente incrustada (documento idéntico en cualquier equipo)
-    from pypdf import PdfReader
+    # El import va DENTRO del try a propósito: pypdf es una dependencia
+    # OPCIONAL. Si falta, esta prueba sola queda en FAIL con el motivo; antes
+    # el ModuleNotFoundError mataba el self-test entero y se perdían las otras
+    # 12 comprobaciones (medido al correrlo con un intérprete sin pypdf).
     try:
+        from pypdf import PdfReader
         fonts = set()
         for pg in PdfReader(pdf).pages:
             res = pg.get("/Resources", {})
@@ -183,16 +194,63 @@ def main():
     results.append(("Figuras: se incrustan y no cuentan como tarjeta", okfig, detail))
 
     if os.path.exists(figpdf):
-        import pdfplumber
-        with pdfplumber.open(figpdf) as pf:
-            txt = "\n".join((p.extract_text() or "") for p in pf.pages)
-            imgs = sum(len(p.images) for p in pf.pages)
+        try:
+            import pdfplumber
+            with pdfplumber.open(figpdf) as pf:
+                txt = "\n".join((p.extract_text() or "") for p in pf.pages)
+                imgs = sum(len(p.images) for p in pf.pages)
+        except ImportError:
+            txt, imgs = "", -1
         # Un SVG se incrusta como VECTOR (no suma XObject de imagen: mejor, queda
         # nítido y ligero); el PNG sí suma. Con el logo de la portada, >= 2.
         up = txt.upper()   # la insignia se imprime en versalitas por CSS
         results.append(("Figuras: imagen incrustada y pies numerados en orden",
                         imgs >= 2 and "FIGURA 1" in up and "FIGURA 2" in up,
-                        "imagenes=%d" % imgs))
+                        "imagenes=%d" % imgs if imgs >= 0
+                        else "sin pdfplumber: no se pudo verificar"))
+
+    # 9) el AVISO de líneas largas (v5.8) DEBE dispararse cuando debe. Sin este
+    #    caso, el aviso podía apagarse en una refactorización sin que nadie lo
+    #    notara — y su trabajo es evitar un ciclo perdido de compuerta verbatim.
+    largo = os.path.join(tmp, "largo.md")
+    with open(largo, "w", encoding="utf-8") as f:
+        f.write("---\ntitle: Linea larga\n---\n\n## Seccion\n\n``` Tarjeta con linea larga\n"
+                + ("x" * 120) + "\n```\n")
+    r4 = run([sys.executable, os.path.join(SCRIPTS, "build_pdf.py"), largo,
+              os.path.join(tmp, "largo.pdf"), "--no-verify"])
+    results.append(("Aviso de líneas largas dispara cuando debe",
+                    "LÍNEAS LARGAS EN TARJETAS" in r4.stderr, ""))
+
+    # 10) …y NO dispara con la muestra oficial: un fixture que incumple la regla
+    #     que la skill enseña entrena a ignorar los avisos (efecto "cry wolf").
+    results.append(("La muestra oficial NO dispara el aviso (fixture ejemplar)",
+                    "LÍNEAS LARGAS EN TARJETAS" not in r.stderr, ""))
+
+    # 12) BLOQUE CON ESTILO (v5.7): ::: nota Titulo ... ::: produce un contenedor
+    #     atomico con su clase, procesa Markdown adentro y NO cuenta como tarjeta.
+    blkmd = os.path.join(tmp, "bloque.md")
+    with open(blkmd, "w", encoding="utf-8") as f:
+        f.write("---\ntitle: Bloque con estilo\n---\n\n## Seccion con bloque\n\n"
+                "::: nota Antes de empezar\nTen a la mano el **catalogo** y los precios.\n:::\n\n"
+                "``` Prompt unico\ncontenido copiable\n```\n")
+    blkpdf = os.path.join(tmp, "bloque.pdf")
+    blkhtml = os.path.join(tmp, "bloque.html")
+    r4 = run([sys.executable, os.path.join(SCRIPTS, "build_pdf.py"), blkmd, blkpdf,
+              "--save-html", blkhtml])
+    okblk, detblk = r4.returncode == 0 and os.path.exists(blkpdf), r4.stderr.strip()[:120]
+    if okblk:
+        try:
+            d4 = json.loads(r4.stdout.strip().splitlines()[-1])
+            hout = open(blkhtml, encoding="utf-8").read()
+            okblk = (d4.get("cards") == 1                       # el bloque NO es tarjeta
+                     and 'class="block nota"' in hout            # clase propia
+                     and "<strong>catalogo</strong>" in hout     # markdown SI se procesa adentro
+                     and d4.get("verbatim", {}).get("ok") is True)
+            detblk = "cards=%s · clase y markdown interno OK" % d4.get("cards")
+        except Exception as e:
+            okblk, detblk = False, str(e)
+    results.append(("Bloque con estilo ::: (v5.7): clase propia, markdown adentro, no es tarjeta",
+                    okblk, detblk))
 
     report(results)
     core = all(ok for name, ok, _ in results if "numeración" not in name)  # motor es informativo

@@ -36,6 +36,7 @@ Se apaga solo con `--no-index`, y solo para documentos de una sola pieza.
 | `---` | Separador |
 | ` ``` ` … ` ``` ` | **Tarjeta de prompt** monoespaciada (atómica, copiable) |
 | `::: prompt Título` … `:::` | **Tarjeta de prompt** en prosa (atómica, copiable) |
+| `::: nombre Título` … `:::` | **Bloque con estilo** atómico (destacado, aviso, ficha de datos) |
 | `![Pie](ruta/img.svg)` | **Figura** atómica: imagen + pie numerado, nunca se parten |
 
 ### Figuras (v5.6)
@@ -64,6 +65,23 @@ El texto tras los backticks de apertura se usa como título de la tarjeta:
     Actúa como asesor de ventas de mi tienda. Saluda al cliente por su
     nombre, pregunta qué busca y ofrece 2 opciones con precio.
     ```
+
+### Bloque con estilo (v5.7)
+
+Cualquier nombre que no sea `prompt` produce un contenedor atómico con clase
+propia — `::: nota` → `<div class="block nota">`. Sirve para que un documento
+largo respire: destacados, avisos, fichas de datos.
+
+    ::: nota Antes de empezar
+    Ten a la mano el **catálogo** y los precios actualizados.
+    Sin eso, el resto del módulo no se puede completar.
+    :::
+
+Diferencia clave con la tarjeta de prompt: **el contenido de adentro SÍ se
+procesa como Markdown** (negritas, listas, tablas). Por eso no sirve para texto
+copiable literal — para eso están las tarjetas. El bloque nunca se parte entre
+páginas. Es neutro por defecto; un tema (`--css`) le puede dar color a la clase
+que use.
 
 ### Tarjeta de prompt en prosa
 

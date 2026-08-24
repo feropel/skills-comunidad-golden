@@ -24,26 +24,49 @@
   },
   "gold_gradient": "linear-gradient(145deg, #f4d67a, #d4af37 55%, #9a7b1e)",
   "typography": {
-    "family": "-apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
-    "mono": "\"SF Mono\", \"JetBrains Mono\", \"Fira Code\", ui-monospace, Menlo, Consolas, monospace",
-    "kicker": { "transform": "uppercase", "letter_spacing": "0.14em", "color": "gold", "weight": 600 }
+    "family": "GoldenSans (Inter estatica, incrustada) + fallback: -apple-system, BlinkMacSystemFont, \"Segoe UI\", Roboto, Helvetica, Arial, sans-serif",
+    "mono": "GoldenMono (JetBrains Mono estatica, incrustada) + fallback: ui-monospace, Menlo, Consolas, monospace",
+    "kicker": {
+      "transform": "uppercase",
+      "letter_spacing": "0.14em",
+      "color": "gold",
+      "weight": 600
+    },
+    "fonts_note": "Las fuentes se incrustan desde assets/fonts/ (OFL) en build_pdf.py:fonts_style(). ESTATICAS y sin Area Privada en el cmap a proposito: las variables corrompen el copy-paste de corchetes. No sustituir por variables."
   },
   "geometry": {
     "page": "A4",
     "margin_mm": 15,
     "footer_reserve_mm": 16,
     "radius_px": 16,
-    "card_max_mm": 250
+    "card_max_mm_note": "NO se configura aqui. build_pdf.py lo deriva: (297 - margin_mm - footer_reserve_mm) - 20mm de colchon, y lo inyecta como variable CSS. El valor en golden-print.css es solo el fallback si el HTML se usa suelto."
   },
   "allowed_hex_for_audit": [
-    "#faf9f5", "#ffffff", "#f6f5f1", "#17140d", "#6b7280", "#e7e4dc",
-    "#b8912a", "#d4af37", "#e7c65a", "#fbf5e2", "#ecd79a", "#1a1508",
-    "#f4d67a", "#9a7b1e", "#15a34a", "#dc2626", "#2563eb",
-    "#000000", "#333333", "#111111"
+    "#faf9f5",
+    "#ffffff",
+    "#f6f5f1",
+    "#17140d",
+    "#6b7280",
+    "#e7e4dc",
+    "#b8912a",
+    "#d4af37",
+    "#e7c65a",
+    "#fbf5e2",
+    "#ecd79a",
+    "#1a1508",
+    "#f4d67a",
+    "#9a7b1e",
+    "#15a34a",
+    "#dc2626",
+    "#2563eb",
+    "#000000",
+    "#333333",
+    "#111111"
   ],
   "logo": {
     "primary": "assets/logo-golden.svg",
     "primary_note": "Emblema oficial Golden Group Community (PNG incrustado en SVG).",
-    "community_orange_original": "PROYECTOS/SKOOL/logo-comunidad-golden.svg"
-  }
+    "community_orange_original": "RETIRADO del disco (la carpeta PROYECTOS/SKOOL ya no existe); habria que re-subirlo si se quiere volver al naranja"
+  },
+  "geometry_note": "audit_pdf.py lee de aqui margin_mm y footer_reserve_mm (unica fuente de verdad para el auditor). El resto es documentacion."
 }

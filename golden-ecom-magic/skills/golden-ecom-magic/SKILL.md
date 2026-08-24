@@ -20,6 +20,8 @@ description: >
 
 # golden-ecom-magic — Fábrica de imágenes con Ecom Magic AI
 
+<!-- skill v2.3 · 2026-08-23 (cierre del ciclo con el Centro de Mando): la "ley de migración de vía" que nació de la v2.2 quedó canonizada en la gaceta y su barrido pescó la MISMA afirmación-veneno viva fuera de esta skill (golden-imagen-arena/references/motores.md decía "Ecom Magic no tiene API ni MCP"). Aprendizaje horneado aquí: el barrido de negaciones se hace también en las HERMANAS que citan a la skill migrada, no solo adentro -->
+<!-- skill v2.2 · 2026-08-23 (auditoría golden-skill-auditor, 917→ORO): 4 contradicciones entre archivos que la v2.1 no vio. La grave: ui-navegacion.md seguía afirmando "Ecom Magic no tiene API/MCP" (verdad de v1.x) — justo lo contrario del núcleo v2.0; un modelo que leyera ese archivo se iba al navegador y mataba la vía principal. También: la foto seguía documentada como "la arrastra el usuario" en campos-generacion (es fallback, por MCP entra por URL); "Editar anuncio (no regeneres)" contradecía el gotcha de que banners_edit degrada la etiqueta; y la lista negra no estaba donde se redacta el copy. Añadido: tabla de equivalencia campo web → parámetro MCP, el corte de antes/después por vertical señalizado en "Planear el set", ejemplo real completo (4 piezas limpias + 2 reembolsos = la regla de corte en acción) y la conexión con el Centro de Mando -->
 <!-- skill v2.1 · 2026-08-10 (loop del arsenal, semana 2 · producción): CORTE DE ANTES/DESPUÉS POR VERTICAL en references/campos-generacion.md. La heurística de molde daba luz verde a "Antes/Después (resultado en piel/cuerpo)" con el único filtro de "no rostros", y Meta 2026 lo PROHIBE en antiedad/arrugas/reafirmante y en pérdida de peso (permitido solo en cosmética general con 18+). Golden vende crema reafirmante de cuello: la regla como estaba habilitaba justo el caso prohibido. Añadidos también los dos transversales que Meta juzga por significado implícito: segunda persona que señala la condición y titular de plazo con resultado. Mismo parche espejo en golden-imagen-arena y golden-ugc-avatar -->
 <!-- skill v2.0 · MCP NATIVO (2026-07-30): Ecom Magic sacó servidor MCP oficial (ecom-magic.ai/mcp/v1, OAuth) → vía principal por herramientas, sin navegador y sin handoff de foto (entra por URL pública). Validado en vivo: pieza "modo de uso" de Tag Recede generada 100% autónoma en 32 s. Navegador degradado a fallback. Nuevos references/mcp-api.md y capacidades-extra.md; optimizar-webp.py acepta URL. Gotcha nuevo: el generador mete ¡ y ¿ → prohibirlos en additional_instructions -->
 <!-- skill v1.2 · fix auditoría 2026-07-25: optimizar-webp.py ya no aplasta a cuadrado (acepta 1080x1350, misma lógica que golden-imagen-arena) y reporta AVISO honesto cuando no baja del límite en vez de mentir OK; ui-navegacion muestra el uso rectangular explícito -->
@@ -167,6 +169,13 @@ Set típico:
   van intercaladas como bloques de imagen: "cómo actúa", antes/después, modo de uso,
   garantía visual, comparativa, etc.
 
+⛔ **Antes de meter un ANTES/DESPUÉS en el set, mira el VERTICAL.** Meta 2026 lo PROHIBE en
+antiedad/arrugas/reafirmante, en pérdida de peso y en salud bucal — y ahí no es un detalle de
+diseño, es riesgo de que tumben la cuenta publicitaria. La tabla por vertical y los sustitutos
+que sí convierten (macro de textura, modo de uso, mecanismo, ingredientes, lifestyle) están en
+`references/campos-generacion.md` → "CORTE DE ANTES/DESPUÉS POR VERTICAL". Decídelo al planear
+el set, no cuando ya gastaste el crédito.
+
 Tamaño: por MCP va en `size_preset` (`1080x1080`) o, para el vertical de secciones,
 `size_preset:"custom"` + `width:1080, height:1350`. Decide el set tú, informa cuántos créditos
 cuesta y confirma el gasto una vez antes de disparar.
@@ -254,7 +263,36 @@ Integradas al producto en Golden Lab (Shopify) con alt-text SEO.
    **Ley 5** (prohibir `¡`/`¿` en las instrucciones).
 6. `optimizar-webp.py <url>` → **WebP 147.2 KB**.
 
-Total: 3 piezas, 3 créditos, 3 WebP < 150 KB. La vía MCP es la que se usa de aquí en adelante.
+**Piezas 4 y 5 — el set se cerró en 4, no en 5 (la regla de corte en acción):**
+se generaron dos piezas más por MCP. La de "fórmula natural" salió limpia (WebP 142.0 KB). La de
+"tipos de verrugas" falló la auditoría **tres veces seguidas**, cada vez con una invención
+distinta: (1) ingredientes falsos escritos sobre la caja, (2) "Resultados Visibles Garantizados",
+(3) "MÁS DE 10.000 USUARIOS SATISFECHOS". Se pidió `refund_request` de las inservibles y **se
+entregó el carrusel con las 4 piezas limpias**, informando qué faltó y por qué.
+
+De ahí salieron la **Ley 6**, la **lista negra obligatoria** y la **regla de corte** — el
+aprendizaje más caro de la skill y el que evita publicar un dato falso.
+
+Total entregado: **4 piezas limpias**, todas < 150 KB, con 2 reembolsos solicitados. La vía MCP
+es la que se usa de aquí en adelante.
+
+## Conexión con el ecosistema
+
+Los cambios relevantes de esta skill (gotchas nuevos de la plataforma, reglas de compliance,
+cambios de vía) se reportan a **🧠 GOLDEN - CENTRO DE MANDO**, que es quien decide si eso se
+retransmite a las skills hermanas. Aplica sobre todo a lo que aprendemos en vivo del generador:
+si inventa un claim nuevo o Meta cambia una política, el hallazgo no se queda en este chat.
+Las reglas de compliance visual (ej. el corte de antes/después por vertical) tienen espejo en
+`golden-imagen-arena` y `golden-ugc-avatar`: al cambiar una aquí, avisa para que se propague.
+
+**Ley de migración de vía (nació aquí, hoy es ley de la casa).** Cuando esta skill —o cualquier
+otra— cambie de vía (navegador → API/MCP, o al revés), no basta con escribir la vía nueva: hay
+que **cazar las afirmaciones de la vía vieja del tipo "esto no se puede / no existe"**, porque un
+modelo fresco las lee como hecho y desanda la migración. Y el barrido **no termina en esta
+skill**: se hace también en las **hermanas que la citan**. Evidencia: tras limpiar la v2.2, el
+Centro de Mando encontró "Ecom Magic no tiene API ni MCP" todavía vivo en
+`golden-imagen-arena/references/motores.md` — la misma verdad vieja, escondida en una hermana.
+Grep sugerido: `grep -rniE "no tiene (api|mcp)|no hay atajo" ~/.claude/skills`.
 
 ## Archivos de referencia
 

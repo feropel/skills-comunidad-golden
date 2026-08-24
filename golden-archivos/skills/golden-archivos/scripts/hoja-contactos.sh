@@ -19,6 +19,22 @@ DIR="${1:?carpeta}"; OUT="${2:?salida.png}"; COLS="${3:-5}"; ROWS="${4:-}"
 command -v ffmpeg >/dev/null 2>&1 || { echo "🔴 Falta ffmpeg (instalar: brew install ffmpeg). Sin mosaico, verifica abriendo los archivos uno a uno con Read." >&2; exit 1; }
 S=230
 WORK=$(mktemp -d)
+
+# La lista debe cubrir TODO lo que clasificar.sh manda a IMÁGENES/GIFS/VIDEOS.
+# Si un formato falta aquí, su archivo no se intenta siquiera: no sale en el
+# mosaico NI en la línea "no se pudo leer" — desaparece en silencio, y un mosaico
+# que calla piezas invalida la verificación visual (que es el corazón de la fase 6).
+MEDIA_EXTS="jpg jpeg png webp gif heic heif tiff tif bmp svg psd mp4 mov webm m4v avi mkv hevc"
+ARGS=(); primero=1
+for e in $MEDIA_EXTS; do
+  [ $primero -eq 1 ] && primero=0 || ARGS+=(-o)
+  ARGS+=(-iname "*.$e")
+done
+CANDIDATOS=()
+while IFS= read -r c; do CANDIDATOS+=("$c"); done < <(
+  find "$DIR" -maxdepth 1 -type f ! -name '.*' \( "${ARGS[@]}" \) 2>/dev/null | sort)
+TOTAL_ARCHIVOS=$(find "$DIR" -maxdepth 1 -type f ! -name '.*' 2>/dev/null | wc -l | tr -d ' ')
+NO_MEDIA=$(( TOTAL_ARCHIVOS - ${#CANDIDATOS[@]} ))
 i=1
 while IFS= read -r f; do
   ffmpeg -y -loglevel error -i "$f" \
@@ -30,9 +46,7 @@ while IFS= read -r f; do
   else
     echo "   (no se pudo leer: $(basename "$f"))" >&2
   fi
-done < <(find "$DIR" -maxdepth 1 -type f ! -name '.*' \
-          \( -iname '*.jpg' -o -iname '*.jpeg' -o -iname '*.png' -o -iname '*.webp' \
-             -o -iname '*.gif' -o -iname '*.heic' -o -iname '*.mp4' -o -iname '*.mov' \) | sort)
+done < <(printf '%s\n' "${CANDIDATOS[@]}")
 
 n=$((i-1))
 [ "$n" -eq 0 ] && { echo "Sin imágenes legibles en $DIR"; rm -rf "$WORK"; exit 1; }
@@ -52,4 +66,10 @@ fi
   -filter_complex "tile=${COLS}x${ROWS}:padding=6:color=gray" -frames:v 1 "$OUT")
 rm -rf "$WORK"
 echo ""
-echo "Hoja de contactos ($n piezas): $OUT"
+echo "Hoja de contactos: $n de ${#CANDIDATOS[@]} piezas renderizadas → $OUT"
+if [ "$n" -lt "${#CANDIDATOS[@]}" ]; then
+  echo "⚠️ $(( ${#CANDIDATOS[@]} - n )) no se pudieron renderizar (ver líneas anteriores): el mosaico está INCOMPLETO, verifícalas con Read." >&2
+fi
+if [ "$NO_MEDIA" -gt 0 ]; then
+  echo "ℹ️ $NO_MEDIA archivo(s) de la carpeta no son media (docs, datos) y no entran al mosaico." >&2
+fi

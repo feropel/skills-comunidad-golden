@@ -28,8 +28,9 @@ con `tabs_context_mcp{createIfEmpty:true}`. Encadena acciones con `browser_batch
 - **Menú:** Herramientas de Espionaje, Análisis Financiero, Investigación de Ángulos de
   Venta, Investigación de Avatar, **Generador de Mockups**, **Generador de Logos**.
   (Generador de Guiones / Videos / Emails = "Pronto".)
-- **Uso de Créditos:** "Créditos del Plan  N/200" — LÉELO al inicio y repórtalo. 1 crédito
-  por imagen.
+- **Uso de Créditos:** "Créditos del Plan N/M" — LÉELO al inicio y repórtalo (el tope M depende
+  del plan; no lo asumas). 1 crédito por imagen. Por MCP el saldo real lo da `wallet_balance`,
+  que separa plan + comprados + ganados.
 - Abajo: usuario logueado (nombre + correo).
 
 ## Flujo de pantallas para generar
@@ -67,6 +68,10 @@ con `tabs_context_mcp{createIfEmpty:true}`. Encadena acciones con `browser_batch
 
 ## Subir la FOTO del producto (regla dura, aprendida en validación)
 
+> 🔴 **ANTES DE LEER ESTA SECCIÓN: por la vía MCP este problema NO EXISTE.** La foto entra como
+> `product_image_url` (URL pública) o con `assets_upload`. Si estás peleando con la subida,
+> estás en la vía equivocada — vuelve a `mcp-api.md`. Lo de abajo aplica SOLO al navegador.
+
 El input `Imagen 1/2/3` se llenaría, en teoría, con `file_upload` — PERO `file_upload` SOLO
 acepta archivos genuinamente compartidos con la sesión, y en **Claude Code (terminal) eso casi
 nunca se cumple**. Verificado en validación:
@@ -76,7 +81,6 @@ nunca se cumple**. Verificado en validación:
   ("only files the user has shared with this session").
 - `upload_image` tampoco sirve ("Unable to access message history to retrieve image").
 - Descargar la foto desde una **URL/CDN** al disco tampoco ayuda: `file_upload` igual la rechaza.
-- Ecom Magic **no tiene API/MCP** (verificado en la cuenta y en la web), así que no hay atajo.
 
 **Solución primaria (Claude Code) — handoff de 3 segundos, igual que el login:** pide al usuario
 que **arrastre él mismo la foto al recuadro "Imagen 1"** en su Chrome (o use "Subir desde PC").
@@ -120,12 +124,14 @@ saca la URL de la pieza generada desde el DOM y bájala tú directo:
   la misma acción.
 - **El scroll se "come" dentro de un textarea** → haz scroll sobre el margen (ej. x≈1450) para
   mover la página, no sobre el cuadro de texto.
-- **La imagen salió rara / ignoró las instrucciones** → usa **"Editar anuncio"** con una orden
-  concreta (no regeneres de cero). Si quedó inservible → **"Solicitar reembolso"** y regenera
-  cambiando el molde o afinando "Instrucciones Adicionales". El modelo **"GPT Image 2"** a veces
-  da mejor estética.
+- **La imagen salió rara / ignoró las instrucciones** → si el ajuste es de un bloque grande
+  (titular, un beneficio, color) usa **"Editar anuncio"** con una orden concreta. **Pero si en la
+  pieza se LEE la etiqueta del producto, REGENERA en vez de editar**: la edición re-renderiza
+  todo y deja el texto fino del envase ilegible (verificado). Si quedó inservible → **"Solicitar
+  reembolso"** y regenera cambiando el molde o afinando "Instrucciones Adicionales". El modelo
+  **"GPT Image 2"** a veces da mejor estética.
 - **La generación tarda** 1-3 min por pieza (normal). Espera en tramos y vigila la card
   "Generando…" en "Anuncios Generados"; **no re-dispares** el botón (gastarías otro crédito).
-- **Se acabaron los créditos** (0/200) → no se puede generar; informa el saldo al usuario y
+- **Se acabaron los créditos** (saldo en 0) → no se puede generar; informa el saldo al usuario y
   para. (Compartir una pieza a la comunidad regala +1 crédito, pero no es parte del flujo.)
 - **El botón "Generar" está gris** → falta la referencia o la foto del producto; complétalas.

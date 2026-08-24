@@ -1,8 +1,27 @@
 # Guía campo por campo — Generador de Anuncios
 
-Pantalla: **Generador de Anuncios → [Producto] → "Generar Nuevo Anuncio"**.
-Cada generación consume **1 crédito**. Llena bien los campos ANTES de generar: un campo
-vacío o flojo = imagen floja = crédito perdido.
+Los campos son **los mismos por las dos vías**: por MCP son parámetros de `banners_generate`
+(vía principal, ver `mcp-api.md`); por navegador son la pantalla **Generador de Anuncios →
+[Producto] → "Generar Nuevo Anuncio"**. Cada generación consume **1 crédito**: un campo vacío o
+flojo = imagen floja = crédito perdido.
+
+**Equivalencia campo web → parámetro MCP** (para no traducir a ojo):
+
+| Campo en la web | Parámetro MCP |
+|---|---|
+| Referencia (plantilla) | `reference_banner_url` |
+| Foto del Producto 1/2/3 | `product_image_url` · `product_image_2_url` · `product_image_3_url` (o `product_id`) |
+| Tamaño de salida | `size_preset` (`1080x1080`…) · vertical 1080×1350 = `custom` + `width`/`height` |
+| Idioma del copy | `language` |
+| Modelo | `model` (`ecomagic` \| `gpt-image-2`) |
+| Detalles del Producto | `product_details` |
+| Ángulo de Venta | `sales_angle` |
+| Problema específico | `specific_problem` |
+| Avatar / Público objetivo | `target_avatar` |
+| Cómo se vuelve la solución | `ideal_solution` (+ `unique_mechanism`, `desired_outcome`) |
+| Instrucciones Adicionales | `additional_instructions` |
+| Adaptar Personajes | `character_nationality` · `character_sex` · `character_age_range` |
+| (sin equivalente web) | `thinking_mode`, `awareness_level` — solo por MCP |
 
 ## Los campos, en orden
 
@@ -49,10 +68,14 @@ afín en otros verticales). Si el producto tiene identidad de color fuerte (ej. 
 prefiere un molde que **contraste** sin pelear con esa identidad.
 
 ### Foto del Producto (obligatorio)
-De 1 a 3 fotos **reales** del producto. En Claude Code **la sube el usuario** arrastrándola al
-recuadro "Imagen 1" (el sandbox bloquea la subida programática — el detalle y los otros entornos
-están en `ui-navegacion.md` → "Subir la FOTO"). Usa la mejor foto limpia; si hay varias tomas
-útiles, aprovecha las 3 ranuras.
+De 1 a 3 fotos **reales** del producto. Usa la mejor foto limpia; si hay varias tomas útiles,
+aprovecha las 3 ranuras.
+- **Por MCP (vía principal):** entra como `product_image_url` — una **URL pública** (CDN de
+  Shopify, web del proveedor). Archivo local → `assets_upload(purpose="product_image")`. Si el
+  producto ya existe en Ecom Magic, `product_id` ya trae su foto guardada. **El usuario no sube
+  ni arrastra nada.**
+- **Solo por navegador (fallback):** ahí sí la arrastra el usuario al recuadro "Imagen 1" —
+  ver `ui-navegacion.md` → "Subir la FOTO".
 
 ### Tamaño de salida del anuncio (obligatorio)
 Dropdown. Estándar Golden:
@@ -127,14 +150,23 @@ Tú escribes el copy de cada pieza (vía Instrucciones Adicionales / Detalles / 
 - **El precio** solo si la pieza es específicamente de oferta/pack y el usuario lo pide; si
   no, déjalo para el bloque nativo de golden-shopify (se edita sin regenerar).
 - **Nada inventado**: precios, claims y garantías salen de los datos reales del usuario.
+- 🔴 **Pega la LISTA NEGRA en `additional_instructions` SIEMPRE** (texto exacto en la Ley 6 del
+  SKILL.md). El generador inventa por defecto: etiqueta con ingredientes falsos, "garantizado",
+  "más de 10.000 usuarios". Sin la lista negra, lo hace. Y aun con ella, **audita el render**.
 - **Coherencia de marca**: no metas amarillos gratis en fondos/diseño; respeta la paleta real
   del producto (si el producto ya es amarillo, como Tag Recede, eso es *producto fiel*, no la
   regla que se evita).
 
 ## Supervisión y arreglo
 
-- **"Editar anuncio"** (en "Ver Anuncio") → instruye cambios concretos sobre una pieza ya
-  generada ("quita X, pon Y, cambia color").
-- **"Redimensionar"** → misma pieza en otro tamaño.
-- **"Traducir"** → otra versión de idioma.
-- **"Solicitar reembolso de crédito"** → si la pieza salió inservible, recupera el crédito.
+(Web → MCP: "Editar anuncio" = `banners_edit` · "Redimensionar" = `banners_resize` · "Traducir"
+= `banners_translate` · "Solicitar reembolso" = `refund_request`. Editar/redimensionar/traducir
+cuestan 1 crédito; el reembolso es gratis.)
+
+- **Editar** → cambios de bloque grande (titular, un beneficio, un color). ⚠️ **Si en la pieza se
+  LEE la etiqueta del producto, REGENERA en vez de editar**: la edición re-renderiza todo y deja
+  el texto fino del envase ilegible (verificado en vivo).
+- **Redimensionar** → misma pieza en otro tamaño sin rehacer el diseño.
+- **Traducir** → otra versión de idioma (mismo producto, otro país).
+- **Reembolso** → si la pieza salió inservible (etiqueta alterada, claim inventado), recupera el
+  crédito y regenera con la lista negra puesta.

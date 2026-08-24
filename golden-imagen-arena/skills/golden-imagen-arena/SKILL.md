@@ -20,6 +20,8 @@ description: >
 
 # golden-imagen-arena — Varias IAs compiten, una gana
 
+<!-- skill v1.9 · 2026-08-23 (Estándar 9 del auditor) · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
+<!-- skill v1.8 · 2026-08-22 (turno del CENTRO DE MANDO al chat FILTRO) · NUEVO references/vocabulario-foto.md: tabla español→token exacto para lente/focal, esquemas de luz con tamaño-ángulo-ratio, materiales y ángulo de cámara. ORIGEN: evaluación del método que vendía la guía "Higgsfield director de arte"; el método ya existía en golden-cinematica (ley de tokens exactos) pero su vocabulario es 100% web/3D. HUECO MEDIDO con grep sobre esta skill: 0 menciones de focal (35/50/85mm), 0 de softbox/difusor, las 2 de "lente" eran metafóricas. El bloque [1 ESCENA] decía "luz suave de estudio" (adjetivo): la arena medía interpretaciones, no motores. NO se tocaron las 5 leyes, ni compliance, ni componer.py, ni el disparador. -->
 <!-- skill v1.7 · 2026-08-21 (auditoría golden-skill-auditor): ley 2 ahora cubre el style_id de ms_image dentro del intake único del preflight (antes goteaba a mitad de la arena); paso 6 suma checklist explícito de "definición de terminado" antes de entregar a golden-shopify/golden-ads -->
 <!-- skill v1.6 · 2026-08-10 (loop del arsenal, semana 2 · producción): el corte de ANTES/DESPUÉS POR VERTICAL en references/prompt-maestro.md. La norma del 2026-08-07 prohibía el antes/después solo en dental; Meta 2026 lo prohíbe además en antiedad/arrugas/reafirmante y en pérdida de peso, y lo permite en cosmética general con 18+. Añadidos los dos transversales al bloque [5 PROHIBIDO]: segunda persona que señala la condición del espectador y titular de plazo con resultado (Meta juzga el significado implícito). Roster de motores verificado contra el MCP en vivo el 2026-08-10: al día. Parche espejo en golden-ecom-magic y golden-ugc-avatar -->
 <!-- skill v1.5 · 2026-08-07 (centro de mando, cosecha del chat un estudio de producto) · reglas de arte para SALUD (dental y afines) horneadas en references/prompt-maestro.md: PROHIBIDO bocas con lesiones visibles, antes/después de dentadura, delantal blanco/estetoscopio/sillón dental (aval médico aparente), porcentajes de resultados en pantalla y preguntas que señalen una condición del espectador; PERMITIDO y probado macro del gotario, textura, corte de esmalte ilustrado y lifestyle de baño. Van al bloque [5 PROHIBIDO] del prompt maestro cuando el vertical es salud -->
@@ -270,6 +272,9 @@ Si falta cualquier casilla, la arena no está lista para pasar a `golden-shopify
 
 - `references/motores.md` — catálogo verificado de los modelos disponibles, sus parámetros
   y cuándo usar cada uno. Léelo al armar la alineación de la arena.
+- `references/vocabulario-foto.md` — **cómo pedir la foto por su nombre técnico.** Frase en
+  español a la izquierda, token exacto a la derecha (lente, luz con ángulo y ratio, superficie,
+  ángulo de cámara). Ábrelo SIEMPRE que el encargo llegue vago y devuelve 3 opciones concretas.
 - `references/prompt-maestro.md` — plantilla del prompt de ecom y cómo escribir el texto
   que va dentro de la imagen. Léelo antes de generar.
 - `references/rubrica.md` — rúbrica de conversión para calificar y rankear. Léelo antes de

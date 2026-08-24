@@ -18,6 +18,10 @@ description: >-
 
 # golden-pdf-check · el estándar de PDF de Comunidad Golden
 
+<!-- skill v5.12 · 2026-08-23 (auditoría golden-skill-auditor v1.16, corrida desde el chat de Chatea Pro comentarios) · HALLAZGO CRÍTICO ENCONTRADO CORRIENDO LA SKILL COMO ESTÁ DOCUMENTADA (`python scripts/selftest.py`): el `from pypdf import PdfReader` de la prueba 6 vivía FUERA del try, así que un intérprete sin esa dependencia OPCIONAL mataba el self-test con un ModuleNotFoundError y se perdían las otras 14 comprobaciones — el reporte no salía nunca. Ahora los imports opcionales (pypdf, pdfplumber de la prueba de figuras) van DENTRO del try: la prueba que no se puede correr sale [FAIL] con el motivo y el resto sigue. MEDIDO en los dos intérpretes: sin pypdf → 14 PASS + 1 FAIL con motivo (antes: traceback, 0 resultados); con todas las deps → 15/15 TODO OK. Además: dependencias declaradas por script en la sección de self-test (cuál necesita qué y que todas degradan), `assets/selftest-sample.md` citada por nombre con la advertencia de no editar el fixture, y se retiró una prueba de líneas largas que quedó DUPLICADA por trabajo simultáneo de otra sesión el mismo día. -->
+<!-- skill v5.11 · 2026-08-23 (auditoría golden-skill-auditor, segunda pasada del día) · CRÍTICO: los 5 comandos documentados decían `python`, binario que NO existe en el Mac de Golden — un chat limpio recibía `command not found`. Ahora la skill declara el intérprete ($PY = ~/.golden/pdfenv/bin/python con fallback a python3, sección 'Antes de correr nada') y todos los comandos lo usan: el conocimiento vivía en la memoria del ecosistema, no en la skill. Además: golden-brand.json declaraba card_max_mm=250 (el real lo DERIVA build_pdf.py = 246) y la tipografía del sistema en vez de las fuentes incrustadas — dos datos desfasados en el archivo que el SKILL.md señala como el sitio de tokens; se corrigieron con nota de quién manda. CSS muerto .note-card retirado (v5.7 la reemplazó por .block). El fixture propio violaba la regla ≤76 y disparaba el aviso en CADA corrida (efecto 'cry wolf'): re-envuelto con las MISMAS palabras + 2 casos nuevos en selftest (el aviso dispara cuando debe / la muestra oficial no lo dispara) = 13 pruebas. Conexión con el Centro de Mando declarada (estándar 9). -->
+<!-- skill v5.10 · 2026-08-23 (auditoría golden-skill-auditor v1.16, 919→ORO) · (1) v5.9 quedaba SIN DECLARAR: sus dos cambios vivían solo en comentarios del CSS — se declaran abajo; (2) `::: nombre Título` (bloques con estilo, v5.7) faltaba en references/content-format.md, el archivo que enseña el formato: agregado a la tabla y con sección propia; (3) geometry.card_max_mm de golden-brand.json decía 250 cuando el valor real derivado es 246 (área útil − colchón de 20mm) — corregido y marcado como derivado; (4) `.note-card` era CSS muerto desde v5.7 (nada lo genera; lo reemplazó `.block`) — retirado; (5) el puntero al logo naranja `PROYECTOS/SKOOL/logo-comunidad-golden.svg` estaba MUERTO (esa carpeta ya no existe) en 3 archivos — corregido; (6) selftest 11→13: prueba de bloque con estilo (v5.7) y prueba de que el aviso de líneas largas (v5.8) se dispara — antes esas versiones no tenían red de regresión; (7) ORDEN FER declarado en Verificación: auditar el PDF CANDIDATO y solo instalarlo si dice APROBADO; (8) docstrings al día (selftest 1-4→13 pruebas, audit_pdf --palette). Conexión: los cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO. -->
+<!-- skill v5.9 · 2026-08 (declarada retroactivamente en v5.10; vivía solo en el CSS) · (a) `code.inline` con break-inside:avoid + white-space:nowrap — un span de código en línea que caía en el borde se partía a la mitad de la palabra (medido: informe otra marca, pág 12→13, "SIN MOVIMIENTOS" rebanado); (b) rediseño de tablas: el oro pasa de RELLENO de cada th a ACENTO (borde inferior 2px) + filas alternas y más padding — 24 tablas de un informe inundaban la hoja de amarillo y se veía aglomerado (medido por FER sobre el PDF real) -->
 <!-- skill v5.8 · 2026-08-07 (centro de mando, cosecha del chat un estudio de producto) · LÍNEAS LARGAS EN TARJETAS: dentro de una tarjeta monoespaciada, una línea de más de ~76 caracteres se ENVUELVE al renderizar y la compuerta verbatim la reporta como "espaciado/orden alterado" (pasó con dos prompts de imagen; se resolvió reescribiéndolos a 72-84 chars/línea). Regla de redacción "líneas de tarjeta ≤ 76 caracteres" en content-format.md + build_pdf.py AVISA antes de renderizar con tarjeta y línea exactas (⚠️ LÍNEAS LARGAS EN TARJETAS por stderr) -->
 <!-- adenda 2026-08-20 (centro de mando, autoevalúo del ecosistema): references/brand.md quedó citada desde el SKILL.md — era el único componente de la skill sin cita (hueco genuino confirmado por el inventario v1.8 del auditor); util, se cita, no se retira. -->
 <!-- skill v5.7 · TEMAS: `--css tema.css` anexa una hoja que solo redefine variables/colores (la identidad Golden queda intacta por defecto) y `--palette paleta.json` hace que audit_pdf.py juzgue con OTRA paleta permitida. Ademas bloques con estilo `::: nombre Titulo … :::` -> <div class="block nombre"> con el contenido procesado como Markdown (para que un documento largo respire: destacados, avisos, tablas de datos). Origen: manual M3 del MBA con la identidad naranja/cian del programa -->
@@ -91,6 +95,44 @@ carácter. Ante la duda, no lo cambies.
 
 ---
 
+## Antes de correr nada · el intérprete
+
+Los scripts necesitan `playwright`, `pdfplumber`, `Pillow` y `pypdf`. **No existe
+el binario `python` en el Mac de Golden** (solo `python3`), y las dependencias
+viven en un entorno propio. Resuelve el intérprete UNA vez y úsalo en todos los
+comandos de esta skill:
+
+```bash
+PY=~/.golden/pdfenv/bin/python; [ -x "$PY" ] || PY=python3; echo "$PY"
+```
+
+Ese es el `$PY` que aparece en los comandos de abajo. El entorno `~/.golden/pdfenv`
+es el oficial de Golden para PDFs; si algún día no está, `python3` sirve mientras
+tenga las cuatro dependencias. Si falta alguna:
+
+```bash
+$PY -m pip install playwright pdfplumber pillow pypdf && $PY -m playwright install chromium
+```
+
+Escribir `python` a secas falla con `command not found` — por eso los comandos de
+esta skill nunca lo usan.
+
+## Conexión con el ecosistema
+
+**Fábrica: chat ✅ SKILL golden-pdf-check.** Ahí se repara esta skill; los demás chats
+reportan defectos medidos en vez de editarla (REGISTRO-FABRICAS lee esta línea para
+resolver el dueño, y los actores de auditoría masiva la respetan). Se declara AQUÍ, en el
+archivo, y no solo en memoria: una fábrica que vive solo en la memoria del ecosistema
+desaparece si alguien reformula esa nota.
+
+Los cambios relevantes de esta skill (defectos medidos en producción, normas
+nuevas de FER sobre la maquetación) se reportan a **🧠 GOLDEN - CENTRO DE MANDO**,
+que es quien decide si la lección se retransmite a otros chats. Varias versiones
+de esta skill nacieron así: un chat construyendo un entregable real midió el
+defecto y lo mandó a la fábrica. Ese circuito es el que la mantiene viva.
+
+---
+
 ## Paso A · Construir un PDF Golden
 
 1. Prepara el contenido en **Markdown-Golden**. Lee `references/content-format.md`.
@@ -101,7 +143,7 @@ carácter. Ante la duda, no lo cambies.
 
 2. Genera el PDF:
    ```bash
-   python scripts/build_pdf.py contenido.md salida.pdf
+   $PY scripts/build_pdf.py contenido.md salida.pdf
    ```
    El script arma el HTML con la identidad Golden (`assets/golden-print.css`),
    corre el auto-fit (`assets/autofit.js`) y renderiza a PDF. Al terminar corre
@@ -150,7 +192,7 @@ carácter. Ante la duda, no lo cambies.
   en el pie ("Comunidad Golden · Página X de Y") y ejecuta el auto-fit midiendo
   al ancho exacto del PDF. Es el motor por defecto. Si algún día falta:
   ```bash
-  pip install playwright && python -m playwright install chromium
+  $PY -m pip install playwright && $PY -m playwright install chromium
   ```
 - **Fallback: Chrome headless** (el script lo detecta solo). Mantiene bloques
   atómicos y ahora mide al ancho correcto (`--window-size`), pero sin numeración
@@ -162,7 +204,7 @@ carácter. Ante la duda, no lo cambies.
 ## Paso B · Auditar un PDF existente
 
 ```bash
-python scripts/audit_pdf.py documento.pdf --json informe.json
+$PY scripts/audit_pdf.py documento.pdf --json informe.json
 ```
 
 Revisa:
@@ -208,7 +250,7 @@ Cuando la auditoría marca problemas o el usuario quiere el resultado perfecto:
 4. **Compuerta verbatim obligatoria:** compara el texto del PDF viejo contra el
    nuevo para garantizar que no cambió ni una palabra:
    ```bash
-   python scripts/verbatim_check.py --old viejo.pdf --new nuevo.pdf
+   $PY scripts/verbatim_check.py --old viejo.pdf --new nuevo.pdf
    ```
    Exit 0 = idéntico; exit 3 = hay diferencias (te lista qué segmentos). Si hay
    diferencias, NO entregues: revisa la extracción y corrige. Nunca alteres el
@@ -219,6 +261,14 @@ Cuando la auditoría marca problemas o el usuario quiere el resultado perfecto:
 ---
 
 ## Verificación (siempre antes de entregar)
+
+**ORDEN OBLIGATORIO (norma FER):** *la skill revisa, aprueba, y ahí mismo sí se
+entrega.* La auditoría va **ANTES** de instalar el PDF en su destino, no después
+de anunciarlo. El flujo correcto es: `selftest.py` (la skill está sana) →
+renderizar a un **PDF candidato** en una carpeta temporal → `audit_pdf.py` sobre
+ese candidato → **solo si dice APROBADO** se copia al destino final y se avisa.
+Nunca sobrescribas el PDF bueno con uno sin auditar, ni digas "listo" antes del
+veredicto.
 
 Confirma que el PDF quedó bien:
 
@@ -238,11 +288,22 @@ Si tocas el CSS, el parser o el auto-fit, corre el self-test antes de dar por
 buena la skill. Construye una muestra y verifica build + verbatim + anti-corte:
 
 ```bash
-python scripts/selftest.py
+$PY scripts/selftest.py
 ```
 
 Debe imprimir `TODO OK`. Si algo sale FAIL, arréglalo antes de usar la skill en
-material real.
+material real. La muestra que construye es `assets/selftest-sample.md`, que trae
+horneadas las trampas de copy-paste (`>>`, `//`, `https://`, `<<X>>`, un emoji y
+una tarjeta larga): **no edites ese texto**, es el fixture de regresión.
+
+**Dependencias por script** (para que un FAIL se lea bien): `build_pdf.py` y
+`audit_pdf.py` necesitan `pdfplumber` (compuerta verbatim y auditoría) y
+`playwright` (motor con numeración); la auditoría de color usa `Pillow` +
+`pdftoppm`; `selftest.py` además usa `pypdf` para leer las fuentes incrustadas.
+Todas son **opcionales con degradación**: si falta una, esa comprobación sale
+FAIL con el motivo y el resto sigue — ninguna tumba la corrida. Si el intérprete
+del sistema no las tiene, corre los scripts con uno que sí (un venv propio) en
+vez de asumir que la skill quedó mal.
 
 ## Personalización de marca
 
@@ -251,7 +312,9 @@ Todo vive en `assets/`:
 - `golden-print.css` — estilo de impresión (portada, tarjetas, tablas).
 - `logo-golden.svg` — **emblema oficial Golden Group Community** (el círculo
   dorado/negro con las GG; es el PNG oficial incrustado en un envoltorio SVG).
-  El naranja de comunidad vive en `PROYECTOS/SKOOL/logo-comunidad-golden.svg`.
+  (El naranja de comunidad que se usó de origen ya NO está en disco: la carpeta
+  `PROYECTOS/SKOOL/` fue retirada. Si algún día se quiere volver a él, hay que
+  re-subir el archivo; no queda copia dentro de la skill.)
 - `autofit.js` — lógica anti-corte. El alto máximo por tarjeta (`--card-max-mm`,
   variable CSS) lo **deriva build_pdf.py de la geometría real** (única fuente de
   verdad: área útil − colchón) y lo inyecta; el valor escrito en el CSS es solo

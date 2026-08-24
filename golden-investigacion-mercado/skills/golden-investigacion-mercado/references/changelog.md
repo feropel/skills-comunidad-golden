@@ -1,13 +1,159 @@
 # Changelog — GOLDEN INVESTIGACIÓN DE MERCADO
 
 ## Índice (orden cronológico DESCENDENTE — más reciente arriba)
-G5.9 · G5.8.1 · G5.8 · G5.7 · G5.6 · G5.5 · G5.4 · G5.3 · G5.2 · G5.1 · G5.0 · G4.3 · G4.2.1 · G4.2
-· G4.1 · G4.0 · G3.10 · G3.9 · G3.8 · G3.7 · G3.6 · G3.5 · G3.4 · G3.3 · G3.2 · G3.1 · G3.0 · G2.5
-· G2.4 · G2.3 · G2.2 · G2.1 · G2.0 · G1.0
+G5.12 · G5.11 · G5.10 · G5.9 · G5.8.1 · G5.8 · G5.7 · G5.6 · G5.5 · G5.4 · G5.3 · G5.2 · G5.1 · G5.0 · G4.3
+· G4.2.1 · G4.2 · G4.1 · G4.0 · G3.10 · G3.9 · G3.8 · G3.7 · G3.6 · G3.5 · G3.4 · G3.3 · G3.2 · G3.1
+· G3.0 · G2.5 · G2.4 · G2.3 · G2.2 · G2.1 · G2.0 · G1.0
+
+## G5.12 — 2026-08-23 — Auditoría `golden-skill-auditor` (888 → 985): la skill se aplicó a sí misma lo que predica
+
+Dos hallazgos CRÍTICOS, ambos del mismo tipo — **afirmaciones propias que nadie había verificado**,
+que es justo el error que esta skill enseña a evitar:
+
+**1. El candado de auto-verificación estaba desactivado por el propio blindaje.**
+`scraping-firecrawl.md` declara textualmente que `scripts/fuentes_baseline.json` *"queda fuera del
+blindaje a propósito: el script tiene que poder reescribirlo. Si se blinda, la suite deja de poder
+actualizarse."* Estado real medido: tenía `uchg` (17 de 17 nodos) y la escritura fallaba. Cuando la
+matriz caducara (60 días desde el 2026-08-02, faltaban 39), `verificar_fuentes.py --baseline` habría
+muerto y la skill habría perdido su detector de cambio de fuentes sin que nadie se enterara.
+Fix: el baseline queda fuera del blindaje y el ritual de re-blindaje lo respeta explícitamente.
+
+**2. El índice del changelog prometía 3 versiones que no existían.** El índice listaba
+G5.9 · G5.8.1 · G5.8, pero el cuerpo saltaba de G5.10 a G5.7 — y otra entrada citaba "Nota de
+auditoría G5.9", una referencia a una sección inexistente. Las tres son versiones reales (su
+contenido sobrevivía resumido en el sello `GIM_VERSION` del SKILL.md): la auditoría 943→1000, la
+minería de YouTube completa con `yt-dlp` + `whisper-cpp`, y el afinado del modelo ya cacheado.
+**Restauradas** desde ese contenido; índice y cuerpo ahora coinciden 1 a 1 (verificado por script).
+
+Mejorables reparados: numeración de `reglas-de-oro.md` iba 9 → 10.5 → 10.6 → 10 (la regla 10
+aparecía DESPUÉS de sus propias sub-reglas) y los puntos de la regla 9 iban 1,2,3,5,4 → reordenados ·
+la lección Toppik ("los precios del estudio son REFERENCIA, no decisión") vivía solo en references y
+ahora es la **REGLA 11 del SKILL.md**, que es lo único que siempre se lee · "Archivos de esta skill"
+omitía los 2 scripts, incluido el candado que el propio cuerpo ordena correr → listados ·
+`dossier-psicologico.md` capa 30 citaba "(Fase 4)", fase que no existe post-split → corregido ·
+signo de apertura eliminado · **Estándar 9 instalado**: la skill declara su conexión con el Centro
+de Mando.
+
+Verificado EN VIVO durante la auditoría, no asumido: `candado_scraping.py` caza el modo 4 (captcha
+con title poblado) y deja pasar el dato bueno; `yt-dlp` y `whisper-cli` responden a `which`.
+Ningún conocimiento de campo se perdió — todo fue orden, trazabilidad y desbloqueo.
+
+## G5.11 — 2026-08-23 — Auditoría adversarial encuentra el punto ciego del candado G5.10
+
+FER pidió, antes de entregar la ronda de 5 estudios ya corregida en G5.10, una autoevaluación
+adversarial con `golden-verificador` (solo ve el resultado final y el estándar, no cómo se
+construyó). El verificador confirmó que el trabajo de G5.10 fue real (dossier 30/30 en los 5,
+compliance INVIMA contrastado palabra por palabra contra la fuente oficial, precios de competidor
+exactos al peso, minería de YouTube genuina) — pero encontró 3 fallas nuevas de sistema:
+
+**1. El candado de la regla 9 (conteo de menciones) no detecta un "injerto de párrafo".** Un
+párrafo completo de Magnesium Complex (9 líneas, incluida una frase citando el nombre del otro
+producto) quedó pegado literalmente dentro del estudio de Resveratrol. Pasaba el candado porque el
+conteo era 197 menciones propias contra 4 ajenas — un párrafo pegado no mueve ese número lo
+suficiente para disparar la alarma. Fix: regla 9 punto 5 — verificación adicional obligatoria de
+intersección de bloques de texto literal (&gt;60 caracteres) contra los otros estudios de la corrida,
+con atención especial a las secciones de "condiciones"/"cobertura"/"handoff", que es donde vive la
+plantilla reutilizada sin darse cuenta de a quién pertenece.
+
+**2. `[PENDIENTE]` declarado sobre un insumo que ya estaba en la carpeta.** El estudio de Beevana
+declaró faltante la foto de etiqueta del producto mientras esa foto ya estaba guardada en la carpeta
+del proyecto — con datos que contradicen el costeo del propio documento (etiqueta real: 60 g; el
+estudio costeó proveedor/margen/flete sobre 30 g) y un ítem de compliance no señalado (el envase
+dice "ARTHRITIS"). Fix: regla 10.5 — `ls -la` de la carpeta del proyecto obligatorio antes de
+escribir cualquier `[PENDIENTE]` por insumo faltante.
+
+**3. Veredicto y resumen ejecutivo no se reconcilian con secciones nuevas que los contradicen.**
+Beevana sección 11 concluye "el negocio NO es rentable a esa escala" y la sección 10 (veredicto)
+sigue diciendo "margen amplio, lanzar con condiciones" — sin tocarse entre sí. Fix: regla 10.6 —
+toda actualización que cambie un dato de viabilidad reescribe veredicto y resumen ejecutivo en el
+mismo momento; y "N de N secciones completadas" se mide contra las 10 secciones del estándar
+(`02-documento-maestro.md`), no contra lo que el documento efectivamente escribió (3 de 5 estudios
+declaraban "9 de 9" o "10 de 10" cuando les faltaban Buyer Personas y/o Estrategia de Mensaje).
+
+Reportado al Centro de Mando junto con G5.10. Ningún conocimiento de campo se perdió — solo se
+añadieron los candados 9.5, 10.5 y 10.6 sobre lo que ya existía.
 
 > Nota de auditoría G5.9: G4.2 y G4.2.1 (2026-07-29) vivían mal insertadas al final del archivo,
 > después de G1.0 — rompían el orden cronológico descendente que respeta el resto del changelog.
 > Reubicadas aquí, entre G4.3 (2026-07-30) y G4.1 (2026-07-27), que es donde su fecha las ubica.
+
+## G5.10 — 2026-08-22 — Incidente real: contaminación cruzada entre agentes + falso negativo de herramienta
+
+Corrida real de 5 estudios en paralelo (Magnesium Complex, Beevana, Turmeric Curcumin, Soft Serve
+Serum, Resveratrol Complex — nombres genéricos, no hay dueño de marca en ninguno). FER auditó él
+mismo los `.docx` entregados abriendo el XML y contando menciones por producto — y encontró que uno
+de los cinco estaba mal, algo que ni la propia corrida ni el reporte del agente habían detectado.
+
+**Incidente 1 — contaminación cruzada por carpeta de trabajo compartida.** Un agente reconstruyendo
+el `.docx` de Soft Serve Serum Truly usó una carpeta de trabajo con nombre fijo (`unpacked/`) sobre
+el scratchpad compartido de la sesión. Otro agente, corriendo en paralelo sobre Magnesium Complex,
+usaba una carpeta con el mismo nombre. Se pisaron. El documento final en el Escritorio tenía el
+título correcto ("Soft Serve Serum Truly") pero 143 menciones de magnesio/magnesium contra solo 12
+de "truly" por dentro — el contenido real era casi todo de otro producto. El candado que ya existía
+("el XML es válido? hay texto real?") **pasaba en verde** porque la corrupción no rompe el
+formato del documento, solo mezcla el contenido de dos investigaciones distintas.
+- Fix: **regla 9 nueva en `reglas-de-oro.md`** — toda carpeta de trabajo para editar/reconstruir un
+  `.docx` debe llevar un sufijo único e impredecible por ejecución (PID, timestamp con milisegundos,
+  o `mktemp -d`), nunca un nombre fijo. Y, más importante: **después de guardar**, contar menciones
+  del producto correcto vs. cualquier otro producto que pueda estar corriendo en paralelo — si no
+  hay un margen claro, no se declara terminado, se repite desde una carpeta limpia.
+
+**Incidente 2 — falso negativo de herramienta.** Varios de los 5 agentes declararon `[PENDIENTE]`
+la minería de comentarios de YouTube (`yt-dlp --write-comments`) y la transcripción local
+(`whisper-cli`) con la frase "el entorno no tiene acceso a esas herramientas de scraping" — **sin
+correr `which yt-dlp` ni `which whisper-cli`** para comprobarlo. Verificado después, en la máquina
+real: ambas SÍ están instaladas (`yt-dlp` 2026.07.04 en `/opt/homebrew/bin/`, `whisper-cli` del
+paquete `whisper-cpp` 1.9.1, con el modelo `ggml-small.bin` ya cacheado por `hyperframes`). El
+"hueco de cobertura" reportado en los 5 estudios para este punto era una suposición del agente, no
+una limitación real del entorno.
+- Fix: **regla 10 nueva en `reglas-de-oro.md`** — prohibido escribir `[PENDIENTE]` por "herramienta
+  no disponible" sin haber corrido el comando de verificación (`which <herramienta>`) y citado la
+  salida real. Solo un fallo real, con evidencia, justifica el `[PENDIENTE]`.
+
+**Reportado al Centro de Mando** por mandato explícito de FER ("esto no puede volver a pasar, avísale
+al centro de mando"). Ningún conocimiento de campo se perdió — solo se añadieron los dos candados
+(reglas 9 y 10) sobre lo que ya existía.
+
+## G5.9 — 2026-08-21 — Auditoría golden-skill-auditor (943 → 1000)
+
+Cinco hallazgos con evidencia, todos reparados en su momento:
+- **`README-COMUNIDAD.md` era material intruso en la raíz** (la política de la casa deja en la raíz
+  solo `SKILL.md` + `references/scripts/assets/agents`; ninguna otra skill golden- lo tenía suelto)
+  → movido a `references/README-COMUNIDAD.md`, con su puntero en la lista de archivos.
+- **`scraping-firecrawl.md` y `changelog.md` superaban las 300 líneas sin tabla de contenido**
+  (regla de Estructura de la rúbrica) → índice agregado a ambos.
+- **G4.2 y G4.2.1 (2026-07-29) estaban insertadas AL FINAL del archivo, después de G1.0** — rompían
+  el orden cronológico descendente → reubicadas entre G4.3 y G4.1, que es donde su fecha las pone.
+- **Se citaba el dominio real de un competidor** como caso de estudio, contra la propia política
+  G3.2 de esta skill (changelog generalizado, sin nombres de terceros) → genericizado a "una tienda
+  real de gotas dentales (Chile)"; la lección técnica quedó intacta.
+- **description sin cláusula negativa explícita** ("no construye páginas, no pauta") → agregada.
+
+Ningún conocimiento de campo se perdió: fue reorganización y limpieza.
+
+## G5.8.1 — 2026-08-11 — El modelo de whisper ya estaba en el equipo (afinado desde la fábrica de golden360)
+
+Dato de campo llegado por la red sináptica: seguir la receta de transcripción a ciegas
+**re-descargaba ~500 MB para nada**, porque `hyperframes` ya deja el modelo en
+`~/.cache/hyperframes/whisper/models/ggml-small.bin`. La receta del §1.6 de
+`01-investigacion-360.md` ahora **mira primero si el modelo existe** y solo descarga si falta.
+Edición mínima: ese archivo y el sello.
+
+## G5.8 — 2026-08-11 — MINERÍA DE YOUTUBE COMPLETA: la locución también se mina
+
+La sección 1.6 decía *"si hay MCP de transcripción de video disponible"* — en condicional — y por
+eso **la locución de los videos no se minaba nunca**. Ahora es concreto y medido:
+- **Comentarios** con `yt-dlp --write-comments`, **con su `like_count`**, en vez de depender de que
+  Firecrawl alcanzara los primeros. El like es un **voto**: la queja más votada es la objeción más
+  común del mercado, no la más ruidosa. *Medido: 25 comentarios con likes reales en una corrida.*
+- **Locución** transcrita en **LOCAL** con `whisper-cpp` — gratis, sin llave y sin que el archivo
+  salga del equipo. *Medido: 7,5 min de audio en 29 s.* Receta portable en el §1.6.
+- Instrucción dura: **transcribir los 3–5 videos top**, porque el guion hablado es el argumento de
+  venta que ya le funciona a alguien, y los subtítulos quemados no se leen del fotograma (van una
+  palabra por cuadro).
+
+Porqué del hueco, para que no se repita: la capacidad ya existía en `golden-video-editor` desde
+antes y **nunca se propagó** a las skills que la necesitaban.
 
 ## G5.7 — 2026-08-07 — Cosecha del chat "un estudio de producto(Chile)" (6 ítems)
 Repartido por el Centro de Mando desde la bandeja (orden de FER: "sin omitir detalle"). Todo salió

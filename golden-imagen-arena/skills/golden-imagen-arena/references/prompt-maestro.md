@@ -14,6 +14,9 @@ the product to be composited later; no rectangle, no panel, no block of flat col
 
 ```
 [1 ESCENA]      qué se ve, dónde está el producto, luz y fondo
+                ⚠️ si el encargo viene vago ("bonita", "elegante", "que se vea cara"),
+                NO adivines: abre `references/vocabulario-foto.md` y devuelve 3 opciones
+                concretas (lente + esquema de luz + superficie + ángulo) para que elija
 [2 PRODUCTO]    la referencia manda: "usa el producto de la imagen de referencia
                 EXACTAMENTE como es — mismo envase, mismo logo, misma etiqueta,
                 mismos colores. No lo redibujes ni inventes texto sobre el empaque"
@@ -65,7 +68,7 @@ the product to be composited later; no rectangle, no panel, no block of flat col
 
 ## Reglas de arte para SALUD (dental y afines) — norma del Centro de Mando 2026-08-07
 
-Probadas en campo en el estudio dental de Chile. Aplican a todo prompt de imagen cuando el
+Probadas en campo en el un estudio de producto. Aplican a todo prompt de imagen cuando el
 vertical es salud bucal o parecido (suplementos, piel, capilar con claim sensible):
 
 **PROHIBIDO en la imagen:**

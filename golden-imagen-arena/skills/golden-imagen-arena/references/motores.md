@@ -115,8 +115,7 @@ real antes de renovar**. Si el mes fue flojo, dilo con este número, no con una 
 
 ## Lo que NO está aquí
 
-- **Ecom Magic** (el sitio ecom-magic.ai) no tiene API ni MCP (verificado en la cuenta y
-  en su web). Solo navegador; por eso quedó fuera de esta arena.
+- **Ecom Magic**: SÍ tiene MCP oficial desde la v2.0 de golden-ecom-magic (2026-08) — la afirmación anterior de que no tenía API era de la vía vieja y quedó cazada por la ley de migración de vía (2026-08-23). Cuando Ecom Magic aplique, la productora es golden-ecom-magic por su MCP; esta arena manda cuando hay que COMPARAR motores.
 - **Open-Generative-AI** (`Anil-matcha/Open-Generative-AI`, 24,9k ⭐, MIT) se vende en
   redes como "la alternativa open source que mata a Higgsfield". **Auditado y descartado
   el 2026-07-27**, por tres razones verificadas:

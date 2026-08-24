@@ -24,7 +24,7 @@
 - **Categoría:** Marketing · **Idioma:** español
 - **Cuerpo:**
 ```
-Hola {{1}}, soy Vale 🙂 vi que dejaste tu Sérum Aurora casi listo. Te ayudo a cerrar el pedido en 1 minuto, lo quieres para 1 o 2 unidades.
+Hola {{1}}, soy Vale 🙂 vi que dejaste tu Sérum Aurora casi listo. Te ayudo a cerrar el pedido en 1 minuto, lo quieres para 1 o 2 unidades?
 ```
 - **Botón:** Respuesta rápida → "Sí, ayúdame"
 
@@ -43,7 +43,7 @@ Con el Sérum Aurora no arriesgas nada: pagas contra entrega cuando lo recibes e
 *Dispara a ~20-24 h · texto libre si la ventana sigue abierta; con plantilla si ya pasó de 24 h*
 
 ```
-Nos queda poco stock de esta tanda del Sérum Aurora y la promo de envío gratis cierra pronto. Te aparto el tuyo hoy, lo confirmo.
+Nos queda poco stock de esta tanda del Sérum Aurora y la promo de envío gratis cierra pronto. Te aparto el tuyo hoy, lo confirmo?
 ```
 
 ---
@@ -56,13 +56,13 @@ Nos queda poco stock de esta tanda del Sérum Aurora y la promo de envío gratis
 - **Categoría:** Marketing · **Idioma:** español
 - **Cuerpo:**
 ```
-Hola {{1}}, te guardé tu Sérum Aurora con envío gratis y una mini-muestra de regalo. Lo activo hoy y te llega contra entrega. Lo cerramos.
+Hola {{1}}, te guardé tu Sérum Aurora con envío gratis y una mini-muestra de regalo. Lo activo hoy y te llega contra entrega. Lo cerramos?
 ```
 - **Botón:** Respuesta rápida → "Sí, lo quiero"
 
 **Campo Instrucción especial (mensaje + [Instrucción IA])**
 ```
-Hola {{1}}, te guardé tu Sérum Aurora con envío gratis y una mini-muestra de regalo. Lo activo hoy y te llega contra entrega. Lo cerramos.
+Hola {{1}}, te guardé tu Sérum Aurora con envío gratis y una mini-muestra de regalo. Lo activo hoy y te llega contra entrega. Lo cerramos?
 [Instrucción IA: si responde que sí, dispara el flujo de venta/logístico para tomar la dirección y confirmar el pedido. Si tiene una objeción, resuélvela y ofrece cerrar contra entrega. No repitas descuento si ya lo diste. Máximo 1 reactivación más y suelta.]
 ```
 

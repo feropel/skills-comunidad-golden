@@ -15,7 +15,9 @@ description: >
 
 # Golden Crítico — el abogado del diablo
 
-**Versión:** `GC1.1` · Fábrica: chat centro de mando.
+<!-- skill v1.2 (GC1.2) · 2026-08-23 (Estándar 9, golden-skill-auditor) · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
+
+**Versión:** `GC1.2` · Fábrica: chat centro de mando.
 Manual de criterio escrito por Fable 5: los pasos que el mejor modelo seguiría para criticar
 un plan de verdad. Cualquier modelo que lea esto debe seguirlos igual.
 
@@ -172,6 +174,9 @@ vale menos que uno de 3 donde los 3 pelean — porque el relleno se cuela a prod
 lo señala.
 
 ## Changelog
+- **GC1.2** (2026-08-23) — Estándar 9 (Centro de Mando, golden-skill-auditor): comentario HTML
+  bajo el H1 declarando que los cambios relevantes de esta skill se reportan a
+  🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. Cambio puntual, sin tocar el resto del contenido.
 - **GC1.1** (2026-08-21) — Auditoría golden-skill-auditor: añadida sección "Qué recibe y qué
   entrega" (intake único al inicio, degradación elegante sin brand-brain/datos/skills hermanas),
   Plantilla de salida con esqueleto exacto de markdown, y ejemplo corto entrada→salida ilustrativo

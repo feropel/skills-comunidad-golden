@@ -170,13 +170,6 @@ code.inline {
 .prompt-body.prose { font-family: var(--font); white-space: pre-wrap; }
 .prompt-card.was-scaled { box-shadow: 0 0 0 1px var(--gold-line) inset; }
 
-/* Bloque de prosa "prompt" (no monoespaciado), mismo comportamiento atómico */
-.note-card {
-  break-inside: avoid; page-break-inside: avoid;
-  border-left: 3px solid var(--gold); background: var(--surface-soft);
-  border-radius: 0 10px 10px 0; padding: 11px 15px; margin: 12px 0;
-}
-
 /* ============================================================
    FIGURA (pantallas, diagramas, capturas) — v5.6
    Atómica igual que la tarjeta de prompt: la imagen y su pie

@@ -17,7 +17,10 @@ description: >-
 
 # Golden Group — Análisis de Meta Ads
 
-**Versión:** `GMA1.1` · **Última modificación:** 2026-08-21 (auditoría golden-skill-auditor: CSV soportado + limpieza) · versión declarada el 2026-08-19 por el Centro de Mando para que el censo diario pueda detectar ediciones
+**Versión:** `GMA1.2` · **Última modificación:** 2026-08-23 (Estándar 9 — Conexión con el Centro de Mando) · versión declarada el 2026-08-19 por el Centro de Mando para que el censo diario pueda detectar ediciones
+
+<!-- skill v1.2 · 2026-08-23 · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
+<!-- skill v1.1 · 2026-08-21 · auditoría golden-skill-auditor: CSV soportado + limpieza (historial completo conservado abajo). -->
 
 <!-- 2026-08-07 · DESCRIPCIÓN RECORTADA: superaba el tope de ~1.536 caracteres del listado de skills y se estaba TRUNCANDO, así que las frases del final NO disparaban. Medido antes/después: 1565 → 821 chars. Lo que se movió al cuerpo son rutas de references y explicaciones; se conservaron y ampliaron las frases reales del usuario, que son lo que dispara. -->
 <!-- adenda 2026-08-20 (centro de mando, autoevalúo del ecosistema): resuelta la contradicción tarjeta/cuerpo — la description declara EL DISPARADOR ES EL ARCHIVO y el cuerpo ordenaba empezar SIEMPRE en vivo, ignorando el archivo que el usuario trajo. Regla nueva: con archivo sobre la mesa, el archivo manda y el vivo se ofrece como contraste; sin archivo, vivo. Coherente con la frontera declarada por golden-ads. -->

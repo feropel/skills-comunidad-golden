@@ -5,6 +5,7 @@ description: Golden Group — TEARDOWN exhaustivo de videos publicitarios (ads, 
 
 # Golden Group — Teardown de videos publicitarios
 
+<!-- skill v1.5 · 2026-08-23 (centro de mando) · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 <!-- skill v1.4 · 2026-08-21 (auditoría golden-skill-auditor) · Reparación tras auditoría 840/1000 (BRONCE):
      (1) corregido el sobre-promesa de Instagram/Facebook en el description y el Paso 0 — antes sonaba
      verificado, ahora dice explícitamente que solo YouTube/TikTok están medidos; (2) nuevo Paso "Intake"

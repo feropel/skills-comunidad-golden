@@ -24,6 +24,7 @@ description: >-
 
 # Golden Group — Agenda de Citas
 
+<!-- skill v1.2 · 2026-08-23 · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 <!-- skill v1.1 · 2026-08-21 · auditoría golden-skill-auditor: quitó el emoji 🦷 fijo (fosilizado a odontología pese a declarar negocio genérico), agregó casos borde (sin huecos, MCP caído, choque de horario, cliente sin contacto, zona horaria ambigua), manejo de error por paso, checklist de "terminado", ejemplo end-to-end, y delegación explícita a golden-automatizacion / golden-chatea-pro-* / golden-cobros. Reserva declarada: aún sin corrida en vivo contra un Google Calendar real con datos de un consultorio — validar el primer caso real y anotar aquí el resultado. -->
 <!-- skill v1.0 · fábrica de este chat · primera versión -->
 

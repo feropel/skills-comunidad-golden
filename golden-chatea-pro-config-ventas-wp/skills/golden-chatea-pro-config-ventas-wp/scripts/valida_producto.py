@@ -20,7 +20,11 @@ y verifica los DOS techos contra assets/limites.json:
     - palabras_clave/ids_de_anuncio con formato de 7 slots por comas
     - sin ¿ ¡ en textos que ve el cliente (estándar Golden)
 
-Con --registro además valida la entrada del Disparador de productos Extendido.
+Con --registro además valida la entrada del Disparador de productos Extendido y
+hace el chequeo D1: la palabra clave del producto y la del registro deben ser
+IDENTICAS BYTE A BYTE (si difieren, aunque sea en la posicion del slot, el
+producto no arranca — incidente Kingo Shop 2026-08-23). SIN --registro ese cruce
+NO se hace y el validador lo avisa.
 
 Uso:
     python3 valida_producto.py --in /ruta/<producto>_BOTFIELD.json \
@@ -102,6 +106,22 @@ def check_cuatro_bytes(nombre, texto):
         )
 
 
+def cargar_json(ruta, etiqueta):
+    """Carga un JSON con error LEGIBLE (antes: traceback de Python crudo).
+    Gemelo del makedirs de build_config: el usuario que teclea mal una ruta
+    o pega un JSON con una coma de mas merece un mensaje, no un stacktrace."""
+    try:
+        with open(ruta, encoding="utf-8") as f:
+            return json.load(f)
+    except FileNotFoundError:
+        sys.exit(f"ERROR: no existe el archivo de {etiqueta}: '{ruta}'. Revisa la ruta.")
+    except OSError as e:
+        sys.exit(f"ERROR: no se pudo leer {etiqueta} '{ruta}': {e}")
+    except json.JSONDecodeError as e:
+        sys.exit(f"ERROR: el {etiqueta} '{ruta}' no es JSON valido — {e}\n"
+                 "       Revisa comas de mas, comillas sin cerrar o llaves sin balancear.")
+
+
 def main():
     p = argparse.ArgumentParser()
     p.add_argument("--in", dest="entrada", required=True, help="JSON del Bot Field de producto lleno")
@@ -113,8 +133,7 @@ def main():
     lim = _lim["capa_nativa"]
     BOT = _lim["bot_field"]
 
-    with open(a.entrada, encoding="utf-8") as f:
-        prod = sin_meta(json.load(f))
+    prod = sin_meta(cargar_json(a.entrada, "producto (--in)"))
 
     # Regex reparado (verificador 2026-08-08): [A-Z0-9_]+ dejaba pasar {{Hueco}},
     # {{hueco}}, {{ X }}, {{X-2}}, {{X 3}} y slots simples sin llenar {URL_TIENDA}.
@@ -215,8 +234,7 @@ def main():
         check_apertura(nombre, texto)
 
     if a.registro:
-        with open(a.registro, encoding="utf-8") as f:
-            reg = sin_meta(json.load(f))
+        reg = sin_meta(cargar_json(a.registro, "registro (--registro)"))
         reg = reg.get("entrada_nueva", reg)
         print("\nEntrada del Disparador Extendido:")
         for clave in ("producto", "name", "keyW", "idAd", "estado"):
@@ -224,13 +242,31 @@ def main():
                 errores.append(f"registro: falta '{clave}'")
         if reg.get("producto") and reg.get("producto") != info.get("nombre"):
             avisos.append("registro.producto no coincide con informacion_de_producto.nombre")
-        kw_prod = (act.get("palabras_clave") or "").strip(",")
-        kw_reg = (reg.get("keyW") or "").strip(",")
+        # D1 (incidente Kingo Shop 2026-08-23): la palabra clave del producto y la
+        # entrada del Disparador deben coincidir BYTE A BYTE. El .strip(",") anterior
+        # enmascaraba diferencias reales de POSICION de slot ("A,,,,,," vs ",A,,,,,"
+        # comparaban iguales) — probado: pasaba como valido. Ahora comparacion exacta.
+        kw_prod = act.get("palabras_clave") or ""
+        kw_reg = reg.get("keyW") or ""
         if kw_prod and kw_reg and kw_prod != kw_reg:
-            errores.append("La palabra clave del registro NO coincide con la del producto")
+            errores.append(
+                "D1 ROTO: la palabra clave del producto y la del registro NO son identicas "
+                "byte a byte — el producto NO va a arrancar.\n"
+                f"       producto.palabras_clave -> {kw_prod!r}\n"
+                f"       registro.keyW           -> {kw_reg!r}"
+            )
+        elif kw_prod and kw_reg:
+            print("  D1: palabra clave identica byte a byte producto<->registro  OK")
         check_slots("registro.keyW", reg.get("keyW"))
         check_cuatro_bytes("registro.keyW", reg.get("keyW"))
         print(f"  producto={reg.get('producto')} · name={reg.get('name')} · estado={reg.get('estado')}")
+
+    if not a.registro:
+        avisos.append(
+            "Sin --registro NO se verifico D1 (palabra clave del producto == entrada del "
+            "Disparador Extendido, byte a byte). Ese cruce es el que evita que el producto "
+            "no arranque: corre el validador con --registro antes de dar el producto por bueno."
+        )
 
     if avisos:
         print("\n⚠️  Avisos (no bloquean):")

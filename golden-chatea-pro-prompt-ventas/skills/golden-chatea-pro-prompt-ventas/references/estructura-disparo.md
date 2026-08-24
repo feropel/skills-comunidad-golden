@@ -82,8 +82,7 @@ Se registran **DOS activadores por producto**. El activador único (solo la fras
 funciona donde el enlace **precarga** el mensaje (botón de la página, CTA de WhatsApp en Meta),
 pero en **TikTok, los estados de WhatsApp y los comentarios NO hay nada que precargue** — ahí el
 cliente escribe a mano y el bot no dispara. (Misma familia del bug Libido UP: el orgánico decía
-"escribe RITUAL" y el activador registrado era otro. Solución probada en el estudio dental de
-Chile: frase completa + palabra corta "SONRISA".)
+"escribe RITUAL" y el activador registrado era otro. Solución probada en el un estudio de producto: frase completa + palabra corta "SONRISA".)
 
 **Activador 1 — la FRASE COMPLETA del anuncio/botón**, palabra por palabra, incluyendo el nombre
 del producto. Es la que dispara desde los canales con mensaje precargado:

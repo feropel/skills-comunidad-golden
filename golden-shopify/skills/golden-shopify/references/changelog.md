@@ -3,6 +3,30 @@
 Registro de versiones de la skill. Cada vez que se absorbe una mejora de una página
 real, se sube una versión aquí (ver el ritual de auto-mejora en SKILL.md).
 
+## G4.5 — 2026-08-23 — Auditoría golden-skill-auditor: se cierra la DEUDA del base + reestructura
+Hallazgos con evidencia, todos reparados:
+- 🔴 **DEUDA G4.x CERRADA:** `assets/product.base.json` seguía en el orden viejo de 17 secciones mientras
+  el embudo canónico documentado iba en 24 — el GENERADOR contradecía a su propia documentación.
+  **Regenerado a las 24** (21 del embudo + 3 de sistema) con los componentes que ya existían:
+  sec-dolor-segmentado, sec-cta-suelto ×3 (puertas 2/3/final), sec-seguridad, ticker medio,
+  sec-bloque-alternado (variantes + modo de uso), sec-combos, envío+garantía, sec-seo-aio-schema,
+  y candado/ignition/whatsapp como secciones sueltas. Condicionales (dolor público B, variantes)
+  y ruido (autoridad, ficha técnica, related) quedan apagados por defecto.
+- 🔴 **Sellos desincronizados en 3 versiones distintas a la vez:** SKILL.md G4.4 · config-center G4.3 ·
+  base.json **G3.14** (15 versiones atrás) → toda página generada salía sellada con una versión falsa.
+  Los 3 orígenes sincronizados a **G4.5**.
+- 🔴 **`## Paso 0 · Cerebro de marca` quedó ENCIMA del H1** (una adenda se insertó entre el frontmatter y
+  el título): el documento abría con una sección antes de su propio nombre → movido bajo el H1.
+- 🔴 **SKILL.md 623 líneas** (tope de la rúbrica: 500), con el PROTOCOLO TEMA VIVO **duplicado** (resumen
+  duro arriba + versión completa abajo) → la versión completa sale a `references/tema-vivo.md` y la tabla
+  del embudo a `references/embudo-canonico.md`; índice de archivos compactado. **623 → 491.**
+- 🟡 **Puntero muerto:** el resumen mandaba a "la línea ~460" para el detalle, que ya vivía en la 520 →
+  ahora apunta a un ARCHIVO, no a un número de línea (los números bailan con cada versión).
+- 🟡 **Contradicción interna:** el mismo bloque decía que Ignition sale del main (G4.0) y la línea
+  "Bloques del main" seguía listándolo → corregido.
+- ✅ Verificado: cero datos privados, cero referencias rotas (`scraping-firecrawl.md` es cita válida a
+  la skill hermana golden-investigacion-mercado), JSON válidos.
+
 ## G4.4 — 2026-08-22 — Cierre de auditoría golden-skill-auditor (críticos reparados)
 Auditoría verificó 9 hallazgos críticos contra el archivo real; los 9 se confirmaron y se repararon:
 1. **GFS_VERSION desincronizado** — el config center declaraba `"G3.14"` (~15 versiones atrás de la

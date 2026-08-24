@@ -133,8 +133,13 @@ def construir(a):
     ps = campo1["producto_segundos"]
     ps["prompt_datos"] = leer_prompt("reglas-estructura-producto.txt")
     if a.prompt_maestro:
-        with open(a.prompt_maestro, encoding="utf-8") as f:
-            ps["prompt_prompt"] = f.read().strip()
+        try:
+            with open(a.prompt_maestro, encoding="utf-8") as f:
+                ps["prompt_prompt"] = f.read().strip()
+        except OSError as e:
+            sys.exit(f"ERROR: no se pudo leer --prompt-maestro '{a.prompt_maestro}': {e}\n"
+                     "       Revisa la ruta. Si aun no existe, generalo con "
+                     "golden-chatea-pro-prompt-ventas (prompt de negocio).")
 
     notif = campo1["notificaciones"]["notificacion_1"]
     notif["whatsapp"] = a.whatsapp_notif
@@ -239,6 +244,19 @@ def main():
 
     ok, valores = reporte(campo1, campo2)
 
+    # COMPUERTA DE TOPES (gemela de la compuerta de huecos de v4.1.3): si un tope DURO
+    # se excede, NO se escribe archivo. Antes se escribian los 2 BOTFIELD igual y solo
+    # se salia con exit 1 — quedaba en disco un archivo con pinta de pegable que, si
+    # alguien lo pegaba, se guardaba CORTADO y mataba al bot en silencio: exactamente
+    # el fallo que esta skill existe para evitar.
+    if not ok:
+        print("!" * 62)
+        print("ERROR: un tope DURO se excede (ver arriba). NO se escribio ningun archivo.")
+        print("       Acorta el prompt maestro o lo variable del intake y vuelve a correr.")
+        print("       Los prompts fijos de assets/prompts/ NO se recortan.")
+        print("!" * 62)
+        sys.exit(1)
+
     # La salida es COMPACTA (ensure_ascii=False, separators): es lo que se guarda
     # y lo que minimiza el conteo contra el techo escapado.
     destino = os.path.dirname(os.path.abspath(a.out_prefix))
@@ -255,7 +273,7 @@ def main():
     print('  (crear los campos como tipo LONG JSON):')
     print('  _BOTFIELD_1.json -> campo "[Ventas Wp] Configuracion general"')
     print('  _BOTFIELD_2.json -> campo "[Ventas Wp] Configuracion general 2"')
-    sys.exit(0 if ok else 1)
+    sys.exit(0)
 
 
 if __name__ == "__main__":

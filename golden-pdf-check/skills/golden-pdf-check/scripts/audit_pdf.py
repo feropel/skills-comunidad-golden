@@ -14,7 +14,11 @@ Es un análisis HEURÍSTICO y ADVISORY: el arreglo definitivo es
 regenerar el PDF con build_pdf.py, que garantiza bloques atómicos.
 
 Uso:
-    python audit_pdf.py documento.pdf [--json informe.json]
+    python audit_pdf.py documento.pdf [--json informe.json] [--palette paleta.json]
+
+--palette: juzga el color contra OTRA paleta permitida, para documentos que no
+se emiten bajo la marca Golden (el MBA es el caso). El JSON debe traer la clave
+"allowed_hex_for_audit" con los hex de esa marca.
 
 Requiere pdfplumber (preferido) o pypdf. Si falta, indica cómo instalar.
 """

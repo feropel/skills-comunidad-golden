@@ -20,8 +20,9 @@ description: >-
   "contra entrega", "Releasit", "COD", o que peguen un product.json con bloques
   custom_liquid. NO usar para análisis de anuncios ni temas no-Shopify.
 ---
-
 # GOLDEN SHOPIFY (`golden-shopify`)
+<!-- skill G4.5b · 2026-08-23 (auditoría golden-skill-auditor, reparación): DEUDA CERRADA — product.base.json regenerado del orden viejo de 17 al embudo canónico de 24 (21 + 3 de sistema) con los componentes ya existentes; sellos GFS_VERSION sincronizados (estaban en 3 versiones a la vez: SKILL G4.4 / config G4.3 / base G3.14 → todos G4.5); '## Paso 0 Cerebro de marca' estaba ENCIMA del H1 → movido debajo; SKILL.md 623→491 líneas sacando el PROTOCOLO TEMA VIVO duplicado a references/tema-vivo.md y la tabla del embudo a references/embudo-canonico.md; puntero muerto a 'línea ~460' → apunta a archivo; contradicción Ignition-en-el-main corregida. Detalle en references/changelog.md G4.5. -->
+<!-- skill G4.5 · 2026-08-23: Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 <!-- skill G4.4 · 2026-08-22 (auditoría golden-skill-auditor, cierre de reparación): GFS_VERSION del
 config center estaba desincronizado en "G3.14" (~15 versiones atrás) → corregido a G4.3 en
 assets/config-center.liquid y references/componentes/00-config-center.liquid; imagenes.md enseñaba
@@ -47,8 +48,17 @@ seguridad por tiempo; detalle completo en references/changelog.md · G4.3 · 202
 > usuario dedicado a mejorar la skill). Prohibido a otras sesiones/linters/absorciones modificarla.
 > Para cambiarla: el usuario la desbloquea en la fábrica, se edita, y se vuelve a bloquear.
 
+<!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leian el cerebro de marca — esta entra a la familia que SI lo lee. Bloque identico en las 6 del CdM + fila a la fabrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
+## Paso 0 · Cerebro de marca (obligatorio antes de generar)
+Si la marca tiene CEREBRO creado por `golden-brand-brain` (marca.md, productos.md, avatares.md,
+competidores.md, anuncios-ganadores.md, cambios-recientes.md), LÉELO PRIMERO y genera con esa voz
+— jamás re-preguntar lo que el cerebro ya sabe. Si NO existe, ofrece crearlo con `golden-brand-brain`
+antes de continuar; si el usuario pide seguir sin cerebro, se declara en la entrega que el contenido
+se generó sin voz de marca cargada.
+
+
 ## 🚨 PROTOCOLO TEMA VIVO + MEDIA — RESUMEN DURO (leer ANTES de escribir a cualquier tema)
-*Versión completa al final de este archivo (sección "PROTOCOLO TEMA VIVO + MEDIA"). Si este archivo te llegó cortado y no ves esa sección, reléela del disco: `~/.claude/skills/golden-shopify/SKILL.md` desde la línea ~460.*
+*Detalle completo en `references/tema-vivo.md` (si este archivo te llegó cortado, léelo del disco).*
 1. **Verificar QUÉ tema es MAIN** antes de tocar nada (`{themes{nodes{name role id}}}`) — el vivo cambia entre sesiones sin aviso.
 2. **Escritura**: `themeFilesUpsert` body `{type:"BASE64"}`; tras escribir, RELEER y comparar contenido. UNA sola sesión escribe por tema.
 3. **Caché storefront**: la página pública puede servir el render viejo 15-60 min — verificar el ARCHIVO del tema, no re-subir a ciegas.
@@ -75,11 +85,8 @@ override de color Releasit con MutationObserver). Está construido sobre **Shrin
 para Dawn/Sense se adapta con `references/temas.md`. Todo producto nuevo PARTE de esta
 base, sin importar el tema final.
 
-> ⚠️ **[DEUDA G4.x]** `assets/product.base.json` **sigue en el orden de 17 secciones vs las 24 del
-> embudo canónico G4.0 — pendiente de sesión dedicada para regenerarlo.** Hasta entonces, la
-> referencia canónica de ORDEN es la tabla del embudo en este SKILL.md, NO el base. El base sigue
-> siendo válido como motor (config center, Releasit, precio), pero nadie debe usarlo creyendo que
-> su orden de secciones está al día. (Detectado en el chat otro producto, 2026-08-07.)
+> ✅ **`assets/product.base.json` regenerado al embudo canónico de 24 (G4.5)** — vuelve a ser la
+> referencia de ORDEN ya construida, además del motor (config center, Releasit, precio).
 
 ## ⚠️ REGLA #1 — Cada página DEBE ser distinta (innegociable)
 Dos productos NUNCA quedan como la misma página con otro color/fotos. La base PRODUCTO DEMO
@@ -371,85 +378,14 @@ Cualquier bloque nuevo sigue este patrón. El usuario edita arriba; el motor viv
 > Horizon o tiendas nuevas**, consulta además **`references/horizon-bloques.md`** (arquitectura
 > block-based + theme blocks nativos).
 
-## Estructura canónica = EMBUDO CON RITMO (G4.0 — 24 secciones, 4 puertas, PAS + neuroventa)
-La página NO es una lista de secciones: es un **embudo con ritmo** donde **cada fase pide la venta** y,
-a quien no compra, la siguiente lo recupera atacando **la objeción exacta**. El blueprint completo con
-los principios de neuroventa está en `references/reglas-de-oro.md` (Regla 0-A).
+## Estructura canónica = EMBUDO CON RITMO (G4.0 — 24 secciones, 4 puertas, PAS)
+La página NO es una lista de secciones: es un **embudo con ritmo** donde cada fase pide la venta.
+**24 = 21 secciones del embudo + 3 de sistema** (candado, ignition, WhatsApp: overlays `position:fixed`,
+su orden no afecta al layout). **4 puertas de compra:** HERO (CTA#1) · tras el dolor (CTA#2) ·
+pico de convicción (CTA#3) · cierre (CTA final). Blueprint de neuroventa: `references/reglas-de-oro.md` (Regla 0-A).
 
-**Cambio estructural de G4.0** (absorbido de la página real en producción, que ya iba en 24 mientras
-la skill seguía documentando 17):
-- **Candado, Ignition y WhatsApp salen del main y pasan a ser SECCIONES sueltas.** Son overlays
-  `position:fixed` o CSS puro: su orden no afecta al layout, y como secciones el cliente las
-  prende y apaga sin entrar a los bloques del producto.
-- **El cuerpo de la landing se construye con `sec-bloque-alternado.liquid`** (imagen + texto, el
-  lado alterna). Menos texto, más imagen, y la página respira sola.
-- **El schema JSON-LD vive en su propia sección invisible** (`sec-seo-aio-schema.liquid`), no
-  dentro del FAQ: si el cliente apaga o mueve el FAQ, el SEO sobrevive.
-- **3 tickers** (arriba, medio, abajo) en vez de 2: el del medio es el respiro entre las dos
-  mitades pesadas del embudo.
-
-| # | Fase | Sección | Trabajo | Puerta |
-|---|---|---|---|---|
-| — | Sistema | **Candado landing** (sección) | Sin salidas al home | |
-| — | Sistema | **Ignition** (sección) | Intro cinematográfico, 1 vez por sesión | |
-| — | Sistema | **WhatsApp flotante** (sección) | Canal directo, siempre visible | |
-| 1 | Atención | Ticker superior | Micro-confianza (envío gratis · contra entrega) | |
-| 2 | Oferta | **HERO/main** (galería+título+oferta+precio+**CTA#1**+logística+sticky) | Cierre del comprador caliente | **🚪1** |
-| 3 | Problema | Dolor · público A | El cliente se reconoce | |
-| 4 | Problema | Dolor · público B *(solo si hay 2 públicos reales)* | El otro perfil se reconoce | |
-| 5 | | **CTA#2** (`sec-cta-suelto`) | Cierra al que ya se vio retratado | **🚪2** |
-| 6 | Confianza | **Seguridad · objeción #1** | Desactiva el miedo ANTES de las features | |
-| 7 | Solución | Mecanismo / cómo actúa | El "ajá" | |
-| 8 | Respiro | Ticker medio | Corta entre las dos mitades pesadas | |
-| 9 | | **CTA#3** (`sec-cta-suelto`) | Pico de convicción | **🚪3** |
-| 10 | Demostración | Secuencia / demo / escalera | Verlo funcionando | |
-| 11 | Alcance | Variantes o usos *(si el producto los tiene)* | Cada quién encuentra el suyo | |
-| 12 | Uso | Modo de uso | Baja la fricción del "y cómo se usa" | |
-| 13 | Calificación | Es para ti | Auto-selección → menos devoluciones | |
-| 14 | Prueba social | Reseñas | Confianza de otros | |
-| 15 | Respiro | Ticker inferior | | |
-| 16 | Oferta | **Escalera de combos** (`sec-combos`) | Sube el ticket. **Obligatoria en `catalogo`** | |
-| 17 | Riesgo→0 | Envío + garantía | Reversión de riesgo justo antes del cierre | |
-| 18 | Cierre | **CTA final** (`sec-cta-suelto`) | Última puerta | **🚪4** |
-| 19 | Objeciones | **FAQ** | El último "pero" cuando ya lo quiere | |
-| 20 | Legal | Disclaimer | Ligero, cumplimiento | |
-| 21 | SEO/AIO | **Schema invisible** (`sec-seo-aio-schema`) | Google + buscadores con IA | |
-
-**Por PERFIL** (ver `references/perfiles.md`):
-- **`marca`** añade manifiesto, historia/origen y línea de productos; la escalera de combos es opcional.
-- **`catalogo`** quita manifiesto e historia, y hace **obligatorias** la escalera de combos, la
-  demostración y la comparativa.
-
-**Estado por defecto en producción** (aprendido de la página real): countdown, garantía-bloque y
-descripción nativa van **apagados** cuando ya hay una sección que hace ese trabajo mejor. No es que
-sobren: es que duplicados restan.
-
-**Off por defecto** (ruido / condicional): autoridad (cifras placeholder), ficha técnica, related-products.
-WhatsApp flota (posición indiferente) + Sticky siempre visible.
-
-- **Cadencia de CTA:** una puerta cada 2-3 secciones — todas disparan
-  `#custom-releasit-btn`. El **FAQ baja a antes del cierre** (G2.6): las objeciones solo importan
-  cuando ya hay deseo, así que se resuelven tras la prueba social y justo antes del último CTA.
-  La **tranquilidad COD inmediata** (garantía + "pagas al recibir" + logística) ya vive en
-  *Riesgo→0* dentro de `main`, así que el comprador caliente no necesita la FAQ arriba.
-- **Activos por defecto** (antes off/sueltos): escalera, doble CTA, autoridad, por qué elegir?,
-  CTA del manifiesto. **Ficha técnica** va incluida pero **apagada** (solo gadget/kit; sus specs
-  son datos duros `[confirmar]` → no se envían activas, REGLA #3).
-- **Bloques del main:** config center · propuesta · ignition · título · oferta · countdown ·
-  verificado · precio · **CTA #1 Releasit** · garantía · barra logística · **descripción** · sticky.
-
-> ✅ Los ejemplos `examples/demo-shrine.json` y `examples/demo-dawn-v2.json` están **sincronizados
-> con la arquitectura actual (G3.8+)**. Aun así, la referencia de orden canónica es **`product.base.json`**;
-> ante cualquier duda base-vs-ejemplo, gana el base.
->
-> ⚠️ **[DEUDA G4.x] — excepción vigente al párrafo anterior:** `assets/product.base.json` **sigue en
-> 17 secciones vs las 24 del embudo canónico — pendiente de sesión dedicada.** Mientras no se
-> regenere, para el ORDEN de secciones manda la **tabla de arriba** (embudo G4.0 de 24), no el base;
-> el base solo gana en el motor y la config de cada bloque. (Chat otro producto, 2026-08-07.)
-
-Antes del Paso 1, elige **arquetipo** por vertical (define énfasis/orden, no si los bloques
-existen — REGLA #4): A) Perfume · B) Salud lean · C) Vitalidad full · D) Gadget/Demo · E) Kit.
-Matriz completa en `references/arquetipos.md`.
+> 📖 **Tabla fila por fila, perfiles (`marca` | `catalogo`), estado por defecto y cadencia de CTA:**
+> **`references/embudo-canonico.md`**. Ese orden ya viene CONSTRUIDO en `assets/product.base.json`.
 
 ## PLAYBOOK DE GENERACIÓN (0 → 1000) — la receta para una página PERFECTA
 No entregues un esqueleto con copy demo. Una página 1000 tiene TODO el copy escrito para ESTE
@@ -508,30 +444,9 @@ con versión/marca/fecha) y (2) **nota interna al FINAL** (comentario HTML invis
 fecha y hora REALES de generación, fijas, dentro del último bloque — NUNCA tras el `}` final).
 **Formato exacto y reglas en `references/operacion.md` (B).**
 
-## ⚠️ PROTOCOLO TEMA VIVO + MEDIA (absorbido 2026-07-25, obligatorio antes de escribir)
-1. **Verificar QUÉ tema es MAIN antes de tocar nada** (`{themes{nodes{name role id}}}`): el tema
-   vivo puede cambiar entre sesiones sin aviso (pasó: otro chat publicó Dawn y los parches se
-   estaban subiendo al borrador). Nunca asumir el tema por memoria.
-2. **Escritura fiable**: `themeFilesUpsert` con body `{type:"BASE64"}`; tras escribir, RELEER el
-   archivo y comparar contenido (no fiarse del OK ni del tamaño). Una sola sesión escribe por tema.
-3. **Caché del storefront**: tras cambiar plantillas o media, la página pública puede servir el
-   render VIEJO 15-60 min (por URL, incluso con cache-buster). Si un fix "no aparece": verificar
-   el ARCHIVO del tema, no re-subir a ciegas; esperar la purga.
-4. **Borrar media de producto = romper URLs**: los product media viven en `/files/` y otros
-   consumidores los incrustan (plantillas, constructores, config de upsells de Releasit, renders
-   cacheados). ANTES de borrar: inventariar referencias y reemplazarlas; el archivo borrado se
-   puede rescatar del caché del CDN re-subiéndolo con el MISMO filename (la URL revive).
-5. **Galería estándar Golden**: mínimo 5 imágenes por producto, TODAS cuadradas 1:1 (portada
-   packshot + tarjetas de beneficios + macros; reutilizables entre productos de la familia).
-   La portada va posición 1 en Admin (colecciones/búsqueda); si el tema trae
-   `galeria_portada_al_final` (Dawn Golden), la ficha abre con los creativos y el packshot
-   cierra — es diseño aprobado, NO "corregirlo".
-6. **CSS prohibido**: jamás `html,body{overflow-x:clip}` (clip contagia el otro eje y MATA el
-   scroll vertical). Un desborde horizontal se arregla en el elemento culpable (ej. ticker
-   marquee con `overflow:hidden;max-width:100%`), nunca en html/body.
-7. **Sticky/Releasit**: nunca desactivar el Sticky Bar en el panel de Releasit (rompe el botón en
-   silencio); se oculta por CSS (`_rsi-buy-now-button-floating`) y toda ficha conserva SIEMPRE un
-   CTA fijo propio. Probar el botón DE VERDAD (abrir el modal), no solo que exista.
+## PROTOCOLO TEMA VIVO + MEDIA — version completa
+El **resumen duro de 9 puntos esta al inicio de este archivo** (obligatorio antes de escribir a un tema).
+Detalle completo, con el porque de cada punto y los casos reales: **`references/tema-vivo.md`**.
 
 ## Auto-mejora — RITUAL DE ABSORCIÓN
 Cuando el usuario diga *"absorbe las mejoras de esta página"* o pegue un `product.json` que le
@@ -541,71 +456,33 @@ y NUNCA reintroducir nombres reales** (usar descriptores de categoría; la skill
 **Pasos detallados en `references/operacion.md` (C).**
 
 ## Archivos de esta skill
-- `references/reglas-de-oro.md` — **copy/legal + 12 reglas de oro + tabla de errores. LEER SIEMPRE.**
-- `references/perfiles.md` — **G4.0: los 2 perfiles (marca propia | catálogo-dropshipping): qué secciones entran en cada uno, qué tono y qué reglas de copy. LEER antes del Paso 0.**
-- `references/diferenciacion.md` — **REGLA #1: palancas para que cada página sea distinta + chequeo antiespejo.**
-- `references/ignition-variantes.md` — **REGLA #5: intro Ignition distinto por página (8 variantes CSS).**
-- `references/arquetipos.md` — **3 arquetipos de página + matriz de componentes por vertical.**
-- `references/paises-entrega.md` — **tiempos de entrega por país (Guatemala/Colombia). NUNCA mezclar.**
-- `references/colores-conversion.md` — **cómo recomendar el color que más vende por vertical.**
-- `references/estandares-liquid.md` — **ESTÁNDARES DE CÓDIGO LIQUID (original): arquitectura section/block/snippet + schema, CSS BEM/tokenizado con fallback, JS progressive, rendimiento y accesibilidad WCAG 2.2 + checklist "código sano". LEER antes de escribir cualquier bloque.**
-- `references/horizon-bloques.md` — **arquitectura block-based del tema HORIZON (theme blocks nativos, `@theme`/`@app`, `block.shopify_attributes`, presets anidados) y cuándo usar Horizon vs `custom_liquid`. Para tiendas nuevas o migración.**
-- `references/rendimiento.md` — **velocidad de carga: fuentes, imágenes, JS, CSS + checklist. LEER al construir.**
-- `references/imagenes.md` — **imágenes: producto real (lo da el usuario) vs infografías-en-HTML vs decorativo-IA; hosting en Shopify; slots.**
-- `references/imagenes-orquestacion.md` — **CEREBRO de imágenes: reparto golden-imagen-arena (infografías) / golden-ugc-avatar (video/GIF) / Nano Banana (photoreal); el BRIEF VISUAL como contrato de sincronización; matriz de formatos por ubicación.**
+- `references/reglas-de-oro.md` — copy/legal + 12 reglas de oro + tabla de errores
+- `references/perfiles.md` — G4.0: los 2 perfiles (marca propia | catálogo-dropshipping): qué secciones entran en cada uno, qué tono y
+- `references/diferenciacion.md` — REGLA #1: palancas para que cada página sea distinta + chequeo antiespejo.
+- `references/ignition-variantes.md` — REGLA #5: intro Ignition distinto por página (8 variantes CSS).
+- `references/arquetipos.md` — 3 arquetipos de página + matriz de componentes por vertical.
+- `references/paises-entrega.md` — tiempos de entrega por país (Guatemala/Colombia)
+- `references/colores-conversion.md` — cómo recomendar el color que más vende por vertical.
+- `references/estandares-liquid.md` — ESTÁNDARES DE CÓDIGO LIQUID (original): arquitectura section/block/snippet + schema, CSS BEM/tokenizado c
+- `references/horizon-bloques.md` — arquitectura block-based del tema HORIZON (theme blocks nativos, `@theme`/`@app`, `block.shopify_attribut
+- `references/rendimiento.md` — velocidad de carga: fuentes, imágenes, JS, CSS + checklist
+- `references/imagenes.md` — imágenes: producto real (lo da el usuario) vs infografías-en-HTML vs decorativo-IA; hosting en Shopify; s
+- `references/imagenes-orquestacion.md` — CEREBRO de imágenes: reparto golden-imagen-arena (infografías) / golden-ugc-avatar (video/GIF) / Nano Ban
 - `references/sistema.md` — el sistema de componentes + estado del config center.
-- `references/temas.md` — **adaptador Shrine (base PRODUCTO DEMO) → Dawn / Sense / fallback**.
+- `references/temas.md` — adaptador Shrine (base PRODUCTO DEMO) → Dawn / Sense / fallback.
 - `references/releasit-cod.md` — override de botones Releasit, MODE, MutationObserver.
 - `references/efectos-premium.md` — catálogo de snippets (3D, glass, partículas, manifiesto, tilt, contadores).
 - `references/checklist-producto.md` — checklist final antes de entregar.
-- `references/auto-check.md` — **auto-verificación ejecutable de cierre (script). Correr antes de entregar.**
-- `references/changelog.md` — **historial de versiones / mejoras absorbidas.**
-- `references/operacion.md` — **detalle de: modo actualización (A), sello + nota interna (B), ritual de absorción (C).**
-- `references/componentes/*.liquid` — cada componente real, listo para pegar. Incluye
-  `sec-piramide.liquid` y, de la auditoría de la tienda real (v1.19), las **secciones de
-  página ganadora**: `sec-escalera.liquid` (storytelling alternado imagen+texto/GIFs, el
-  motor de venta de productos de demostración), `sec-por-que-elegir.liquid` (trust-grid de 4
-  íconos personalizado al producto) y `sec-autoridad.liquid` (banda de prueba social de marca).
-  Desde v1.30: `sec-cta-mid.liquid` (**doble CTA a media página**, verde, sombra suave) y los
-  fixes de `12-sticky-bar.liquid` / `whatsapp-flotante.liquid` (anclados al `<body>`).
-  **Desde G3.1 (fusión con la línea "GOLDEN FULL") — vertical SALUD/estética:**
-  `sec-disclaimer.liquid` (**disclaimer legal**: cosmético ≠ medicamento + contraindicaciones; flag
-  de registro/INVIMA solo si es REAL) y `sec-es-para-ti.liquid` (**"es para ti?" + seguridad**:
-  califica al cliente y lista cuándo NO usar / consultar antes). **Ambos son OBLIGATORIOS en
-  productos de salud/estética COD** (protección legal, REGLA #3).
-  **Desde G4.3 (cosecha del un estudio de producto, 2026-08-07) — componente estándar
-  "LO QUE ESTE PRODUCTO NO HACE"** (obligatorio-recomendado en verticales de SALUD, junto a
-  `sec-disclaimer` / `sec-es-para-ti`): sección de 3-5 líneas que declara el LÍMITE del producto
-  con honestidad brutal ("No repara una caries ya formada — eso lo hace el dentista. Sí cuida el
-  esmalte y apoya la remineralización"). **Racional probado en campo:** en categorías donde todos
-  los competidores usan odontólogo inventado, logos de cadenas como "distribuidores oficiales" y
-  estadísticas sin estudio (95%/96%/97%/100%), **declarar el límite convierte la objeción "esto es
-  una estafa" en la razón para comprar** — el único vendedor honesto de la categoría se queda con
-  el cliente escéptico, que es la mayoría. Se maqueta como `custom-liquid` con el patrón de
-  `sec-es-para-ti` (lista ❌ "no hace" / ✅ "sí hace") y su mensaje se replica en el ángulo de
-  pauta y en la respuesta pública de comentarios (mismo texto, tres soportes).
-  **Desde G4.0 (absorbidos de la página real en producción):**
-  `sec-bloque-alternado.liquid` (**el patrón dominante del cuerpo de la landing**: imagen + texto
-  con el lado alternando; PC en 2 columnas, móvil apilado, imagen con `srcset` y sin CLS) ·
-  `sec-seguridad.liquid` (**la objeción #1 resuelta ANTES de las features** — una de las secciones
-  que más convierte y casi nadie tiene) · `sec-dolor-segmentado.liquid` (dos secciones de dolor,
-  una por público, cuando el producto le habla a dos perfiles con dolores distintos) ·
-  `sec-combos.liquid` (**escalera de combos 1/2/3 con razón de uso**; obligatoria en perfil
-  `catalogo`) · `sec-cta-suelto.liquid` (**el CTA reutilizable de las puertas 2, 3 y 4**, con
-  fallback a scroll si el botón principal no existe; reemplaza a `sec-cta-mid.liquid`) ·
-  `sec-seo-aio-schema.liquid` (**JSON-LD en sección invisible propia**, sobrevive a que apaguen el FAQ) ·
-  `efx-reveal-seguro.liquid` (**motor de revelado con red de seguridad**: el CTA y las imágenes
-  NUNCA se ocultan, y a los 1.2 s todo lo no revelado se fuerza visible) ·
-  `efx-video-lazy.liquid` (video de demostración con `data-src` + poster WebP: no descarga nada
-  hasta que se acerca al viewport).
-- `assets/product.base.json` — **PLANTILLA BASE (PRODUCTO DEMO), el master a clonar.**
+- `references/auto-check.md` — auto-verificación ejecutable de cierre (script)
+- `references/changelog.md` — historial de versiones / mejoras absorbidas.
+- `references/operacion.md` — detalle de: modo actualización (A), sello + nota interna (B), ritual de absorción (C).
+- `references/componentes/*.liquid` — cada componente real, listo para pegar
+- `assets/product.base.json` — PLANTILLA BASE (PRODUCTO DEMO), el master a clonar.
 - `assets/config-center.liquid` — el bloque config center para insertar.
 - `assets/related-products.premium.css.txt` — CSS premium para featured-collection.
-- `examples/demo-dawn-v2.json` — ⭐ **PLANTILLA PRO v2 (Dawn) — la referencia recomendada:** embudo
-  completo de impulso (countdown activo, escalera con imágenes reales, doble CTA, autoridad,
-  manifiesto, FAQ), sticky/WhatsApp anclados al body, sin sombra dura, slots de imagen. (v1.30)
-- `examples/demo-dawn.json` — referencia previa de adaptación a **Dawn** (v1).
-- `examples/demo-shrine.json` — copia de la base en **Shrine Pro**.
+- `examples/demo-dawn-v2.json` — ⭐ PLANTILLA PRO v2 (Dawn) — la referencia recomendada: embudo
+- `examples/demo-dawn.json` — referencia previa de adaptación a Dawn (v1).
+- `examples/demo-shrine.json` — copia de la base en Shrine Pro.
 
 ## Roadmap v2 (fuera de v1, no implementar salvo que lo pidan)
 - **Trust badges** como fila de sellos reutilizable.

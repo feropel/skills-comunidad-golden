@@ -45,8 +45,10 @@ tinta. El dorado se mantiene como acento premium.
 - Primario horneado: `assets/logo-golden.svg` = **emblema oficial Golden Group
   Community** (círculo dorado/negro con las GG; PNG oficial incrustado en un
   envoltorio SVG, elegido por FER el 2026-07-04).
-- Original naranja de comunidad: `PROYECTOS/SKOOL/logo-comunidad-golden.svg`.
-  Si algún día se cambia la identidad, se ajustan `golden-brand.json`,
+- El original naranja de comunidad (`PROYECTOS/SKOOL/logo-comunidad-golden.svg`)
+  **ya no está en disco**: esa carpeta fue retirada. No queda copia dentro de la
+  skill, así que volver al naranja exige re-subir el archivo.
+- Si algún día se cambia la identidad, se ajustan `golden-brand.json`,
   `golden-print.css` y `logo-golden.svg`.
 
 ## Geometría

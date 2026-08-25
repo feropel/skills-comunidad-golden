@@ -105,6 +105,17 @@ En el `{% schema %}` de la sección, el array `blocks` admite:
 - `presets` con bloques anidados por defecto = el merchant lo arrastra y ya viene armado.
 - Usa `t:` para nombres y textos por defecto.
 
+## 3.1 Starter LISTO para copiar: `references/horizon/_golden-trust.liquid`
+
+La skill trae un theme block Horizon **ya escrito y probado** — no hay que partir de cero:
+
+| Qué es | `references/horizon/_golden-trust.liquid` — bloque "Garantía / Compra segura" |
+|---|---|
+| **Cuándo usarlo** | Tema **Horizon o Pitch** (donde `product.json` NO pega y todo va por bloques nativos), cuando la ficha necesita el bloque de garantía/compra segura COD. Es el equivalente nativo del `custom_liquid` `09-garantia.liquid` del flujo clásico. |
+| **Cómo instalarlo** | Guardar el archivo como `/blocks/_golden-trust.liquid` en el tema. Aparece en el editor como bloque agregable dentro de cualquier sección que acepte `@theme`. |
+| **Por qué ya sirve** | Trae schema propio (textos por settings), `{{ block.shopify_attributes }}`, hereda la Paleta (`var(--brand-*)`) y cumple los estándares de `references/estandares-liquid.md` (BEM prefijado `gt-trust`, accesible, liviano). |
+| **Cómo clonarlo** | Es el molde para los demás bloques nativos: copiar su estructura (comment de uso → markup con `shopify_attributes` → `<style>` con tokens → `{% schema %}`) y cambiar el contenido. |
+
 ## 4. Cómo lo aprovecha Golden (alta conversión COD)
 
 - **Para tiendas en Dawn/Shrine/Sense:** seguimos con bloques `custom_liquid` portables (no cambia el flujo).

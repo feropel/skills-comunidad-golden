@@ -45,7 +45,7 @@ Antes de reescribir, auditar lo que hay: título y meta actuales, handle (no se 
 tráfico, se conserva), duplicados de la misma keyword en varias fichas, imágenes sin alt, y schema
 mal ubicado o ausente. Se corrige lo que está mal y se conserva lo que ya rankea.
 
-Herramienta opcional para la auditoría: `claude-seo-ai`.
+Herramienta opcional para la auditoría: `claude-seo-ai:audit` (es un PLUGIN, no una skill de `~/.claude/skills`).
 
 ## Checklist de cierre
 

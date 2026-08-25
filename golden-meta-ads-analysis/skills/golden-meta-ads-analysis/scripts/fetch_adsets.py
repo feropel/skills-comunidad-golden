@@ -96,7 +96,7 @@ def main():
 
     active = sum(1 for a in adsets if a.get("effective_status") == "ACTIVE")
     print(f"📦 {len(adsets)} conjunto(s) — {active} activo(s)\n")
-    print("═" * 68)
+    print()
 
     enriched = []
 
@@ -201,12 +201,12 @@ def main():
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
-    print(f"\n{'═' * 68}")
+    print()
     print(f"\n✅ Análisis de conjuntos completado.")
     print(f"💾 Datos guardados en: {filename}")
     if is_cbo:
         print("⚠️  CBO activo: evalúa el éxito final a nivel de CAMPAÑA.")
-    print("\nPega el contenido del JSON en Claude para profundizar el análisis.\n")
+    print("\n(Flujo automatizado: Claude lee este JSON directo con Read — no hay que pegarlo.)\n")
 
 
 if __name__ == "__main__":

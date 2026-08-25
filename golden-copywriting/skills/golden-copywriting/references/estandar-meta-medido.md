@@ -5,6 +5,11 @@
 Esto no son buenas prácticas de blog: son tres fuentes contrastadas y medidas. Cuando escribas
 copy de Meta, este archivo manda sobre cualquier intuición de largo.
 
+Índice: §1 Límites oficiales (125/40/25) · §2 Rendimiento bimodal y cómo se aplica al 5+5+5 ·
+§3 La ventana de 125 y dónde va la oferta · §4 Molde COD Colombia + títulos medidos · §5 Tildes ·
+Cómo volver a levantar la evidencia (con la trampa de effective_status) · §6 El copy no es la
+variable dominante · §7 Qué del mercado es medible y qué no.
+
 ## 1 · Límites oficiales (fuente autoritativa)
 
 Centro de ayuda de Meta, artículo **223409425500940** — *"Prácticas recomendadas de creatividad
@@ -24,6 +29,17 @@ silencio**, no rechaza: el copy entra, se ve cortado y nadie se entera.
 Meta también recomienda **de forma explícita cargar varias opciones por campo** para que el
 sistema optimice la entrega. El estándar 5+5+5 de esta skill está respaldado por la fuente.
 
+**La descripción de 25 NO es donde va el argumento de venta, y lo dice Meta.** Artículo
+**497610041230617**: *"your description should contain only nonessential information"*. No pelees
+por meter la oferta en 25 caracteres — ese campo es para información prescindible. (Medido
+2026-08-25.)
+
+**El generador de variantes de Meta SOPORTA ESPAÑOL.** Artículo **180641596861873**: *"text
+variations with and without personas are currently available when primary text inputs are in
+english, portuguese and spanish"*, y genera **hasta 5 variantes** de texto principal y título. Es
+decir, el mecanismo que el 5+5+5 necesita está disponible en el idioma en que Golden pauta; deja de
+ser una limitación teórica. (Medido 2026-08-25.)
+
 ## 2 · El rendimiento es BIMODAL (lo que contradice al consejo estándar)
 
 AdSpyder, sobre **43,9 millones de anuncios de Meta** (muestra aleatoria de 8.815):
@@ -34,7 +50,7 @@ AdSpyder, sobre **43,9 millones de anuncios de Meta** (muestra aleatoria de 8.81
 | 250 a 500 | 10,8% — segundo pico |
 | **50 a 125** | **7,7% — el peor** |
 
-**Meta premita los extremos y castiga el término medio.** La mediana histórica de los 43M es 118
+**Meta premia los extremos y castiga el término medio.** La mediana histórica de los 43M es 118
 caracteres — justo dentro del valle. La mayoría del mercado escribe en la zona que peor funciona.
 
 **Límite del dato, declararlo siempre:** mide **cuánto tiempo vive un anuncio**, no cuánto vende.
@@ -93,6 +109,21 @@ persona, en vez de cinco versiones del mismo mensaje compitiendo entre sí.
 > cuentas con gasto. Se comparó largo contra largo. El reparto 2+3 lleva meses sin ejecutarse.
 >
 > **Antes de dar por buena o por mala esta tabla, verifica que los cortos estén corriendo.**
+>
+> **Actualización 2026-08-25 · el banco de pruebas se apagó, y el motivo enseña algo.** Los dos
+> brazos que medían este reparto en Le'côterra CP2 (`V6 · Bergamot · 15 copys` contra
+> `Video 6 · Bergamot · mejor CPA`) **ya no corren**: la cuenta migró a catálogo dinámico. El
+> estándar 2+3 no se validó ni se refutó — se quedó sin experimento.
+>
+> **Y la tanda corta `OPEN 7`, que sí sigue viva (BLUE CP1), muestra por qué esto nunca converge.**
+> Los tres copys cortos se cargaron **como anuncios hermanos**, y el conjunto repartió así:
+> Bergamot **166.697 COP**, Duo **436 COP**, Vanilla **9 COP**. Dos de tres con entrega cero.
+> **El algoritmo elige uno en las primeras horas y las demás nunca alcanzan muestra: eso no es un
+> test de tres copys, es un copy con dos testigos.**
+>
+> **Consecuencia dura para el 5+5+5, ya no teórica:** cargar las variantes como anuncios separados
+> **garantiza que no se midan**. Van como opciones múltiples DENTRO de un mismo anuncio — que es
+> además lo que Meta documenta y lo que ahora sabemos que soporta español (§1).
 
 ## 3 · Los primeros 125 caracteres son el anuncio entero
 
@@ -257,11 +288,37 @@ DISAPPROVED, PENDING_REVIEW, PREAPPROVED, PENDING_BILLING_INFO, IN_PROCESS, WITH
 nivel `ad_account`. Si no cuadra, te falta cobertura — ese cuadre es lo único que delata el
 hueco, porque una lista corta no da error, devuelve menos y parece correcta.
 
+### La OTRA cara de la trampa: a veces el hueco no es tuyo (verificado el 2026-08-25)
+
+Cuadrar el gasto no solo sirve para detectar un filtro mal puesto. **A veces la API simplemente no
+devuelve el gasto, hagas lo que hagas.** Medido el 2026-08-25:
+
+| Cuenta | Gasto de la CUENTA | Suma de los anuncios legibles | Cobertura |
+|---|---|---|---|
+| GOLDEN CP6 | 3.171.690 COP | **lista vacía** | **0%** |
+| BLUE CP5 DOLAR | 777,20 USD | **lista vacía** | **0%** |
+| BLUE CP1 | 3.545.529 COP | 167.142 COP | 4,7% |
+| GOLDEN CP1 | 4.198.431 COP | 967.222 COP | 23% |
+| Le'côterra CP2 | 2.670.379 COP | 1.224.515 COP | 46% |
+
+GOLDEN CP6 devuelve vacío **con filtro, sin filtro y a nivel `campaign` también**. No es el filtro.
+
+**Por qué esto arruina una comparación de copys, con número:** en BLUE CP1 el anuncio que la API sí
+deja ver (`OPEN 7 - V5 Bergamot`) reporta **CPA 27.783 / ROAS 5,38**. La campaña que lo contiene
+reporta **CPA 60.444 / ROAS 2,31**. El anuncio visible se ve **2,2x mejor** que su propia campaña.
+Rankear copys sobre lo que la API entrega, sin cuadrar, es cherry-picking con pasos extra.
+
+> **Regla dura: antes de comparar CPA entre copys, cuadra la cobertura. Si el gasto de los anuncios
+> leídos no se acerca al de la cuenta, no reportes el ranking de copys — reporta la cobertura.**
+
 ### Cuántas cuentas hay que mirar
 
-`ads_get_ad_accounts` con `limit: 100`. El 2026-08-10 devolvió **75 cuentas**: 62 consultables,
-13 no (DISABLED, UNSETTLED o CLOSED). De las consultables, solo **36 tienen medio de pago** y de
-esas **14 tuvieron gasto en 30 días**. Ese embudo 75 → 36 → 14 es el denominador del informe.
+`ads_get_ad_accounts` con `limit: 100`. El 2026-08-25 devolvió **74 cuentas** (sin `next_cursor`;
+mismo número las corridas del 16 y 21 de agosto). Descontando 13 no consultables, 2 con Ads MCP
+deshabilitado y `GOLDEN CP BACK UP`, quedan **58 barribles — el censo completo de lo legible**, y de
+esas **16 tuvieron gasto en 30 días**. Ese embudo 74 → 58 → 16 es el denominador del informe.
+No te quedes en las que tienen medio de pago: **6 cuentas sin medio de pago entraron al barrido y
+confirmaron cero**, y solo por mirarlas dejaron de ser un hueco.
 **`GOLDEN CP BACK UP` (408753721820872) no se toca ni se lee** — orden del Centro de Mando.
 
 ## 6 · El copy NO es la variable dominante (medido 2026-08-21)
@@ -289,10 +346,15 @@ anuncio y con qué creativo corre**, y solo después toca las palabras.
 
 Tres corridas de 150 anuncios por recencia dejan esto claro:
 
-- **El largo del título SÍ es medible.** Media 30,1 → 29,6 → 30,0; "cabe en 40" entre 81% y 84%.
-  Estable en tres muestras independientes. Úsalo como base.
-- **Emoji, MAYÚSCULAS y "título = oferta" NO son medibles así.** Emoji hizo 51% → 65% → 26% en
-  tres corridas. Eso no es una tendencia, es una muestra que cambia de composición. Se probó la
+- **Lo medible del título es `cabe en 40`, NO la media.** Cuatro corridas: 82% → 81% → 84% → 79%.
+  Siempre alrededor de cuatro de cada cinco. Esa es la base.
+- **Corrección del 2026-08-25 a lo que decían las corridas 1-3:** aquí se afirmaba que la longitud
+  media era la cifra estable (30,1 → 29,6 → 30,0). **No lo es.** La corrida 4 dio media **32,5** con
+  la mediana **cayendo** de 28 a 25,5 — media arriba y mediana abajo es cola larga: dos anunciantes
+  con títulos de 300+ caracteres arrastran el promedio. **Era estable por suerte de muestreo, no por
+  robustez.** Si necesitas un número de largo, usa la mediana (25-31 en cuatro corridas), nunca la media.
+- **Emoji, MAYÚSCULAS y "título = oferta" NO son medibles así.** Emoji hizo 51% → 65% → 26% → **58%**
+  en cuatro corridas. Eso no es una tendencia, es una muestra que cambia de composición. Se probó la
   robustez midiendo **1 título por página** (neutraliza al anunciante que repite): 30%, casi igual
   — o sea, no lo sesga un anunciante concentrado, **el indicador se mueve solo**.
 - **Corrección explícita a la corrida del 2026-08-16:** allí se anotó el alza de emoji y

@@ -127,7 +127,7 @@ def main():
         if sp:
             total_spend += float(sp)
 
-    print("═" * 68)
+    print()
 
     enriched = []
 
@@ -256,13 +256,13 @@ def main():
     with open(filename, "w", encoding="utf-8") as f:
         json.dump(payload, f, ensure_ascii=False, indent=2)
 
-    print(f"\n{'═' * 68}")
+    print()
     print(f"\n✅ Análisis de anuncios completado.")
     print(f"💾 Datos guardados en: {filename}")
     print(f"📌 Regla: Un cambio a la vez — no pauses varios anuncios simultáneamente.")
     if learn_st == "LEARNING":
         print(f"⚠️  Conjunto en aprendizaje — espera antes de hacer cualquier cambio.")
-    print("\nPega el contenido del JSON en Claude para el análisis detallado.\n")
+    print("\n(Flujo automatizado: Claude lee este JSON directo con Read — no hay que pegarlo.)\n")
 
 
 if __name__ == "__main__":

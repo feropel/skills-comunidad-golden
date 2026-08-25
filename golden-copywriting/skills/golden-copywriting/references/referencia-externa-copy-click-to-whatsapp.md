@@ -38,5 +38,5 @@ Es un **PAS comprimido**, sin la fase de agitacion larga: dolor, prueba social, 
 
 El tercero es el mas interesante para retargeting y el menos explotado.
 
-Fuente completa:
-`Desktop/MASTER/IA/CLAUDE/PROYECTOS/PANAMA - OPERACION/`
+Fuente completa: carpeta local `PROYECTOS/PANAMA - OPERACION/` (dentro del arbol
+MASTER/IA/CLAUDE del Desktop del usuario; los nombres reales de las carpetas llevan emojis).

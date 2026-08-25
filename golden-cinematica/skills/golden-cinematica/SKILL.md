@@ -18,19 +18,33 @@ description: >-
   sencillo o corporativo estándar (golden-web), ni imágenes sueltas de producto
   (golden-imagen-arena).
 ---
+<!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leian el cerebro de marca — esta entra a la familia que SI lo lee. Bloque identico en las 6 del CdM + fila a la fabrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
 
 # Golden Cinemática — el salto de "página" a "experiencia"
+<!-- skill GC1.4.1 · 2026-08-24 (centro de mando, remediación del verificador de cierre): línea de RUTA del cerebro en el Paso 0 (las lectoras ordenaban LÉELO PRIMERO sin decir dónde — un chat limpio no podía ejecutar la orden) + bump que las ediciones del 23-24 dejaron sin subir. -->
 
+## Paso 0 · Cerebro de marca (obligatorio antes de generar)
+
+Si la marca tiene CEREBRO creado por `golden-brand-brain` (marca.md, productos.md, avatares.md,
+competidores.md, anuncios-ganadores.md, cambios-recientes.md), LÉELO PRIMERO y genera con esa voz
+— jamás re-preguntar lo que el cerebro ya sabe. Si NO existe, ofrece crearlo con `golden-brand-brain`
+antes de continuar; si el usuario pide seguir sin cerebro, se declara en la entrega que el contenido
+se generó sin voz de marca cargada.
+
+
+<!-- skill GC1.4 (2026-08-23) · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR -->
 <!-- skill GC1.3 (2026-08-21) · auditoría golden-skill-auditor: (1) desambigua la cita a `references/estilo-agencia-premium.md` — vive en golden-web, no localmente, se escribía sin dueño y se leía como archivo propio; (2) suma sección "Cuando algo falla o falta" con plan de degradación explícito (CDN caído, sin render de fondo, 60fps no alcanzado en móvil, tokens no entregados por el usuario) — antes no había manejo de error declarado; (3) TOC en references/recetas.md (309 líneas, pasaba el umbral de 300 sin índice). Blindaje: chflags uchg (quitar con chflags -R nouchg, reponer con chflags -R uchg) — mecanismo documentado aquí por primera vez -->
 <!-- skill GC1.2 (2026-08-02) · filtro de 2 reels de efectos (code.xr OTP v5 · code_and_chill MENISCUS): dos familias NUEVAS que el vocabulario no tenia — ESTADOS (success state animado, carga en el boton, validacion en vivo, progreso por segmentos) con la nota de que en contra entrega la confirmacion NO es decoracion sino la venta (el cliente dio sus datos sin pagar y la duda reaparece como cancelacion al confirmar por WhatsApp), y NAVEGACION (morphing dock por path SVG y tangentes, sticky compacto, desplazamiento por vecindad). Ninguno de los 2 reels publica el codigo (piden comentar), asi que se documenta el PATRON, no la receta -->
 <!-- skill GC1.1 (2026-07-27) · filtro de 9 reels: 5 términos nuevos al vocabulario de entrada y revelado (pixel/entrance reveal por grid, smooth loader con máscara, stacked sticky sections, fondo ligado al scroll) con la nota de que se hacen a mano en CSS/JS y no hace falta Framer -->
 <!-- skill GC1.0 (2026-07-25) · nace de un diagnóstico de FER: "las páginas que me has hecho son 10 de 100". Destilado del análisis frame a frame de 6 sitios de Textura Agency (@textura.eu / getlayers.ai), donde se capturó el PROMPT REAL con sus tokens numéricos. El hallazgo central: la diferencia entre 10/100 y 100/100 no es la librería, es que el encargo lleva milisegundos, grados, radios y hex exactos en vez de adjetivos -->
 
-**Versión:** `GC1.3` · Fábrica: chat centro de mando.
+**Versión:** `GC1.4.1` · Fábrica: chat centro de mando.
 
 Esta skill existe por una razón concreta: las páginas Golden nombraban las librerías
 correctas y aun así salían genéricas. El diagnóstico fue que **conocer el nombre de la
 librería no produce nada**. Lo que produce es la receta con sus números.
+
+El cerebro vive en `PROYECTOS/BRAND-BRAINS/<MARCA>/` — la resolución exacta (buscar con find ANTES de crear, naming MAYÚSCULAS-CON-GUIONES) la declara `golden-brand-brain`: ante cualquier duda de ruta, invócala en vez de adivinar.
 
 ## La ley que manda sobre todas
 
@@ -158,6 +172,14 @@ completa abajo.
   (nunca un genérico #000/#fff sin decisión).
 
 ## Changelog
+
+- **GC1.4.1** (2026-08-24): bump de las ediciones del 24 (verificador de cierre R2: la version vive en 4 caras — sello, linea Version, Changelog y REGISTRO — y el bump anterior toco solo el sello).
+- **GC1.4** (2026-08-23) — Adenda del Centro de Mando: entra a la familia que lee el CEREBRO DE
+  MARCA (`golden-brand-brain`) — bloque "Paso 0 · Cerebro de marca" bajo el H1, idéntico en las
+  6 skills de contenido del CdM. Además, Estándar 9: cambios relevantes se reportan a 🧠 GOLDEN -
+  CENTRO DE MANDO - NO BORRAR. (Entrada añadida en el barrido del arsenal 2026-08-24: ambos
+  cambios existían solo como sellos en comentario; en el mismo barrido se renumeró el índice de
+  `references/recetas.md`, que no calzaba con los encabezados reales de las recetas.)
 - **GC1.3** (2026-08-21) — Auditoría golden-skill-auditor: desambigua la cita a
   `estilo-agencia-premium.md` (vive en golden-web), suma la sección de degradación
   ("Cuando algo falla o falta") y el índice de `references/recetas.md`.

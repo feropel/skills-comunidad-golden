@@ -20,21 +20,46 @@ description: >
   golden-ugc-avatar; bot → familia golden-chatea-pro. Es el DIRECTOR DE ORQUESTA, no un
   instrumento.
 ---
+<!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leían el cerebro de marca — esta entra a la familia que SÍ lo lee. Bloque idéntico en las 6 del CdM + fila a la fábrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
 
 # GOLDEN 360 — la ruta de producto de Golden Group (`golden360`)
 
+## Paso 0 · Cerebro de marca (obligatorio antes de generar)
+
+Si la marca tiene CEREBRO creado por `golden-brand-brain` (marca.md, productos.md, avatares.md,
+competidores.md, anuncios-ganadores.md, cambios-recientes.md), LÉELO PRIMERO y genera con esa voz
+— jamás re-preguntar lo que el cerebro ya sabe. Si NO existe, ofrece crearlo con `golden-brand-brain`
+antes de continuar; si el usuario pide seguir sin cerebro, se declara en la entrega que el contenido
+se generó sin voz de marca cargada.
+Como orquestador: ADEMÁS de leerlo tú, PASA la ruta del cerebro a CADA skill hija que invoques — el
+lanzamiento entero con una sola voz.
+
+**Dónde vive y cómo viaja** (sin esto, "pasa la ruta" es una orden sin destino): el cerebro es de la
+MARCA, no del producto, así que vive fuera de `PROYECTOS/<PRODUCTO>/` — su ruta la declara
+`golden-brand-brain`; si la marca aún no lo tiene, esa skill lo crea. Como el esquema del expediente
+no tiene todavía campo propio para ella, la ruta se escribe **en la cabecera del `README.md` del
+paquete** (Fase 9) y se repite **en el encargo de cada hija que se invoque**. Un dato que solo vive en
+la conversación se pierde en el próximo chat: por eso queda por escrito en el paquete.
+📌 Pendiente elevado al Centro de Mando (2026-08-24): añadir `marca.cerebro_ruta` al esquema
+`PRODUCTO.json`. Es un ESTÁNDAR TRANSVERSAL — lo escriben otras skills — y por la convivencia de esta
+skill no se toca sin su aviso previo. Mientras tanto manda la regla del README.
+
+<!-- GR360_VERSION: R1.9 — 2026-08-24 — AUDITORÍA FRESCA (golden-skill-auditor v1.16; base 918, veredicto 903 PLATA por la reserva del estreno). Arreglos con evidencia: (1) `golden-brand-brain`, dependencia OBLIGATORIA del Paso 0 desde el 23-ago, no estaba ni en REQUISITOS ni en HIJAS de candado.py — el chequeo decía "ecosistema completo" sobre un hueco; ya está en ambas. (2) "Pasa la ruta del cerebro" era orden sin destino: ahora se declara dónde vive (es de la MARCA, no del producto) y se anota en la cabecera del README del paquete, con su fila en la plantilla de la Fase 9; el campo `marca.cerebro_ruta` del esquema queda ELEVADO al Centro de Mando por ser estándar transversal. (3) El sello R1.8 decía "15/15 hijas" y son 13 (los auxiliares se contaban dos veces) — corregido. (4) R1.8 y la adenda del cerebro no tenían entrada de changelog, reincidencia de la clase que R1.6b ya había registrado: escritas. (5) Sellos reagrupados en un solo bloque (R1.2/R1.1/R1.0 habían quedado partidos por una sección viva). Menores: claude-seo-ai → claude-seo-ai:audit, tildes de la adenda. Reportado al Centro de Mando. Fábrica: chat exclusivo golden360. -->
 <!-- GR360_VERSION: R1.8 — 2026-08-21 — Auditoría golden-skill-auditor (959→1000 ORO). Arreglos: (1)
      concordancia de género en la línea disparadora del description ("este skill" → "esta skill",
      único hueco de gramática detectado en las 22 skills que citan a esta). (2) Fase 9 traía el
      README.md como obligatorio en candado.py y en el texto, pero sin plantilla — cada corrida
      inventaba su propio formato; se agregó la plantilla exacta (índice + compuertas + pendientes)
      bajo la Fase 9, que es la sección donde `candado.py` la exige. Todo lo demás verificado en
-     vivo y sin hallazgos: `candado.py --skills` corrido de verdad → 15/15 hijas instaladas + 2
+     vivo y sin hallazgos: `candado.py --skills` corrido de verdad → 13/13 hijas instaladas + 2
      auxiliares + 1 extra del dueño, 0 faltantes; `ast.parse` limpio; 4 referencias a hermanas
      verificadas contra archivo real; 0 huérfanos, 0 rotas, 0 secretos, sin signos de apertura. Fábrica:
      chat exclusivo golden360. -->
 <!-- GR360_VERSION: R1.7 — 2026-08-11 — MINERÍA DE LOCUCIÓN recogida en la orquestación (aviso de la red sináptica del Centro de Mando). El Bloque 1 ya no solo mina comentarios: transcribe el audio de los videos ganadores en LOCAL. Verificado ejecutando en esta máquina, no citando: yt-dlp 2026.07.04 + ffmpeg + whisper-cli presentes, 6,8 s de audio en español transcritos en 1,9 s. Se apunta a la receta canónica (§1.6 de golden-investigacion-mercado) sin duplicarla, para que no envejezca en dos sitios. Se exige la locución de los 3-5 videos top ANTES de la Compuerta 1, y el guion UGC de la Fase 5 parte de ella. NO se halló en esta skill la limitación vieja que el CdM pedía revisar: nunca dijo que el video fuera ilegible, simplemente no lo mencionaba. -->
 <!-- GR360_VERSION: R1.3 — 2026-07-31 — CONVIVENCIA horneada en AUTO-MEJORA tras el visto bueno del Centro de Mando: quién puede cambiar qué (ruta = esta fábrica con changelog+re-blindaje; estándares transversales — protocolos, esquema PRODUCTO.json, numeración de fases/compuertas — = aviso PREVIO al Centro de Mando para difusión; hija a fondo = su fábrica) + la ley de sistema para splits/renombres (gaceta 5c-bis) nacida de la auditoría R1.1. Se escribe en la skill porque lo que solo vive en un mensaje entre chats se pierde. -->
+<!-- GR360_VERSION: R1.2 — 2026-07-31 — RENOMBRADA por pedido de FER: `golden-ruta-360` → **`golden360`** (se invoca "Golden360"; el identificador va en minúscula porque el name: de una skill no admite mayúsculas). Carpeta, name:, H1 y las 22 referencias cruzadas (5 propias + 17 en golden-investigacion-mercado) propagadas de una vez para que ninguna hermana apunte a un nombre muerto. Se sumaron los disparadores por nombre ("Golden360", "corre la 360"). Nombre anterior conservado en este changelog para poder rastrearlo. También se renombró el mapa espejo del Centro de Mando: `PROYECTOS/_SISTEMA/RUTA-PRODUCTO-360.md` → `GOLDEN-360.md` (R1.1), con stub de redirección en el nombre viejo, y allí se corrigió la fila "Orquestador de todo", que seguía diciendo `golden-investigacion-mercado` desde antes del split. AUTORIZACIÓN PERMANENTE de FER (2026-07-31): este chat-fábrica puede modificar todo lo de golden360 sin pedir permiso, siempre que mejore los procesos; el Centro de Mando conserva la autoridad sobre todo el ecosistema. -->
+<!-- GR360_VERSION: R1.1 — 2026-07-31 — AUDITADA (golden-skill-auditor, 867→ORO). Arreglos: (1) NUMERACIÓN CANÓNICA — todas las references y candado.py venían con la numeración fósil pre-split (la página decía "Fase 3", la pauta "Fase 4", el bot "Fase 6", el montaje "Fase 7.5" que ya no existe); se alinearon con SKILL.md y el mapa espejo, y las references se renombraron por FUNCIÓN (pagina-destino-venta / pauta-golden-ads / chatea-pro-handoff) para que la numeración no vuelva a mentir desde el nombre del archivo. (2) REGLA 7 de RE-ENTRADA: si ya existe PRODUCTO.json se retoma en estado.fase_actual y no se reinvestiga. (3) candado.py verifica ahora la Fase 5 (creativos + GIF) y el PDF Golden, que el SKILL.md declaraba y el script no miraba; auxiliares de Fase 0.5 dejan de reportarse como faltantes. (4) rutas de hermanas escritas completas (~/.claude/skills/...). Fábrica: chat exclusivo golden360. -->
+<!-- GR360_VERSION: R1.0 — 2026-07-30 — NACE del split de golden-investigacion-mercado G4.3 (pedido de FER: investigación pura por un lado, orquestador por el otro). Hereda intactos los 3 bloques / 12 fases / 4 compuertas y el expediente PRODUCTO.json de la ruta G4.x; el Bloque 1 ahora DELEGA la investigación en golden-investigacion-mercado (leída en vivo). Trae consigo: seo-aio-producto, 03-pagina-shopify, 04-pauta-golden-ads, organico-redes, 07-chatea-pro-handoff, qa-pre-encendido y scripts/candado.py. Incluye sección AUTO-MEJORA (mandato global de mejora continua). Fábrica de origen: chat de investigación; mapa espejo en PROYECTOS/_SISTEMA/RUTA-PRODUCTO-360.md. -->
 
 <!-- 2026-08-07 · DESCRIPCIÓN RECORTADA de 2.197 a ~1.150 caracteres: superaba el tope de ~1.536 del listado de skills y se estaba TRUNCANDO por el final, que es justo donde vivían las fronteras con las skills hermanas. Lo que se movió aquí abajo es el detalle de los 3 bloques, que describe el funcionamiento interno y no dispara nada. Se conservaron íntegras las frases reales de FER, que son lo que activa la skill. -->
 
@@ -54,9 +79,6 @@ description: >
   Cierra con seguimiento y retro, que hornea lo aprendido.
 
 Todo se apoya en el **expediente único `PRODUCTO.json`**.
-<!-- GR360_VERSION: R1.2 — 2026-07-31 — RENOMBRADA por pedido de FER: `golden-ruta-360` → **`golden360`** (se invoca "Golden360"; el identificador va en minúscula porque el name: de una skill no admite mayúsculas). Carpeta, name:, H1 y las 22 referencias cruzadas (5 propias + 17 en golden-investigacion-mercado) propagadas de una vez para que ninguna hermana apunte a un nombre muerto. Se sumaron los disparadores por nombre ("Golden360", "corre la 360"). Nombre anterior conservado en este changelog para poder rastrearlo. También se renombró el mapa espejo del Centro de Mando: `PROYECTOS/_SISTEMA/RUTA-PRODUCTO-360.md` → `GOLDEN-360.md` (R1.1), con stub de redirección en el nombre viejo, y allí se corrigió la fila "Orquestador de todo", que seguía diciendo `golden-investigacion-mercado` desde antes del split. AUTORIZACIÓN PERMANENTE de FER (2026-07-31): este chat-fábrica puede modificar todo lo de golden360 sin pedir permiso, siempre que mejore los procesos; el Centro de Mando conserva la autoridad sobre todo el ecosistema. -->
-<!-- GR360_VERSION: R1.1 — 2026-07-31 — AUDITADA (golden-skill-auditor, 867→ORO). Arreglos: (1) NUMERACIÓN CANÓNICA — todas las references y candado.py venían con la numeración fósil pre-split (la página decía "Fase 3", la pauta "Fase 4", el bot "Fase 6", el montaje "Fase 7.5" que ya no existe); se alinearon con SKILL.md y el mapa espejo, y las references se renombraron por FUNCIÓN (pagina-destino-venta / pauta-golden-ads / chatea-pro-handoff) para que la numeración no vuelva a mentir desde el nombre del archivo. (2) REGLA 7 de RE-ENTRADA: si ya existe PRODUCTO.json se retoma en estado.fase_actual y no se reinvestiga. (3) candado.py verifica ahora la Fase 5 (creativos + GIF) y el PDF Golden, que el SKILL.md declaraba y el script no miraba; auxiliares de Fase 0.5 dejan de reportarse como faltantes. (4) rutas de hermanas escritas completas (~/.claude/skills/...). Fábrica: chat exclusivo golden360. -->
-<!-- GR360_VERSION: R1.0 — 2026-07-30 — NACE del split de golden-investigacion-mercado G4.3 (pedido de FER: investigación pura por un lado, orquestador por el otro). Hereda intactos los 3 bloques / 12 fases / 4 compuertas y el expediente PRODUCTO.json de la ruta G4.x; el Bloque 1 ahora DELEGA la investigación en golden-investigacion-mercado (leída en vivo). Trae consigo: seo-aio-producto, 03-pagina-shopify, 04-pauta-golden-ads, organico-redes, 07-chatea-pro-handoff, qa-pre-encendido y scripts/candado.py. Incluye sección AUTO-MEJORA (mandato global de mejora continua). Fábrica de origen: chat de investigación; mapa espejo en PROYECTOS/_SISTEMA/RUTA-PRODUCTO-360.md. -->
 
 Eres el **director de orquesta** de Golden Group. No investigas, no diseñas, no pautas: haces que las
 skills especialistas lo hagan **en el orden correcto, con compuertas que impiden gastar en un
@@ -97,6 +119,7 @@ imposible de romper por diseño. Esquema:
 ## REQUISITOS — skills que este orquestador llama
 | Fase | Skill | Para qué |
 |---|---|---|
+| Paso 0 | **`golden-brand-brain`** | cerebro de marca (voz única de todo el lanzamiento) |
 | B1 completo | **`golden-investigacion-mercado`** | forense + intake + investigación 360 + dossier + .docx |
 | 0.5 | `golden-archivos` · `golden-meta-ads-analysis` · `golden-dropi-analisis` | inventario / pauta previa / pedidos |
 | C1 | `golden-productos-ganadores` | validar demanda |
@@ -223,6 +246,8 @@ Coherencia contra el expediente: keyword única, precios idénticos, verbo consi
 corrida inventa su propio formato y el candado no tiene contra qué leer):
 ```markdown
 # <PRODUCTO> — Paquete de lanzamiento
+
+**Cerebro de marca:** <ruta al cerebro de golden-brand-brain, o "SIN CEREBRO — contenido generado sin voz de marca cargada">
 
 ## Índice de archivos
 - PRODUCTO.json — expediente único

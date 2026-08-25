@@ -65,7 +65,7 @@ WhatsApp flota (posición indiferente) + Sticky siempre visible.
 - **Bloques del main:** config center · propuesta  ·  título · oferta · countdown ·
   verificado · precio · **CTA #1 Releasit** · garantía · barra logística · **descripción** · sticky.
 
-> ✅ Los ejemplos `examples/demo-shrine.json` y `examples/demo-dawn-v2.json` están **sincronizados
+> ✅ Los ejemplos `references/examples/demo-shrine.json` y `references/examples/demo-dawn-v2.json` están **sincronizados
 > con la arquitectura actual (G3.8+)**. Aun así, la referencia de orden canónica es **`product.base.json`** (regenerado a las 24 en G4.5);
 > ante cualquier duda base-vs-ejemplo, gana el base.
 >

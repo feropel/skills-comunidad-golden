@@ -12,7 +12,7 @@
       "name": "golden-chatea-pro-full-configuracion",
       "source": "./golden-chatea-pro-full-configuracion",
       "description": "Orquesta los 4 asistentes de Chatea Pro (ventas WhatsApp, comentarios, logistico, carritos) en una sola configuracion coordinada.",
-      "version": "1.4.0",
+      "version": "1.4.1",
       "category": "marketing"
     },
     {
@@ -26,7 +26,7 @@
       "name": "golden-chatea-pro-prompt-ventas",
       "source": "./golden-chatea-pro-prompt-ventas",
       "description": "Crea el paquete de venta por producto para Chatea Pro: saludo, multimedia, pregunta de entrada, prompt de venta, recordatorios y remarketing.",
-      "version": "3.15.0",
+      "version": "3.15.1",
       "category": "marketing"
     },
     {
@@ -40,7 +40,7 @@
       "name": "golden-chatea-pro-config-logistico",
       "source": "./golden-chatea-pro-config-logistico",
       "description": "Configura el asistente logistico de Chatea Pro: valida direcciones y coordina la entrega antes de generar la guia.",
-      "version": "1.4.0",
+      "version": "1.5.0",
       "category": "marketing"
     },
     {
@@ -54,7 +54,7 @@
       "name": "golden-chatea-pro-config-carritos",
       "source": "./golden-chatea-pro-config-carritos",
       "description": "Configura el asistente de carritos abandonados de Chatea Pro: recupera por WhatsApp los checkouts que el cliente dejo a medias.",
-      "version": "1.3.1",
+      "version": "1.5.0",
       "category": "marketing"
     },
     {
@@ -124,7 +124,7 @@
       "name": "golden-dropi-analisis",
       "source": "./golden-dropi-analisis",
       "description": "Convierte tus informes de Dropi en dos maestros: logística y base de clientes.",
-      "version": "1.6.0",
+      "version": "1.6.1",
       "category": "operations"
     },
     {
@@ -138,7 +138,7 @@
       "name": "golden-imagen-arena",
       "source": "./golden-imagen-arena",
       "description": "La misma imagen generada en varios motores de IA y calificada por conversión.",
-      "version": "1.9.0",
+      "version": "1.10.0",
       "category": "design"
     },
     {
@@ -166,21 +166,21 @@
       "name": "golden-matriz-viral",
       "source": "./golden-matriz-viral",
       "description": "Saca la fórmula del contenido que ya funcionó y genera guiones nuevos.",
-      "version": "1.6.0",
+      "version": "1.8.0",
       "category": "marketing"
     },
     {
       "name": "golden-meta-ads-analysis",
       "source": "./golden-meta-ads-analysis",
       "description": "Diagnóstico ejecutable de campañas de Meta con unit economics en pesos.",
-      "version": "1.2.0",
+      "version": "1.3.0",
       "category": "marketing"
     },
     {
       "name": "golden-pdf-check",
       "source": "./golden-pdf-check",
       "description": "El estándar de PDF de la comunidad: marca, márgenes y bloques que no se parten.",
-      "version": "5.12.0",
+      "version": "5.13.0",
       "category": "education"
     },
     {
@@ -208,7 +208,7 @@
       "name": "golden-ugc-avatar",
       "source": "./golden-ugc-avatar",
       "description": "Avatares con IA hiperrealistas y videos de testimonio hablando.",
-      "version": "1.8.0",
+      "version": "1.10.1",
       "category": "marketing"
     },
     {
@@ -257,7 +257,7 @@
       "name": "golden-chatea-auditoria",
       "source": "./golden-chatea-auditoria",
       "description": "Revisa tu espacio de Chatea entero y te dice campo por campo qué está sano y qué está roto.",
-      "version": "1.4.0",
+      "version": "1.6.0",
       "category": "marketing"
     },
     {

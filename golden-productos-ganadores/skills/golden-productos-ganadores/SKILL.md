@@ -19,6 +19,16 @@ description: >-
 
 # Golden Group — Productos Ganadores
 
+<!-- skill GPG1.10 · 2026-08-24 · Barrido total del arsenal (auditoría fresca golden-skill-auditor,
+CdM): (a) 🔴 la fuente "deep-research (skill)" NO existe instalada — verificado con ls del arsenal;
+reemplazada por la vía real (WebSearch + firecrawl_search/firecrawl_agent) sin perder el caso de uso;
+(b) metricas_saturacion.py probado contra un caso malo NUEVO (activos > históricos): devolvía
+"supervivencia 125% — categoría sana" en vez de gritar — guardia de totales inconsistentes agregada
+y re-probada (ahora: no concluir, repetir las llamadas); los 3 casos medidos de siempre siguen dando
+idéntico (3,3% · 74,3% · muestra<30); (c) el recordatorio Apify/Google Maps del 2026-08-12 ya venció
+— anotado como APLAZADO vigente hasta orden explícita de FER, no arrancar solo -->
+<!-- skill GPG1.9 · 2026-08-23 · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se
+reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR -->
 <!-- skill GPG1.8 · 2026-08-21 · auditoria golden-skill-auditor (880/1000 antes de reparar): (a)
 SOURCING LOCAL sacado del cuerpo a references/sourcing-local.md — no hace falta en cada corrida,
 solo cuando el producto no esta en Dropi; (b) fallback agregado si candado_scraping.py (script de la
@@ -34,7 +44,7 @@ documentado explicitamente: chflags uchg, coherente con el resto de skills golde
 <!-- skill GPG1.1 · 2026-07-25: nueva fuente SCANNER DE VOLUMEN VISIBLE (Temu/AliExpress/Amazon por navegador, contadores de órdenes como señal de demanda dura) — patrón destilado de las extensiones de WiFi Money; se replica con el MCP de Chrome sin instalar código ajeno -->
 <!-- skill GPG1.0 · creación: Ad Library como prueba reina + rúbrica 0-100 + ficha entregable -->
 
-**Versión:** `GPG1.8` · Fábrica: este chat. · **Blindaje:** `chflags uchg` (desbloquear con
+**Versión:** `GPG1.10` · Fábrica: este chat. · **Blindaje:** `chflags uchg` (desbloquear con
 `chflags -R nouchg`, reponer con `chflags -R uchg` al cerrar cualquier reparación).
 
 Objetivo: pasar de "no sé qué vender" a una **ficha de producto validado con evidencia**, en minutos, usando solo herramientas ya conectadas (sin pagar spy tools).
@@ -90,7 +100,10 @@ Objetivo: pasar de "no sé qué vender" a una **ficha de producto validado con e
   > **🎯 La verificación que sí caza los tres: EL DATO RESPONDE A LO QUE PEDÍ?** Si buscaste
   > verrugas y llegan vestidos, es basura. Un producto fantasma puntuado en la rúbrica manda a
   > testear algo que no existe, con presupuesto real.
-- **deep-research** (skill) → cuando el usuario quiere un barrido profundo multi-fuente verificado de un nicho.
+- **Investigación profunda multi-fuente** (cuando el usuario quiere un barrido verificado de un
+  nicho entero): `WebSearch` + `firecrawl_search` (y `firecrawl_agent` si está conectado). No hay
+  skill "deep-research" instalada en el arsenal — verificado 2026-08-24; para el deep-dive de un
+  producto YA elegido, la vía sigue siendo `golden-investigacion-mercado`.
 - **Scanner de volumen visible** → las tiendas muestran el contador de ventas en el listado
   ("5K+ vendidos este mes", "10K+ bought"). Esa cifra es demanda DURA al nivel de producto —
   complementa la Ad Library (que prueba que alguien PAUTA, no que vende).
@@ -236,6 +249,13 @@ falta en cada corrida.
 Tras entregar la ficha, pregunta: «Investigo a fondo el avatar con `golden-investigacion-mercado` y monto la página con `golden-shopify`?»
 
 ## Changelog
+- **GPG1.10** (2026-08-24) — **Barrido total del arsenal (CdM).** (1) La fuente "deep-research
+  (skill)" no existe en el arsenal (verificado con `ls ~/.claude/skills`) — reemplazada por la vía
+  real sin skill fantasma; (2) `metricas_saturacion.py` mordido por un caso malo nuevo: con
+  activos > históricos reportaba "supervivencia 125% — categoría sana"; guardia agregada
+  (inconsistencia de totales → no concluir) y verificada ejecutando antes y después, con los 3 casos
+  históricos intactos; (3) recordatorio Apify (12-ago) vencido → marcado APLAZADO vigente. Reportado
+  al Centro de Mando (estándar 9).
 - **GPG1.8** (2026-08-21) — **Reparación por `golden-skill-auditor`** (auditoría inicial 880/1000,
   sin crítico). Cuatro arreglos con evidencia: (1) `SOURCING LOCAL` (43 líneas que solo aplican a
   marca propia sin proveedor en Dropi) se movió a `references/sourcing-local.md` — divulgación

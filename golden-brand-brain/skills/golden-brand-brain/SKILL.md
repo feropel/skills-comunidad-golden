@@ -16,7 +16,10 @@ description: >
 
 # Golden Brand Brain — el cerebro vivo de cada marca
 
-**Versión:** `BB1.1` · Un setup, todos los assets on-brand.
+<!-- BB1.3 — 2026-08-24 (barrido total del arsenal, CdM): la skill acaba de volverse dependencia obligatoria de 7 skills de contenido (Paso 0 del cerebro) y el contrato no era ejecutable por un chat limpio — "PROYECTOS/BRAND-BRAINS/<MARCA>/" era una ruta relativa sin regla de resolución. Se hornea el contrato de resolución (verificar con ls, buscar BRAND-BRAINS existente antes de crear otra, naming MAYÚSCULAS-CON-GUIONES) y el contrato de consumo para las skills lectoras. -->
+<!-- BB1.2 — Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
+
+**Versión:** `BB1.3` · Un setup, todos los assets on-brand.
 
 La idea: en vez de re-explicar tu negocio en cada chat, cada marca tiene UNA carpeta de
 conocimiento que yo leo antes de generar cualquier cosa. Se monta una vez, se actualiza
@@ -36,6 +39,21 @@ PROYECTOS/BRAND-BRAINS/<MARCA>/
 
 Un cerebro por marca: Golden Group Enterprise, Organic Bless, Lecoterra, cada cliente/alumno.
 Si la carpeta no existe cuando se necesita, ofrécete a crearla (Modo 1) — no trabajes a ciegas.
+
+**Cómo se resuelve la ruta en cualquier entorno (contrato para un chat sin memoria):**
+1. `PROYECTOS/` es la carpeta raíz de proyectos del usuario — normalmente el propio directorio
+   de trabajo del chat o una carpeta directa dentro de él. No adivines: verifícalo con `ls`.
+2. Antes de crear `BRAND-BRAINS/`, **busca si ya existe una** (ej.
+   `find <raíz de proyectos> -maxdepth 2 -type d -name "BRAND-BRAINS"`). Dos carpetas
+   BRAND-BRAINS = dos cerebros de la misma marca divergiendo en silencio; es el peor fallo posible.
+3. El nombre de la carpeta de marca va en `MAYÚSCULAS-CON-GUIONES` (ej. `GOLDEN-GROUP`),
+   igual que su carpeta de proyecto si la tiene.
+4. Si tras buscar no aparece ni la carpeta ni la marca, eso NO es error: es Modo 1 (ofrecer crearla).
+
+**Contrato de consumo (para las skills que leen el cerebro — el "Paso 0" de las 7 de contenido):**
+`ls <raíz>/BRAND-BRAINS/` → carpeta de la marca → leer los 6 archivos completos (son cortos) →
+generar con esa voz. Un campo `[PENDIENTE]` leído se respeta: se pregunta o se declara, jamás se
+rellena inventando.
 
 ## Modo 1 — CREAR el cerebro (setup, una vez)
 
@@ -97,6 +115,16 @@ Cuando se va a generar CUALQUIER asset para una marca con cerebro:
   de formato y el checklist de setup. Leer al crear o reestructurar un cerebro.
 
 ## Changelog
+- **BB1.3** (2026-08-24) — Barrido total del arsenal (CdM). La skill pasó a ser dependencia
+  OBLIGATORIA de 7 skills de contenido (Paso 0 del cerebro) y el contrato no era ejecutable por
+  un chat limpio sin memoria: la convención `PROYECTOS/BRAND-BRAINS/<MARCA>/` era una ruta
+  relativa sin regla de resolución. Se añade el contrato de resolución de ruta (verificar con
+  `ls`, buscar una BRAND-BRAINS existente ANTES de crear otra — dos carpetas = cerebros
+  divergiendo en silencio —, naming `MAYÚSCULAS-CON-GUIONES`) y el contrato de consumo para las
+  skills lectoras (ls → carpeta de marca → leer los 6 → `[PENDIENTE]` se respeta). Contenido y
+  estructura originales intactos.
+- **BB1.2** (2026-08-23) — Estándar 9 (Centro de Mando): cambios relevantes de esta skill se
+  reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. Contenido y estructura originales intactos.
 - **BB1.1** (2026-08-21) — Auditoría `golden-skill-auditor`: Modo 1 ahora revisa PRIMERO si el
   cerebro ya existe parcial antes de escribir (no sobrescribe archivos con datos reales), define
   qué hacer cuando no hay ninguna fuente (arranca en `[PENDIENTE]`, no se detiene), y ata el

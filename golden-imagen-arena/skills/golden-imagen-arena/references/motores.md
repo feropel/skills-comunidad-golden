@@ -24,9 +24,9 @@ generate_image {
   Bytedance/BFL/OpenAI-Hazel usan `image_references`. Ante la duda:
   `models_explore {action:"get", model_id:"<id>"}` y mira `medias[].roles`.
 - `get_cost: true` devuelve el costo sin generar. Úsalo en el preflight.
-- La generación es **asíncrona**: `generate_image` devuelve un job. Consulta
-  `job_status {job_id}` hasta `completed` para obtener las URLs de resultado
-  (manejo de `failed`/moderación: paso 4 del SKILL.md).
+- La generación es **asíncrona**: `generate_image` devuelve un job. **No hay `job_status`**:
+  espera la tanda con `jobs_wait` (bloqueante) o mira un job con `job_display {job_id}` para
+  obtener las URLs de resultado (manejo de `failed`/moderación: paso 4 del SKILL.md).
 
 ## Los que sirven para ecom de producto
 

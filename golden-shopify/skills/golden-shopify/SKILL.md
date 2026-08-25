@@ -6,9 +6,8 @@ description: >-
   Plantilla base = PRODUCTO DEMO (el build más completo, sobre Shrine Pro), adaptable a
   Dawn ("plantilla down", el tema que se enseña/regala), Sense y cualquier tema
   (la mayoría de bloques son custom-liquid y portables).
-  Trabaja con DOS PERFILES sobre un mismo motor: "marca propia" (manifiesto,
-  historia, línea de productos) y "catálogo/dropshipping" (escalera de combos,
-  demostración y comparativa obligatorias, reglas de copy de dropshipping).
+  Trabaja con DOS PERFILES sobre un mismo motor: "marca propia" y
+  "catálogo/dropshipping".
   Úsala SIEMPRE que el usuario quiera: crear o mejorar una landing/página de
   producto, armar un product.json o product.<tema>.json, adaptar una página de
   un cliente a otro tema, cambiar la marca/colores de una plantilla, agregar
@@ -21,7 +20,10 @@ description: >-
   custom_liquid. NO usar para análisis de anuncios ni temas no-Shopify.
 ---
 # GOLDEN SHOPIFY (`golden-shopify`)
-<!-- skill G4.5b · 2026-08-23 (auditoría golden-skill-auditor, reparación): DEUDA CERRADA — product.base.json regenerado del orden viejo de 17 al embudo canónico de 24 (21 + 3 de sistema) con los componentes ya existentes; sellos GFS_VERSION sincronizados (estaban en 3 versiones a la vez: SKILL G4.4 / config G4.3 / base G3.14 → todos G4.5); '## Paso 0 Cerebro de marca' estaba ENCIMA del H1 → movido debajo; SKILL.md 623→491 líneas sacando el PROTOCOLO TEMA VIVO duplicado a references/tema-vivo.md y la tabla del embudo a references/embudo-canonico.md; puntero muerto a 'línea ~460' → apunta a archivo; contradicción Ignition-en-el-main corregida. Detalle en references/changelog.md G4.5. -->
+<!-- skill G4.5d · 2026-08-24 (verificador de cierre): fechas de sello corregidas con mtime MEDIDO (la ronda cruzó de día: base el 23, reestructura el 24) y el Paso 0 ya declara DÓNDE vive el cerebro (PROYECTOS/BRAND-BRAINS/<MARCA>/, resolución exacta por golden-brand-brain). Regla que deja: la fecha de un sello se MIDE, nunca se hereda del contexto. -->
+<!-- DOS EJES DE VERSIÓN (no confundir, no son desincronía): (a) VERSIÓN DE LA SKILL = este sello + references/changelog.md, con sufijos a/b/c/d por ronda de auditoría; (b) GFS_VERSION = lo que se estampa en la PÁGINA GENERADA (config-center + componentes/00 + product.base.json), y solo sube cuando cambia lo que la página produce. Hoy: skill G4.5d · GFS_VERSION G4.5. Al bumpear, tocar TODAS las caras del eje que cambió. -->
+<!-- skill G4.5c · 2026-08-24 (barrido D del CdM): starter Horizon _golden-trust.liquid dejó de ser huérfano (citado en horizon-bloques.md §3.1) y examples/ se movió a references/examples/ con sus 17 citas reescritas — árbol de primer nivel ya canónico. -->
+<!-- skill G4.5b · 2026-08-24 (auditoría golden-skill-auditor, reparación): DEUDA CERRADA — product.base.json regenerado del orden viejo de 17 al embudo canónico de 24 (21 + 3 de sistema) con los componentes ya existentes; sellos GFS_VERSION sincronizados (estaban en 3 versiones a la vez: SKILL G4.4 / config G4.3 / base G3.14 → todos G4.5); '## Paso 0 Cerebro de marca' estaba ENCIMA del H1 → movido debajo; SKILL.md 623→491 líneas sacando el PROTOCOLO TEMA VIVO duplicado a references/tema-vivo.md y la tabla del embudo a references/embudo-canonico.md; puntero muerto a 'línea ~460' → apunta a archivo; contradicción Ignition-en-el-main corregida. Detalle en references/changelog.md G4.5. -->
 <!-- skill G4.5 · 2026-08-23: Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 <!-- skill G4.4 · 2026-08-22 (auditoría golden-skill-auditor, cierre de reparación): GFS_VERSION del
 config center estaba desincronizado en "G3.14" (~15 versiones atrás) → corregido a G4.3 en
@@ -50,6 +52,9 @@ seguridad por tiempo; detalle completo en references/changelog.md · G4.3 · 202
 
 <!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leian el cerebro de marca — esta entra a la familia que SI lo lee. Bloque identico en las 6 del CdM + fila a la fabrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
 ## Paso 0 · Cerebro de marca (obligatorio antes de generar)
+El cerebro vive en `PROYECTOS/BRAND-BRAINS/<MARCA>/` — la resolución exacta de la ruta la declara
+`golden-brand-brain`: ante duda de ruta, invócala en vez de adivinar.
+
 Si la marca tiene CEREBRO creado por `golden-brand-brain` (marca.md, productos.md, avatares.md,
 competidores.md, anuncios-ganadores.md, cambios-recientes.md), LÉELO PRIMERO y genera con esa voz
 — jamás re-preguntar lo que el cerebro ya sabe. Si NO existe, ofrece crearlo con `golden-brand-brain`
@@ -282,8 +287,8 @@ explícitamente** este plan y muéstralo en una línea por punto:
 - **Color primario + color del CTA** (justificado por conversión, REGLA #2).
 
 Reglas del plan:
-- **Compara contra los ejemplos** (`examples/demo-dawn-v2.json` ⭐ la plantilla PRO recomendada,
-  `examples/demo-shrine.json`, `examples/demo-dawn.json`)
+- **Compara contra los ejemplos** (`references/examples/demo-dawn-v2.json` ⭐ la plantilla PRO recomendada,
+  `references/examples/demo-shrine.json`, `references/examples/demo-dawn.json`)
   y contra cualquier página que el usuario te muestre o que esté en
   `~/.claude/SHOPIFY BY CLAUDE/PLANTILLAS/`. El plan DEBE divergir de ellas.
 - Si construyes **varios productos en una misma sesión**, cada plan debe pulsar **palancas
@@ -313,7 +318,7 @@ comparativas, "cómo usar", reseñas, garantía), **no dupliques** ese contenido
 SIEMPRE parte de `assets/product.base.json` (la base PRODUCTO DEMO, la más completa). Luego:
 - Tema **Shrine / Shrine Pro** → ya estás en el tema nativo de la base, sigue directo.
 - Tema **Dawn** → aplica el adaptador de `references/temas.md` (tickers→custom-liquid,
-  footer `.footer`, quita settings Shrine-only). Usa `examples/demo-dawn.json`
+  footer `.footer`, quita settings Shrine-only). Usa `references/examples/demo-dawn.json`
   como referencia viva de cómo queda en Dawn.
 - Tema **Sense / otro** → como Dawn, + fallback genérico de `temas.md`.
 
@@ -480,9 +485,9 @@ y NUNCA reintroducir nombres reales** (usar descriptores de categoría; la skill
 - `assets/product.base.json` — PLANTILLA BASE (PRODUCTO DEMO), el master a clonar.
 - `assets/config-center.liquid` — el bloque config center para insertar.
 - `assets/related-products.premium.css.txt` — CSS premium para featured-collection.
-- `examples/demo-dawn-v2.json` — ⭐ PLANTILLA PRO v2 (Dawn) — la referencia recomendada: embudo
-- `examples/demo-dawn.json` — referencia previa de adaptación a Dawn (v1).
-- `examples/demo-shrine.json` — copia de la base en Shrine Pro.
+- `references/examples/demo-dawn-v2.json` — ⭐ PLANTILLA PRO v2 (Dawn) — la referencia recomendada: embudo
+- `references/examples/demo-dawn.json` — referencia previa de adaptación a Dawn (v1).
+- `references/examples/demo-shrine.json` — copia de la base en Shrine Pro.
 
 ## Roadmap v2 (fuera de v1, no implementar salvo que lo pidan)
 - **Trust badges** como fila de sellos reutilizable.

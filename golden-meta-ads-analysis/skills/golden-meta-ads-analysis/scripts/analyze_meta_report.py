@@ -321,7 +321,9 @@ def analyze_by_placement(df, gasto_col, compras_col, ticket=None):
 
 def analyze_all_layers(df, ticket=None, min_gasto_ad=50000):
     """
-    Ejecuta el análisis en 6 capas y devuelve un dict con todos los resultados.
+    Ejecuta las 4 capas automatizadas (1-4: tipos, creativos, demografía, placement)
+    y devuelve un dict con todos los resultados. Las capas 5-8 se calculan inline
+    (ver docstring del módulo).
     """
     # Detectar columnas
     moneda, gasto_col = detect_currency(df)

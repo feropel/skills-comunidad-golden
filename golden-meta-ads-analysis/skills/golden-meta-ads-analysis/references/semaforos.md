@@ -1,13 +1,20 @@
 # Semáforos y KPIs
 
-## Sistema de semáforos (5 niveles)
+> Regla de precedencia (2026-08-24): para toda métrica que TAMBIÉN exista en las tablas de
+> `benchmarks_por_objetivo.md`, esa tabla es la fuente ÚNICA y sus umbrales mandan — este archivo
+> los repite solo donde hace falta para el diagnóstico y ya quedó alineado. Lo propio de este
+> archivo (tiers CPA vs breakeven, CTR por vertical, CPC/CPM COP, hold rate, frecuencia, reglas
+> de decisión) no vive en ningún otro lado.
+
+## Sistema de semáforos (tiers de `evaluar_cpa()` — el código es la fuente)
 
 Para cada elemento (campaña, adset, creativo, segmento demográfico) hay que asignar un veredicto. El sistema estándar es:
 
 | Símbolo | Veredicto | CPA vs breakeven | Acción |
 |---|---|---|---|
 | 🟢 | EXCELENTE | ≤ CPA con margen 20%+ | Escalar agresivamente (+20% cada 48h) |
-| 🟢 | BUENO | ≤ CPA con margen 10% | Escalar (+10-20%/48h) |
+| 🟢 | MUY BUENO | ≤ CPA con margen 15% | Escalar |
+| 🟢 | BUENO | ≤ CPA con margen 10% | Escalar moderadamente (+10-20%/48h) |
 | 🟡 | ACEPTABLE | ≤ CPA con margen 5% | Mantener, optimizar creativo o segmentación |
 | 🟡 | MARGINAL | ≤ CPA breakeven | Revisar tendencia. Si va peor, pausar. |
 | 🔴 | PIERDE | > CPA breakeven, ≤ 1.5x | Pausar y rediseñar |
@@ -71,9 +78,10 @@ En Advantage+ tolera frecuencia más alta (hasta 4-5).
 - Rojo: <1.5%
 
 ### Tasa de conversión pago iniciado → compra
-- Verde: ≥25%
-- Amarillo: 15-24%
-- Rojo: <15%
+Fuente única (`benchmarks_por_objetivo.md`, tabla VENTAS "% Compras / Pagos iniciados"):
+- Verde: >30%
+- Amarillo: 10-30%
+- Rojo: <10%
 
 ## Reglas de decisión rápida
 
@@ -139,13 +147,13 @@ Refrescar = duplicar el adset con un nombre nuevo. Meta lo trata como nuevo lear
 
 Tasas de referencia validadas en e-commerce Colombia (Meta Ads):
 
-| Etapa del embudo | Verde | Amarillo | Rojo |
-|---|---|---|---|
-| Clic en enlace → Visita LP | ≥70% | 50-69% | <50% |
-| Visita LP → Pago iniciado | ≥15% | 8-14% | <8% |
-| Pago iniciado → Compra | ≥20% | 12-19% | <12% |
-| Visita LP → Compra (directo) | ≥3% | 1.5-2.9% | <1.5% |
-| Velocidad de carga LP | ≤1.0s | 1.0-2.0s | >2.0s |
+| Etapa del embudo | Verde | Amarillo | Rojo | Dueño del umbral |
+|---|---|---|---|---|
+| Clic en enlace → Visita LP | ≥70% | 50-69% | <50% | fuente única (coincide) |
+| Visita LP → Pago iniciado | ≥15% | 8-14% | <8% | solo aquí (Colombia) |
+| Pago iniciado → Compra | >30% | 10-30% | <10% | fuente única |
+| Visita LP → Compra (directo) | ≥3% | 1.5-2.9% | <1.5% | solo aquí (Colombia) |
+| Velocidad de carga LP | ≤1.0s | 1.0-2.0s | >2.0s | solo aquí (Colombia) |
 
 ### Diagnóstico por etapa del embudo
 
@@ -163,7 +171,7 @@ Cuando un creativo tiene CPA rojo pero CTR verde, el problema NO está en el anu
 - Falta de prueba social (testimonios, reviews)
 - No hay oferta clara o urgencia
 
-**Pago → Compra baja (<12%):**
+**Pago → Compra baja (<10%):**
 - Checkout complejo o lento
 - Pocos métodos de pago disponibles
 - Costos extra inesperados (flete alto al final)

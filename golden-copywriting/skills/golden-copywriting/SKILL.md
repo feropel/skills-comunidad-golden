@@ -19,8 +19,28 @@ description: >-
 ---
 
 # Golden Group — Copywriting Multicanal
+<!-- skill GCW1.4.0 · 2026-08-25 (corrida 4 de copywriting-tendencias-8-dias): la lectura por API NO cubre el gasto de la cuenta (GOLDEN CP6 y BLUE CP5 devuelven vacío con gasto real; BLUE CP1 al 4,7%) → regla nueva de cuadre de cobertura en estandar-meta-medido.md; se corrige la afirmación de 3 corridas de que la media del título era estable (lo estable es "cabe en 40", 79-87%); dos citas oficiales nuevas (la descripción de 25 es para info NO esencial; el generador de variantes de Meta soporta español); el banco de pruebas del reparto 2+3 se apagó. -->
+<!-- skill GCW1.3.9 · 2026-08-24 (centro de mando, remediación del verificador de cierre): línea de RUTA del cerebro en el Paso 0 (las lectoras ordenaban LÉELO PRIMERO sin decir dónde — un chat limpio no podía ejecutar la orden) + bump que las ediciones del 23-24 dejaron sin subir. -->
+<!-- GCW1.3.8 — 2026-08-24 · Barrido total del arsenal (pluma delegada del CdM). POLÍTICA DE BLINDAJE DECLARADA: esta skill va SIN BLINDAR (sin uchg, chmod 644) por decisión del CdM — la tarea copywriting-tendencias-8-dias le escribe cada 8 días y el flag venía produciendo el ciclo documentado en la bitácora (corridas encontrándola desblindada, choque de dos manos el 21-ago). La protección es la regla de manos autorizadas, no el flag. Se encontró blindada en 5 de 6 nodos contra esa política → liberada. Además: aviso DATO LOCAL agregado al puntero de tendencias-vivas.md (el rótulo existía solo dentro del archivo — quien empaque la skill leyendo SKILL.md no se enteraba de excluirlo), typo "premita"→"premia" y mini-índice en estandar-meta-medido.md, ruta de la fuente Panamá precisada en la referencia externa. tendencias-vivas.md NO se tocó (DATO LOCAL: solo la tarea de 8 días escribe ahí; su encabezado "¿Argumento en 125?" viola la regla de la casa de signos de apertura — queda reportado para que la próxima corrida lo corrija). -->
+<!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leian el cerebro de marca — esta entra a la familia que SI lo lee. Bloque identico en las 6 del CdM + fila a la fabrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
+<!-- GCW1.3.7 — Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 
-**Versión:** `GCW1.3.6` · **Fábrica: el CENTRO DE MANDO** (chat "🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR").
+## Paso 0 · Cerebro de marca (obligatorio antes de generar)
+
+Si la marca tiene CEREBRO creado por `golden-brand-brain` (marca.md, productos.md, avatares.md,
+competidores.md, anuncios-ganadores.md, cambios-recientes.md), LÉELO PRIMERO y genera con esa voz
+— jamás re-preguntar lo que el cerebro ya sabe. Si NO existe, ofrece crearlo con `golden-brand-brain`
+antes de continuar; si el usuario pide seguir sin cerebro, se declara en la entrega que el contenido
+se generó sin voz de marca cargada.
+
+
+
+**Versión:** `GCW1.4.0` · **Fábrica: el CENTRO DE MANDO** (chat "🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR").
+
+> 🔓 **Política de blindaje (CdM, 2026-08-24): esta skill va SIN blindar.** La tarea
+> `copywriting-tendencias-8-dias` le escribe cada 8 días; el flag `uchg` solo producía choques de
+> manos (ver bitácora, corridas 2 y 3). Al cerrar cualquier edición se deja `chmod 644`, sin
+> `uchg`. La protección real es la regla de manos autorizadas de abajo.
 
 > 🏭 **Quién puede editar esta skill.** No tiene chat-fábrica propio, y por la regla de la casa
 > *skill sin chat-fábrica = su fábrica es el Centro de Mando*. Manos autorizadas, solo dos:
@@ -34,6 +54,8 @@ description: >-
 
 Copy que vende en LatAm por los **dos modelos de Golden**: catálogo contra entrega y marcas
 propias con pago anticipado. Directo, emocional, orientado a la acción. Nada de relleno corporativo.
+
+El cerebro vive en `PROYECTOS/BRAND-BRAINS/<MARCA>/` — la resolución exacta (buscar con find ANTES de crear, naming MAYÚSCULAS-CON-GUIONES) la declara `golden-brand-brain`: ante cualquier duda de ruta, invócala en vez de adivinar.
 
 ## Reglas de oro
 1. **El hook lo es todo.** Los primeros 3 segundos / la primera línea deciden. Siempre entrega 5+ variantes de hook.
@@ -138,6 +160,8 @@ copy que sepas malo.
 
 Bitácora que la tarea programada **`copywriting-tendencias-8-dias`** refresca cada 8 días con
 (a) lo que está corriendo en el mercado y (b) el rendimiento real de las campañas de Golden.
+🔒 **Es DATO LOCAL — NO DISTRIBUIBLE** (CPA reales de cuentas Golden con nombre): si esta skill
+se publica o comparte con alumnos, ese archivo se EXCLUYE o se reemplaza por cifras de ejemplo.
 **Léela siempre antes de escribir copy de Meta**: `estandar-meta-medido.md` es la base estable,
 `tendencias-vivas.md` es lo que se mueve. Si la entrada más reciente trae números y fuente que
 contradicen la base, manda la reciente; si es una impresión sin medir, manda la base.
@@ -186,6 +210,43 @@ vale menos que uno de 3 donde los 3 pelean — porque el relleno se cuela a prod
 lo señala.
 
 ## Changelog
+
+- **GCW1.4.0** (2026-08-25) — **Cuarta corrida de la tarea de 8 días.** Cobertura: 74 cuentas
+  inventariadas, **58 barridas — el censo completo de lo legible** (las corridas anteriores llegaban
+  a 42), 16 con gasto, 6 bajadas a nivel anuncio, 13 creativos leídos, mercado de 150 anuncios /
+  84 páginas / 142 títulos con script autotesteado (16 checks, 0 fallos), 4 de 5 cuerpos de mercado
+  leídos. Cambios de fondo en `estandar-meta-medido.md`:
+  **(1) Sección nueva "La OTRA cara de la trampa":** la API a veces **no devuelve el gasto pase lo
+  que pase** — GOLDEN CP6 (3.171.690 COP) y BLUE CP5 (777,20 USD) devuelven lista vacía con filtro,
+  sin filtro y a nivel campaña; BLUE CP1 cubre 4,7%. Se añade **regla dura de cuadre de cobertura
+  antes de rankear copys**, con el caso medido que la justifica (el anuncio visible de BLUE CP1 se ve
+  2,2x mejor que su propia campaña). Esto **relativiza las tablas anuncio-por-anuncio de las corridas
+  1-3**, que nunca cuadraron cobertura.
+  **(2) Corrección a §7:** llevaba tres corridas diciendo que la longitud media del título era la
+  cifra estable. No lo es (30,1 → 29,6 → 30,0 → **32,5**, con la mediana cayendo a 25,5). Lo estable
+  en cuatro corridas es **"cabe en 40": 79-87%**.
+  **(3) §1, dos citas oficiales nuevas:** la descripción de 25 es *"only nonessential information"*
+  (art. 497610041230617) y el generador de variantes de Meta **soporta español** (art. 180641596861873).
+  Límites **125/40/25 confirmados por cuarta vez**, sin cambio.
+  **(4) §2:** el banco de pruebas del reparto 2+3 se apagó (Le'côterra CP2 migró a catálogo), y la
+  tanda corta viva muestra el mecanismo: cargadas como anuncios hermanos, el conjunto le dio
+  166.697 / 436 / 9 COP — **cargar variantes como anuncios separados garantiza que no se midan**.
+  Además: corregido el `¿Argumento en 125?` que GCW1.3.8 dejó anotado (regla de la casa, sin signos
+  de apertura). **Blindaje: NO se re-blindó, a propósito** — la política del CdM (GCW1.3.8) derogó el
+  `uchg` para esta skill y el mandato de la tarea programada todavía lo ordena; se respetó la fábrica
+  declarada y la contradicción va a la bandeja. Respaldo previo:
+  `RESPALDOS-SKILLS/golden-copywriting-GCW1.3.9-20260825-corrida4.tar.gz`.
+- **GCW1.3.9** (2026-08-24): bump de las ediciones del 24 (verificador de cierre R2: la version vive en 4 caras — sello, linea Version, Changelog y REGISTRO — y el bump anterior toco solo el sello).
+- **GCW1.3.8** (2026-08-24) — **Barrido total del arsenal (pluma delegada del CdM) + política de
+  blindaje declarada.** La skill se encontró blindada en 5 de 6 nodos cuando la política del CdM
+  para ella es SIN blindar (la tarea de 8 días le escribe; el flag producía el ciclo de choques que
+  la propia bitácora documenta) → liberada y la política queda escrita arriba y en el ritual de
+  AUTO-MEJORA. Gemelo del rótulo DATO LOCAL agregado al puntero de `tendencias-vivas.md` (el aviso
+  vivía solo dentro del archivo). `estandar-meta-medido.md`: typo "premita"→"premia" y mini-índice
+  (301 líneas ya pedían tabla de contenido). Ruta de la fuente Panamá precisada en la referencia
+  CTWA. `tendencias-vivas.md` intacto (DATO LOCAL): su encabezado "¿Argumento en 125?" viola la
+  regla de signos de apertura — reportado para que lo corrija la próxima corrida de la tarea, única
+  mano autorizada ahí. Reportado al CdM (estándar 9).
 - **GCW1.3.6** (2026-08-21, mismo día) — **CORRIGE A GCW1.3.5, que se publicó con un
   cherry-picking.** Al ampliar la cobertura a las 12 cuentas con gasto que la 1.3.5 había dejado
   fuera, apareció que `OPEN 7` (14-ago) y `OPEN 8` (19-ago) **no son una pieza suelta de copy
@@ -290,6 +351,7 @@ lo señala.
 ## 🔄 AUTO-MEJORA (mandato global — autorización permanente de FER)
 Al cerrar cada corrida real: 1) **auto-califícate** (1–1000, honesto, con evidencia) contra el
 criterio de calidad de esta skill; 2) toda lección que sea de SISTEMA se **hornea aquí** con el
-ritual (backup → desbloquear → arreglar → changelog+sello → re-blindar); 3) si detectas un hueco
+ritual (backup → arreglar → changelog+sello → cerrar SIN blindar, chmod 644 — política CdM
+2026-08-24 para esta skill, ver arriba); 3) si detectas un hueco
 propio, **arréglalo sin esperar que lo pidan** e informa; 4) pasa `golden-skill-auditor`
 periódicamente. Nunca borres conocimiento: reorganiza y añade.

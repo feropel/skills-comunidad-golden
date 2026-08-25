@@ -79,6 +79,44 @@ PLACEHOLDER = re.compile(
 )
 
 
+
+# Archivos escribibles POR DISENO dentro de skills blindadas (regla de los dos lugares:
+# la excepcion vive AQUI y en la prosa de la skill duena). R4 F6: sin esto,
+# investigacion-mercado era ruido fijo "sin blindar" en cada corrida.
+EXCEPCIONES_PARCIALES = {
+    "golden-investigacion-mercado": frozenset({"scripts/fuentes_baseline.json"}),
+}
+
+def uchg_arbol(carpeta, exentos=frozenset()):
+    """True SOLO si la carpeta existe, tiene al menos un archivo, y TODOS los archivos
+    (SIGUIENDO symlinks) llevan UF_IMMUTABLE — salvo los declarados en `exentos` (rutas
+    relativas de escribibles POR DISENO, ej. un baseline que el propio script actualiza).
+    Falla CERRADO: inexistente o vacia = NO blindada. Stat por archivo (sin find -flags).
+    CUERPO BYTE-IDENTICO en censo-ligero.py y chequeo.py — una sola semantica (R3/R4)."""
+    import stat as _st
+    if not os.path.isdir(carpeta):
+        return False
+    total = 0
+    for raiz, _dirs, archivos in os.walk(carpeta, followlinks=True):
+        for _d in _dirs:  # R5 menor 4: los directorios tambien se juzgan — con archivos uchg
+            try:          # y carpeta abierta se podia INYECTAR un archivo nuevo sin resistencia
+                if not (os.stat(os.path.join(raiz, _d)).st_flags & _st.UF_IMMUTABLE):
+                    return False
+            except OSError:
+                return False
+        for a in archivos:
+            rel = os.path.relpath(os.path.join(raiz, a), carpeta)
+            if rel in exentos:
+                continue
+            total += 1
+            try:
+                fl = os.stat(os.path.join(raiz, a)).st_flags
+            except OSError:
+                return False
+            if not (fl & _st.UF_IMMUTABLE):
+                return False
+    return total > 0
+
 def es_falso_positivo(texto, match, path):
     """Decide si una coincidencia es ruido en vez de una credencial real.
 
@@ -365,10 +403,11 @@ def revisar_blindaje(hallazgos):
     # skills/golden-copywriting/references/tendencias-vivas.md cada 8 dias (archivo de
     # esa skill, no de esta). Verificado el 2026-08-19: llevaba 3 dias blindada por
     # seguir el consejo de este mismo chequeo.
-    SIN_BLINDAJE_POR_DISENO = {"golden-copywriting"}
+    SIN_BLINDAJE_POR_DISENO = {"golden-copywriting",  # su rutina de 8 dias le escribe
+                           "golden-chatea-operacion"}  # politica de su fabrica (22-ago): sin blindar hasta validar el offset horario contra un pais distinto de Colombia — la primera corrida real de otro pais levanta la excepcion
     protegidas, abiertas, exentas = 0, [], []
     for d in sorted(os.listdir(base)):
-        if not d.startswith("golden-"):
+        if not d.startswith("golden"):
             continue
         skill_md = os.path.join(base, d, "SKILL.md")
         if not os.path.exists(skill_md):
@@ -378,7 +417,7 @@ def revisar_blindaje(hallazgos):
             ))
             continue
         try:
-            blindada = bool(os.stat(skill_md).st_flags & 0x00000002)  # UF_IMMUTABLE
+            blindada = uchg_arbol(os.path.dirname(skill_md), EXCEPCIONES_PARCIALES.get(os.path.basename(os.path.dirname(skill_md)), frozenset()))  # semantica unica + exentos por diseno (R4)
         except (AttributeError, OSError):
             continue
         if d in SIN_BLINDAJE_POR_DISENO:
@@ -525,7 +564,7 @@ def main():
     print(f"  {datetime.now():%Y-%m-%d %H:%M}   ·   sin salida de red")
     print()
     print(f"  📂 {escaneados} archivos revisados")
-    print(f"  🛡️  {protegidas} skills golden blindadas, {abiertas} abiertas")
+    print(f"  🛡️  {protegidas} skills golden blindadas, {abiertas} abiertas — de {protegidas + abiertas} juzgadas (toda cifra de cobertura sale con su universo al lado: R3)")
     print(f"  🪝 guardián golden-careful: {'activo' if guardian else 'AUSENTE'}")
     if cache:
         print(f"  🗃️  caché: {cache['archivos']} archivos · {cache['gb']} GB")

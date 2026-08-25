@@ -20,6 +20,7 @@ description: >
 
 # golden-imagen-arena — Varias IAs compiten, una gana
 
+<!-- skill v1.10 · 2026-08-24 (barrido total del arsenal, CdM) · CAZADO Y CORREGIDO: el flujo mandaba consultar `job_status {job_id}` hasta completed (paso 4 del SKILL.md + references/motores.md) y ese tool NO EXISTE en el MCP de Higgsfield — verificado contra el schema vivo del servidor y contra golden-ugc-avatar (misma casa, verificada en producción, que ya lo advertía: "There is no job_status polling tool"). Dos skills hermanas sobre el mismo servidor se contradecían. La espera real es `jobs_wait` (bloqueante, acepta los ids de la tanda) o `job_display` por job + `show_generations` para historial. Sin más cambios. -->
 <!-- skill v1.9 · 2026-08-23 (Estándar 9 del auditor) · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 <!-- skill v1.8 · 2026-08-22 (turno del CENTRO DE MANDO al chat FILTRO) · NUEVO references/vocabulario-foto.md: tabla español→token exacto para lente/focal, esquemas de luz con tamaño-ángulo-ratio, materiales y ángulo de cámara. ORIGEN: evaluación del método que vendía la guía "Higgsfield director de arte"; el método ya existía en golden-cinematica (ley de tokens exactos) pero su vocabulario es 100% web/3D. HUECO MEDIDO con grep sobre esta skill: 0 menciones de focal (35/50/85mm), 0 de softbox/difusor, las 2 de "lente" eran metafóricas. El bloque [1 ESCENA] decía "luz suave de estudio" (adjetivo): la arena medía interpretaciones, no motores. NO se tocaron las 5 leyes, ni compliance, ni componer.py, ni el disparador. -->
 <!-- skill v1.7 · 2026-08-21 (auditoría golden-skill-auditor): ley 2 ahora cubre el style_id de ms_image dentro del intake único del preflight (antes goteaba a mitad de la arena); paso 6 suma checklist explícito de "definición de terminado" antes de entregar a golden-shopify/golden-ads -->
@@ -85,7 +86,7 @@ igual que se verifica un JSON. Un motor que escribe mal los datos queda DESCALIF
 1. ENTRADA     → foto real del producto → media_id (URL o subida)
 2. PROMPT      → un solo prompt maestro de ecom (references/prompt-maestro.md)
 3. ARENA       → mismo prompt + misma foto en 3-4 motores en paralelo
-4. DESCARGA    → job_status hasta completed → curl de los resultados + WebP < 150 KB
+4. DESCARGA    → jobs_wait hasta completed → curl de los resultados + WebP < 150 KB
 5. JURADO      → rúbrica de conversión (references/rubrica.md) → ranking y ganador
 6. ENTREGA     → ganador a golden-shopify / golden-ads + motor default del producto
 ```
@@ -207,9 +208,11 @@ diversidad la da la arena, no las variantes del mismo modelo.
 
 ### 4. Descargar y optimizar
 
-`generate_image` es **asíncrono**: devuelve un job, no la imagen. Consulta
-`job_status {job_id}` hasta que salga `completed` (espera unos segundos entre
-consultas; los motores tardan de segundos a un par de minutos). Si un job sale
+`generate_image` es **asíncrono**: devuelve un job, no la imagen. **No existe un tool
+`job_status`** (verificado contra el schema vivo del MCP el 2026-08-24; los motores tardan
+de segundos a un par de minutos). Para esperar los resultados de la tanda usa
+`jobs_wait` con los ids de los jobs (espera bloqueante), o consulta uno puntual con
+`job_display {job_id}` / navega el historial con `show_generations`. Si un job sale
 `failed` o lo frena moderación, no tumba la arena: reintenta ese motor UNA vez y,
 si repite, se declara fuera de competencia y el ranking sigue con los demás —
 anota el motivo en el informe.

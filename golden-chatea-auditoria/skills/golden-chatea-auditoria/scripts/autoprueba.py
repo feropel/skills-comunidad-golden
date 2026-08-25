@@ -107,8 +107,12 @@ def espacio_roto():
 
     # --- E3: credencial de voz heredada · F6: multimedia como cadena
     # --- F5: precio que no es numero limpio · C3: prompt_libre sobre su tope nativo
+    # El api_key va REDACTADO (`<<REDACTADO...>>`), la forma REAL en la que llega a este
+    # script: extraer.py ya lo redacto por patron de valor antes de que auditar.py vea el
+    # DUMP. Un fixture con la llave en claro (como antes) solo probaba una forma que el
+    # propio auditor real nunca recibe.
     p6 = producto("FUGAS")
-    p6["voz_con_ia"]["api_key"] = "sk_" + "a" * 45
+    p6["voz_con_ia"]["api_key"] = "<<REDACTADO ElevenLabs len=48>>"
     p6["voz_con_ia"]["habilitar"] = "si"
     p6["embudo_de_ventas"]["multimedia"] = "https://una-sola-url-como-cadena"
     p6["informacion_de_producto"]["precio"] = "74.900 COP"
@@ -187,6 +191,18 @@ def espacio_roto():
     # --- A3: el pais dice MEXICO y todos los productos estan en COP (plantilla clonada)
     campos.append(campo("[Comentarios IA] Pais", "MEXICO", "text"))
 
+    # --- F3 clase: hueco de editor dentro de un producto ACTIVO. Caso REAL medido en Golden
+    # el 2026-08-22: un producto vendiendo llevaba el corchete en pleno paso de cobro y la
+    # lista de placeholders conocidos no lo veia. El de minusculas ([total]) NO debe disparar.
+    p9 = producto("HUECOS")
+    p9["prompt"]["prompt_libre"] = (
+        "Envia los datos de pago [AQUI VAN LOS DATOS DE PAGO ANTICIPADO: Nequi + titular] "
+        "y el valor $[total] al cliente. Foto: [IMAGEN 1 — URL]")
+    campos.append(campo("[Producto Ventas Wp] 9", p9))
+    disparador.append({"producto": "HUECOS", "name": "[Producto Ventas Wp] 9",
+                       "keyW": "Hola quiero informacion y precio de HUECOS,,,,,,",
+                       "idAd": "9,,,,,,", "estado": "activo"})
+
     return {
         "_etiqueta": "AUTOPRUEBA-espacio-roto",
         "_extraido": "2026-01-01T00:00:00",
@@ -199,8 +215,14 @@ def espacio_roto():
         "/me": {"id": 1, "name": "Autoprueba", "email": "autoprueba@local"},
         "/flow/bot-fields": campos,
         "/flow/user-fields": [],
-        # I3: zona extraida que ningun control mira (aqui, los subflujos)
+        # I3: zona extraida que NINGUN control mira. custom-events no lo audita nadie: tiene
+        # que seguir apareciendo como sin cubrir. subflows/segments/agents SI tienen control
+        # (B4 los cuenta) y NO deben aparecer aqui: es la regresion del bug de la lista
+        # `auditadas` desincronizada de lo que B4 realmente audita.
+        "/flow/custom-events": [{"name": "un_evento"}],
         "/flow/subflows": [{"ns": "f999999s1", "name": "un subflujo"}],
+        "/flow/segments": [{"ns": "f999999sg1", "name": "un segmento"}],
+        "/flow/agents": [{"ns": "f999999ag1", "name": "un agente"}],
         # G1/G2: el payload real viene ANIDADO bajo `data`. Mirar solo el primer nivel
         # devolvia CERO credenciales teniendo seis. El falso negativo se siembra aqui.
         "/integration/shopify": {"data": {"url": "una-tienda-ajena.myshopify.com",
@@ -208,8 +230,13 @@ def espacio_roto():
                                           "status": "verified"}, "status": "ok"},
         "/integration/openai": {"data": {"api_key": "<<REDACTADO len=164>>",
                                          "status": "verified"}, "status": "ok"},
-        # A4: un canal caido, que el control viejo no miraba (solo veia si el dict existia)
-        "/workspace-settings/channels": {"whatsapp": True, "facebook": "expired"},
+        # A4: la FORMA REAL del endpoint (medida contra Golden Colombia, fXXXXXX): enteros
+        # anidados bajo `data`, no booleanos ni strings "connected"/"active" en la raiz. El
+        # control viejo solo reconocia esa segunda forma inventada, que ningun canal real usa
+        # -- lo unico que le disparaba era el `status:"ok"` del sobre HTTP. whatsapp=1 conectado,
+        # facebook=0 caido.
+        "/workspace-settings/channels": {"data": {"whatsapp": 1, "facebook": 0,
+                                                   "instagram": 1}, "status": "ok"},
         # F7: la cuenta propia sale del servidor, no de suponer cual es la mayoritaria
         "/team-info": {"data": {"id": 236245, "name": "Autoprueba"}},
         # F13: zona extraida que antes no auditaba nadie
@@ -318,6 +345,11 @@ def main():
     for c in anterior["/flow/bot-fields"]:
         if c["name"] == "[Carritos] Configuracion":
             c["value"] = "{}"
+        # --- J1b: un valor CORTO en la corrida anterior, con muchas tildes en la actual —
+        # el hueco entre crudo y escapado es grande (cada tilde pesa 6 escapados) y sirve
+        # para probar que el diff muestra el escapado REAL, no el largo crudo del JSON.
+        if c["name"] == "[Comentarios] Configuracion General":
+            c["value"] = json.dumps({"texto": "corto"})
     c2 = Auditoria(espacio_roto()); c2.correr(); c2.comparar(anterior)
     tipos = {t for t, _, _ in c2.cambios}
     if {"NUEVO", "EDITADO"} <= tipos:
@@ -325,6 +357,52 @@ def main():
     else:
         print(f"  FALLA J1   el diff solo vio {tipos}")
         faltan.append("diff")
+
+    # --- prueba 4c (J1b): el diff calcula y muestra el ESCAPADO real, no el largo crudo
+    import re as _re
+    valor_nuevo = next(c["value"] for c in espacio_roto()["/flow/bot-fields"]
+                       if c["name"] == "[Comentarios] Configuracion General")
+    esc_esperado = len(json.dumps(valor_nuevo)[1:-1])
+    crudo_esperado = len(valor_nuevo)
+    detalle_cfg = next((d for t, n, d in c2.cambios
+                        if n == "[Comentarios] Configuracion General"), "")
+    m = _re.search(r"([\d,]+) → ([\d,]+) escapados", detalle_cfg)
+    mostrado_en = int(m.group(2).replace(",", "")) if m else None
+    if mostrado_en == esc_esperado and esc_esperado != crudo_esperado:
+        print("  OK    J1b  el diff muestra el escapado real, no el largo crudo del JSON")
+    else:
+        print(f"  FALLA J1b  el diff mostro {mostrado_en}, el escapado real es {esc_esperado} "
+              f"(crudo {crudo_esperado})")
+        faltan.append("diff-escapado")
+
+    # --- prueba 4b: los DOS niveles de confianza del corchete.
+    # Contrastado contra los 12 productos reales de Golden: tratar "mayusculas sostenidas"
+    # como hueco acusaba 3 falsos de cada 4. El verbo de encargo es rojo; el resto, duda.
+    g = Auditoria(espacio_roto()); g.correr()
+    f3 = [h for h in g.hallazgos if h["control"] == "F3"]
+    rojo = [h for h in f3 if h["severidad"] == "MUERTO" and "AQUI VAN" in h["evidencia"]]
+    duda = [h for h in f3 if h["severidad"] == "DUDA" and "IMAGEN 1" in h["evidencia"]]
+    falso = [h for h in f3 if "[total]" in h["evidencia"]]
+    if rojo and duda and not falso:
+        print("  OK    F3   verbo de encargo = rojo · mayusculas = duda · [total] no dispara")
+    else:
+        print(f"  FALLA F3   rojo={len(rojo)} duda={len(duda)} falso_positivo={len(falso)}")
+        faltan.append("corchetes-dos-niveles")
+
+    # --- prueba CLV: una clave de decision no puede fusionar dos hallazgos DISTINTOS.
+    # `[Producto Ventas Wp] 9` (HUECOS) ya trae, sembrados arriba, un hueco de editor (rojo,
+    # producto activo) Y un corchete en mayusculas (duda) EN EL MISMO CAMPO. Sin la huella
+    # de la evidencia en la clave, los dos colapsaban bajo `F3|[Producto Ventas Wp] 9` y una
+    # sola decision del dueno silenciaba a los dos de una vez.
+    f3_p9 = [h for h in g.hallazgos
+             if h["control"] == "F3" and h["campo"] == "[Producto Ventas Wp] 9"]
+    claves_p9 = {h["clave"] for h in f3_p9}
+    if len(f3_p9) >= 2 and len(claves_p9) == len(f3_p9):
+        print("  OK    CLV  dos hallazgos F3 del mismo campo tienen claves distintas")
+    else:
+        print(f"  FALLA CLV  {len(f3_p9)} hallazgos comparten {len(claves_p9)} clave(s): "
+              "una decision silenciaria mas de uno")
+        faltan.append("clave-colision")
 
     # --- prueba 5: degradacion elegante. Un endpoint que respondio con error NO puede
     # tumbar la auditoria entera: un 500 puntual de la API costaria el informe completo.
@@ -356,6 +434,37 @@ def main():
     else:
         print(f"  FALLA HO   {len(dudas_con_accion)} dudas con accion quedaron fuera")
         faltan.append("handoff-dudas")
+
+    # --- prueba HO2: todo rojo o naranja entra al paquete, TENGA O NO `accion` explicita.
+    # Filtrar por "tiene accion" antes de mirar severidad tiraba rojos/naranjas reales
+    # (medido: 22 de 39 hallazgos abiertos, 5 rojos de un disparador). Se busca un caso
+    # sembrado que YA no trae `accion` (varios D3 y el propio C4 no la traen) y se confirma
+    # que su titulo aparece en el paquete escrito.
+    graves_sin_accion = [h for h in f.hallazgos
+                         if h["severidad"] in ("MUERTO", "ANUNCIADA") and not h.get("accion")]
+    faltantes_ho2 = [h for h in graves_sin_accion if h["titulo"] not in texto]
+    if graves_sin_accion and not faltantes_ho2:
+        print(f"  OK    HO2  {len(graves_sin_accion)} rojos/naranjas sin accion "
+              "entraron al paquete")
+    elif not graves_sin_accion:
+        print("  FALLA HO2  no hay ningun caso sembrado de rojo/naranja sin accion para probarlo")
+        faltan.append("handoff-severidad-sin-fixture")
+    else:
+        print(f"  FALLA HO2  {len(faltantes_ho2)} de {len(graves_sin_accion)} quedaron fuera")
+        faltan.append("handoff-severidad")
+
+    # --- prueba I3: B4 e I3 comparten la MISMA lista de endpoints auditados (ENDPOINTS_B4).
+    # custom-events no lo cubre nadie y tiene que seguir apareciendo; subflows/segments/agents
+    # SI los cubre B4 y no deben aparecer como sin control.
+    k = Auditoria(espacio_roto()); k.correr()
+    i3h = next((h for h in k.hallazgos if h["control"] == "I3"), None)
+    ev_i3 = i3h["evidencia"] if i3h else ""
+    if ("/flow/custom-events" in ev_i3 and "/flow/segments" not in ev_i3
+            and "/flow/agents" not in ev_i3 and "/flow/subflows" not in ev_i3):
+        print("  OK    I3B4 B4 e I3 comparten la lista real de endpoints auditados")
+    else:
+        print(f"  FALLA I3B4 desincronizado: {ev_i3}")
+        faltan.append("i3-b4-desync")
     os.unlink(tmp)
 
     if faltan:

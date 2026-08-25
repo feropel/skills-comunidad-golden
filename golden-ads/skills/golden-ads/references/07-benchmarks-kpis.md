@@ -14,6 +14,9 @@ manda es tu **breakeven** (REGLA 2). Úsalos para ubicar dónde está el cuello,
 | **CPA** | < breakeven | ≈ breakeven | > breakeven | veredicto de rentabilidad |
 | **ROAS** | > breakeven ROAS | ≈ | < | ídem (ajustar por entrega COD) |
 
+> Contraste externo opcional: benchmarks CTWA/COD de terceros (CPM 3–8 USD, hook >30%, mercado Panamá)
+> en `referencia-externa-ctwa-cod-panama.md` — leerlos con su propia advertencia: orientan, no mandan.
+
 ## MATRIZ DE VEREDICTO DEL TESTEO (la regla principal)
 
 Un conjunto no se juzga por UNA métrica: se juzga por su **huella completa**, y cada escenario

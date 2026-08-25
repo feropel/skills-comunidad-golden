@@ -20,6 +20,60 @@ description: |
 
 # golden-chatea-auditoria · la salud de un espacio de Chatea Pro
 
+<!-- skill v1.6 (GCA1.6) — 2026-08-25 — verificacion adversarial (golden-verificador) contra el
+espacio REAL de Golden Colombia (fXXXXXX): ocho hallazgos, los ocho con su caso malo sembrado
+en autoprueba.py ANTES de arreglar el codigo. (1) A4 no evaluaba NINGUN canal real: el endpoint
+real trae enteros anidados bajo `data` (`{"data":{"whatsapp":1,...}}`) y el codigo solo
+reconocia booleanos o strings "connected/active/ok" — lo unico que disparaba era el
+`status:"ok"` del SOBRE HTTP, no un canal. Corregido para leer la forma real, con el fixture
+reproduciendola. (2) E3 (credencial de voz heredada) NUNCA podia disparar contra un DUMP real:
+comparaba `api_key` contra el string YA REDACTADO por extraer.py (`<<REDACTADO...>>`), que
+siempre falla esa condicion — el fixture viejo probaba una forma en claro que el auditor real
+jamas recibe. Ahora el control juzga si HABIA algo que redactar, no si sigue en claro. (3) El
+paquete `--handoff` filtraba por "¿tiene `accion`?" ANTES de mirar la severidad: 22 de 39
+hallazgos abiertos no llegaban al paquete en la corrida real, 5 de ellos rojos de un solo
+disparador y 11 fugas de credenciales. Ahora todo 🔴 o 🟠 entra siempre, tenga o no `accion`.
+(4) La clave del libro de decisiones (`control|objetivo`) no era unica cuando un mismo campo
+acumulaba varios hallazgos distintos sin `objetivo` explicito (`D3|[Remarketing IA]...` cubria
+5 hallazgos de una sola vez; `F3|[Producto Ventas Wp] 8` mezclaba un rojo con un azul bajo la
+misma clave): una decision del dueno podia silenciar mas de uno sin que nadie lo notara. Se
+afina con una huella corta de la evidencia cuando no hay `objetivo` (los agregados deliberados,
+como `huerfanos-con-pauta`, siguen con su clave estable de siempre). (5) El diff (`--anterior`,
+J1) mostraba el largo crudo del JSON prominente y solo el DELTA como "escapados": un campo cerca
+del techo no tenia forma de leer su escapado absoluto real. Ahora muestra el escapado real
+primero (`ea → en escapados`) y el crudo aparte, marcado. (6) Varios controles se declaraban
+"corrido" sin denominador o sin ejecutar su medida real: B2 (el limite de campos de usuario no
+lo expone la API — ahora NO_VERIFICADO siempre, nunca "corrido"), A1 (sin denominador, ahora
+`1 endpoint`), B4 (contaba objetos sin declarar cuantos ni cuales, ahora lo declara), G2 (solo
+hacia una pregunta y se marcaba "corrido" como si hubiera verificado algo — ahora NO_VERIFICADO
+con la evidencia encontrada). Y F4/F12/I1 estaban en `A` en controles.md pero el codigo los
+reporta NO_VERIFICADO (lectura humana): sincronizados a `H`. (7) Cifras de la autoprueba
+desincronizadas entre SKILL.md y controles.md: quedan en **30 defectos + 11 pruebas de
+comportamiento** en los dos lugares (las 4 nuevas: J1b escapado real, CLV colision de claves,
+HO2 severidad en el handoff, I3B4 sincronia de la lista de endpoints auditados). (8) La lista
+`auditadas` de I3 (bloque_i) vivia hardcodeada y desincronizada de lo que B4 realmente audita:
+decia que subflows/tags/ai-agents/ai-tasks/inbound-webhooks/segments/agents no tenian control
+cuando B4 ya los contaba — 7 falsos positivos. Ahora ambas comparten la constante
+`ENDPOINTS_B4`, una sola lista para los dos lectores. -->
+<!-- skill v1.5 (GCA1.5) — 2026-08-22 — PRIMERA lectura profunda de los 12 prompts de
+producto en campo: los controles F4/F9/F10/F11/F12 estaban escritos desde el primer dia y NUNCA
+se habian ejercido. Encontraron un defecto REAL en produccion que el auditor no veia:
+`[Producto Ventas Wp] 8` (Tag Recede, ACTIVO y registrado en el disparador) llevaba
+`[AQUI VAN LOS DATOS DE PAGO ANTICIPADO: Nequi/Daviplata + titular]` en pleno paso de cobro. La
+lista de placeholders conocidos (`[NOMBRE`, `TU_TOKEN`...) no lo cazaba — el mismo modo de fallo
+que esta skill le prohibe a los demas: el detector solo mira donde le sembraron el defecto.
+Ahora F3 caza la CLASE, en DOS niveles de confianza MEDIDOS contra los 12 productos reales:
+verbo de encargo (AQUI VA, PONER, FALTA, COMPLETAR, REEMPLAZAR) = rojo si el producto esta
+activo; corchete en mayusculas sostenidas = DUDA, porque 3 de cada 4 eran plantilla viva del
+motor de Producto en Segundos ([CATEGORIA], [NOMBRE ASESORA]) y un auditor que acusa 3 falsos de
+4 le ensena al dueno a ignorarlo. El corchete de variable en minusculas ([total]) no dispara.
+F3 mira las HOJAS DE TEXTO, no el JSON crudo: aplicado al crudo, el `[` que abre un array
+fabricaba falsos positivos en los dos disparadores. Mismo criterio en la zona de agentes y
+tareas de IA. Autoprueba: 30 defectos + 7 pruebas de comportamiento.
+NOTA DE PROCESO: el turno que iba a escribir esta entrada se corto por un AbortError del canal
+de permisos, y la skill quedo con el codigo de GCA1.5 y el SKILL.md diciendo GCA1.4 — el censo
+diario no habria visto la edicion. Leccion: la version se escribe en el MISMO comando que el
+ultimo cambio de codigo, no en uno posterior. -->
 <!-- skill v1.4 (GCA1.4) — 2026-08-22 — auditoria golden-skill-auditor (850 PLATA), pasada
 fresca. Lo grave era del MISMO tipo que esta skill le prohibe a los demas: (1) B7 y J2 estaban
 declarados en el catalogo como controles automaticos y NO aparecian en la tabla de cobertura —
@@ -70,7 +124,7 @@ numérico. Ver detalle completo debajo. -->
 skill nació sin CHANGELOG y sin número, y sin versión el censo diario no puede ver que alguien
 la editó. -->
 
-**Versión:** `GCA1.4`
+**Versión:** `GCA1.6`
 
 Auditar aquí significa **medir el estado real del servidor contra el estándar**, no leer la
 configuración y opinar. Nada se da por bueno sin haberlo contado, y el informe se entrega en
@@ -171,8 +225,8 @@ Las cuatro banderas son opcionales y ninguna es decorativa:
 | `--json` | Todo en crudo, para encadenar con otra herramienta. |
 
 **La autoprueba va primero y no se salta.** Fabrica un espacio que se SABE roto (**30 defectos
-sembrados más 6 pruebas de comportamiento**, entre ellos los cinco falsos negativos que una
-verificación adversarial encontró) y exige que el auditor los encuentre todos. Un auditor que sale en verde contra un
+sembrados más 11 pruebas de comportamiento**, entre ellos los falsos negativos que dos
+verificaciones adversariales encontraron) y exige que el auditor los encuentre todos. Un auditor que sale en verde contra un
 espacio sano no prueba nada: prueba que no mira. Si la autoprueba falla, el auditor está roto y
 no se corre contra datos reales.
 

@@ -167,5 +167,6 @@ Ningún precio, stock o reseña entra a una ficha sin comprobar que el dato resp
 > 📌 **Hay un tercer uso, aplazado por decisión de FER (2026-08-05):** el scraper de **Google Maps**
 > permite listar negocios locales con su WhatsApp y filtrar los que tienen muchas reseñas y **no
 > tienen web** — el cliente exacto del Asistente Golden. FER lo quiere, pero **no ahora**:
-> *"todavía no me dedico a esa parte, pero lo voy a hacer"*. Recordatorio programado para el
-> 2026-08-12. No arrancar antes.
+> *"todavía no me dedico a esa parte, pero lo voy a hacer"*. El recordatorio programado
+> (2026-08-12) ya venció sin orden de arranque — sigue APLAZADO hasta que FER lo ordene
+> explícitamente; no arrancar por iniciativa propia (verificado vigente 2026-08-24).

@@ -146,7 +146,7 @@ def main():
         json.dump(result, f, ensure_ascii=False, indent=2)
 
     print(f"\n✅ Datos guardados en: {filename}")
-    print("\nPega el contenido de ese archivo en Claude para el análisis.\n")
+    print("\n(Flujo automatizado: Claude lee este JSON directo con Read — no hay que pegarlo.)\n")
 
 
 if __name__ == "__main__":

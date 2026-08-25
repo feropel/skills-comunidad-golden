@@ -2,7 +2,7 @@
 
 Todos los snippets estan listos para copiar y pegar dentro de un bloque
 `custom_liquid` o una seccion. Cada uno incluye lo necesario (CSS + HTML/JS).
-Los snippets completos y conectados viven en `references/componentes/` y en los ejemplos (`examples/demo-shrine.json`).
+Los snippets completos y conectados viven en `references/componentes/` y en los ejemplos (`references/examples/demo-shrine.json`).
 
 ## 1) Motor global de animaciones (reveal + tilt + contador)
 

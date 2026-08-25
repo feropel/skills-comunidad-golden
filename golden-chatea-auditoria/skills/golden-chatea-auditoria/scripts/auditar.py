@@ -23,6 +23,7 @@ URLs vivas, subflujo vivo detras de un disparador, y los cruces contra Dropi, Sh
 Esos se declaran como NO VERIFICADO en la cobertura, nunca se omiten en silencio.
 """
 
+import hashlib
 import json
 import re
 import sys
@@ -31,6 +32,14 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
 TOPES = json.loads((RAIZ / "assets" / "topes-nativos.json").read_text())
+
+# Los endpoints puramente de conteo que B4 audita. I3 (bloque_i, "lo que entra al DUMP se
+# audita o se declara") usa esta MISMA lista para decidir que zonas quedan sin control: dos
+# listas separadas se desincronizan la primera vez que alguien edita una y no la otra — medido:
+# I3 decia que estos endpoints no tenian control cuando B4 ya los contaba. Una sola lista, dos
+# lectores.
+ENDPOINTS_B4 = ("/flow/subflows", "/flow/tags", "/flow/ai-agents", "/flow/ai-tasks",
+                "/flow/inbound-webhooks", "/flow/segments", "/flow/agents")
 
 TECHO_ESCAPADO = TOPES["techo_bot_field"]["practico_escapado"]
 ALERTA = TOPES["techo_bot_field"]["alerta_porcentaje"]
@@ -56,6 +65,32 @@ MOJIBAKE = ["Ã¡", "Ã©", "Ã­", "Ã³", "Ãº", "Ã±", "Ã‘", "â€™",
 
 PLACEHOLDERS = ["{{", "TU_TOKEN", "TU_NOMBRE", "TU_TIENDA", "XXXX", "[NOMBRE",
                 "[PRODUCTO", "lorem ipsum", "ejemplo.com", "PONER AQUI", "PENDIENTE:"]
+
+# La LISTA de arriba caza los huecos que ya conocemos por su nombre. Eso es exactamente el
+# modo de fallo que esta skill le prohibe a los demas: el detector solo mira donde le
+# sembraron el defecto. Medido en Golden el 2026-08-22: un producto ACTIVO y registrado en el
+# disparador llevaba `[AQUI VAN LOS DATOS DE PAGO ANTICIPADO: Nequi/Daviplata + titular]` en
+# pleno paso de cobro, y `[IMAGEN 1 — URL]` en el embudo. Ninguno estaba en la lista, asi que
+# el auditor los dio por buenos. Se caza la CLASE: corchete con mayusculas sostenidas o con
+# una palabra de encargo dentro — el idioma con el que un humano se deja una nota a si mismo.
+# El corchete de VARIABLE del flujo va en minusculas ([total], [saldo]) y no dispara.
+# DOS niveles de confianza, porque medir importa mas que gritar. Contrastado contra los 12
+# productos de Golden: la version que trataba "mayusculas sostenidas" como hueco acuso 4
+# corchetes y solo 1 era real — los otros 3 eran variables de plantilla ([CATEGORIA],
+# [NOMBRE ASESORA]) que el motor de "Producto en Segundos" rellena, y una variable larga con
+# instruccion adentro en la lista de datos del pedido. Un auditor que acusa 3 de 4 en falso
+# ensena al dueno a ignorarlo.
+#
+# ALTA confianza: el corchete lleva un VERBO DE ENCARGO — un humano dejandose una nota.
+HUECO_DE_EDITOR = re.compile(
+    r"\[[^\]\n]{0,90}"
+    r"(AQU[IÍ] VA|AQU[IÍ] IR|PONER|POR COMPLETAR|FALTA |COMPLETAR|PENDIENTE|REEMPLAZAR|"
+    r"TU NOMBRE|TU TIENDA|XXX)"
+    r"[^\]\n]{0,90}\]", re.I)
+
+# BAJA confianza: corchete en mayusculas sostenidas. Puede ser plantilla viva o hueco.
+# Se reporta como DUDA para confirmar, nunca como muerte.
+CORCHETE_MAYUSCULAS = re.compile(r"\[[^\]\n]{0,90}[A-ZÁÉÍÓÚÑ]{4,}[^\]\n]{0,90}\]")
 
 # Los mismos patrones que redacta el extractor. Aqui sirven para lo contrario: detectar
 # lo que NO se redacto, y para contar credenciales alli donde el nombre del campo no delata.
@@ -128,7 +163,23 @@ class Auditoria:
             m = re.search(r"`(\[[^`]+\]?[^`]*)`", titulo)
             if m:
                 campo = m.group(1)
-        clave = f"{control}|{objetivo or campo or titulo}"
+        clave_base = f"{control}|{objetivo or campo or titulo}"
+        if objetivo:
+            # `objetivo` fue elegido a mano por la llamada como identificador AGREGADO y
+            # deliberado (ej. "huerfanos-con-pauta" agrupa varios productos a proposito):
+            # se respeta tal cual, es la clave estable que sobrevive a los conteos del titulo.
+            clave = clave_base
+        else:
+            # Sin un `objetivo` explicito, dos hallazgos DISTINTOS del mismo campo (dos huecos
+            # de texto distintos, dos entradas distintas del mismo disparador) caian bajo la
+            # MISMA clave `control|campo`: una sola decision del dueno los silenciaba a los dos
+            # sin que nadie lo notara. Medido: `D3|[Remarketing IA] Disparador de productos`
+            # cubria 5 hallazgos de una sola vez, y `F3|[Producto Ventas Wp] 8` mezclaba un
+            # rojo con un azul bajo la misma clave. Se afina con una huella corta del contenido
+            # especifico (la evidencia), no con la posicion en la corrida: el contenido no se
+            # mueve aunque el orden de iteracion cambie.
+            huella_corta = hashlib.sha1(evidencia.encode("utf-8", "replace")).hexdigest()[:8]
+            clave = f"{clave_base}::{huella_corta}"
         h = {
             "control": control, "severidad": sev, "titulo": titulo,
             "evidencia": evidencia, "consecuencia": consecuencia, "accion": accion,
@@ -178,9 +229,18 @@ class Auditoria:
 
     def _valor_json(self, campo):
         """Parsea el valor de un campo. Un valor que no parsea estando declarado
-        array/longtext es sospecha de truncada silenciosa, no un descuido de formato."""
+        array/longtext es sospecha de truncada silenciosa, no un descuido de formato.
+
+        `text` topa igual que `array` (controles.md C4) y en la practica puede
+        guardar el mismo JSON de producto que `array` — el tipo declarado no
+        decide si el contenido es JSON, intentar parsear si. Por eso `text`
+        tambien se intenta, pero SIN levantar C6 si falla: un campo `text`
+        corriente (no producto) no tiene por que ser JSON, y no es sospechoso."""
         v = campo.get("value")
-        if campo.get("var_type") in ("array", "longtext") and isinstance(v, str) and v.strip():
+        if not (isinstance(v, str) and v.strip()):
+            return v
+        tipo = campo.get("var_type")
+        if tipo in ("array", "longtext"):
             try:
                 return json.loads(v)
             except json.JSONDecodeError as e:
@@ -191,6 +251,11 @@ class Auditoria:
                            "y guarda el contenido cortado.",
                            "Reescribir el campo completo y releerlo del servidor.")
                 return None
+        if tipo == "text":
+            try:
+                return json.loads(v)
+            except json.JSONDecodeError:
+                return v
         return v
 
     def filas(self, clave):
@@ -227,10 +292,10 @@ class Auditoria:
         me = self.d.get("/me") or {}
         if "_ERROR_HTTP" in me or "_ERROR" in me:
             self.falla("A1", "MUERTO", "El token no responde", json.dumps(me)[:200])
-            self.cubre("A1", "corrido")
+            self.cubre("A1", "corrido", 1, "1 endpoint revisado: /me no respondio 200")
             return
         self.universo["cuenta"] = me.get("email") or me.get("name") or "?"
-        self.cubre("A1", "corrido", nota=f"/me respondio: {self.universo['cuenta']}")
+        self.cubre("A1", "corrido", 1, f"/me respondio: {self.universo['cuenta']}")
 
         # La identidad sale del servidor: el prefijo del var_ns de los campos, nunca el
         # nombre del archivo del token.
@@ -267,15 +332,33 @@ class Auditoria:
                    f"pais {pais.strip() or '(vacio)'} contra {sorted(monedas)}")
 
         # A4 · los canales, uno por uno (no basta con que el endpoint responda)
+        # El endpoint real viene ANIDADO bajo `data` y con ENTEROS (0/1), no booleanos ni
+        # strings "connected"/"active": `{"data":{"whatsapp":1,"apple":0,...},"status":"ok"}`.
+        # La version vieja solo reconocia booleanos o esos strings, asi que ningun canal real
+        # matchea nunca — lo unico que disparaba era el `status:"ok"` del SOBRE HTTP, que no es
+        # un canal. Medido contra Golden Colombia (fXXXXXX): 0 canales reales evaluados, 1
+        # "conectado" fantasma (el status del sobre).
         canales = self.d.get("/workspace-settings/channels")
         conectados, caidos = [], []
-        if canales:
-            for ruta, hoja in self.caminar(canales):
-                if isinstance(hoja, bool) or str(hoja).lower() in ("connected", "verified",
-                                                                   "active", "ok"):
-                    (conectados if hoja not in (False, "false") else caidos).append(ruta)
-                elif str(hoja).lower() in ("disconnected", "expired", "invalid", "failed"):
-                    caidos.append(f"{ruta}={hoja}")
+        if isinstance(canales, dict):
+            cuerpo = canales.get("data") if isinstance(canales.get("data"), dict) else canales
+            for ruta, hoja in self.caminar(cuerpo):
+                llave = ruta.split(".")[-1]
+                if llave in ("status", "message", "success"):   # el sobre HTTP, no un canal
+                    continue
+                if isinstance(hoja, bool):
+                    conectado = hoja
+                elif isinstance(hoja, int):
+                    conectado = hoja != 0
+                elif str(hoja).lower() in ("connected", "verified", "active", "ok", "1"):
+                    conectado = True
+                elif str(hoja).lower() in ("disconnected", "expired", "invalid", "failed",
+                                           "0", "false"):
+                    conectado = False
+                else:
+                    continue
+                (conectados if conectado else caidos).append(
+                    ruta if conectado else f"{ruta}={hoja}")
         for c in caidos:
             self.falla("A4", "MUERTO", "Hay un canal caido o desconectado", str(c),
                        "El asistente que dependa de ese canal esta muerto, y la config "
@@ -326,17 +409,21 @@ class Auditoria:
         self.cubre("B7", "corrido", len(self.d.get("_conteos") or {}),
                    f"{len(ilegibles)} endpoints ilegibles declarados en vez de reventar")
 
+        # B2 · el CONTEO se puede medir por API, pero el LIMITE del workspace (lo que el
+        # control realmente tiene que juzgar, controles.md B2) no lo expone ningun endpoint —
+        # se lee en el panel. Declararlo "corrido" cuando la paginacion se agoto sonaba a
+        # verificado, pero nunca se comparo contra ningun tope: es NO_VERIFICADO siempre, con
+        # el conteo (y si la paginacion quedo corta) como nota, no como veredicto.
         uf = self.filas("/flow/user-fields")
         self.universo["campos_usuario"] = len(uf) if uf else None
         dec_uf = ((self.d.get("_conteos") or {}).get("/flow/user-fields") or {}
                   ).get("declarados_por_servidor")
         completo = (dec_uf is None) or (self.universo["campos_usuario"] == dec_uf)
-        self.cubre("B2", "corrido" if (isinstance(uf, list) and completo) else
-                   "PARCIAL" if isinstance(uf, list) else "sin_datos",
-                   self.universo["campos_usuario"],
-                   (f"el servidor declara {dec_uf}: revisados "
-                    f"{self.universo['campos_usuario']} de {dec_uf}" if not completo else
-                    "el limite por workspace se lee en el panel, no por API"))
+        nota_b2 = "el limite por workspace se lee en el panel, no por API"
+        if isinstance(uf, list) and not completo:
+            nota_b2 = (f"el servidor declara {dec_uf}: contados "
+                       f"{self.universo['campos_usuario']} de {dec_uf}; ademas, {nota_b2}")
+        self.cubre("B2", "NO_VERIFICADO", self.universo["campos_usuario"], nota_b2)
 
         # Asistentes por prefijo real, no por lo que se supone instalado.
         prefijos = {}
@@ -369,11 +456,14 @@ class Auditoria:
                        "Restaurar el asset desde el backup de la skill.",
                        objetivo="asset-esperados")
             self.cubre("B6", "no_corrido", 0, "falta assets/asistentes-esperados.json")
-            for clave in ("/flow/subflows", "/flow/tags", "/flow/ai-agents",
-                          "/flow/ai-tasks", "/flow/inbound-webhooks"):
+            contados = 0
+            for clave in ENDPOINTS_B4:
                 v = self.d.get(clave)
                 self.universo[clave] = len(v) if isinstance(v, list) else None
-            self.cubre("B4", "corrido")
+                if isinstance(v, list):
+                    contados += len(v)
+            self.cubre("B4", "corrido", len(ENDPOINTS_B4),
+                       f"{contados} objetos contados en {len(ENDPOINTS_B4)} endpoints")
             self._productos()
             return
         esperados = json.loads(ruta_esp.read_text())
@@ -403,11 +493,14 @@ class Auditoria:
         self.cubre("B6", "corrido", len(esperados["asistentes"]),
                    f"{len(faltan)} sin instalar")
 
-        for clave in ("/flow/subflows", "/flow/tags", "/flow/ai-agents", "/flow/ai-tasks",
-                      "/flow/inbound-webhooks"):
+        contados = 0
+        for clave in ENDPOINTS_B4:
             v = self.d.get(clave)
             self.universo[clave] = len(v) if isinstance(v, list) else None
-        self.cubre("B4", "corrido")
+            if isinstance(v, list):
+                contados += len(v)
+        self.cubre("B4", "corrido", len(ENDPOINTS_B4),
+                   f"{contados} objetos contados en {len(ENDPOINTS_B4)} endpoints")
 
         self._productos()
 
@@ -487,14 +580,15 @@ class Auditoria:
                                f"Recortar a {tope:,} con la skill de configuracion.")
         self.cubre("C3", "corrido", rutas_revisadas)
 
-        # C4 · tipo del campo
+        # C4 · tipo del campo — text y array topan igual en 20.000 (controles.md)
         candidatos = [(n, c) for n, c in self.campos.items()
-                      if c.get("var_type") == "array"
+                      if c.get("var_type") in ("array", "text")
                       and len(json.dumps(c.get("value") or "")[1:-1]) > TECHO_ESCAPADO * 0.8]
         for n, c in candidatos:
             esc = len(json.dumps(c.get("value") or "")[1:-1])
+            tipo = c.get("var_type")
             self.falla("C4", "ANUNCIADA",
-                       f"`{n}` sigue siendo `array` y va por el {esc / TECHO_ESCAPADO:.0%}",
+                       f"`{n}` sigue siendo `{tipo}` y va por el {esc / TECHO_ESCAPADO:.0%}",
                        f"{esc:,} escapados; longtext daria 500.000",
                        "El tipo es inmutable: no se cambia ni por UI ni por API.",
                        "Crear un campo nuevo longtext y repuntar la referencia del flujo.")
@@ -803,14 +897,22 @@ class Auditoria:
                        "se contrasta contra el pixel.")
         self.cubre("E4", "corrido", len(metas))
 
-        # E3 · credencial de voz heredada
+        # E3 · credencial de voz heredada. extraer.py REDACTA por patron de valor (PATRONES_SECRETO)
+        # antes de que este script vea el DUMP, asi que en un DUMP real `api_key` SIEMPRE llega
+        # como `<<REDACTADO...>>` cuando hubo una credencial (o vacio cuando no la hubo). La
+        # version vieja exigia lo contrario — "no empieza por REDACTADO" — que solo era cierto
+        # en el fixture de la propia autoprueba (armado a mano, sin pasar por el redactor): contra
+        # un DUMP real la condicion nunca se cumplia y E3 jamas disparaba. El dato que hay que
+        # juzgar no es si esta redactado, es si HABIA algo que redactar.
         for n, prod in self.productos.items():
             voz = prod.get("voz_con_ia") or {}
             api = voz.get("api_key") or ""
-            if api and not str(api).startswith("<<REDACTADO"):
+            if api:
+                redactada = str(api).startswith("<<REDACTADO")
                 self.falla("E3", "FUGA",
                            f"`{n}` lleva una credencial de voz dentro del producto",
-                           f"`voz_con_ia.api_key` presente, {len(str(api))} caracteres, "
+                           f"`voz_con_ia.api_key` presente, {len(str(api))} caracteres "
+                           f"({'redactada en el DUMP, viva en el servidor' if redactada else 'EN CLARO en el DUMP'}), "
                            f"habilitar={voz.get('habilitar')!r}",
                            "Copiar un producto 'exacto' copia tambien la credencial de la "
                            "cuenta de origen.",
@@ -839,6 +941,39 @@ class Auditoria:
                            f"`{n}` tiene marcadores de posicion sin reemplazar",
                            f"{hallados}",
                            "Se publico sin terminar de parametrizar.")
+            # OJO: se busca en las HOJAS DE TEXTO, no en el JSON crudo. Aplicado al crudo,
+            # el `[` que abre un array parece la apertura de un hueco y cualquier palabra en
+            # mayusculas dentro del array dispara un falso positivo (medido: los dos campos
+            # de disparador salieron acusados). La sintaxis no es contenido.
+            val = self.valor_json(c)
+            hojas = ([h for _, h in self.caminar(val) if isinstance(h, str)]
+                     if isinstance(val, (dict, list)) else [v])
+            huecos = sorted({m.group(0) for h in hojas
+                             for m in HUECO_DE_EDITOR.finditer(h)})
+            dudosos = sorted({m.group(0) for h in hojas
+                              for m in CORCHETE_MAYUSCULAS.finditer(h)}) 
+            dudosos = [x for x in dudosos if x not in huecos]
+            if dudosos:
+                self.falla("F3", "DUDA",
+                           f"`{n}` tiene {len(dudosos)} corchete(s) en mayusculas: "
+                           "plantilla viva o hueco",
+                           "\n     ".join(x[:120] for x in dudosos[:8]),
+                           "Si el motor los rellena son plantilla y estan bien; si no, el "
+                           "cliente los lee tal cual.",
+                           "Confirmar cual de los dos es antes de tocar nada.")
+            if huecos:
+                # Si el campo es un producto ACTIVO, el cliente lee ese corchete tal cual.
+                activo = "[Producto Ventas Wp]" in n and '"estado":"activo"' in \
+                    v.replace(" ", "")
+                self.falla("F3", "MUERTO" if activo else "FUGA",
+                           f"`{n}` tiene {len(huecos)} hueco(s) que quedo(aron) sin llenar",
+                           "\n     ".join(h[:120] for h in huecos),
+                           "El cliente recibe el corchete tal cual, y si cae en el paso de "
+                           "cobro se pierde la venta ahi mismo."
+                           if activo else
+                           "Quedo sin terminar de parametrizar.",
+                           "Llenarlos con la skill duena antes de que ese producto reciba "
+                           "un mensaje mas.")
         if mojibake_campos:
             self.falla("F1", "FUGA",
                        f"{len(mojibake_campos)} de {textos} campos tienen la codificacion rota",
@@ -874,11 +1009,20 @@ class Auditoria:
                            f"{multi[:120]!r}",
                            "El panel la muestra vacia y al guardar la deja en [], sin un solo error.",
                            "Reescribirla como lista.")
-            for ruta, hoja in self.caminar(prod):
+        # F7 recorre TODOS los campos de bot, no solo self.productos: una imagen
+        # ajena puede vivir en cualquier asistente (Comentarios, Logistico...),
+        # no solo en Ventas WhatsApp. Se cuentan URLs distintas, no rutas/hojas.
+        vistas = set()
+        for n, c in self.campos.items():
+            val = self.valor_json(c)
+            objetivo = val if isinstance(val, (dict, list)) else c.get("value")
+            for ruta, hoja in self.caminar(objetivo) if isinstance(objetivo, (dict, list)) \
+                    else ([("", objetivo)] if isinstance(objetivo, str) else []):
                 if isinstance(hoja, str) and "media.chateapro.app" in hoja:
                     m = re.search(r"media\.chateapro\.app/temp/\d{6}/(\d+)/", hoja)
-                    if m:
-                        cuentas_img.setdefault(m.group(1), []).append(f"{n} → {ruta}")
+                    if m and (n, hoja) not in vistas:
+                        vistas.add((n, hoja))
+                        cuentas_img.setdefault(m.group(1), []).append(f"{n} → {ruta or 'value'}")
         # La cuenta propia sale del SERVIDOR (/team-info), no de suponer que la mayoritaria
         # es la buena. Un espacio clonado ENTERO tiene una sola cuenta y es la ajena: el
         # control de "mas de una cuenta" no lo veia.
@@ -908,7 +1052,7 @@ class Auditoria:
                            "Volver a subir esas imagenes desde el panel de este espacio.")
         self.cubre("F5", "corrido", len(self.productos))
         self.cubre("F6", "corrido", len(self.productos))
-        self.cubre("F7", "corrido", len(self.productos))
+        self.cubre("F7", "corrido", len(self.campos))
         for control, nota in (("F4", "las fugas de marca se leen contra el negocio real"),
                               ("F8", "las URLs se piden una por una"),
                               ("F9", "el prompt contra el producto real"),
@@ -981,7 +1125,14 @@ class Auditoria:
         self.cubre("G1", "corrido",
                    sum(1 for k in self.d if k.startswith("/integration/")),
                    f"{len(con_credencial)} credenciales halladas")
-        self.cubre("G2", "corrido" if dominio else "sin_datos")
+        # G2 solo EXTRAE el dominio y le hace una pregunta al dueno: no tiene contra que
+        # comparar para decidir si es el correcto (no hay un dominio esperado en ningun
+        # asset), asi que marcarlo "corrido" sonaba a verificado cuando en realidad nunca
+        # produjo un veredicto, solo una duda. Es NO_VERIFICADO con evidencia, no una
+        # verificacion completa.
+        self.cubre("G2", "NO_VERIFICADO" if dominio else "sin_datos",
+                   nota=f"dominio encontrado: {dominio}" if dominio else
+                   "la integracion de Shopify no trajo dominio")
         self.cubre("G3", "corrido", len(self.campos))
         self.cubre("G4", "NO_VERIFICADO", nota="la rotacion se decide con FER")
 
@@ -1012,6 +1163,8 @@ class Auditoria:
                     for ph in PLACEHOLDERS:
                         if ph in hoja and ph != "{{":   # {{ }} es sintaxis viva de Chatea
                             marcas.append(f"{donde}: {ph!r}")
+                    for m in HUECO_DE_EDITOR.finditer(hoja):
+                        marcas.append(f"{donde}: {m.group(0)[:90]!r}")
         self.universo["zona_ia"] = {"objetos": objetos, "cadenas": cadenas}
         if moji:
             self.falla("F13", "FUGA",
@@ -1034,9 +1187,14 @@ class Auditoria:
     # ------------------------------------------- I · cordura del propio auditor
     def bloque_i(self):
         # I3 · lo que entra al DUMP se audita o se declara. Nada en tierra de nadie.
+        # ENDPOINTS_B4 es la MISMA lista que usa bloque_b para contar subflujos, tags,
+        # agentes/tareas IA y webhooks: antes esta lista vivia duplicada e incompleta aqui, asi
+        # que I3 acusaba como "sin control" endpoints que B4 ya contaba (medido: 7 falsos
+        # positivos). Una sola lista, importada, no copiada.
         auditadas = {"/me", "/team-info", "/flow/bot-fields", "/flow/user-fields",
                      "/workspace-settings/channels", "_agentes_detalle", "_tareas_detalle",
-                     "_conteos", "_etiqueta", "_extraido", "_token_archivo"}
+                     "_conteos", "_etiqueta", "_extraido", "_token_archivo",
+                     *ENDPOINTS_B4}
         sin_control = [k for k, v in self.d.items()
                        if k not in auditadas and not k.startswith("/integration/")
                        and v not in (None, [], {}, "")]
@@ -1094,9 +1252,14 @@ class Auditoria:
                 continue
             ea, en = len(json.dumps(va)[1:-1]), len(json.dumps(vn)[1:-1])
             signo = "+" if en >= ea else ""
+            # El escapado (json.dumps(...)[1:-1]) es la unidad que importa: es contra la que
+            # se mide el techo de 19.000 (bloque C). El largo crudo (len(va)/len(vn)) es
+            # SIEMPRE menor o igual — cada tilde pesa 6 escapados y cada emoji 12 — y mostrarlo
+            # como si fuera el escapado le miente al lector el margen real que queda contra el
+            # techo. Se muestra el escapado PRIMERO y con su nombre, el crudo aparte y marcado.
             self.cambios.append(("EDITADO", n,
-                                 f"{len(va):,} → {len(vn):,} caracteres "
-                                 f"({signo}{en - ea:,} escapados)"))
+                                 f"{ea:,} → {en:,} escapados ({signo}{en - ea:,}) "
+                                 f"[crudo {len(va):,} → {len(vn):,} caracteres]"))
             if ea <= TECHO_ESCAPADO < en:
                 self.falla("C1", "MUERTO",
                            f"`{n}` CRUZO el techo escapado desde la corrida anterior",
@@ -1207,7 +1370,17 @@ def escribir_handoff(a, destino):
     """
     porskill, preguntas = {}, []
     for h in a.hallazgos:
-        if h["severidad"] == "DECIDIDO" or not h.get("accion"):
+        if h["severidad"] == "DECIDIDO":
+            continue
+        # Filtrar por "¿tiene `accion`?" ANTES de mirar la severidad descartaba rojos y
+        # naranjas reales que se reportan sin una `accion` de una linea (varios D3, C4...):
+        # medido en Golden, 22 de 39 hallazgos abiertos se quedaron fuera del paquete, 5 de
+        # ellos rojos de un solo disparador. Un 🔴 o 🟠 entra SIEMPRE, tenga o no `accion`
+        # explicita: la severidad decide, no la presencia de ese campo.
+        if h["severidad"] in ("MUERTO", "ANUNCIADA"):
+            porskill.setdefault(h.get("skill_duena") or "(por determinar)", []).append(h)
+            continue
+        if not h.get("accion"):
             continue
         if h["severidad"] == "DUDA":
             # Una duda con accion concreta no es basura: es una pregunta que hay que

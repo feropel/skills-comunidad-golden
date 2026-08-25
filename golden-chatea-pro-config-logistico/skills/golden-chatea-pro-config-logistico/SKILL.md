@@ -5,6 +5,7 @@ description: Golden Group — Configura el asistente LOGÍSTICO de Chatea Pro (e
 
 # Golden · Chatea Pro — Asistente Logístico (padre)
 
+<!-- skill v1.5 · 2026-08-24 (barrido total del arsenal, CdM): el PASO 0 decía "pregunta 1 a la vez" — goteo que contradice la ley de autonomía Golden (estandares-golden §3: los datos que solo el dueño tiene se piden UNA vez, al inicio, nunca goteados; cada repregunta es una fuga de turnos). Ahora el intake se pide completo en un solo turno. Los 6 datos, los techos (incl. adenda LONG JSON de dos niveles), gotchas de API, la LEY de no heredar datos y el resto quedan intactos. -->
 <!-- skill v1.4 · 2026-08-23 (Estándar 9 — Conexión con el Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 <!-- skill v1.3 · 2026-08-21 (auditoría golden-skill-auditor) — description con más sinónimos/frases reales de disparo y desambiguación explícita de la hija (se activa sola, no hace falta llamarla aparte); PASO 1 con manejo de error si la hija golden-chatea-pro-validacion-direcciones no está instalada o no tiene el pack del país (nunca inventar el prompt a mano, declarar pendiente con motivo); PASO 2 con checklist explícito de "terminado" (país, transportadoras, tiempos, prompt de la hija, escribir-releer si aplica, barrido si el origen fue una cuenta guía). -->
 <!-- skill v1.2.1 · 2026-08-08 (centro de mando, chat otro espacio de Chatea 2026-08-08 (2ª ronda: 5ª categoría + prosa libre)) · QUINTA CATEGORÍA VETADA en la ley: claims y cifras de negocio (años en el mercado, clientes atendidos, porcentajes de entrega, premios) — no rompen nada técnico ni los caza un barrido de llaves, pero el bot termina mintiendo con datos de otra empresa (caso real: "Más de 100.000 clientes atendidos en Colombia" a punto de heredarse). Y regla operativa LA MARCA VIVE TAMBIÉN EN PROSA LIBRE: al barrido se añade grep -i por el nombre de la marca origen sobre todo el texto a escribir (cazó 10 menciones en 3 campos que el mapeo de llaves no vio). -->
@@ -92,7 +93,7 @@ Tiene dos niveles:
 
 ## Flujo de configuración
 
-### PASO 0 — Intake operativo del negocio (pregunta 1 a la vez, no inventes nada)
+### PASO 0 — Intake operativo del negocio (pídelo COMPLETO en un solo turno — intake único, nunca goteado — y no inventes nada)
 1. **País** del workspace.
 2. **Transportadoras habilitadas** para **domicilio** (las que el negocio realmente tiene contratadas).
 3. Si ofrece **recogida en oficina** y con qué transportadoras.

@@ -1,9 +1,16 @@
 # Catálogo de tipos de novedad — rescate por tipo
 
-Para cada tipo: qué significa, probabilidad de rescate (referencia), plantilla de WhatsApp
+Para cada tipo: qué significa, probabilidad de rescate, plantilla de WhatsApp
 (1er toque + 2º toque) y la solución típica en plataforma. Personalizar SIEMPRE con: nombre
 del cliente, producto y ciudad reales. `{campos}` se llenan con datos reales — jamás inventados.
 Tono: cercano, servicial, UNA pregunta concreta. Nunca culpar. Sin signos de apertura.
+
+**Las probabilidades de rescate (ALTA/MEDIA/BAJA) son ESTIMACIÓN cualitativa de criterio COD,
+NO tasa medida** — no hay N ni fecha detrás de ellas. Sirven para ordenar el ataque del día, no
+para reportarlas como dato. Cuando la operación tenga la tasa real por tipo (novedades de ese
+tipo entregadas / novedades de ese tipo, con N y fecha del periodo), reemplaza estas etiquetas
+por la cifra medida y anota N y fecha aquí mismo — desde ese día los números del usuario mandan
+sobre esta estimación (misma regla que los umbrales del Modo 2 en SKILL.md).
 
 ---
 

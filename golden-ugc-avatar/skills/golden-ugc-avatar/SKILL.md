@@ -7,12 +7,11 @@ description: >
   character identity and enforce voice/body coherence. Supports reusable identity via Soul
   training and Reference Elements, so one avatar stays the same person across dozens of videos.
   Use this skill whenever the user mentions UGC avatars, AI avatars, avatar generation, creating
-  UGC content, making AI talking-head videos, generating avatar images for video, the Higgsfield
+  UGC content, AI talking-head videos, the Higgsfield
   workflow, Soul characters, Nano Banana avatar, Seedance UGC, the avatar pipeline, or anything
   about creating AI-generated people for social media content, ads, or brand videos. Also trigger
   when the user asks to "make a person," "create a character for video," "generate a talking-head,"
-  "haz un avatar," "crea un UGC," "hazme un video hablando," or "un avatar para mi marca." Handles
-  the image step AND the video step as one unified pipeline, and runs either stage alone when needed.
+  "haz un avatar," "crea un UGC," "hazme un video hablando," or "un avatar para mi marca." Runs either stage alone when needed.
   Do NOT use for product-only images (packshots, infographics, product listing photos) — that is
   `golden-imagen-arena`. Do NOT use to build the product page, run ads, or edit/caption the final
   clip — those are `golden-shopify`, `golden-ads`, and `golden-video-editor` respectively; this
@@ -20,6 +19,21 @@ description: >
 ---
 
 # Golden UGC Avatar — Higgsfield Pipeline
+<!-- skill v1.10.1 · 2026-08-24 (centro de mando, remediación del verificador de cierre): línea de RUTA del cerebro en el Paso 0 (las lectoras ordenaban LÉELO PRIMERO sin decir dónde — un chat limpio no podía ejecutar la orden) + bump que las ediciones del 23-24 dejaron sin subir. -->
+<!-- skill v1.10 · 2026-08-24 (golden-skill-auditor, auditoria fresca): resuelta la COLISION de dos pasos "0" (el cerebro de marca pasa a "Paso previo"; Step 0 sigue siendo el de toolchain, asi no se renumera nada ya referenciado); el cerebro de marca ENTRA al diagrama de pipeline (era obligatorio y no aparecia en el mapa); Step 4 sube de H3 a H2 (era un paso par de 0-3 escondido dentro de Step 3, invisible al escanear encabezados pese a salir en el diagrama); y la regla de COMPLIANCE de la adenda 2026-08-23 baja del comentario HTML al CUERPO — seccion propia en Step 3 + quinto item en la compuerta de QA del Step 4 (una instruccion que solo vive en un comentario no es una instruccion). Blindaje real: chflags uchg Y chmod 0444 (doble; reponer ambos). Cambios relevantes reportados a GOLDEN - CENTRO DE MANDO. -->
+<!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leian el cerebro de marca — esta entra a la familia que SI lo lee. Bloque identico en las 6 del CdM + fila a la fabrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
+<!-- adenda 2026-08-23 (centro de mando, alineación de espejo de compliance tras auditoría de ecom-magic v2.2): la LISTA NEGRA de claims inventados (Ley 6 de golden-ecom-magic, espejada en golden-imagen-arena) aplica TAMBIÉN a los guiones del avatar — un claim médico/curativo inventado dicho por un avatar es el mismo riesgo de cuenta que impreso en una imagen. Antes de aprobar un guion: contrastar claims contra la lista negra del espejo. -->
+<!-- v1.9 — Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
+
+
+## Paso previo · Cerebro de marca (obligatorio antes de generar)
+
+Si la marca tiene CEREBRO creado por `golden-brand-brain` (marca.md, productos.md, avatares.md,
+competidores.md, anuncios-ganadores.md, cambios-recientes.md), LÉELO PRIMERO y genera con esa voz
+— jamás re-preguntar lo que el cerebro ya sabe. Si NO existe, ofrece crearlo con `golden-brand-brain`
+antes de continuar; si el usuario pide seguir sin cerebro, se declara en la entrega que el contenido
+se generó sin voz de marca cargada.
+
 
 <!-- skill v1.8 · 2026-08-21 (golden-skill-auditor, reparación): description now states explicit
 disambiguation (NOT for product-only images/page/ads/editing, with the correct hermana for each);
@@ -34,6 +48,8 @@ no QA gate before handoff. Blindaje: chflags uchg (desbloquear con `chflags -R n
 <!-- skill v1.7 · 2026-08-10 (loop del arsenal, semana 2 · producción): before/after cut BY VERTICAL added to the Step 2 health block. The 2026-08-07 norm banned before/after for dental only; Meta 2026 also bans it for anti-aging/wrinkles/firming and weight loss, and allows it for general cosmetics with an 18+ audience. Two cross-vertical bans added to the negative prompt: second person pointing at the viewer's condition, and timeframe-plus-result headlines (Meta judges implied meaning). Mirrored in golden-ecom-magic and golden-imagen-arena -->
 <!-- skill v1.6 · 2026-08-07 (centro de mando, cosecha del chat un estudio de producto) · reglas de arte para verticales de SALUD (dental y afines) en el Step 2, aplicables a prompts de imagen Y video: prohibido bocas con lesiones, antes/después de dentadura, delantal/estetoscopio/sillón dental, porcentajes en pantalla y preguntas que señalen condición del espectador; permitido macro del gotario, textura, corte de esmalte ilustrado y lifestyle de baño -->
 <!-- skill v1.4 · pipeline foto→video UGC sobre Higgsfield MCP · imagen soul_2/nano_banana_pro + video seedance_2_0 (fallback seedance_2_0_mini en plan starter) · verificado en vivo el camino imagen+talking-head; Soul reutilizable documentado, aún sin correr end-to-end · changelog completo al pie -->
+
+El cerebro vive en `PROYECTOS/BRAND-BRAINS/<MARCA>/` — la resolución exacta (buscar con find ANTES de crear, naming MAYÚSCULAS-CON-GUIONES) la declara `golden-brand-brain`: ante cualquier duda de ruta, invócala en vez de adivinar.
 
 ## What this skill does
 
@@ -55,6 +71,8 @@ This skill is written against the live Higgsfield MCP, but tool names and model 
 
 ```
 User brief
+   ↓
+Paso previo  Read the brand brain (golden-brand-brain) → voice, product, real claims
    ↓
 Step 0  Verify Higgsfield MCP + discover models live
    ↓
@@ -232,6 +250,15 @@ Assemble using the `【Avatar】【Scene】【Emotional/Physical State】【Voic
 description over **verbatim** and add "Maintain exact appearance throughout, consistent character,
 no deformation." Keep direction tight: 50–200 words of actual direction.
 
+### Claims in the script — compliance mirror (account risk)
+A fabricated medical or curative claim **spoken by an avatar** carries the same account risk as one
+printed on an image, so the blacklist of invented claims (Ley 6 of `golden-ecom-magic`, mirrored in
+`golden-imagen-arena`) applies to dialogue too. Before approving any script, contrast every claim in
+it against that list: no cure/heal promise, no invented percentage, no timeframe-plus-result, no
+medical authority the brand does not hold. If the brief hands you a claim, ask for its source; with
+no source, rewrite the line around a benefit the product can actually stand behind — never invent
+one to fill the beat. (Centro de Mando, 2026-08-23.)
+
 ### The coherence guarantee — voice must match the body
 Non-negotiable: whatever the body is doing in Layer 3, the voice in Layers 4–5 must carry the
 matching signature (running → audible breathing and staccato delivery; post-workout → recovering
@@ -273,7 +300,9 @@ with `model: "higgsfield_preset"` + `preset_id`. Always list them live — the c
 
 The start frame must be a confirmed `media_id` (or a completed image job id) — never a raw URL.
 
-### Step 4: Self-check before handing off ("done" means this passes)
+---
+
+## Step 4: Self-check before handing off ("done" means this passes)
 Before presenting the result as final, check it against the skill's own promise — consistency and
 coherence, not taste:
 1. **Identity match** — the face/build/hair in the video's first frame reads as the same person as
@@ -287,6 +316,10 @@ coherence, not taste:
    frame contains none of the forbidden elements and no before/after was used where it's banned.
 4. **Negative prompt was included** — Step 3 always ships a `【Negative Prompts】` block; missing it
    is the top cause of uncanny output (see `references/seedance_prompt_system.md` §9).
+5. **Claims cleared** — every claim spoken in the dialogue passed the compliance mirror above: none
+   invented, no unbacked medical or curative promise, no timeframe-plus-result. One fabricated claim
+   can cost the ad account, which is far more expensive than a re-generation.
+
 A pipeline run is **done** when: the image was approved by the user, the video's identity and voice
 pass the checks above, and both assets (plus the handoff note to the destination skill, if any) were
 handed to the user. If a check fails and the cause isn't obvious, say what looks off rather than
@@ -403,6 +436,18 @@ against this table before switching. Rule: iterate with the cheap model, spend o
 ---
 
 ## Version & changelog
+- **v1.10** — Auditoría fresca (golden-skill-auditor): resuelta la colisión de dos pasos "0" — el
+  bloque del cerebro de marca pasa a **Paso previo** y Step 0 sigue siendo el de toolchain, así no
+  se renumera nada ya referenciado; el cerebro de marca **entra al diagrama** de pipeline (estaba
+  declarado obligatorio pero no aparecía en el mapa del flujo); **Step 4 sube de H3 a H2** (era un
+  paso par de 0-3 escondido dentro de Step 3, invisible al escanear encabezados aunque sí salía en
+  el diagrama); y la regla de **compliance de la adenda 2026-08-23 baja al cuerpo** — sección propia
+  en Step 3 (contrastar cada claim del guion contra la lista negra) más un quinto ítem en la
+  compuerta de QA del Step 4, porque una instrucción que solo vive en un comentario HTML no la
+  ejecuta nadie. Blindaje real documentado: doble (chflags uchg **y** chmod 0444).
+- **v1.9** — Estándar 9 (Centro de Mando): declarado explícitamente que los cambios relevantes de
+  esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR (regla de FER, 2026-08-22,
+  `estandares-golden.md` §9). Tarea liviana, sin auditoría completa.
 - **v1.8** — Reparación (golden-skill-auditor): description ahora declara desambiguación explícita
   (no usar para imágenes de producto, página, ads o edición — remite a la skill correcta en cada
   caso); corregido el handoff de edición para apuntar a `golden-video-editor` en vez de

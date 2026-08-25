@@ -1,7 +1,7 @@
 # REFERENCIA EXTERNA · Click to WhatsApp y COD (masterclass Panama 2026-07-30)
 
 > **ESTATUS: REFERENCIA OPCIONAL, NO REGLA.**
-> Esto NO es doctrina Golden y NO sustituye ninguna regla dura de esta skill. En particular NO releva de: multianunciante OFF, los 15 copys, asset_feed_spec, UTM, ni el resto de reglas obligatorias del SKILL.md.
+> Esto NO es doctrina Golden y NO sustituye ninguna regla dura de esta skill (las 17 de `reglas-de-oro.md`: no inventar metricas, breakeven por modelo de pago, confirmar antes de gastar, compliance, copys 5+5+5 normalizados, topes en vez de apagados...). Tampoco releva de las leyes de pauta de la casa que viven en la memoria Golden fuera de esta skill (multianunciante OFF, estandar de copys medido, naming de campanas, UTM).
 > Son benchmarks y estructuras de un tercero (Leyendas E.C.O.M + Ecom Founders, con data de Dropi Panama), capturados para contrastar. Usar como insumo de criterio cuando el contexto encaje, jamas como automatismo.
 
 ## 1. Cuando este material es relevante
@@ -78,5 +78,6 @@ Es un PAS comprimido. Ver golden-copywriting/references para el tratamiento de c
 - Los benchmarks de CPM son de Panama 2026: no son universales ni permanentes
 - Nada de esto autoriza a saltarse las reglas duras del SKILL.md
 
-Fuente completa y unit economics detallados:
-`Desktop/MASTER/IA/CLAUDE/PROYECTOS/PANAMA - OPERACION/`
+Fuente completa y unit economics detallados: carpeta local `PROYECTOS/PANAMA - OPERACION/`
+(dentro del arbol MASTER/IA/CLAUDE del Desktop del usuario; los nombres reales de las carpetas
+llevan emojis).

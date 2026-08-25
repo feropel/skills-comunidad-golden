@@ -116,7 +116,7 @@ No basta un breakeven del ticket promedio: **calcula el breakeven CPA para cada 
 oferta (1 unidad / combo x2 / combo x3)** y preséntalos JUNTOS. La conclusión operativa —
 "sin combo esto no cierra" — **solo aparece cuando se ven los tres escalones a la vez**.
 
-Caso real (estudio dental Chile, 2026-08-07): con costo estimado $8.500, envío/recaudo $4.500 y
+Caso real (un estudio de producto, 2026-08-07): con costo estimado $8.500, envío/recaudo $4.500 y
 entrega 65%, el breakeven CPA en Meta fue:
 | Escalón | Breakeven CPA Meta |
 |---|---|

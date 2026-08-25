@@ -16,9 +16,17 @@ description: >-
 ---
 
 # Golden Group — Análisis de Meta Ads
+<!-- skill GMA1.3.1 · 2026-08-24 (centro de mando, remediación del verificador de cierre): el gemelo VIVO del umbral Pago→Compra (semaforos.md:174 decía <12% contra la fuente única <10%) — quinta reaparición de la clase regla-en-una-rama; alineado. -->
 
-**Versión:** `GMA1.2` · **Última modificación:** 2026-08-23 (Estándar 9 — Conexión con el Centro de Mando) · versión declarada el 2026-08-19 por el Centro de Mando para que el censo diario pueda detectar ediciones
+**Versión:** `GMA1.3.1` · **Última modificación:** 2026-08-24 (barrido total del arsenal, CdM) · versión declarada el 2026-08-19 por el Centro de Mando para que el censo diario pueda detectar ediciones
 
+<!-- skill v1.3 · 2026-08-24 · Barrido total del arsenal (auditoría fresca golden-skill-auditor, CdM). Reparado con evidencia:
+(1) GEMELOS VIVOS de la contradicción que la adenda 2026-08-20 dio por resuelta — el título de §1B seguía diciendo "EN VIVO por defecto, ARCHIVO de respaldo", el heading "Modo EN VIVO (por defecto)" y la nota "Nunca lo presentes como el camino principal" contradecían "EL DISPARADOR ES EL ARCHIVO" de la description; los cuatro corregidos y los modos etiquetados A/B igual que en references.
+(2) UMBRALES DEL EMBUDO TRIPLICADOS Y CONTRADICTORIOS pese a la "fuente única" declarada: Clic→Visita era ≥80/<65 en SKILL.md, ≥70/<50 en semaforos.md y >70/<50 en benchmarks_por_objetivo.md; Pago→Compra tenía CUATRO versiones (≥30/<18, ≥25/<15, ≥20/<12, >30/<10 — dos de ellas dentro del propio semaforos.md). Consolidado: benchmarks_por_objetivo.md manda donde la métrica exista, semaforos.md se alineó y declara el dueño de cada umbral, SKILL.md dejó de duplicar la tabla.
+(3) SEMÁFORO CPA: evaluar_cpa() cortaba DESCARTAR en 1.3× breakeven mientras SKILL.md y semaforos.md decían 1.5× — probado ejecutando (CPA a 1.4× daba ⚫ por código y 🔴 por docs). Código alineado a 1.5× (el valor documentado en dos lugares) y re-ejecutado: 1.4×→🔴 PIERDE, 1.6×→⚫ DESCARTAR. La tabla del Paso 5 ahora refleja los 7 tiers exactos del código (el código es la fuente).
+(4) MIGRACIÓN DE VÍA SIN LIMPIAR: extraccion_en_vivo.md ordena "NUNCA le pidas al usuario que pegue el JSON" pero los 5 fetch_* imprimían "Pega el contenido en Claude" — los 5 prints corregidos al flujo automatizado (Claude lee con Read). También retirados los separadores ═ de los scripts (el propio principio 3 los prohíbe) y el docstring de analyze_all_layers que aún decía "6 capas" (gemelo del fix v1.1).
+(5) extraccion_en_vivo.md: aclarado que read_insights no bloquea (check_token.py solo bloquea escritura).
+Pipeline re-verificado ejecutando: unit economics + evaluar_cpa + trm_resolver + generación real de .docx (37.8KB). Cambios reportados al Centro de Mando por el agente del barrido. -->
 <!-- skill v1.2 · 2026-08-23 · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 <!-- skill v1.1 · 2026-08-21 · auditoría golden-skill-auditor: CSV soportado + limpieza (historial completo conservado abajo). -->
 
@@ -45,11 +53,11 @@ Método estándar de Golden Group para analizar informes de Meta Ads de cualquie
 
 ---
 
-## 1B. CÓMO ENTRAN LOS DATOS — EN VIVO por defecto, ARCHIVO de respaldo
+## 1B. CÓMO ENTRAN LOS DATOS — el ARCHIVO manda cuando hay archivo; EN VIVO cuando no
 
 El motor de análisis (unit economics, capas, veredicto, Word) es idéntico: solo cambia de dónde salen los números. **El archivo manda cuando hay archivo:** si el usuario trajo un Excel/CSV, ese archivo es el disparador y su expectativa — se analiza EL ARCHIVO, y el modo en vivo se OFRECE como contraste de frescura si hay MCP disponible. Solo cuando no hay archivo de por medio (llegaste por derivación de golden-ads) se empieza por el modo en vivo.
 
-### ✅ Modo EN VIVO (por defecto) — extracción directa de la Meta Marketing API
+### ✅ Modo EN VIVO (Modo B — cuando NO hay archivo) — extracción directa de la Meta Marketing API
 El usuario no exporta nada: tú traes los datos con los scripts `fetch_*.py`. Al inicio, ofrécelo así:
 > "Puedo conectarme a tu cuenta de Meta y bajar los informes yo mismo (solo-lectura, no toco nada de tu pauta). Necesito un Access Token de solo lectura una sola vez. Lo generamos o ya tienes uno?"
 
@@ -60,10 +68,10 @@ El usuario no exporta nada: tú traes los datos con los scripts `fetch_*.py`. Al
 
 Con el token ya verificado, sigue el flujo completo de `references/extraccion_en_vivo.md` (negocios → campañas → insights → adsets → anuncios, con auto-detección de tipo). Luego entras al MISMO motor: si es `ventas` COD sigues desde el Paso 2 (unit economics); si es otro objetivo usas `references/benchmarks_por_objetivo.md`.
 
-### 🗂️ Modo ARCHIVO (respaldo) — Excel/CSV exportado
-Úsalo cuando: el usuario ya trae el archivo y lo prefiere, no tiene acceso API, tiene rol restringido en la BM, o el API falla (token vencido, rate limit, cambio de versión). Es el modo más seguro (cero credenciales). El usuario sube el archivo y sigues el workflow de la sección 4 desde el Paso 1.
+### 🗂️ Modo ARCHIVO (Modo A — el que manda cuando el usuario trae archivo) — Excel/CSV exportado
+Es el disparador natural de esta skill (ver description) y además el camino cuando: no hay acceso API, el rol en la BM es restringido, o el API falla (token vencido, rate limit, cambio de versión). Es el modo más seguro (cero credenciales). El usuario sube el archivo y sigues el workflow de la sección 4 desde el Paso 1.
 
-> **Por qué el archivo se queda:** es la red de seguridad sin credenciales. Nunca lo presentes como el camino principal, pero nunca lo quites — garantiza que la skill funcione para todos y en cualquier condición.
+> **Por qué los dos modos conviven:** con archivo sobre la mesa, el archivo manda (es lo que el usuario trajo y espera). Sin archivo, el vivo es el camino. Ninguno se quita — juntos garantizan que la skill funcione para todos y en cualquier condición.
 
 **Método de las 3 Q's (marco narrativo del diagnóstico, ambos modos):** 1️⃣ Qué pasó? (resultado vs objetivo/breakeven) · 2️⃣ Por qué pasó? (embudo + calidad, señala el paso más débil) · 3️⃣ Qué haremos? (en COD = qué pausar / qué escalar / cómo configurar y replicar). Detalle y tablas por objetivo en `references/benchmarks_por_objetivo.md`. Basado en el trabajo de Felipe Vergara.
 
@@ -242,27 +250,29 @@ conocimiento validado que separa un CPA alto normal de uno que hay que apagar.
 
 **Capa 7 — Embudo de conversión.** Tasas: Impresiones → Clics → Visitas LP → Pagos iniciados → Compras. Diagnóstico por etapa. Si trae `Velocidad Carga de la página`, reportarla (<1s excelente, >2s problema).
 
-**Benchmarks Colombia e-commerce Meta:**
-| Etapa | 🟢 Verde | 🟡 Amarillo | 🔴 Rojo |
-|-------|---------|------------|--------|
-| Clic → Visita LP | ≥80% | 65-79% | <65% |
-| Visita → Pago iniciado | ≥12% | 8-11% | <8% |
-| Pago → Compra | ≥30% | 18-29% | <18% |
-| Clic → Compra global | ≥3.5% | 2-3.4% | <2% |
+**Umbrales del embudo: NO viven aquí.** La fuente ÚNICA de los umbrales 🔴🟡🟢 por etapa es la
+tabla VENTAS de `references/benchmarks_por_objetivo.md` (regla inquebrantable declarada ahí) — el
+diagnóstico del embudo se hace contra esa tabla, y el semáforo por etapa dentro del Word contra
+la tabla "Benchmarks del embudo de conversión" de `references/semaforos.md`, que remite a la misma
+fuente. Duplicar los números aquí ya produjo tres versiones desincronizadas (lección 2026-08-24).
 
 **Capa 8 — Tendencia temporal.** Si los datos cubren >30 días: el CPA está subiendo, bajando o estable? Múltiples versiones de campaña (OPEN 1, OPEN 2, OPEN 3): las recientes mejor o peor? Fatiga creativa. Si no hay datos temporales suficientes, omitir y decirlo.
 
 ### Paso 5 — Veredicto
 
+El mapeo lo hace la función `evaluar_cpa(cpa_real, ue)` en `calculate_unit_economics.py` — el
+CÓDIGO es la fuente única del semáforo CPA (los tiers de `references/semaforos.md` son el mismo
+mapeo explicado). Tiers que produce, tal cual el código:
+
 | Símbolo | Veredicto | CPA vs breakeven | Acción |
 |---------|-----------|-----------------|--------|
-| 🟢 | ESCALAR | < CPA margen 10% | +20-30% presupuesto cada 3 días |
-| 🟢 | CONTINUAR | < breakeven | Mantener |
-| 🟡 | REVISAR | Breakeven ±15% | Vigilar, no escalar |
-| 🔴 | PAUSAR | > breakeven | Pausar si lleva >$120K COP gastados |
-| ⚫ | DESCARTAR | >1.5× breakeven | Apagar hoy |
-
-La función `evaluar_cpa(cpa_real, ue)` en `calculate_unit_economics.py` hace este mapeo.
+| 🟢 | EXCELENTE | ≤ CPA margen 20% | Escalar agresivamente (+20-30% cada 48-72h) |
+| 🟢 | MUY BUENO | ≤ CPA margen 15% | Escalar |
+| 🟢 | BUENO | ≤ CPA margen 10% | Escalar moderadamente |
+| 🟡 | ACEPTABLE | ≤ CPA margen 5% | Mantener, optimizar creativo/segmentación |
+| 🟡 | MARGINAL | ≤ breakeven | Revisar tendencia; si empeora, pausar |
+| 🔴 | PIERDE | > breakeven, ≤ 1.5× | Pausar y rediseñar (con gasto suficiente, ej. >$120K COP) |
+| ⚫ | DESCARTAR | > 1.5× breakeven | Apagar hoy, no rescatar |
 
 ### Paso 6 — Plan de acción
 

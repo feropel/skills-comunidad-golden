@@ -171,12 +171,12 @@ def evaluar_cpa(cpa_real, ue):
     elif cpa_real <= cpa_be:
         tier = '🟡 MARGINAL'
         descripcion = '0-5% margen — revisar tendencia'
-    elif cpa_real <= cpa_be * 1.3:
+    elif cpa_real <= cpa_be * 1.5:
         tier = '🔴 PIERDE'
-        descripcion = 'Pierde plata, hasta 30% sobre breakeven — pausar y rediseñar'
+        descripcion = 'Pierde plata, hasta 50% sobre breakeven — pausar y rediseñar'
     else:
         tier = '⚫ DESCARTAR'
-        descripcion = '>30% sobre breakeven — apagar, no rescatar'
+        descripcion = '>1.5x breakeven — apagar, no rescatar'
     
     return tier, descripcion, round(margen_neto, 0)
 

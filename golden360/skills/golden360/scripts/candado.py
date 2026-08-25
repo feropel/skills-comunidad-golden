@@ -21,6 +21,7 @@ SKILLS_DIR = os.path.expanduser("~/.claude/skills")
 
 # Skills hijas del pipeline (nombre → para qué). Mantener alineado con REQUISITOS de SKILL.md.
 HIJAS = {
+    "golden-brand-brain": "cerebro de marca — Paso 0, obligatorio ANTES de generar",
     "golden-investigacion-mercado": "Bloque 1 completo: forense + investigación + dossier + .docx",
     "golden-shopify": "página COD (Fase 4)",
     "golden-web": "sitio/landing no-COD (Fase 4, alternativa)",

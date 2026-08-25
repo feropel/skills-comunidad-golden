@@ -20,12 +20,17 @@ description: >-
 ---
 
 # Golden Blindaje — auditoría del entorno de agentes
+<!-- skill GB1.5.2 · 2026-08-25 (centro de mando, cierre R6): la 'prosa de las DOS listas' del sello GB1.5.1 vivía SOLO en el sello — ahora EXCEPCIONES_PARCIALES está nombrada en la sección operativa Excepciones por diseño, con su ejemplo, la regla de los dos gemelos y el límite del dir raíz. Afirmación verificada por grep antes de sellar (receta R6). -->
+<!-- skill GB1.5.1 · 2026-08-25 (centro de mando, remediación R5): re-blindaje del propio chequeo.py (había quedado 644 sin uchg tras la edición de las 23:23 — la skill del blindaje era la única sin blindar del arsenal, cazada por sus DOS instrumentos); prosa actualizada a las DOS listas de excepción; uchg_arbol juzga también DIRECTORIOS (con archivos uchg y carpeta abierta se podía inyectar un archivo sin resistencia — latente, con caso al banco); guardia de paridad ahora falla CERRADO y cubre también la tabla de excepciones. -->
+<!-- skill GB1.5 · 2026-08-25 (centro de mando, remediación R3/R4 del verificador de cierre): chequeo.py CAMBIÓ DE SEMÁNTICA — esto supersede al claim 'INTACTO' del sello GB1.4 y al 'sin cambios de comportamiento', que eran ciertos a su hora y quedaron viejos el mismo día: (1) blindaje por N de M nodos del árbol con la función uchg_arbol de cuerpo BYTE-IDÉNTICO al del censo (stat por archivo, SIGUE symlinks, falla CERRADO); (2) filtro golden* sin guion (golden360 entró al juicio); (3) denominador impreso ('de N juzgadas'); (4) EXCEPCIONES_PARCIALES para escribibles por diseño (fuentes_baseline.json de investigación — regla de los dos lugares); (5) shebang restaurado a la línea 1. -->
 
+<!-- skill GB1.4 · 2026-08-24 · barrido total del arsenal (CdM): la prosa de "Excepciones por diseño" estaba desincronizada del código — decía "Hoy la lista es golden-copywriting" (una sola) cuando chequeo.py lleva DOS exentas desde el 22-ago (golden-copywriting + golden-chatea-operacion); la prosa ahora nombra las dos, declara al script como fuente de verdad y exige actualizar ambos lugares al agregar una excepción. chequeo.py INTACTO (corrido completo hoy: exit 0, 1672 archivos, 0 ALTO). -->
+<!-- skill GB1.3 · 2026-08-23 · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR -->
 <!-- skill GB1.2 · 2026-08-21 · auditoría golden-skill-auditor: agrega Fase 0 (flujo explícito paso a paso: correr, verificar ALTO abriendo el archivo, presentar triage, pedir permiso antes de tocar seguridad) con definición de terminado y manejo de error si el script no corre; blindaje propio documentado (chflags uchg); cita a tendencias-vivas.md desambiguada como archivo de golden-copywriting, no local -->
 <!-- skill GB1.1 · 2026-07-27 · filtro del PDF Claude Security y de blender-mcp, protocolo de triage con ventanas duras, 5 errores que hacen inútil una auditoría, sección MCPs de terceros -->
 <!-- skill GB1.0 · 2026-07-23 · auditoría local de ~/.claude sin salida de red · 6 áreas (secretos, permisos, hooks, MCP, blindaje, caché) -->
 
-**Versión:** `GB1.2` · Fábrica: chat centro de mando. Blindaje propio: `chflags uchg` (estándar de la casa).
+**Versión:** `GB1.5.2` · Fábrica: chat centro de mando. Blindaje propio: `chflags uchg` (estándar de la casa).
 
 Hay una capa que ninguna herramienta de seguridad de código mira: **la configuración
 con la que corren los agentes**. Ahí viven los tokens de Shopify, Meta, Stripe y
@@ -121,17 +126,29 @@ Verifica que el archivo de credenciales sea `600` (solo tú lo lees), busca toke
 texto plano y detecta servidores que descarguen algo al arrancar.
 
 ### 5 · Blindaje
-Cuenta cuántas skills `golden-*` están con `chflags uchg` y cuáles quedaron abiertas.
+Cuenta cuántas skills `golden*` (SIN exigir guion: golden360 también se juzga) están con `chflags uchg` y cuáles quedaron abiertas.
 Una skill abierta mientras se edita es normal; olvidada, no.
 
-**Excepciones por diseño** (`SIN_BLINDAJE_POR_DISENO` en `scripts/chequeo.py`): una skill que
-una rutina programada ESCRIBE sola va sin `uchg` a propósito. Blindarla no la protege: hace que
-la rutina falle en silencio. Hoy la lista es `golden-copywriting` (la rutina
-`copywriting-tendencias-8-dias` le escribe su propio
+**Excepciones por diseño** (`SIN_BLINDAJE_POR_DISENO` en `scripts/chequeo.py` — esa lista en el
+código es LA fuente de verdad; esta prosa la resume): una skill que una rutina programada
+ESCRIBE sola, o que su fábrica decidió dejar abierta, va sin `uchg` a propósito. Blindarla no la
+protege: hace que la rutina falle en silencio. Hoy la lista tiene DOS entradas:
+`golden-copywriting` (la rutina `copywriting-tendencias-8-dias` le escribe su propio
 `~/.claude/skills/golden-copywriting/references/tendencias-vivas.md` cada 8 días — ese archivo
-vive en golden-copywriting, no en esta skill). Para esas skills el chequeo invierte el semáforo:
-avisa en ALTO si aparecen blindadas. Cuando una rutina nueva empiece a escribir dentro de una
-skill, añádela a ese conjunto.
+vive en golden-copywriting, no en esta skill) y `golden-chatea-operacion` (política de su
+fábrica, 22-ago: sin blindar hasta validar el offset horario contra un país distinto de
+Colombia; la primera corrida real de otro país levanta la excepción). Para esas skills el
+chequeo invierte el semáforo: avisa en ALTO si aparecen blindadas. Cuando una rutina nueva
+empiece a escribir dentro de una skill (o una fábrica declare su excepción), añádela al conjunto
+del script Y a esta prosa — las dos listas se desincronizan en silencio si solo se toca una.
+
+**La SEGUNDA tabla de excepción es `EXCEPCIONES_PARCIALES`** (chequeo.py y censo-ligero.py, cuerpos
+gemelos): archivos SUELTOS escribibles por diseño dentro de skills que SÍ van blindadas — hoy,
+`scripts/fuentes_baseline.json` de golden-investigacion-mercado (el baseline que su propio script
+actualiza; su exención está declarada también en el sello G5.12 de esa skill — regla de los dos
+lugares). Igual que la lista de arriba: se toca en LOS DOS gemelos a la vez, y la autoprueba del
+censo los compara en cada corrida. Límite declarado del medidor: el directorio RAÍZ de una skill
+no se juzga (los subdirectorios sí) — una inyección en raíz abierta la caza la corrida siguiente.
 
 **Desblindar son dos pasos, no uno** (medido el 2026-08-19): con el directorio inmutable,
 `chflags -R nouchg` no alcanza. El orden que funciona es
@@ -218,6 +235,15 @@ a una carpeta con datos del negocio.
 - `golden-archivos` → si la limpieza de caché se vuelve un tema de orden general.
 
 ## Changelog
+- **GB1.4** (2026-08-24) — Barrido total del arsenal (Centro de Mando): sincronizada la prosa de
+  "Excepciones por diseño" con `SIN_BLINDAJE_POR_DISENO` de `chequeo.py` — la prosa nombraba solo
+  a `golden-copywriting` cuando el código lleva DOS exentas (se suma `golden-chatea-operacion`,
+  política de su fábrica del 22-ago). El script queda declarado fuente de verdad y la regla nueva
+  exige tocar ambos lugares al agregar excepciones. `chequeo.py` sin cambios (ejecutado completo
+  hoy: exit 0, 1672 archivos escaneados, 0 hallazgos ALTO).
+- **GB1.3** (2026-08-23) — Estándar 9 (Centro de Mando): agrega la declaración de que los cambios
+  relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. Sin cambios de
+  comportamiento en `chequeo.py`.
 - **GB1.2** (2026-08-21) — Auditoría `golden-skill-auditor`: agrega la sección **Flujo** con los
   5 pasos explícitos del agente (correr, verificar cada ALTO abriendo el archivo, presentar el
   triage completo, no aplicar arreglos sin pedirlo el usuario, documentar descartes) y la

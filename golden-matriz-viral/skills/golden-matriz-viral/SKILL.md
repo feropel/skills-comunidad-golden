@@ -17,6 +17,19 @@ description: >
 ---
 
 # Golden Matriz Viral — la fórmula de tu contenido
+<!-- skill GMV1.8.1 · 2026-08-24 (centro de mando, remediación del verificador de cierre): línea de RUTA del cerebro en el Paso 0 (las lectoras ordenaban LÉELO PRIMERO sin decir dónde — un chat limpio no podía ejecutar la orden) + bump que las ediciones del 23-24 dejaron sin subir. -->
+
+<!-- skill v1.8 · 2026-08-24 · Barrido total del arsenal (auditoría fresca golden-skill-auditor,
+CdM): (1) entra el bloque Paso 0 · Cerebro de marca BAJO el H1 — el estándar de la familia de
+contenido del CdM (adenda 2026-08-23) que esta skill no traía: leía el brand-brain goteado en las
+Fases 2-3 pero sin el paso obligatorio inicial, con lo que una corrida podía arrancar la ingesta y
+la matriz sin cargar la voz de la marca; (2) sellos reordenados al patrón de la casa (más nuevo
+ARRIBA — estaban v1.6 encima de v1.7, la misma clase de desfase que produjo el doble sello de
+golden-ads); (3) la receta de comentarios declara `jq` como dependencia con fallback en python3.
+Cambios reportados a 🧠 GOLDEN - CENTRO DE MANDO (estándar 9). -->
+
+<!-- skill v1.7 · 2026-08-23 · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se
+reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 
 <!-- skill v1.6 · 2026-08-21 · golden-skill-auditor: (1) Versión desincronizada — la etiqueta decía
 GMV1.4 mientras el Changelog ya iba en GMV1.5 (la transcripción local con whisper-cpp de la Fase 1
@@ -27,9 +40,21 @@ entrada→salida de un renglón de matriz y un guion (Fase 2/3) para que el prim
 inferir el formato. (4) Se agregó definición explícita de "terminado" por fase. (5) Blindaje:
 `chflags uchg` — mecanismo documentado aquí y en el registro de golden-skill-auditor. -->
 
-**Versión:** `GMV1.6` · Fábrica: chat centro de mando.
+**Versión:** `GMV1.8.1` · Fábrica: chat centro de mando.
 El principio: el algoritmo ya te dijo qué funciona — está en tus métricas y en las de los
 creadores que admiras. Esta skill convierte esa evidencia en una fórmula reutilizable.
+
+## Paso 0 · Cerebro de marca (obligatorio antes de generar)
+
+Si la marca tiene CEREBRO creado por `golden-brand-brain` (marca.md, productos.md, avatares.md,
+competidores.md, anuncios-ganadores.md, cambios-recientes.md), LÉELO PRIMERO: la matriz se compara
+contra los anuncios ganadores ya registrados, los guiones nacen con esa voz y los avatares de ahí
+alimentan el criterio de Identificación de la Fase 4 — jamás re-preguntar lo que el cerebro ya
+sabe. Si NO existe, ofrece crearlo con `golden-brand-brain` antes de continuar; si el usuario pide
+seguir sin cerebro, se declara en la entrega que los guiones salieron sin voz de marca cargada
+(la Fase 3 ya detalla cómo se degrada).
+
+El cerebro vive en `PROYECTOS/BRAND-BRAINS/<MARCA>/` — la resolución exacta (buscar con find ANTES de crear, naming MAYÚSCULAS-CON-GUIONES) la declara `golden-brand-brain`: ante cualquier duda de ruta, invócala en vez de adivinar.
 
 ## Fase 1 — INGESTA (juntar la evidencia)
 
@@ -62,6 +87,8 @@ NO le pidas que pegue métricas a mano — tráelas tú primero** (paso 1) y sol
      --extractor-args "youtube:comment_sort=top;max_comments=100" \
      -o "salida.%(ext)s" "<URL>"
    jq -r '.comments[] | "[\(.like_count)] \(.author): \(.text)"' salida.info.json
+   # Si no hay jq (viene con: brew install jq), mismo resultado con python3:
+   #   python3 -c "import json;[print(f\"[{c.get('like_count')}] {c.get('author')}: {c.get('text')}\") for c in json.load(open('salida.info.json'))['comments']]"
    ```
    Medido: 30 comentarios con **`author`, `text` y `like_count`**, de ~2.450.067 disponibles.
    🎯 **`like_count` es lo que cambia el juego:** un comentario con miles de likes es un dolor,
@@ -220,6 +247,17 @@ para producir.
 - **No pisa a:** `golden-copywriting` (copy de venta directa) ni `golden-ads` (pauta).
 
 ## Changelog
+
+- **GMV1.8.1** (2026-08-24): bump de las ediciones del 24 (verificador de cierre R2: la version vive en 4 caras — sello, linea Version, Changelog y REGISTRO — y el bump anterior toco solo el sello).
+- **GMV1.8** (2026-08-24) — **Barrido total del arsenal (CdM).** (1) Bloque **Paso 0 · Cerebro de
+  marca** instalado bajo el H1 — el estándar de la familia de contenido (adenda CdM 2026-08-23) que
+  aquí faltaba: el brand-brain se leía goteado en las Fases 2-3 y una corrida podía arrancar sin la
+  voz de la marca cargada; (2) sellos del encabezado reordenados al patrón de la casa (más nuevo
+  arriba — estaban v1.6 encima de v1.7, la clase de desfase que ya produjo el doble sello de
+  golden-ads); (3) `jq` declarado como dependencia de la receta de comentarios, con fallback en
+  python3. Reportado al Centro de Mando (estándar 9).
+- **GMV1.7** (2026-08-23) — Estándar 9 (Centro de Mando): declarado que los cambios relevantes de
+  esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. Sin cambios de capacidad.
 - **GMV1.6** (2026-08-21) — Auditoría `golden-skill-auditor`: (1) la etiqueta de versión decía
   GMV1.4 mientras este Changelog ya iba en GMV1.5 — la capacidad de transcripción local (Fase 1)
   ya estaba en el cuerpo pero la versión no lo reflejaba; sincronizado a GMV1.5→GMV1.6, un solo

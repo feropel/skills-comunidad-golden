@@ -4,18 +4,18 @@ Todo probado para la **ruta HTML de un archivo** (el entregable normal de Golden
 npm, sin build, se publica en Vercel tal cual. Para Next/React, la misma lógica con
 `@react-three/fiber`.
 
-**Índice**
-1. Base — importmap (va en todas)
-2. Preloader con contador y cortina
-3. Duna de partículas que ondula en loop
-4. Objeto cromado que refleja el entorno
-5. Wireframe blanco de 1px encima
-6. Cursor con inercia
-7. Bloom (el halo premium)
-8. Scroll cinemático (la cámara como dolly)
-9. Rendimiento y fallback (obligatorio antes de entregar)
-10. Fondo de video pre-renderizado
-11. Checklist de la escena
+**Índice** (los números calzan con los encabezados de cada receta)
+- Base — importmap (va en todas)
+- 1 · Preloader con contador y cortina
+- 2 · Duna de partículas que ondula en loop
+- 3 · Objeto cromado que refleja el entorno
+- 4 · Wireframe blanco de 1px encima
+- 5 · Cursor con inercia
+- 6 · Bloom (el halo premium)
+- 7 · Scroll cinemático (la cámara como dolly)
+- 8 · Rendimiento y fallback (obligatorio antes de entregar)
+- 9 · Fondo de video pre-renderizado
+- Checklist de la escena
 
 **Regla:** copia la receta y **cambia los tokens del bloque de arriba**. No toques el
 motor hasta que la escena se vea bien quieta.

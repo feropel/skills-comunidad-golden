@@ -17,9 +17,11 @@ description: >
 
 # Golden Logística — rescate de novedades y control de devoluciones (COD)
 
-**Versión:** `GL1.2` · Fábrica: este chat. Blindada con `chflags uchg` (desbloquear con
+**Versión:** `GL1.4` · Fábrica: este chat. Blindada con `chflags uchg` (desbloquear con
 `chflags -R nouchg`, re-blindar con `chflags -R uchg`).
 
+<!-- GL1.4 — 2026-08-24 — barrido total del arsenal (CdM), fila pendiente ejecutada: las probabilidades de rescate por tipo en references/tipos-novedad.md quedaron rotuladas explícitamente como ESTIMACIÓN cualitativa (sin N ni fecha — el dato medido no existe dentro de la skill), con la instrucción de reemplazarlas por la tasa real (con N y fecha) cuando la operación la mida. Nada más se tocó: método de rescate, plantillas y reglas intactos. -->
+<!-- GL1.3 — 2026-08-23 — Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 <!-- GL1.2 — 2026-08-21 — Reparación de auditoría (golden-skill-auditor): fusionado CHANGELOG.md dentro de este changelog y borrado (era archivo suelto que se habría publicado al marketplace); corregida la regla rota "sin `` ni ``" del checklist final (perdía los caracteres ¿ ¡ en una edición previa); agregado el puntero desde ## Referencias a referencia-externa-cancelacion-y-despachos.md, que estaba huérfano. Ver detalle en ## Changelog. -->
 <!-- GL1.1 — 2026-08-17 — ESTÁNDAR DE SKILL PROFESIONAL aplicado (encargo de FER). La skill medía 1/7 en la auditoría de profundidad: tenía el procedimiento pero no ROL, ni contrato de entregable, ni cobertura, ni autocrítica. Se añaden los 6 elementos que faltaban sin tocar el método de rescate, que ya era bueno. Molde: golden-ads / golden360 (7/7). Estándar completo en STACK-GOLDEN/DESTILADOS/estandar-skill-profesional.md -->
 
@@ -149,6 +151,14 @@ Entrega solo lo que sobrevive, y di qué descartaste.
   verifica y esta skill se actualiza con los nombres reales).
 
 ## Changelog
+- **GL1.4** (2026-08-24) — Barrido total del arsenal (Centro de Mando), fila pendiente ejecutada:
+  en `references/tipos-novedad.md` las probabilidades de rescate (ALTA/MEDIA/BAJA) quedan
+  rotuladas como ESTIMACIÓN cualitativa sin N — no existe tasa medida dentro de la skill — con
+  instrucción de sustituirlas por la tasa real (N y fecha) cuando la operación la mida. El método
+  de rescate, las plantillas y las reglas duras no se tocaron.
+- **GL1.3** (2026-08-23) — Estándar 9 (Centro de Mando) aplicado: se declara que los cambios
+  relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. Ver comentario
+  HTML bajo el H1. No tocó el método ni ninguna otra regla.
 - **GL1.2** (2026-08-21) — Reparación de auditoría (golden-skill-auditor): fusionado
   `CHANGELOG.md` (archivo suelto que se habría publicado al marketplace) dentro de este changelog
   y borrado; corregida la regla rota "sin `` ni ``" en el checklist final — el string de los

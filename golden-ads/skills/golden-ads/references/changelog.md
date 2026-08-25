@@ -4,10 +4,14 @@
 > número vigente en su sello; el detalle completo de cada cambio vive aquí.
 
 ## Índice
+- [G5.3 — 2026-08-24 · Barrido total del arsenal (CdM)](#g53--2026-08-24--barrido-total-del-arsenal-ordenado-por-fer-vía-centro-de-mando)
+- [G5.2 — 2026-08-24 · Sello único + rescates](#g52--2026-08-24--auditoría-golden-skill-auditor-sello-único--rescates)
+- [G5.1 — 2026-08-23 · Estándar 9 (Centro de Mando)](#g51--2026-08-23--estándar-9-centro-de-mando)
+- [G5.0 — 2026-08-21 · Auditoría: examples/ → references/, ledger fusionado](#g50--2026-08-21--auditoría-golden-skill-auditor-examples--references-ledger-fusionado)
 - [G4.9 — 2026-08-18 · CAPA HUMANA parte 2](#g49--2026-08-18--capa-humana-parte-2-redes-patrones-y-sondeo-de-producto)
 - [G4.8 — 2026-08-18 · CAPA HUMANA](#g48--2026-08-18--capa-humana-audiencia-momento-y-mensaje-con-corazón)
 - [G4.7 — 2026-08-11 · RED SINÁPTICA + reconciliación de sello](#g47--2026-08-11--red-sináptica-puente-a-la-transcripción-local-de-creativos--reconciliación-de-sello)
-- [G4.5 — 2026-08-07 · Cosecha dental Chile](#g45--2026-08-07--cosecha-del-chat-estudio-360-dental-cavity-healing-chile-vía-centro-de-mando)
+- [G4.5 — 2026-08-07 · Cosecha dental Chile](#g45--2026-08-07--cosecha-del-chat-estudio-360-producto-de-ejemplo-chile-vía-centro-de-mando)
 - [Notas menores — 2026-07-30 / 2026-08-02](#notas-de-versión-menores-no-selladas--2026-07-30-y-2026-08-02)
 - [G4.6 — 2026-07-27 · Golden NO es solo contra entrega](#g46--2026-07-27--corrección-de-fondo-golden-no-es-solo-contra-entrega)
 - [G4.4 — 2026-07-18 · Aclaración Modo A/B](#g44--2026-07-18--aclaración-la-datahistórico-es-la-excepción-producto-nuevo--modo-b-por-default)
@@ -18,6 +22,52 @@
 - [G3.9 → G3.0 — 2026-06-25 · construcción del preset y validación en vivo](#g39--2026-06-25--golden-pro-preset-único-construido-en-vivo-hookhold-rate-creadas)
 - [G2.0 — 2026-06-25 · rename + Meta/TikTok/Google + full-funnel](#g20--2026-06-25--rename-a-golden-ads--metatiktokgoogle-completos--full-funnel)
 - [G1.0 — 2026-06-25 · versión inicial](#g10--2026-06-25--versión-inicial-centro-de-comando-de-pauta)
+
+## G5.3 — 2026-08-24 — Barrido total del arsenal ordenado por FER, vía Centro de Mando
+Auditoría fresca `golden-skill-auditor` (lote AUDITA+ARREGLA del CdM). Hallazgos con evidencia, reparados:
+- **El ledger volvía a estar incompleto** (tercera reincidencia de la clase que G4.7 y G5.2 dieron por
+  cerrada): el sello G5.2 del `SKILL.md` afirmaba "changelog completado con G5.0/G5.1/G5.2" pero este
+  archivo terminaba en G4.9 (mtime 2026-08-21, sin tocar en la corrida del 24). Se añadieron las tres
+  entradas, reconstruidas desde los sellos reales conservados en los backups
+  `golden-ads-20260823-025937` y `golden-ads-20260824-215040`, y se marca la lección de clase: **"el
+  ledger quedó completo" solo se sella tras releer este archivo del disco, no desde la intención.**
+- **La cita prometida en `07` no existía**: el sello G5.2 decía que `referencia-externa-ctwa-cod-panama.md`
+  quedaba "citada desde `07`"; grep en `07-benchmarks-kpis.md` dio cero. Cita añadida de verdad (línea de
+  contraste externo bajo la tabla orientativa).
+- **Plugin fantasma `3qs:3qs`**: citado en `SKILL.md` (Relación con otras skills) y `01-fuentes-datos.md`
+  como delegado de análisis de informes; verificado contra `~/.claude/plugins` (installed_plugins.json +
+  grep del cache): NO está instalado. Se retiró la cita; la delegación queda en `golden-meta-ads-analysis`.
+- **Tool inexistente `ads_targeting_search`** en `16-segmentacion.md` §A: el MCP de Meta conectado no la
+  expone (lista de tools del entorno verificada). Reescrito: los IDs de interés se buscan en la UI de Ads
+  Manager (o no se usan intereses; en COD amplio rinde más).
+- **`referencia-externa-ctwa-cod-panama.md` atribuía al SKILL.md reglas que no contiene** (multianunciante
+  OFF, 15 copys, asset_feed_spec, UTM — grep 0 matches en la skill): esas son leyes de la casa que viven
+  en la memoria Golden, no reglas de este SKILL.md. Redacción corregida sin perder la advertencia; ruta
+  final de la fuente ajustada a la carpeta real `PROYECTOS/PANAMA - OPERACION/`.
+- Re-blindada con su mecanismo histórico (`chflags -R uchg`; la corrida del 24 la había dejado escribible).
+Cambios relevantes reportados a 🧠 GOLDEN - CENTRO DE MANDO (estándar 9). Sello → **G5.3**.
+
+## G5.2 — 2026-08-24 — Auditoría golden-skill-auditor: sello único + rescates
+*(Entrada reconstruida en G5.3 desde el sello impreso del SKILL.md de esa corrida; la corrida original
+no escribió este ledger.)* Sello ÚNICO (había dos GAE_VERSION contradictorios, G5.1 arriba y G5.0 abajo —
+reincidencia del desfase que G4.7 dio por cerrado); `referencia-externa-ctwa-cod-panama.md` rescatada del
+olvido (82 líneas huérfanas, ahora en el mapa; la cita desde `07` que este sello prometía la materializó
+recién G5.3); resumen de reglas renumerado a la numeración CANÓNICA de `reglas-de-oro.md`; mapa reordenado;
+`3qs` → `3qs:3qs` (revertido en G5.3: el plugin no existe instalado).
+
+## G5.1 — 2026-08-23 — Estándar 9 (Centro de Mando)
+*(Entrada reconstruida en G5.3 desde el sello del backup `golden-ads-20260824-215040`.)* Se declara la
+conexión con el ecosistema: los cambios relevantes de esta skill se reportan a
+🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR.
+
+## G5.0 — 2026-08-21 — Auditoría golden-skill-auditor: examples/ → references/, ledger fusionado
+*(Entrada reconstruida en G5.3 desde el sello del backup `golden-ads-20260823-025937`.)*
+(1) `examples/EJEMPLO-diagnostico.md` y `examples/PRESET-columnas-golden-09.2025.md` movidos a
+`references/` (la carpeta `examples/` no es empaque válido de marketplace; los 2 punteros del cuerpo
+actualizados); (2) el `CHANGELOG.md` de la raíz (duplicaba y desincronizaba con `references/changelog.md`,
+faltaban G4.5 y G4.7 en el ledger) fusionado aquí — este archivo pasa a ser la ÚNICA fuente de
+versión/fecha, con índice al inicio; (3) reconciliadas 2 notas de versión aplicadas sin bump de
+GAE_VERSION en 2026-07-30 y 2026-08-02.
 
 ## G4.9 — 2026-08-18 — CAPA HUMANA parte 2: redes, patrones y sondeo de producto
 Segunda pasada sobre la misma clase de FER, buscando lo que había quedado como frase y no como doctrina:

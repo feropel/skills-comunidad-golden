@@ -3,7 +3,32 @@
 Registro de versiones de la skill. Cada vez que se absorbe una mejora de una página
 real, se sube una versión aquí (ver el ritual de auto-mejora en SKILL.md).
 
-## G4.5 — 2026-08-23 — Auditoría golden-skill-auditor: se cierra la DEUDA del base + reestructura
+## G4.5d — 2026-08-24 — Dos filas del verificador de cierre
+- 🔴 **FECHA MENTIDA en el sello:** SKILL.md y el changelog declaraban "2026-08-23" para rondas que se
+  escribieron el **2026-08-24 22:13** (medido por mtime). **Causa raíz:** la fecha se tomó del contexto
+  de la sesión en vez de MEDIRLA con `date` — la sesión cruzó de un día al otro y el sello se quedó en
+  el día viejo. Corregido con la fecha real de cada ronda: el trabajo del base fue el 23 (03:09) y la
+  reestructura + G4.5b/c el 24 → G4.5 queda como 23/24, G4.5b y G4.5c como 24.
+  **Regla que deja:** la fecha de un sello se MIDE (`date` / mtime), nunca se hereda del contexto ni se
+  copia de la entrada anterior.
+- 🟡 **El Paso 0 del cerebro ordenaba "LÉELO PRIMERO" sin decir DÓNDE vive** → añadida la línea de la
+  familia: el cerebro vive en `PROYECTOS/BRAND-BRAINS/<MARCA>/` y la resolución exacta la declara
+  `golden-brand-brain` (ante duda de ruta, invocarla en vez de adivinar).
+
+## G4.5c — 2026-08-24 — Dos filas del barrido D del Centro de Mando (verificadas y cerradas)
+- 🟡 **`references/horizon/_golden-trust.liquid` era huérfano REAL:** existía y ningún texto vivo lo
+  citaba (solo el changelog, que es historia) → un modelo trabajando Horizon no sabía que ya tenía un
+  theme block escrito y probado. **Citado desde `references/horizon-bloques.md` §3.1** con su
+  cuándo-usarlo, cómo instalarlo (`/blocks/_golden-trust.liquid`), por qué ya sirve y cómo clonarlo
+  como molde de los demás bloques nativos.
+- 🟡 **`examples/` vivía fuera de las carpetas canónicas** (references/scripts/assets/agents) y el
+  inventario la marcaba como material que viajaría al marketplace tal cual. Los 3 ejemplos SÍ estaban
+  citados, así que se eligió MOVER en vez de declarar excepción: ahora `references/examples/` y las
+  **17 citas reescritas** en SKILL.md y references. Árbol de primer nivel: solo `assets/` + `references/`.
+- Origen: pasada de contraste del CdM (955 ORO). Ambas verificadas de forma independiente en la fábrica
+  antes de tocar nada (0 citas vivas del starter; 3 carpetas de primer nivel).
+
+## G4.5 — 2026-08-23/24 — Auditoría golden-skill-auditor: se cierra la DEUDA del base + reestructura
 Hallazgos con evidencia, todos reparados:
 - 🔴 **DEUDA G4.x CERRADA:** `assets/product.base.json` seguía en el orden viejo de 17 secciones mientras
   el embudo canónico documentado iba en 24 — el GENERADOR contradecía a su propia documentación.
@@ -171,7 +196,7 @@ Hallazgos con evidencia, todos arreglados:
 - **Referencia rota:** un archivo premium retirado citado 3 veces en `efectos-premium.md` pero no existe
   (archivo retirado en una versión vieja) → re-apuntado a `references/componentes/`, ejemplos y
   `related-products.premium.css.txt` (que SÍ existen).
-- **Signos de apertura** (interrogación/exclamación invertidas) en 12 docs + `examples/demo-dawn.json` (regla GLOBAL del usuario:
+- **Signos de apertura** (interrogación/exclamación invertidas) en 12 docs + `references/examples/demo-dawn.json` (regla GLOBAL del usuario:
   solo signo de cierre) → eliminados en todos.
 - **Línea de versión bajo el H1** de SKILL.md (patrón de la casa) → añadida.
 - Confirmado por inventario: cero datos privados, cero componentes huérfanos reales (los 38 citados),
@@ -243,8 +268,8 @@ Auditoría exhaustiva de los ~40 componentes (no solo la base):
 ## G3.8 — 2026-07-01 — Ejemplos de referencia al día + FAQ demo de-fosilizado
 Los ejemplos que la skill usa como referencia estaban VIEJOS (demo-shrine en G2.8, 0/6 secciones de
 fusión) → engañaban la generación. Sincronizados a la arquitectura G3.7:
-- **`examples/demo-shrine.json`** = snapshot de `product.base.json` (embudo canónico, 17 secciones).
-- **`examples/demo-dawn-v2.json`** llevado al embudo canónico: 6 secciones de fusión añadidas como
+- **`references/examples/demo-shrine.json`** = snapshot de `product.base.json` (embudo canónico, 17 secciones).
+- **`references/examples/demo-dawn-v2.json`** llevado al embudo canónico: 6 secciones de fusión añadidas como
   custom-liquid `scheme-1`, `sec_autoridad` off, **candado landing** insertado y **FAQ accesible**.
 - **FAQ demo de la BASE** tenía copy de bebida energética (tapa-vaso, "energía y vigor", Borojó/
   Guaraná/Chontaduro) → **de-fosilizado** a copy product-agnostic. Ambos ejemplos pasan el auto-check.
@@ -386,7 +411,7 @@ auto-reprobaba). Cambios:
   doc: ya hay un template nativo de referencia.
 - **Render REAL (procedimiento repetible)** documentado en `auto-check.md`: subir a tema no
   publicado → preview → verificar móvil+PC (foco/teclado, CLS, CTA, secciones sin vacíos) → screenshot.
-- **Ejemplo al día:** `examples/demo-shrine.json` regenerado desde el base actual (accesible). **Limpieza:**
+- **Ejemplo al día:** `references/examples/demo-shrine.json` regenerado desde el base actual (accesible). **Limpieza:**
   eliminado `INSTALAR.txt` (ya se instala por el marketplace de Comunidad-Golden). Sellos → **G3.0**.
 - Residual honesto (fuera del archivo de skill, es del entorno/producto): un render 100% headless
   automático (depende de una tienda Shopify en vivo) y un tema Horizon nativo COMPLETO (aquí va el starter).
@@ -480,7 +505,7 @@ NO se absorbe; la skill queda genérica/anónima.
 - **Orden canónico nuevo — FAQ inmediatamente después de la descripción del producto.** Decisión
   del usuario. `assets/product.base.json` reordenado: ticker → main → **faq** → cómo-actúa → reseñas →
   manifiesto → ticker → whatsapp → related. Documentado en SKILL.md ("Estructura canónica"): la
-  referencia de orden es SIEMPRE el `product.base.json`, no `examples/demo-dawn-v2.json` (desfasado
+  referencia de orden es SIEMPRE el `product.base.json`, no `references/examples/demo-dawn-v2.json` (desfasado
   desde v1.31, aún con el FAQ al fondo). Esto cierra la duda base-vs-ejemplo.
 - **REGLA #3 invertida (reseñas/rating): nunca dejar vacío.** Si el cliente no tiene reseñas/rating,
   se INVENTAN ejemplos buenos (5–6 reseñas variadas con nombres locales y alguna de 4★ + rating
@@ -592,13 +617,13 @@ a toda página de la skill, sin tocar 15 componentes):
 - Con `!important` para ganarle a los max-width estrechos de cada componente, así llenan el ancho.
 - Las bandas (autoridad, manifiesto, tickers) ya eran full-width. Los bloques del producto
   (precio, garantía, logística…) siguen en la columna del producto (no se ensanchan, correcto).
-- Aplicado a `assets/config-center.liquid`, a la plantilla `examples/demo-dawn-v2.json` y al
+- Aplicado a `assets/config-center.liquid`, a la plantilla `references/examples/demo-dawn-v2.json` y al
   entregable real `product.producto-demo.json`. Sello → v1.31. Resultado: se ve bien en **móvil Y PC**.
 
 ## v1.30 — 2026-06-19 — Plantilla PRO v2 (Dawn, máximo impulso de compra) + fixes de componentes
 Absorbido del build real **tienda-demo / producto-demo** (página entregada e integrada por API).
 Es la evolución del esqueleto Dawn a "plantilla profesional persuasiva" lista para vender:
-- **Nueva plantilla de referencia `examples/demo-dawn-v2.json`** (anonimizada, tokenizada,
+- **Nueva plantilla de referencia `references/examples/demo-dawn-v2.json`** (anonimizada, tokenizada,
   con slots de imagen `REEMPLAZA-TU-CDN`): embudo COMPLETO de impulso →
   ticker · producto (eyebrow + oferta + **countdown activo** + rating + precio dinámico +
   **CTA verde** + garantía + barra logística) · **escalera de venta con imágenes reales** ·

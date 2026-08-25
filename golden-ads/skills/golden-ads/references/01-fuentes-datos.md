@@ -21,7 +21,7 @@ con **ToolSearch** (`select:ads_get_ad_accounts,ads_insights_performance_trend,.
 ## B) Informe exportado (Excel/CSV/PDF de Ads Manager)
 El usuario sube el archivo. Para el análisis profundo (unit economics + semáforo 🔴🟡🟢, ranking de
 campañas/creativos, demografía, ubicaciones, plan campo por campo) **delega en
-`golden-meta-ads-analysis`** (está hecho exactamente para eso) o `3qs` (metodología 3 Q's).
+`golden-meta-ads-analysis`** (está hecho exactamente para eso).
 - Pide que el export traiga: nivel (campaña/conjunto/anuncio), gasto, impresiones, CTR, CPC, CPM,
   compras/resultados, CPA, ROAS, frecuencia, fechas. Si faltan columnas, dilo.
 - Cruza con unit economics (REGLA 2) para convertir métricas en veredicto de rentabilidad.

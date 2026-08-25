@@ -1,5 +1,49 @@
 # Changelog — GOLDEN 360
 
+## R1.9 — 2026-08-24 — Auditoría fresca (918 base · 903 con reserva → PLATA, reparada)
+- **La dependencia obligatoria del Paso 0 no existía para el sistema.** El bloque "Cerebro de marca"
+  que el Centro de Mando instaló el 23-ago exige `golden-brand-brain` ANTES de generar nada, pero esa
+  skill no estaba ni en la tabla REQUISITOS ni en `HIJAS` de `candado.py`. Consecuencia medida:
+  `candado.py --skills` decía "✅ ecosistema completo" aunque faltara justo la skill del Paso 0 — el
+  chequeo de dependencias daba verde sobre un hueco. Ya está en las dos listas.
+- **"Pasa la ruta del cerebro" era una orden sin destino.** No decía dónde vive el cerebro ni dónde se
+  anota, y el esquema `PRODUCTO.json` no tiene campo para ella. Ahora: el cerebro es de la MARCA (vive
+  fuera de `PROYECTOS/<PRODUCTO>/`, su ruta la declara `golden-brand-brain`) y se escribe en la
+  **cabecera del `README.md`** del paquete — con su fila ya en la plantilla de la Fase 9 — más el
+  encargo de cada hija. Un dato que solo vive en la conversación se pierde en el próximo chat.
+  📌 Elevado al Centro de Mando: añadir `marca.cerebro_ruta` al esquema. Es ESTÁNDAR TRANSVERSAL y por
+  la convivencia de esta skill no se toca sin su aviso previo.
+- **El sello R1.8 declaraba una cifra falsa.** Decía "`candado.py --skills` corrido de verdad → 15/15
+  hijas instaladas + 2 auxiliares": ejecutado hoy son **13 hijas** + 2 auxiliares + 1 extra. Las 15
+  líneas verdes se leyeron como 15 hijas y los auxiliares se contaron dos veces. Corregido en el sello.
+  Un "verificado en vivo" con la cifra mal contada es peor que no dar cifra: la siguiente auditoría la
+  copia. (Con `golden-brand-brain` la lista pasa hoy a 14 hijas.)
+- **Dos cambios sin entrada de changelog**, la misma falla que R1.6b ya había registrado a posteriori
+  el 11-ago — o sea la clase se repitió: la auditoría R1.8 (21-ago) y la adenda del cerebro (23-ago).
+  Ambas quedan registradas abajo. Quien lea el historial ya ve el estado real.
+- **Sellos reagrupados:** R1.2/R1.1/R1.0 habían quedado DEBAJO de la sección "Los 3 bloques", partiendo
+  el bloque de versión en dos con contenido vivo en medio — la sección quedaba expuesta a irse en la
+  próxima poda de sellos. Ahora los 6 sellos van juntos bajo el H1, como manda el patrón de la casa.
+- Menores: `seo-aio-producto.md` citaba `claude-seo-ai` a secas cuando el SKILL.md ya lo precisó como
+  `claude-seo-ai:audit` (es un PLUGIN); y la adenda del CdM venía sin tildes ("no leian", "identico",
+  "fabrica") — corregidas sin tocar su contenido.
+- Verificado ejecutando, no citando: `ast.parse` limpio · `candado.py --skills` corrido → ecosistema
+  completo con la hija nueva · inventario 0 rotas / 0 huérfanas / 0 dudosos · blindaje 12 de 12 nodos ·
+  sin secretos · sin signos de apertura.
+- **Reserva que NO cierra con código y baja el puntaje con honestidad:** la ruta sigue sin correrse
+  entera con un producto real. Está auditada, no estrenada.
+
+## R1.8b — 2026-08-23 — Paso 0 · Cerebro de marca (registrado a posteriori el 2026-08-24)
+- El Centro de Mando instaló el bloque "Cerebro de marca" tras el hallazgo del chat FILTRO DE
+  HERRAMIENTAS: 7 de 12 skills de contenido no leían el cerebro. Bloque idéntico en 6 skills del CdM.
+  Quedó en el SKILL.md con su adenda propia, pero **sin entrada aquí**. Se registra ahora.
+
+## R1.8 — 2026-08-21 — Auditoría golden-skill-auditor 959 → 1000 (registrada a posteriori el 2026-08-24)
+- Se selló en el SKILL.md pero **no se escribió aquí**. Lo que hizo: (1) concordancia de género en la
+  línea disparadora del description ("este skill" → "esta skill"); (2) la Fase 9 exigía `README.md` en
+  `candado.py` y en el texto pero sin plantilla, así que cada corrida inventaba su formato — se agregó
+  la plantilla exacta (índice + compuertas + pendientes) bajo la Fase 9.
+
 ## R1.7 — 2026-08-11 — El Bloque 1 ahora mina la LOCUCIÓN de los videos (aviso de la red sináptica)
 - Encargo del Centro de Mando: la transcripción local existía en `golden-video-editor` desde hacía
   tiempo sin propagarse; ya está en la investigación (G5.8), matriz-viral, video-teardown, ads y

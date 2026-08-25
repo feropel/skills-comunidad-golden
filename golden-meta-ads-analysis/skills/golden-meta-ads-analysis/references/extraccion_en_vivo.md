@@ -31,7 +31,7 @@ En cada paso que requiera credenciales o IDs:
 Meta banea cuentas por mal uso de la API. Exige siempre:
 - **System User Token** (no expira), NO token personal del Explorador de API Graph.
 - **Developer App en una Business Manager SEPARADA** de producción (crear la app en la misma BM de las cuentas de producción es causa frecuente de baneo).
-- **Scopes mínimos solo-lectura:** `ads_read` + `business_management`. NUNCA `ads_management` ni `read_insights`.
+- **Scopes mínimos solo-lectura:** `ads_read` + `business_management`. NUNCA `ads_management` (escritura — el preflight `check_token.py` lo bloquea). `read_insights` no se pide porque sobra (con `ads_read` basta); si viene, no bloquea (es de lectura).
 - Nada de scraping de UI ni MCPs no oficiales.
 
 Si el usuario trae token personal, adviértele:

@@ -54,6 +54,18 @@ def cementerio(activos: int, historicos: int) -> dict:
             "supervivencia_pct": None,
             "lectura": "sin datos históricos — no concluir",
         }
+    if activos > historicos:
+        # Totales inconsistentes: ALL debe ser >= ACTIVE. Suele ser un estimated_total_count
+        # desactualizado entre las dos llamadas. Sin esta guardia salía "supervivencia 125% —
+        # categoría sana" (caso malo probado 2026-08-24).
+        return {
+            "metrica": "cementerio",
+            "activos": activos,
+            "historicos": historicos,
+            "apagados": None,
+            "supervivencia_pct": None,
+            "lectura": "🚩 totales inconsistentes (activos > históricos) — repetir las dos llamadas limit:1, no concluir",
+        }
     apagados = historicos - activos
     pct = round(activos / historicos * 100, 1)
     if historicos < 30:

@@ -7,7 +7,9 @@ La segmentación NO se inventa cuando hay datos. Dos caminos según haya o no hi
 - **Público amplio** (Advantage+ Audience) — deja que el algoritmo encuentre; en COD rinde más que estrecho.
 - **Edad/sexo** por el **buyer persona** de la investigación (marcado como hipótesis a validar).
 - **Ubicaciones**: país + ciudades con **cobertura COD**; excluir zonas sin reparto.
-- Intereses solo como "pista" (con IDs reales vía `ads_targeting_search`; NO inventar IDs).
+- Intereses solo como "pista" y con IDs REALES — NO inventar IDs. El MCP de Meta conectado NO trae
+  tool de búsqueda de intereses (verificado 2026-08-24): los IDs se buscan en la UI de Ads Manager
+  (segmentación detallada) o se omiten los intereses (en COD el público amplio rinde más).
 - Es una hipótesis: el testeo (Modo B) la valida y luego se ajusta con lo que compre.
 
 ## B) CON histórico → basar la segmentación en QUIÉN COMPRA (no quién ve)

@@ -1,16 +1,23 @@
 #!/usr/bin/env python3
 """
 GOLDEN PDF · selftest.py
-Prueba de regresión de la skill: 13 comprobaciones sobre PDFs construidos de
-verdad (nada simulado). Hay una prueba por cada versión que cambió el
+Prueba de regresión de la skill: **15 comprobaciones** sobre PDFs construidos
+de verdad (nada simulado). Hay una prueba por cada versión que cambió el
 comportamiento, para que una regresión no pase en verde:
 
-  1. Construye sin errores · 2. Cuenta de tarjetas · 3. COMPUERTA VERBATIM
-  (texto idéntico) · 4. ANTI-CORTE (nada al filo del borde) · 5. Motor con
-  numeración · 6. Fuente de marca incrustada · 7-8. Detectores ADVERSARIALES
-  (un PDF feo y uno cortado DEBEN ser cazados) · 9. Anti-falso-positivo: dos
-  tarjetas seguidas no son un corte · 10-11. Figuras (v5.6) · 12. Bloque con
-  estilo ::: (v5.7) · 13. Aviso de líneas largas (v5.8).
+  1. Construye sin errores · 2. Salida JSON válida · 3. Cuenta de tarjetas ·
+  4. COMPUERTA VERBATIM (texto idéntico) · 5. ANTI-CORTE (nada al filo del
+  borde) · 6. Motor con numeración · 7. Fuente de marca incrustada ·
+  8-9. Detectores ADVERSARIALES (un PDF feo y uno cortado DEBEN ser cazados) ·
+  10. Anti-falso-positivo: dos tarjetas seguidas no son un corte ·
+  11-12. Figuras (v5.6) · 13. Bloque con estilo ::: (v5.7) · 14. El aviso de
+  líneas largas dispara cuando debe (v5.8) · 15. …y la muestra oficial NO lo
+  dispara (el fixture cumple la regla que la skill enseña).
+
+La cifra de arriba es la que imprime una corrida SANA, y es la que va en el
+sello del changelog. Si agregas una prueba, actualiza el número aquí y verifica
+contándolo en la salida — nunca de memoria: una prueba que solo se registra
+cuando falla infla el sello sin ser reproducible (así nació este arreglo).
 
 Regla de la casa: toda versión que cambie comportamiento entra con su prueba
 aquí. Si tocas el CSS, el parser o el auto-fit, corre esto antes de usar la
@@ -66,9 +73,14 @@ def main():
     if not built:
         report(results); sys.exit(1)
 
+    # La prueba se registra en LOS DOS caminos. Si el PASS solo existiera en la
+    # rama de error, la corrida sana mostraría una prueba menos que la sellada y
+    # la cifra del changelog no sería reproducible (hallazgo del barrido D del
+    # CdM, 2026-08-23): una cifra mal contada es peor que ninguna.
     data = {}
     try:
         data = json.loads(r.stdout.strip().splitlines()[-1])
+        results.append(("Salida JSON válida", True, ""))
     except Exception as e:
         results.append(("Salida JSON válida", False, str(e)))
         report(results); sys.exit(1)

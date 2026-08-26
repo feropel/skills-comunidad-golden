@@ -20,6 +20,30 @@ description: |
 
 # golden-chatea-auditoria · la salud de un espacio de Chatea Pro
 
+<!-- skill v1.7 (GCA1.7) — 2026-08-26 — auditoria fresca (el numero v1.6 ya
+lo habia tomado otro chat el mismo dia con sus propios cambios; esta entrada es POSTERIOR). Tres defectos, dos de ellos de la
+MISMA clase que la skill ya habia arreglado en otro sitio y cuyo GEMELO nadie busco.
+(1) 🔴 LA SEVERIDAD IGNORABA EL `estado` DE LA ENTRADA: 8 de los 14 hallazgos del bloque D
+gritaban sin mirarlo, 5 de ellos en rojo. Medido en Golden y reportado por la verificacion
+adversarial: 4 de las 5 entradas del disparador de Remarketing estan `inactivo` en el servidor y
+salieron en 🔴 igual — la evidencia hasta imprimia "estado 'inactivo'" y el codigo no lo leia. El
+cuadro real no era "el disparador entero roto" sino UNA entrada activa mal cableada y cinco
+apagadas de basura. Es el gemelo exacto de la regla que ya existia para los huerfanos (la
+severidad la decide el negocio, no la estructura). Helpers `activa` / `sev_segun_estado` /
+`nota_estado`, y las entradas al vacio se separan en ACTIVAS (rojo) e INACTIVAS (duda de
+limpieza). (2) 🔴 EL LIBRO DE DECISIONES SE ROMPIO HACIA ATRAS EN SILENCIO: la huella corta
+`::hash` que se anadio para que una decision no silenciara 5 hallazgos a la vez cambio la forma
+de la clave, y 4 de las 6 decisiones ya escritas dejaron de casar — sus hallazgos volvieron a
+gritar como si nadie los hubiera resuelto. Una clave que cambia de forma con una mejora del
+codigo no es una clave estable, y el libro entero vale por su estabilidad. Ahora se aceptan las
+DOS formas: FINA (`control|campo::huella`, silencia uno) y AMPLIA (`control|campo`, silencia
+todos los de ese campo), y el informe AVISA cuando una decision amplia silencia mas de uno.
+(3) 🟡 A4 leia mal su propio endpoint: `/workspace-settings/channels` dice que canales estan
+DISPONIBLES en el plan (1/0), no si estan conectados. `apple: 0` — un canal que el plan de
+Golden no incluye y que ningun asistente usa — salia en 🔴 MUERTO. Ahora solo dispara si falta
+un canal REQUERIDO (whatsapp, whatsapp_cloud, facebook, instagram) y declara que la conexion
+viva se mira en el panel, que es lo que ya dice A5. Autoprueba: 30 defectos + 12 pruebas de
+comportamiento (EST y LIB nuevas). -->
 <!-- skill v1.6 (GCA1.6) — 2026-08-25 — verificacion adversarial (golden-verificador) contra el
 espacio REAL de Golden Colombia (fXXXXXX): ocho hallazgos, los ocho con su caso malo sembrado
 en autoprueba.py ANTES de arreglar el codigo. (1) A4 no evaluaba NINGUN canal real: el endpoint
@@ -124,7 +148,7 @@ numérico. Ver detalle completo debajo. -->
 skill nació sin CHANGELOG y sin número, y sin versión el censo diario no puede ver que alguien
 la editó. -->
 
-**Versión:** `GCA1.6`
+**Versión:** `GCA1.7`
 
 Auditar aquí significa **medir el estado real del servidor contra el estándar**, no leer la
 configuración y opinar. Nada se da por bueno sin haberlo contado, y el informe se entrega en

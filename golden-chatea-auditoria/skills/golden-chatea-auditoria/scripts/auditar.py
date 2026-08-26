@@ -186,11 +186,26 @@ class Auditoria:
             "clave": clave, "campo": campo, "skill_duena": skill_duena,
         }
         # El libro de decisiones: lo que el dueno ya resolvio no se vuelve a gritar.
+        #
+        # Se acepta la clave en DOS formas, y las dos son legitimas:
+        #   FINA   `control|campo::huella` — silencia UN hallazgo concreto.
+        #   AMPLIA `control|campo`         — silencia TODOS los de ese campo/control.
+        # Sin esta doble lectura, anadir la huella corta rompio EN SILENCIO todas las
+        # decisiones ya escritas: medido el 2026-08-25, 4 de las 6 decisiones del libro de
+        # Golden dejaron de casar y sus hallazgos volvieron a gritar como si nadie los
+        # hubiera resuelto. Una clave que cambia de forma con una mejora del codigo no es
+        # una clave estable, y el libro entero vale por su estabilidad.
         d = self.decisiones.get(clave)
+        forma = "fina"
+        if d is None:
+            d = self.decisiones.get(clave_base)
+            forma = "amplia"
         if d:
             h["severidad_original"] = sev
             h["severidad"] = "DECIDIDO"
             h["decision"] = d
+            h["decision_forma"] = forma
+            h["clave_decidida"] = clave if forma == "fina" else clave_base
         self.hallazgos.append(h)
 
     def cubre(self, control, estado, revisados=None, nota=""):
@@ -331,42 +346,37 @@ class Auditoria:
         self.cubre("A3", "corrido", len(monedas) + 1,
                    f"pais {pais.strip() or '(vacio)'} contra {sorted(monedas)}")
 
-        # A4 · los canales, uno por uno (no basta con que el endpoint responda)
-        # El endpoint real viene ANIDADO bajo `data` y con ENTEROS (0/1), no booleanos ni
-        # strings "connected"/"active": `{"data":{"whatsapp":1,"apple":0,...},"status":"ok"}`.
-        # La version vieja solo reconocia booleanos o esos strings, asi que ningun canal real
-        # matchea nunca — lo unico que disparaba era el `status:"ok"` del SOBRE HTTP, que no es
-        # un canal. Medido contra Golden Colombia (fXXXXXX): 0 canales reales evaluados, 1
-        # "conectado" fantasma (el status del sobre).
+        # A4 · los canales. OJO CON LO QUE MIDE ESTE ENDPOINT: devuelve que canales estan
+        # DISPONIBLES en el plan (1 disponible / 0 no), NO si estan conectados y vivos. Leer
+        # el 0 como "canal caido" es un falso positivo medido: Golden tiene `apple: 0` — un
+        # canal que su plan no incluye y que ningun asistente usa — y salio en 🔴 MUERTO.
+        # La conexion VIVA no la expone la API: se mira en el panel, y eso ya lo declara A5.
+        REQUERIDOS = ("whatsapp", "whatsapp_cloud", "facebook", "instagram")
         canales = self.d.get("/workspace-settings/channels")
-        conectados, caidos = [], []
-        if isinstance(canales, dict):
-            cuerpo = canales.get("data") if isinstance(canales.get("data"), dict) else canales
-            for ruta, hoja in self.caminar(cuerpo):
-                llave = ruta.split(".")[-1]
-                if llave in ("status", "message", "success"):   # el sobre HTTP, no un canal
+        disponibles, no_disponibles = [], []
+        if canales:
+            for ruta, hoja in self.caminar(canales):
+                nombre = ruta.split(".")[-1]
+                if nombre in ("status",) or not isinstance(hoja, (int, bool)):
                     continue
-                if isinstance(hoja, bool):
-                    conectado = hoja
-                elif isinstance(hoja, int):
-                    conectado = hoja != 0
-                elif str(hoja).lower() in ("connected", "verified", "active", "ok", "1"):
-                    conectado = True
-                elif str(hoja).lower() in ("disconnected", "expired", "invalid", "failed",
-                                           "0", "false"):
-                    conectado = False
-                else:
-                    continue
-                (conectados if conectado else caidos).append(
-                    ruta if conectado else f"{ruta}={hoja}")
-        for c in caidos:
-            self.falla("A4", "MUERTO", "Hay un canal caido o desconectado", str(c),
-                       "El asistente que dependa de ese canal esta muerto, y la config "
-                       "se ve perfecta.")
-        self.universo["canales"] = {"conectados": len(conectados), "caidos": len(caidos)}
+                (disponibles if hoja else no_disponibles).append(nombre)
+        faltan_req = [c for c in REQUERIDOS if c in no_disponibles]
+        if faltan_req:
+            self.falla("A4", "MUERTO",
+                       "Un canal que los asistentes NECESITAN no esta disponible en el plan",
+                       f"{faltan_req} · disponibles: {len(disponibles)}",
+                       "El asistente que dependa de ese canal no puede operar.",
+                       "Revisar el plan del workspace en el panel.",
+                       objetivo="canal-requerido")
+        self.universo["canales"] = {
+            "disponibles en el plan": len(disponibles),
+            "no disponibles": ", ".join(no_disponibles) or "ninguno",
+            "requeridos presentes": f"{len(REQUERIDOS) - len(faltan_req)} de {len(REQUERIDOS)}"}
         self.cubre("A4", "corrido" if canales else "sin_datos",
-                   len(conectados) + len(caidos),
-                   "canales inspeccionados uno a uno" if canales else "el endpoint no devolvio datos")
+                   len(disponibles) + len(no_disponibles),
+                   "disponibilidad en el plan; la conexion VIVA se mira en el panel (A5)"
+                   if canales else "el endpoint no devolvio datos")
+
         self.cubre("A5", "NO_VERIFICADO",
                    nota="el token de Meta se comprueba en el panel; la API no lo expone")
 
@@ -666,10 +676,11 @@ class Auditoria:
                     continue
                 destino = (e.get("name") or "").strip()
                 if not destino:
-                    self.falla("D3", "MUERTO",
+                    self.falla("D3", self.sev_segun_estado(e, "MUERTO"),
                                f"`{nombre_disp}`: hay una entrada SIN destino",
                                f"entrada {i}: {json.dumps(e, ensure_ascii=False)[:160]}",
-                               "Un disparo que entra por ahi no lleva a ningun producto.")
+                               "Un disparo que entra por ahi no lleva a ningun producto."
+                               + self.nota_estado(e))
                     continue
                 registrados[destino] = e
                 registrados_todos.setdefault(destino, []).append(nombre_disp)
@@ -687,10 +698,11 @@ class Auditoria:
                                    "O el estandar de 7 esta viejo o el valor esta malformado: "
                                    "se confirma en el panel antes de tocarlo.")
                     if etiqueta == "keyW" and not valor.strip(", "):
-                        self.falla("D3", "MUERTO",
+                        self.falla("D3", self.sev_segun_estado(e, "MUERTO"),
                                    f"`{nombre_disp}` → `{destino}`: la palabra clave esta VACIA",
                                    f"{valor!r} · estado {e.get('estado')!r}",
-                                   "Una entrada activa sin palabra clave no puede entrar.")
+                                   "Una entrada activa sin palabra clave no puede entrar."
+                                   + self.nota_estado(e))
 
                 # D2 · caracteres de 4 bytes
                 for etiqueta in ("keyW", "idAd"):
@@ -707,12 +719,22 @@ class Auditoria:
 
             # D3 · entradas que apuntan al vacio
             al_vacio = sorted(set(registrados) - cargados, key=self.orden_ranura)
-            if al_vacio:
+            vivas = [n for n in al_vacio if self.activa(registrados[n])]
+            apagadas = [n for n in al_vacio if not self.activa(registrados[n])]
+            if vivas:
                 self.falla("D3", "MUERTO",
-                           f"`{nombre_disp}`: {len(al_vacio)} de {len(registrados)} entradas "
-                           "apuntan a un campo vacio o inexistente",
-                           f"{al_vacio}",
+                           f"`{nombre_disp}`: {len(vivas)} de {len(registrados)} entradas "
+                           "ACTIVAS apuntan a un campo vacio o inexistente",
+                           f"{vivas}",
                            "El disparo entra y no encuentra producto.")
+            if apagadas:
+                self.falla("D3", "DUDA",
+                           f"`{nombre_disp}`: {len(apagadas)} de {len(registrados)} entradas "
+                           "INACTIVAS apuntan a un campo vacio o inexistente",
+                           f"{apagadas}",
+                           "Estan apagadas, asi que hoy no disparan ni cuestan nada. Es "
+                           "basura de configuracion: limpieza, no urgencia.",
+                           "Borrarlas o repuntarlas cuando se vayan a encender.")
 
             # D1/D4 · contra el producto, cuando existe
             for destino, e in registrados.items():
@@ -742,7 +764,7 @@ class Auditoria:
                                    "faltan de un lado no disparan.",
                                    "Igualar las dos listas byte a byte.")
                     else:
-                        self.falla("D1", "MUERTO",
+                        self.falla("D1", self.sev_segun_estado(e, "MUERTO"),
                                    f"`{destino}`: la palabra clave PRINCIPAL difiere entre "
                                    "sus dos sitios",
                                    f"en el producto: {act!r}\n     en el disparador: {key!r}\n"
@@ -822,6 +844,30 @@ class Auditoria:
                    nota="el ns del subflujo detras del disparador se cruza en el panel")
         self.cubre("D8", "NO_VERIFICADO",
                    nota="la palabra clave contra el texto real del anuncio necesita el creativo")
+
+    @staticmethod
+    def activa(entrada):
+        """Una entrada del disparador cuenta como viva solo si su estado dice activo.
+
+        Sin esto, el auditor grita MUERTO por entradas que estan APAGADAS a proposito. Medido
+        en Golden el 2026-08-25 y reportado por la verificacion adversarial: 4 de las 5
+        entradas del disparador de Remarketing estan `inactivo` en el servidor y salieron en
+        rojo igual — la evidencia hasta imprimia "estado 'inactivo'" y el codigo no lo miraba.
+        Es el gemelo de la regla que ya existia para los huerfanos (la severidad la decide el
+        negocio, no la estructura) y que no se busco al arreglarla la primera vez.
+        """
+        return str((entrada or {}).get("estado") or "").strip().lower() == "activo"
+
+    @staticmethod
+    def sev_segun_estado(entrada, sev_si_viva):
+        """Rojo solo si la entrada esta viva; apagada, es una duda de limpieza."""
+        return sev_si_viva if Auditoria.activa(entrada) else "DUDA"
+
+    @staticmethod
+    def nota_estado(entrada):
+        return "" if Auditoria.activa(entrada) else \
+            " (la entrada esta INACTIVA: no dispara, asi que hoy no cuesta nada; " \
+            "es limpieza, no urgencia)"
 
     @staticmethod
     def orden_ranura(n):
@@ -1336,6 +1382,15 @@ def imprimir(a):
 
     if decididos:
         print(f"\nYA DECIDIDO POR EL DUENO ({len(decididos)}) · no se vuelve a levantar")
+        # Una decision AMPLIA que silencia varios hallazgos se declara: silenciar de mas
+        # sin avisar es el abuso que el libro podria habilitar.
+        from collections import Counter
+        amplias = Counter(h.get("clave_decidida") for h in decididos
+                          if h.get("decision_forma") == "amplia")
+        for c, n in amplias.items():
+            if n > 1:
+                print(f"  aviso: la decision AMPLIA `{c}` silencia {n} hallazgos a la vez. "
+                      "Para silenciar solo uno, escribe su clave completa con `::`.")
         for h in decididos:
             d = h["decision"]
             print(f"  ⚪ {h['control']} · {h['titulo']}")

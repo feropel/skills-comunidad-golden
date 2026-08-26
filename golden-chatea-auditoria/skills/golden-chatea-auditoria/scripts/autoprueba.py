@@ -154,6 +154,12 @@ def espacio_roto():
         {"producto": "SIN DESTINO", "name": "", "keyW": "cla, , , , , , ",
          "idAd": ",,,,,,", "estado": "activo"},
     ]
+    # --- ESTADO: una entrada APAGADA no puede estar MUERTA. Caso real medido en Golden el
+    # 2026-08-25: 4 de las 5 entradas del disparador de Remarketing estaban `inactivo` y el
+    # auditor las grito en rojo igual. La de abajo esta inactiva y con la clave vacia: tiene
+    # que salir DUDA, no MUERTO. La de arriba (28) esta activa y si es roja.
+    segundo.append({"producto": "APAGADA", "name": "[Producto Ventas Wp] 33",
+                    "keyW": ",,,,,,", "idAd": ",,,,,,", "estado": "inactivo"})
     campos.append(campo("[Remarketing IA] Disparador de productos", segundo, "array"))
 
     campos.append(campo("[Ventas Wp] Disparador de productos Extendido",
@@ -272,7 +278,7 @@ ESPERADOS = {
     "G2": "la integracion de Shopify apunta a un dominio ajeno",
     "G3": "credencial guardada como valor de un campo",
     "A3": "pais declarado que no concuerda con la moneda de los productos",
-    "A4": "un canal caido o desconectado",
+    "A4": "un canal REQUERIDO no disponible (y apple=0 NO debe disparar)",
     "F13": "signos de apertura y marcador dentro de las tareas de IA",
     "I3": "zonas del DUMP que no mira ningun control",
     "B3": "campos que no pertenecen a ningun asistente",
@@ -403,6 +409,40 @@ def main():
         print(f"  FALLA CLV  {len(f3_p9)} hallazgos comparten {len(claves_p9)} clave(s): "
               "una decision silenciaria mas de uno")
         faltan.append("clave-colision")
+
+    # --- prueba 4c: la severidad respeta el ESTADO de la entrada.
+    h = Auditoria(espacio_roto()); h.correr()
+    d3 = [x for x in h.hallazgos if x["control"] == "D3"]
+    apagada = [x for x in d3 if "INACTIVAS" in x["titulo"] or "33" in x["evidencia"]]
+    rojo_vivo = [x for x in d3 if x["severidad"] == "MUERTO" and "ACTIVAS" in x["titulo"]]
+    mal = [x for x in d3 if x["severidad"] == "MUERTO"
+           and ("INACTIVA" in x["titulo"] or "] 33" in x["evidencia"])]
+    if apagada and rojo_vivo and not mal:
+        print("  OK    EST  entrada activa = rojo · entrada apagada = duda, nunca rojo")
+    else:
+        print(f"  FALLA EST  apagada={len(apagada)} rojo_vivo={len(rojo_vivo)} en_rojo_mal={len(mal)}")
+        faltan.append("severidad-por-estado")
+
+    # --- prueba 4d: el libro acepta clave AMPLIA y clave FINA.
+    # La huella corta `::hash` se anadio para no silenciar 5 hallazgos con una decision; el
+    # efecto colateral fue romper las decisiones ya escritas (medido: 4 de 6 dejaron de casar).
+    k = Auditoria(espacio_roto()); k.correr()
+    finas = [x["clave"] for x in k.hallazgos if "::" in x["clave"]]
+    assert finas, "el fixture ya no produce claves finas"
+    base = finas[0].split("::")[0]
+    amplia = Auditoria(espacio_roto())
+    amplia.decisiones = {base: {"motivo": "m", "fecha": "2026-01-01", "reabrir_si": "r"}}
+    amplia.correr()
+    fina = Auditoria(espacio_roto())
+    fina.decisiones = {finas[0]: {"motivo": "m", "fecha": "2026-01-01", "reabrir_si": "r"}}
+    fina.correr()
+    n_amplia = sum(1 for x in amplia.hallazgos if x["severidad"] == "DECIDIDO")
+    n_fina = sum(1 for x in fina.hallazgos if x["severidad"] == "DECIDIDO")
+    if n_amplia >= 1 and n_fina == 1:
+        print(f"  OK    LIB  clave amplia silencia {n_amplia} · clave fina silencia exactamente 1")
+    else:
+        print(f"  FALLA LIB  amplia={n_amplia} fina={n_fina} (la amplia debe cubrir, la fina una)")
+        faltan.append("libro-clave-amplia")
 
     # --- prueba 5: degradacion elegante. Un endpoint que respondio con error NO puede
     # tumbar la auditoria entera: un 500 puntual de la API costaria el informe completo.

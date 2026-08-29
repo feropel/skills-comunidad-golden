@@ -3,6 +3,66 @@
 Registro de versiones de la skill. Cada vez que se absorbe una mejora de una página
 real, se sube una versión aquí (ver el ritual de auto-mejora en SKILL.md).
 
+## G4.7 — 2026-08-28 — Regla 0-F: umbral de rentabilidad antes de la escalera (capacidad asimetrica)
+Fila del Centro de Mando (analisis de capacidad asimetrica): esta skill **escribe precios y arma la
+escalera de combos** pero tenia **CERO menciones de breakeven** (medido: 0 apariciones en los 76
+archivos), mientras `golden-ads` lo calcula en cada cuenta. Consecuencia: la skill podia proponer un
+"3 unidades por X" bajo el punto de equilibrio, y eso **no se descubre en la pagina — se descubre con
+la pauta ya pagada**. Misma familia que G4.6 (plata que se pierde despues de pagar el clic), pero al
+reves: alli el pedido no se podia despachar; aqui se despacha y se pierde en cada uno.
+- **Nuevo `references/breakeven-combos.md`**: el criterio se HEREDA de golden-ads (breakeven CPA =
+  margen bruto por unidad; breakeven ROAS = precio / margen bruto, ajustado por tasa de entrega en COD)
+  — no se reinventa formula. Aporte propio: la aritmetica de la ESCALERA en COD, que es lo que golden-ads
+  no cubre porque no arma precios: **el flete se paga por PEDIDO, no por unidad** (por eso la 2a y 3a
+  unidad dejan mas margen — ese es el motor real del combo), pero **la devolucion golpea el pedido
+  completo** (por eso el ajuste por entrega pega mas fuerte en el escalon mas descontado).
+- **Regla 0-F** en reglas-de-oro.md + **umbral en la cabecera de `sec-combos.liquid`**: sin costo, flete
+  y tasa de entrega reales, los precios quedan en `[confirmar]` y la seccion NO se publica.
+- Los 3 chequeos por escalon: margen > 0 ajustado por entrega · sube el margen absoluto por pedido ·
+  deja aire para el CPA. El que no pasa, sube de precio o se elimina.
+- Se entrega el **CPA maximo rentable por escalon**, para que la pauta arranque con la linea trazada.
+- Numeracion censada antes de numerar (ley del numero de regla): 0 a 0-E ocupados, sin duplicados → 0-F.
+- 🟡 Auto-hallazgo del turno: el sello de G4.6 y su entrada citaban "Regla 0-D" cuando la regla quedo
+  numerada **0-E** tras la auto-correccion — un puntero que manda al numero equivocado hace la regla
+  invisible igual que un duplicado. Corregido DENTRO de este turno (norma del CdM: reparar lo propio
+  antes de devolver el turno va con el MISMO numero). Clase: **la ley del numero de regla no termina al
+  numerar — hay que repasar quien CITA ese numero.**
+
+## G4.6 — 2026-08-28 — REGLA 0-E: la orden tiene que poder despacharse (cosecha de produccion)
+Hallazgo REAL medido sobre ordenes en vivo de una tienda COD: paginas que convierten pero generan
+ordenes que el fulfillment RECHAZA ("no se pueden agregar variaciones duplicadas del mismo producto").
+Dos causas distintas, ambas verificadas en las lineas de las ordenes:
+1. **Misma variante en dos lineas separadas** (mismo variant id, mismo precio) porque el order bump
+   crea linea nueva en vez de sumar cantidad → debe ser UNA linea con cantidad 2.
+2. **Dos productos distintos compartiendo el mismo SKU** (un producto suelto y una variante del
+   multi-variante) → aguas abajo se leen como el mismo item duplicado.
+Causa de fondo: Shopify permite el mismo producto en varias lineas; los sistemas COD modelan la orden
+como UNA fila por (producto, variacion) con cantidad. Horneado como **Regla 0-E** en reglas-de-oro.md
++ advertencia operativa en la cabecera de `sec-combos.liquid` (que es SOLO visual: quien materializa
+el combo es Releasit/el bump, y ahi es donde se decide si la orden se puede despachar).
+🟡 Auto-hallazgo del mismo turno: la regla nueva nacio como **0-D**, numero que YA ocupaba otra regla
+vigente (claims en bloques adyacentes, G3.17, escrita por otro chat) → renumerada a **0-E** antes de
+cerrar el turno; la anterior conserva su numero por antiguedad. Y la fecha del caso estaba escrita a
+mano (26) cuando la medida era otra → corregida con `date`. Clase: **antes de numerar una regla, mirar
+que numeros ya existen** — el mismo defecto que la ley del numero de version, un nivel mas abajo.
+Regla practica: **un combo = una variante con SKU propio**, el bump SUMA CANTIDAD, y ningun SKU se
+comparte entre productos. Nota: fusionar lineas en una orden ya creada la destraba pero genera orden
+FANTASMA en el fulfillment (cambia el id, la vieja cuenta doble) — por eso se previene en la pagina.
+
+## G4.5e — 2026-08-26 — Titularidad de la fábrica declarada en el SKILL.md
+- 🟡 **La fábrica de esta skill vivía SOLO en memoria** (`project_golden_shopify_chat_fabrica`) y el
+  SKILL.md no la declaraba → `REGISTRO-FABRICAS.md` la listaba como "sin fábrica declarada / titularidad
+  del CdM", lo que bajo la **Ley del Cambio Único** habría convertido a su propia fábrica en "fábrica
+  ajena" (obligada a entregar filas en vez de reparar) y habría dejado creer a cualquier otro chat que
+  podía editarla. Arbitrado por el CdM: manda la regla de FER. **Declarado en el SKILL.md:**
+  `Fábrica: chat ✅ SKILL golden-shopify` + "solo la fábrica numera esta skill" (ley del número de versión).
+- 🟡 Auto-hallazgo del mismo bump: la nota de los DOS EJES declaraba una foto ("Hoy: skill G4.5d · "
+  "GFS_VERSION G4.5") que el propio bump a G4.5e dejó vieja al instante → reescrita **version-agnóstica**
+  (cada eje se lee de su fuente, no de la nota). Una nota que cita versiones envejece sola: la clase es
+  *no guardar fotos de estado en texto durable*.
+- Adopción de la **Ley del Cambio Único**: bump de versión en el MISMO comando que el cambio (esta
+  entrada y el sello se escribieron en un solo comando), y reporte al CdM con md5 + conteo + hora medida.
+
 ## G4.5d — 2026-08-24 — Dos filas del verificador de cierre
 - 🔴 **FECHA MENTIDA en el sello:** SKILL.md y el changelog declaraban "2026-08-23" para rondas que se
   escribieron el **2026-08-24 22:13** (medido por mtime). **Causa raíz:** la fecha se tomó del contexto

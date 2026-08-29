@@ -417,7 +417,7 @@ def build_html(meta, body_md, with_index=True, logo_path=None, theme_css=None):
 # ---------------- render a PDF ----------------
 def footer_template(label="Comunidad Golden"):
     return (
-        '<div style="width:100%;font-size:8px;color:#9a7b1e;'
+        '<div style="width:100%;font-size:8px;color:#8a6d1f;'
         'font-family:Helvetica,Arial,sans-serif;padding:0 15mm;'
         'display:flex;justify-content:space-between;align-items:center;">'
         "<span>" + html.escape(label) + "</span>"

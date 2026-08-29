@@ -20,8 +20,11 @@ description: >-
   custom_liquid. NO usar para análisis de anuncios ni temas no-Shopify.
 ---
 # GOLDEN SHOPIFY (`golden-shopify`)
+<!-- skill G4.7 · 2026-08-28 (fila del CdM, capacidad asimetrica): REGLA 0-F — umbral de rentabilidad ANTES de escribir la escalera de combos. La skill escribia precios con CERO menciones de breakeven mientras golden-ads lo mide en cada cuenta: un combo bajo el punto de equilibrio se descubria con la pauta ya pagada. Nuevo references/breakeven-combos.md (criterio heredado de golden-ads + aritmetica COD: flete por pedido, devolucion golpea el pedido completo) + umbral en sec-combos.liquid. -->
+<!-- skill G4.6 · 2026-08-28 (cosecha de produccion): REGLA 0-E — la orden tiene que poder DESPACHARSE. Combos = variante con SKU propio, el bump SUMA CANTIDAD y ningun SKU se comparte entre productos: los sistemas COD modelan una fila por (producto,variacion) y rechazan variaciones duplicadas. Advertencia operativa tambien en sec-combos.liquid. -->
+<!-- skill G4.5e · 2026-08-26 (turno concedido por el CdM, Ley del Cambio Unico): la titularidad de la fabrica se declara en el propio SKILL.md ('Fabrica: chat SKILL golden-shopify') y ya no vive solo en memoria — cierra el hueco que tenia el registro listado como fila abierta. -->
 <!-- skill G4.5d · 2026-08-24 (verificador de cierre): fechas de sello corregidas con mtime MEDIDO (la ronda cruzó de día: base el 23, reestructura el 24) y el Paso 0 ya declara DÓNDE vive el cerebro (PROYECTOS/BRAND-BRAINS/<MARCA>/, resolución exacta por golden-brand-brain). Regla que deja: la fecha de un sello se MIDE, nunca se hereda del contexto. -->
-<!-- DOS EJES DE VERSIÓN (no confundir, no son desincronía): (a) VERSIÓN DE LA SKILL = este sello + references/changelog.md, con sufijos a/b/c/d por ronda de auditoría; (b) GFS_VERSION = lo que se estampa en la PÁGINA GENERADA (config-center + componentes/00 + product.base.json), y solo sube cuando cambia lo que la página produce. Hoy: skill G4.5d · GFS_VERSION G4.5. Al bumpear, tocar TODAS las caras del eje que cambió. -->
+<!-- DOS EJES DE VERSIÓN (no confundir, no son desincronía): (a) VERSIÓN DE LA SKILL = este sello + references/changelog.md, con sufijos a/b/c/d por ronda de auditoría; (b) GFS_VERSION = lo que se estampa en la PÁGINA GENERADA (config-center + componentes/00 + product.base.json), y solo sube cuando cambia lo que la página produce. La versión VIGENTE de cada eje se lee de su fuente, no de esta nota: la de la skill en el sello de arriba + references/changelog.md, y GFS_VERSION en assets/config-center.liquid. Al bumpear, tocar TODAS las caras del eje que cambió (y ninguna del otro). -->
 <!-- skill G4.5c · 2026-08-24 (barrido D del CdM): starter Horizon _golden-trust.liquid dejó de ser huérfano (citado en horizon-bloques.md §3.1) y examples/ se movió a references/examples/ con sus 17 citas reescritas — árbol de primer nivel ya canónico. -->
 <!-- skill G4.5b · 2026-08-24 (auditoría golden-skill-auditor, reparación): DEUDA CERRADA — product.base.json regenerado del orden viejo de 17 al embudo canónico de 24 (21 + 3 de sistema) con los componentes ya existentes; sellos GFS_VERSION sincronizados (estaban en 3 versiones a la vez: SKILL G4.4 / config G4.3 / base G3.14 → todos G4.5); '## Paso 0 Cerebro de marca' estaba ENCIMA del H1 → movido debajo; SKILL.md 623→491 líneas sacando el PROTOCOLO TEMA VIVO duplicado a references/tema-vivo.md y la tabla del embudo a references/embudo-canonico.md; puntero muerto a 'línea ~460' → apunta a archivo; contradicción Ignition-en-el-main corregida. Detalle en references/changelog.md G4.5. -->
 <!-- skill G4.5 · 2026-08-23: Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
@@ -49,6 +52,8 @@ seguridad por tiempo; detalle completo en references/changelog.md · G4.3 · 202
 > Se pueden LEER y usar libremente, pero **NO se editan desde fuera de la "fábrica"** (el chat del
 > usuario dedicado a mejorar la skill). Prohibido a otras sesiones/linters/absorciones modificarla.
 > Para cambiarla: el usuario la desbloquea en la fábrica, se edita, y se vuelve a bloquear.
+> **Fábrica: chat `✅ SKILL golden-shopify`** — titularidad declarada aquí, no solo en memoria
+> (REGISTRO-FABRICAS.md). Solo la fábrica numera esta skill (ley del número de versión).
 
 <!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leian el cerebro de marca — esta entra a la familia que SI lo lee. Bloque identico en las 6 del CdM + fila a la fabrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
 ## Paso 0 · Cerebro de marca (obligatorio antes de generar)
@@ -461,6 +466,7 @@ y NUNCA reintroducir nombres reales** (usar descriptores de categoría; la skill
 **Pasos detallados en `references/operacion.md` (C).**
 
 ## Archivos de esta skill
+- `references/breakeven-combos.md` — **Regla 0-F: umbral de rentabilidad ANTES de escribir la escalera de combos (criterio de golden-ads + aritmetica COD)**
 - `references/reglas-de-oro.md` — copy/legal + 12 reglas de oro + tabla de errores
 - `references/perfiles.md` — G4.0: los 2 perfiles (marca propia | catálogo-dropshipping): qué secciones entran en cada uno, qué tono y
 - `references/diferenciacion.md` — REGLA #1: palancas para que cada página sea distinta + chequeo antiespejo.

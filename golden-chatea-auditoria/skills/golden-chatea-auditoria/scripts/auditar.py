@@ -136,7 +136,9 @@ class Auditoria:
         self.productos = {}
         self._cache = {}
         self._vistos = set()
-        self.decisiones = {}     # clave -> {motivo, fecha, reabrir_si}
+        self.decisiones = {}     # clave -> {motivo, fecha, reabrir_si, evidencia_al_decidir}
+        self._reabiertos = []    # decisiones que caducaron porque la situacion cambio
+        self._sin_foto = []      # decisiones sin evidencia_al_decidir: no pueden caducar
         self.cambios = []        # diff contra la corrida anterior
 
     # ---------------------------------------------------------------- utilidades
@@ -201,11 +203,27 @@ class Auditoria:
             d = self.decisiones.get(clave_base)
             forma = "amplia"
         if d:
-            h["severidad_original"] = sev
-            h["severidad"] = "DECIDIDO"
             h["decision"] = d
             h["decision_forma"] = forma
             h["clave_decidida"] = clave if forma == "fina" else clave_base
+            # `reabrir_si` era PROSA que nadie evaluaba: solo se imprimia. La decision de los
+            # huerfanos dice "reabre si se les carga un id de anuncio" y el dia que se cargara,
+            # el hallazgo habria seguido silenciado — la promesa de que el libro no es una
+            # alfombra no la sostenia nada. Lo que el codigo SI puede verificar es si la
+            # SITUACION cambio: se guarda la evidencia del dia en que se decidio y se compara.
+            # Cubre el caso general (se cargo un anuncio, el campo crecio, aparecio otro
+            # producto) sin inventar un lenguaje de condiciones que nadie va a escribir bien.
+            antes = d.get("evidencia_al_decidir")
+            if antes is not None and antes.strip() != evidencia.strip():
+                h["severidad_original"] = sev
+                h["decision_caduca"] = True
+                h["evidencia_al_decidir"] = antes
+                self._reabiertos.append((h["clave_decidida"], antes, evidencia))
+            else:
+                h["severidad_original"] = sev
+                h["severidad"] = "DECIDIDO"
+                if antes is None:
+                    self._sin_foto.append(h["clave_decidida"])
         self.hallazgos.append(h)
 
     def cubre(self, control, estado, revisados=None, nota=""):
@@ -1379,6 +1397,18 @@ def imprimir(a):
             print(f"     consecuencia: {h['consecuencia']}")
         if h["accion"]:
             print(f"     accion: {h['accion']}")
+
+    if a._reabiertos:
+        print(f"\nDECISIONES QUE CADUCARON ({len(a._reabiertos)}) · la situacion cambio "
+              "desde que se decidieron, asi que el hallazgo VUELVE a contar")
+        for clave, antes, ahora in a._reabiertos:
+            print(f"  🔓 {clave}")
+            print(f"       cuando se decidio: {antes[:150]}")
+            print(f"       hoy:               {ahora[:150]}")
+    if a._sin_foto:
+        print(f"\n  aviso: {len(a._sin_foto)} decision(es) sin `evidencia_al_decidir` — NO "
+              "pueden caducar solas, quedan silenciadas hasta que alguien las revise a mano. "
+              "Anade ese campo con la evidencia del dia en que se decidio.")
 
     if decididos:
         print(f"\nYA DECIDIDO POR EL DUENO ({len(decididos)}) · no se vuelve a levantar")

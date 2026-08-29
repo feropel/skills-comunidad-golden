@@ -4,6 +4,13 @@ Objetivo: que los errores ya vistos (dar veredicto sin economics, campo inválid
 confundir moneda) sean imposibles de entregar. Verifica cada punto; si alguno falla, NO entregues.
 
 ## Diagnóstico (Modo A)
+- [ ] **SALUD DE SEÑAL revisada ANTES que el rendimiento** (`23`): CAPI activo, dedup ≥90%,
+      EMQ ≥8.0, <30% de conjuntos en Learning Limited, presupuesto del conjunto ≥5x CPA. Si la
+      señal está rota, TODO lo demás se está midiendo sobre datos falsos y hay que decirlo primero.
+- [ ] **Andromeda** (`23`): ¿los creativos del conjunto son CONCEPTOS distintos o variaciones del
+      mismo ángulo? Similarity >60% = supresión. Menos de 10 conceptos genuinos = bandera.
+- [ ] Si se declaró **fatiga por caída de CTR**: se verificó que no coincida con la redefinición
+      de link clicks de feb-2025 (`23`), que bajó el CTR sin empeorar el creativo.
 - [ ] Cuenta confirmada por `ads_get_ad_accounts` (id, **moneda**, estado, mcp_enabled, queryable).
 - [ ] Métricas leídas con **campos válidos** (chuleta `11`) y **rango de fechas** explícito.
 - [ ] **Unit economics resueltos** (`12`) o marcados `[PENDIENTE]` — y el veredicto absoluto se dio

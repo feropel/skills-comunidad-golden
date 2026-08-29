@@ -1,10 +1,11 @@
 ---
-<!-- adenda 2026-08-24 (centro de mando, barrido D del arsenal): (1) BASE DE RUTAS declarada — toda ruta relativa PROYECTOS/... de esta skill se resuelve contra la carpeta PROYECTOS del Desktop MASTER de la casa (~/Desktop/⭐️ MASTER ⭐️/🤖 IA/🟠 CLAUDE/🌐 PROYECTOS); un chat con otro cwd debe expandirla ahí. (2) Blindaje aplicado con el estándar de la casa (chflags uchg) — no había política declarada en contra. -->
 name: golden-chatea-pro-full-configuracion
-description: Golden Group — ORQUESTADOR MAESTRO de Chatea Pro. Configura de punta a punta TODOS los asistentes de un espacio de trabajo (Comentarios, Logístico, Ventas WhatsApp y Carritos) llamando a las skills hijas especializadas, y garantiza que queden coherentes entre sí (misma voz de marca, mismo país, mismos datos de producto). Úsala SIEMPRE que el usuario quiera montar o configurar CHATEA PRO COMPLETO / TODO el bot / TODOS los asistentes de una tienda ("configúrame todo chatea pro", "monta el bot completo", "arma todos los asistentes", "deja chatea pro listo"), INSTALARLE CHATEA A UN CLIENTE entregando datos del negocio y el token de un workspace ("instálale chatea a este cliente", "monta el bot de mi cliente", "aquí está el token del espacio"), o arreglar un espacio ya configurado o heredado de otra cuenta ("revisa y arregla el chatea de este cliente", "este workspace vino con datos de otra tienda"). Si solo quiere UN asistente puntual (solo comentarios, solo logístico, solo ventas, solo carritos), esta skill lo deriva a la hija que corresponde. NO genera ella misma los JSON ni los prompts: dirige, ordena y audita a las skills hijas.
+description: 'Golden Group — ORQUESTADOR MAESTRO de Chatea Pro. Configura de punta a punta TODOS los asistentes de un espacio de trabajo (Comentarios, Logístico, Ventas WhatsApp y Carritos) llamando a las skills hijas especializadas, y garantiza que queden coherentes entre sí (misma voz de marca, mismo país, mismos datos de producto). Úsala SIEMPRE que el usuario quiera montar o configurar CHATEA PRO COMPLETO / TODO el bot / TODOS los asistentes de una tienda ("configúrame todo chatea pro", "monta el bot completo", "arma todos los asistentes", "deja chatea pro listo"), INSTALARLE CHATEA A UN CLIENTE entregando datos del negocio y el token de un workspace ("instálale chatea a este cliente", "monta el bot de mi cliente", "aquí está el token del espacio"), o arreglar un espacio ya configurado o heredado de otra cuenta ("revisa y arregla el chatea de este cliente", "este workspace vino con datos de otra tienda"). Si solo quiere UN asistente puntual (solo comentarios, solo logístico, solo ventas, solo carritos), esta skill lo deriva a la hija que corresponde. NO genera ella misma los JSON ni los prompts, dirige, ordena y audita a las skills hijas.'
 ---
 
 # Golden · Chatea Pro — Full Configuración (orquestador maestro)
+<!-- adenda 2026-08-24 (centro de mando, barrido D del arsenal): (1) BASE DE RUTAS declarada — toda ruta relativa PROYECTOS/... de esta skill se resuelve contra la carpeta PROYECTOS del Desktop MASTER de la casa (~/Desktop/⭐️ MASTER ⭐️/🤖 IA/🟠 CLAUDE/🌐 PROYECTOS); un chat con otro cwd debe expandirla ahí. (2) Blindaje: la skill se re-blinda con chflags uchg al cerrar cada ronda. -->
+<!-- skill v1.5 · 2026-08-28 (verificación ADVERSARIAL con el agente golden-verificador: 54 de 67 requisitos del briefing cubiertos, 16 fallas → reparadas). Regla que confirma esta ronda: quien construye no verifica. Todo lo de abajo lo encontró un tercero que solo vio el estado final. 🔴 F1 "la plataforma acepta SOLO 7 países" era FALSO — el bundle vivo de la app enumera 10 (COLOMBIA, ARGENTINA, BRASIL, CHILE, ECUADOR, GUATEMALA, MEXICO, PANAMA, PARAGUAY, PERU), los tres "prohibidos" con metadata de primera clase: la skill hacía RECHAZAR instalaciones que la plataforma sí soporta, y de paso acusaba a validacion-direcciones de tener un guatemala.md ilegítimo que resultó legítimo. El briefing está desactualizado ahí. 🔴 F7 "vaciar SIEMPRE [Integraciones] Datos de integracion" no estaba acotado al modo: ejecutado en MODO B le borra al cliente sus tokens vivos de Dropi/Shopify/Meta y le tumba el bot, además de destruir la fuente de verdad que la propia skill usa para identificar su tienda — ahora vale SOLO al clonar hacia un espacio nuevo, JAMÁS en producción. 🔴 F2 "el Logístico no tiene tope en sus campos de texto" era FALSO: pago_anticipado.estrategia_persuasion tiene maxLength 2000 + slice(0,2000) — es la clase de truncado silencioso que la skill enseña a temer, y el validador de la casa ya lo sabía y la contradecía. 🔴 F8 la LEY mandaba grep de marca de origen y "si aparece algo NO se escribe", lo que prohibía escribir Le'côterra, que el encargo EXIGE: la excepción de la LEY ahora es también excepción del barrido (--excepcion). 🔴 F9 la skill mandaba correr verificacion_final.py sin argumentos: son 4 controles (no 5) y el de INTERRUPTORES solo corre con --referencia; sin él sale verde sin auditar ni uno. 🔴 F6 la sección de interruptores del briefing estaba en 0 de 2 y el único texto de la skill decía lo contrario ("respeta los booleans") — un prompt perfecto detrás de un evaluar_direccion:"no" no corre; nuevo PASO 2 bis. 🔴 F11 la sección "reinstalar rompe los disparadores" estaba en 0 de 3, incluida la palabra clave que vive en DOS bot fields y no arranca si difieren en un acento (informacion vs información) — que es justo el trabajo de coherencia del maestro. 🟡 F3/F4 topes 12.000 y 4.000 presentados como "extraídos del código" cuando no existen en el bundle (vienen de capturas), y el 500 atribuido a Comentarios cuando es de Ventas; ahora separados en MEDIDOS / NO MEDIDOS / SIN DOCUMENTAR, con los de Comentarios que faltaban (10.000 y 8.000). 🟡 F5 contradicción interna sobre si el tipo de un campo se cambia (UI vs crear nuevo) → regla única. 🟡 F10 tres umbrales para la misma regla: el validador NO falla a 19.000, solo avisa — el corte operativo lo aplica el orquestador. 🟡 F12 el par array/Extendido estaba en su versión ya desmentida (puede estar poblado de los DOS lados). 🟡 F16 el "60% / mínimo 3 órdenes" era cifra sin fuente y chocaba con feedback_efectividad_sin_umbral. 🟡 F14 el frontmatter no parseaba con YAML estándar (comentario HTML dentro del bloque --- y ": " en un escalar sin comillas) — 7 de 91 skills de la casa comparten el defecto. Añadido además el puente Dropi→Chatea (ficha de operación: novedades reales reescriben el prompt de captura; nunca el export crudo en un bot field) y declarados 3 pendientes con dueño del entregable (img del producto-ejemplo imposible solo por API, valor literal de estado inactivo, orden vaciar/cargar). PENDIENTES DE FUENTE, no de esta skill: TOPES-NATIVOS-POR-CAMPO.md arrastra F2 y F3, y BRIEFING-PARA-SKILLS.md arrastra F1 — hay que remedirlos, y las 6 hermanas que copiaron esa tabla también. -->
 <!-- skill v1.4.1 · 2026-08-24 (centro de mando): bump por las adendas del 24 (base de rutas + blindaje) que quedaron sin subir versión. -->
 
 <!-- skill v1.4 · 2026-08-23 (auditoría golden-skill-auditor 804/1000 BRONCE → reparada) · alineación con el BRIEFING-PARA-SKILLS del 2026-08-07, que la skill no había absorbido. 🔴 CRÍTICO 1: el método cien de cien mandaba llenar "al 90-95%, ~18000-19000 crudos" — el techo real son 20.000 ESCAPADOS (~17.000 crudos, tilde=6 chars, emoji=12) y está MEDIDO que 19.922 crudos = 23.266 escapados = el asistente NO arranca, con la API respondiendo 200 ok y guardando cortado: la skill instruía exactamente el rango que mata la instalación. Reescrito como DOS TECHOS con tabla medida y la fórmula len(json.dumps(v)[1:-1]) < 19.000. 🔴 CRÍTICO 2: faltaba por completo el Techo B (tope NATIVO de cada campo del formulario, extraído del código de la app) — escribir por encima funciona por API pero el panel corta el texto al guardar; añadidos los topes más apretados + puntero a TOPES-NATIVOS-POR-CAMPO.md. 🔴 CRÍTICO 3: la definición de terminado era un checklist que llenaba quien construyó — la causa medida de seis fallas seguidas; nuevo PASO 3 COMPUERTA DE VERIFICACIÓN con el agente golden-verificador (adversarial, recibe solo el estado final), verificacion_final.py y relectura del servidor, reportando COBERTURA y nunca "quedó perfecto". 🔴 CRÍTICO 4: mandaba configurar [Logistico] Plantillas de mensaje, campo MUERTO (relleno "namespace":"string"; las plantillas reales viven dentro de Confirmaciones/Seguimiento/Novedad). 🔴 CRÍTICO 5: afirmaba un censo fijo de campos ("los 79", "~69-79") ya falso tres veces (56/69/79/82 según espacio y fecha) — reemplazado por "re-extrae paginando y clasifica lo que HAY". Añadidos: los 7 países que acepta la plataforma con lo que cambia de verdad entre ellos (código postal obligatorio en México, sin recogida en oficina, domicilio=casa) y la advertencia de que un pack clonado hereda el criterio equivocado; Le'côterra siempre inactivo (enseña, no vende); el encargo típico de instalación a cliente con su definición de terminado; la fuga menos obvia al clonar (nombres de producto y paquetería DENTRO de los ganchos de venta del logístico) y la lista de campos a vaciar; gotchas de API (llave data si no 400, create-bot-field con var_type+value si no 422, paginación con per_page ignorado, ensure_ascii/separators, trigger sin caracteres de 4 bytes, cada llave conserva su tipo, producto de Comentarios de 5 llaves exactas, pares array/Extendido donde array vacío NO significa sin productos, img de Comentarios que solo nace subiendo en el panel); valores por defecto que NO son defectos (comparar contra un workspace que funcione, no contra lo que uno supone); description ampliada al disparo real (instalar a un cliente con token, arreglar un espacio heredado). -->
@@ -51,7 +52,16 @@ llaves de identidad del destino NO basta: el nombre de la marca de origen viaja 
 de ganchos posventa, agradecimientos y plantillas de prompt. Al método de barrido se le añade el
 paso `grep -i` por el NOMBRE de la marca de origen sobre TODO el texto que se va a escribir —
 así se cazaron 10 menciones de la marca origen en 3 campos del destino que el mapeo de llaves
-no vio.
+no vio. Ese `grep` es exactamente el flag `--marca` de la herramienta:
+```bash
+python3 "PROYECTOS/STACK-GOLDEN/barrido-datos-ajenos.py" <archivo.json> \
+  --marca "<marca de origen>" --excepcion "Le'côterra"
+```
+
+⚠️ **El producto-ejemplo autorizado NO cuenta como hallazgo.** Sin `--excepcion`, el barrido
+marca Le'côterra como marca ajena y, aplicando "si aparece algo NO se escribe" al pie de la
+letra, la LEY prohibiría escribir el producto que el encargo típico EXIGE dejar. La excepción de
+la LEY de herencia es también excepción del barrido: decláraselo a la herramienta.
 
 **La fuga menos obvia: los nombres de PRODUCTO y de PAQUETERÍA dentro de los ganchos de venta del
 logístico.** No son configuración, son ejemplos — y la IA imita el ejemplo: con un producto ajeno
@@ -59,11 +69,18 @@ adentro escribe frases que venden lo que el cliente no vende. En una cuenta here
 transportadoras colombianas y la marca del profesor dentro del workspace de un alumno. Al barrer,
 mira también los ganchos por estado (guía generada, en reparto, en oficina, entregado).
 
-**Vaciar SIEMPRE antes de entregar a otro cliente:** `[Integraciones] Datos de integracion`
-(llaves de Dropi, Shopify, OpenAI, Meta y Maps en texto plano), `[Carritos IA] Información de
-productos #N` (productos cacheados por el bot), `[Comentarios] Productos` y `[Producto Ventas
-Wp] N` (catálogos), `[WhatsApp IA] Ventas de productos` / `Facturación` / `Pedidos de hoy`
-(métricas del dueño anterior).
+**Vaciar al CLONAR desde una cuenta guía hacia un espacio nuevo** — y SOLO en ese caso:
+`[Integraciones] Datos de integracion` (llaves de Dropi, Shopify, OpenAI, Meta y Maps en texto
+plano), `[Carritos IA] Información de productos #N` (productos cacheados por el bot),
+`[Comentarios] Productos` y `[Producto Ventas Wp] N` (catálogos), `[WhatsApp IA] Ventas de
+productos` / `Facturación` / `Pedidos de hoy` (métricas del dueño anterior).
+
+🔴 **JAMÁS en MODO B.** En un workspace que ya es del cliente y está en producción, esos campos
+son SUYOS: `[Integraciones] Datos de integracion` es además la fuente de verdad para identificar
+su tienda real (MODO B punto 3). Vaciarlo le tumba el bot y le borra sus tokens vivos de Dropi,
+Shopify y Meta CAPI. En MODO B no se vacía nada: se DIAGNOSTICA y se corrige con autorización.
+La regla de vaciado existe para el material que viaja DESDE una cuenta guía, no para lo que ya
+vive en el destino.
 
 Origen: 2026-08-08, al clonar la config de Golden a otro espacio se colaron la llave de ElevenLabs,
 el teléfono, la plantilla de notificación y agradecimientos firmados con la marca del origen.
@@ -121,6 +138,17 @@ se configura un producto de ahí en adelante y pueda replicarlo solo.
 **Terminado** = los 4 asistentes escritos y releídos del servidor + el producto-ejemplo inactivo
 en los dos asistentes + el reporte ANTES→DESPUÉS completo + la **compuerta de verificación del
 PASO 3 pasada** (verificador adversarial, no tu propio checklist).
+
+**Tres cabos sueltos de este entregable — pendientes con el dueño, no los improvises:**
+1. **El `img` del producto-ejemplo en Comentarios NO se puede cargar solo por API.** Esas URLs
+   (`media.chateapro.app/temp/AAAAMM/<ID_DE_CUENTA>/...`) solo nacen subiendo la imagen en el
+   panel, y copiar la de otra cuenta apunta a la cuenta de origen. O se sube a mano en el panel
+   del cliente, o se decide qué va en `img`. Declara este paso manual al entregar.
+2. **El valor literal de `estado` para "inactivo" no está confirmado** (`"inactivo"` / `"no"` /
+   `false`). Léelo de un workspace que ya tenga el producto-ejemplo cargado antes de escribirlo.
+3. **Orden entre vaciar catálogos y cargar el producto-ejemplo:** primero se vacía (solo al
+   clonar, ver la LEY), y el producto-ejemplo se carga DESPUÉS. Al revés se borra lo que acabas
+   de poner.
 
 ## Dos modos de operación (detéctalo ANTES de preguntar nada)
 
@@ -199,18 +227,34 @@ analizador de palabra clave, saludo, anticancelación, ganchos de venta):
    ⚠️ **Pasarse NO da error:** la API responde `200 {"status":"ok"}`, guarda el JSON **cortado**
    y el asistente **muere en silencio**. El error solo aparece en Panel → Registros de errores.
 
-   **Techo B · el campo nativo del formulario.** Cada campo del panel tiene su propio tope
-   (extraído del código de la app). Escribir por encima por API funciona y no da error, pero el
-   día que alguien abra ese formulario y pulse Guardar, **el campo se corta y se pierde el
-   texto**. Los más apretados: `respuesta_publica.prompt` 3.000 · `ej_a_eliminar` /
-   `ej_a_no_eliminar` 1.000 · `info_extra` 500 · `contacto` / `t_envio` / `datos_req` 200 ·
-   `comportamiento_ia.rol` / `restricciones` / `analizar_palabra.prompt` 2.000 ·
-   `mensaje_inicial` / `pregunta_de_entrada` / `remarketing.prompt_N` 1.000 ·
-   `notificacion.mensaje` 400 · `prompt_libre` 12.000 · `producto_segundos.prompt_datos` 4.000 ·
-   descripción de producto en Comentarios 500. Logístico no tiene tope en sus campos de texto.
-   **Tabla completa y método de extracción: `TOPES-NATIVOS-POR-CAMPO.md`** en
-   `PROYECTOS/CHATEA-PRO-ASISTENTES-MAPA/` — consúltala antes de escribir, no la reproduzcas de
-   memoria.
+   **Techo B · el campo nativo del formulario.** Cada campo del panel tiene su propio tope.
+   Escribir por encima por API funciona y no da error, pero el día que alguien abra ese
+   formulario y pulse Guardar, **el campo se corta y se pierde el texto**.
+
+   **MEDIDOS en el código vivo de la app** (`maxLength`, notación minificada `2e3`=2.000,
+   `1e4`=10.000 — un regex que no la contemple reporta "sin tope" en falso):
+   Comentarios → `comentarios_negativos.prompt_general` 10.000 · `venta_conversacional.prompt`
+   8.000 · `respuesta_publica.prompt` 3.000 · `ej_a_eliminar` / `ej_a_no_eliminar` 1.000 ·
+   `info_extra` 500 · `contacto` / `t_envio` / `datos_req` 200.
+   Ventas (`Configuracion general 2`) → `comportamiento_ia.rol` / `restricciones` /
+   `analizar_palabra.prompt` 2.000 c/u · descripción del producto 500 · `mensaje_inicial` /
+   `pregunta_de_entrada` / `remarketing.prompt_N` 1.000 · `notificacion.mensaje` 400.
+   Logístico → `pago_anticipado.estrategia_persuasion` **2.000** (`maxLength` + un
+   `slice(0,2000)` en `onChange`).
+   ⚠️ **"El Logístico no tiene tope" es FALSO** — lo decía una versión anterior de esta skill y lo
+   sigue diciendo `TOPES-NATIVOS-POR-CAMPO.md`. El validador de la casa ya lo tiene bien.
+
+   **NO medidos en código, vienen de capturas de pantalla** (trátalos como orientativos, no como
+   verdad): `prompt_libre` 12.000 · `producto_segundos.prompt_datos` 4.000. No hay ningún
+   `maxLength` de esos valores en el bundle.
+
+   **Sin documentar todavía:** Carritos (el briefing dice "solo los de correo"; `CartsPage` no
+   tiene ningún `maxLength`, así que viven en un módulo compartido sin localizar) y varios topes
+   sueltos de Ventas medidos pero sin mapear a su campo (300 ×6, 800 ×2, 1.500).
+
+   `TOPES-NATIVOS-POR-CAMPO.md` en `PROYECTOS/CHATEA-PRO-ASISTENTES-MAPA/` tiene la tabla
+   completa, **pero arrastra los dos errores de arriba**: consúltala sabiéndolo, y ante un campo
+   crítico remídelo contra el bundle en vez de creerle a la tabla.
 
    Sobre el TIPO de campo: **JSON** = 20.000 · **LONG JSON** = 500.000 (medido 2026-07-25). Crear
    los campos nuevos como LONG JSON da aire para el JSON completo, **pero NO levanta el Techo A**
@@ -230,15 +274,50 @@ analizador de palabra clave, saludo, anticancelación, ganchos de venta):
 6. **Presentar el prompt final al dueño ANTES de escribirlo** al workspace, con su calificación
    y qué se tomó de cada fuente.
 
+## Ficha de operación: afinar la config con datos reales (opcional, alto impacto)
+
+Toda la configuración de arriba se escribe por **criterio de país**. Cuando el cliente ya tiene
+historia en Dropi, esa historia dice **qué se rompe de verdad en SU operación** — y eso vale más
+que cualquier convención. El ciclo que casi nadie cierra: *lo que falla en la entrega debería
+reescribir lo que el bot pregunta en el chat.*
+
+**Cómo entra el dato (y cómo NO).** El export de Dropi **jamás** se pega en un bot field: se come
+el techo de ~17.000 crudos en dos días, los bot fields son configuración estable y no un feed, y
+metería datos de clientes reales en un campo que cualquiera con el token lee. El camino correcto
+es **Dropi → `golden-dropi-analisis` → ficha de media página → unas pocas líneas en los prompts**.
+Lo que viaja a Chatea son **reglas derivadas**, nunca filas de datos.
+
+Qué sacar de la ficha y a qué campo va:
+
+| Dato de la operación | Qué afina | Dónde |
+|---|---|---|
+| **Novedades más frecuentes** | el prompt de captura se endurece EXACTAMENTE donde falla (si la #1 es dirección incompleta, ese campo se vuelve obligatorio y explícito; si es "no contaba con dinero", se confirma el total antes de cerrar) | Logístico `analisis_direccion.prompt_analisis` + captura de datos de Ventas |
+| **Efectividad por ciudad/depto** | trato diferenciado: donde la entrega es mala, más detalle de dirección, empujar anticipado, o punto de oficina donde exista | Logístico + Ventas |
+| **Mix real de cantidades** | valida si el anclaje funciona. Si todos caen en 1 unidad, el anclaje a 2-3 no está sirviendo y se cambia — se mide, no se adivina | prompt de venta del producto |
+| **Corte real de efectividad del cliente** | el umbral que traiga el workspace es un valor heredado, no una verdad: el dato propio dice dónde está el corte real. Ley de la casa (`feedback_efectividad_sin_umbral`): si hay 1 envío, ese es el dato — se muestra SIEMPRE la muestra y la fuente, no un porcentaje pelado | `validaciones_orden` de Ventas, Logístico y Remarketing (los tres coherentes) |
+| **Tasa de entrega por producto** | qué producto devuelve más y merece filtro más duro o solo anticipado | por producto |
+
+**Reglas de esta ficha:**
+- Es **por cliente y regenerable** (mensual). La ficha de un negocio NO toca el workspace de otro:
+  es la misma LEY de no heredar datos.
+- Va como **conocimiento derivado**, nunca como export crudo: cero teléfonos, cero nombres de
+  clientes, cero direcciones. Solo agregados y las reglas que salen de ellos.
+- Si el cliente **no tiene historia todavía**, se configura por criterio de país y se anota como
+  pendiente revisar a los 30 días con dato propio. No se inventan porcentajes.
+
 ## Flujo de orquestación
 
 ### PASO 0 — Encuadre del espacio de trabajo (pregunta 1 a la vez)
 1. **Negocio / tienda** que se va a configurar.
 2. **País del workspace** (recuerda: 1 workspace = 1 país). Este dato manda sobre todas las hijas.
-   **La plataforma acepta SOLO 7 países**, en mayúscula y sin acentos, tal como los escribe el
-   campo `[Comentarios IA] País`: **COLOMBIA · ECUADOR · CHILE · MEXICO · PANAMA · PERU ·
-   PARAGUAY**. No hay más: nada de Guatemala, Argentina, Bolivia ni Costa Rica, aunque aparezcan
-   en Dropi. Si el cliente opera en uno que no está, dilo antes de empezar — no se puede montar.
+   **La plataforma acepta 10 países** (medido 2026-08-28 contra el bundle vivo de la app,
+   `instalacion-asistentes.chateapro.app/assets/index-*.js`, constante de países): **COLOMBIA ·
+   ARGENTINA · BRASIL · CHILE · ECUADOR · GUATEMALA · MEXICO · PANAMA · PARAGUAY · PERU**, en
+   mayúscula y sin acentos. Los 10 tienen metadata de primera clase (indicativo, dígitos del
+   celular, moneda). ⚠️ Una versión anterior de esta skill decía "solo 7" y excluía Argentina,
+   Brasil y Guatemala: era FALSO y hacía rechazar instalaciones que la plataforma sí soporta.
+   **Este número es una foto fechada: remídelo contra el bundle antes de rechazar a un cliente
+   por su país**, nunca lo afirmes de memoria.
    Y lo que cambia por país no es el acento: cambian la división territorial (estado/municipio/
    colonia vs departamento/ciudad/barrio), si el **código postal es obligatorio** (México sí,
    Colombia no), si **existe recogida en oficina** (en México no, todo va a domicilio), la
@@ -270,6 +349,29 @@ Cuando cada hija entregue su config, NO termines: revisa que todas encajen. Corr
 
 Entrega un **checklist final** marcando cada asistente configurado, su país, y las incoherencias que corregiste.
 
+### PASO 2 bis — INTERRUPTORES y DISPARADORES (lo que más se rompe en silencio)
+
+**Un prompt perfecto detrás de un interruptor apagado no hace nada.** Caso medido: un prompt de
+validación de direcciones de 7.243 caracteres, correcto y cargado, con
+`analisis_direccion.evaluar_direccion = "no"`. Nunca corrió, y nada avisó.
+
+1. **Audita TODOS los interruptores contra un workspace que funcione**, no solo los textos:
+   `activar`, `esta_activo`, `habilitar`, `evaluar_*`. Esto NO contradice la regla de respetar los
+   datos del cliente en MODO B: se respetan sus VALORES de negocio (fletes, porcentajes, tiempos);
+   un interruptor apagado que deja muerto un prompt que acabas de escribir es un HALLAZGO, se
+   reporta y se enciende con autorización.
+2. **`voz_con_ia` de cada producto:** puede venir con una `api_key` de ElevenLabs de la cuenta de
+   origen y `habilitar: "si"`. Es la credencial exacta que ya se filtró una vez. Revísalo por
+   producto, no por asistente.
+3. **La palabra clave vive en DOS sitios y deben coincidir byte a byte:**
+   `[Producto Ventas Wp] N.activadores_del_flujo.palabras_clave` y la entrada del producto en
+   `[Ventas Wp] Disparador de productos Extendido`. **Si difieren en un solo acento, el producto
+   no arranca** (caso real: `informacion` contra `información`). Compáralas byte a byte — esto es
+   coherencia entre dos bot fields, o sea trabajo del maestro, no de una hija.
+4. **Reinstalar un asistente rompe sus disparadores:** recrea los subflujos con `ns` nuevo y deja
+   el disparador apuntando al viejo. Hay que reenlazarlos a mano, y se vuelve a romper en CADA
+   reinstalación. Si reinstalas, reenlazar y volver a verificar es parte del trabajo.
+
 ### PASO 3 — COMPUERTA DE VERIFICACIÓN (obligatoria, no la haces tú)
 
 **Nada se declara terminado sin esto.** Tu checklist del PASO 2 lo llenas tú, que construiste —
@@ -280,8 +382,21 @@ fallara seis veces seguidas. Regla del dueño:
    SOLO el estado final y el estándar que debe cumplir — **nunca cómo lo construiste**. Su trabajo
    es romperlo, no confirmarlo. Devuelve cobertura medida (N de N revisados) y la lista de lo que
    falla o de lo que NO pudo verificar. Nunca dice "está perfecto".
-2. **`verificacion_final.py`** — corre los 5 controles sobre la instalación nueva:
-   `PROYECTOS/CHATEA-PRO-ASISTENTES-MAPA/kevin/PLANTILLA-MEXICO/verificacion_final.py`.
+2. **`verificacion_final.py`** — son **4 controles** (techos · topes nativos · contaminación ·
+   interruptores), y el 4º **solo corre si le pasas `--referencia`**. Sin ese flag imprime
+   `Interruptores comparados: NO (sin referencia)` y sale en verde sin auditar un solo
+   interruptor: sería pasar la compuerta con el validador castrado. Invocación completa:
+   ```bash
+   python3 "PROYECTOS/CHATEA-PRO-ASISTENTES-MAPA/kevin/PLANTILLA-MEXICO/verificacion_final.py" \
+     --token "<token del cliente>" \
+     --referencia "<token de un workspace que YA funcione>" \
+     --excepcion "Le'côterra"
+   ```
+   `--excepcion` evita que el producto-ejemplo autorizado se marque como contaminación.
+   `--autoprueba` corre su banco de casos malos (úsalo si dudas del validador).
+   ⚠️ **El validador NO falla a 19.000 escapados**: a partir de 19.000 avisa y solo falla en
+   20.000. La regla de la casa es más estricta que la herramienta — **el corte operativo es
+   <19.000 y lo aplicas tú**, no lo delegues en el verde del script.
 3. **Releer del servidor** cada campo escrito y comparar contra lo enviado (longitud cruda,
    longitud escapada y contenido). Es la única prueba real y de paso detecta si alguien pisó el
    cambio desde la UI.
@@ -367,8 +482,11 @@ nombre=archivo antes de --confirm. Token = dato sensible: scope mínimo, rotar a
 - **Pares `array` / `Extendido`:** los workspaces migrados dejan el campo `array` vacío y los datos
   en el `longtext` `... Extendido`. Verificado en un espacio que vende a diario: `[Ventas Wp]
   Disparador de productos` vacío con 4 productos activos en el Extendido. **Leer el `array` y
-  concluir "no hay productos" es un error.** El tipo de un campo existente no se puede cambiar:
-  hay que crear uno nuevo.
+  concluir "no hay productos" es un error.** Pero **NO lo generalices al revés**: el par puede
+  estar poblado de LOS DOS lados (medido: `[Comentarios] Productos` con 6.980 caracteres Y su
+  Extendido con 7 productos). **Mira siempre los dos campos.** Sobre cambiar el tipo de un campo
+  existente, la regla única está en el método cien de cien: por API no se convierte (borrar y
+  recrear cambia el `var_ns` y rompe el flujo) — se cambia en la UI.
 - **Imágenes:** `multimedia` e `imagen` aceptan URLs externas (CDN de Shopify, probado). Pero el
   `img` del producto de Comentarios usa `media.chateapro.app/temp/AAAAMM/<ID_DE_CUENTA>/...` y
   esas URLs **solo nacen subiendo la imagen en el panel** — no hay endpoint de subida. Copiar la

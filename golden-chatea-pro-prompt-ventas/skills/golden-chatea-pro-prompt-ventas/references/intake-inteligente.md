@@ -1,12 +1,20 @@
 # Intake inteligente (recolección + investigación antes de construir)
 
-Meta: hacerle la vida fácil al vendedor y ser RÁPIDO. La skill pregunta **TODO lo NECESARIO para que el prompt quede perfecto** (no lo mínimo), pero lo hace en un **FORMULARIO de una vez**: un solo mensaje con todas las preguntas agrupadas y numeradas, país primero, marcando obligatorio vs opcional. El cliente responde de corrido lo que tenga (puede pegar varios datos juntos, como en la vida real). Nada de ida-y-vuelta pregunta por pregunta: eso cansa. Acepta la info en el formato que el cliente tenga (URL, imagen o nada) e investiga por su cuenta lo que falte. Lo único que NO se pregunta es lo condicional que no aplica o lo que ya se obtuvo de la URL/foto/investigación (en ese caso se confirma en el borrador, no se vuelve a preguntar).
+Meta: hacerle la vida fácil al vendedor. La skill pregunta **TODO lo NECESARIO para que el prompt quede perfecto** (no lo mínimo), pero lo hace **UNA PREGUNTA A LA VEZ** (orden de FER 2026-08-26): una sola pregunta, se espera la respuesta, y con ella se pasa a la siguiente. Mandar el cuestionario completo de golpe abruma: la gente abandona o responde a medias. Si el vendedor pega varios datos juntos por su cuenta, se toman todos y no se vuelven a preguntar. Acepta la info en el formato que el cliente tenga (URL, imagen o nada) e investiga por su cuenta lo que falte. Lo único que NO se pregunta es lo condicional que no aplica o lo que ya se obtuvo de la URL/foto/investigación (en ese caso se confirma en el borrador, no se vuelve a preguntar).
 
-## Modo por defecto: FORMULARIO de una vez
-Manda las preguntas JUNTAS, así:
+## Modo por defecto: UNA PREGUNTA A LA VEZ
+Recorre este inventario de a una, esperando cada respuesta. NO lo mandes junto. Orden recomendado (lo que más acelera va primero):
 ```
-Para armarte el mejor asistente te pido estos datos (respóndeme de corrido lo que tengas; lo que no sepas, yo lo propongo):
-
+1. Producto: cuál es? Si tienes el enlace de tu página o una foto, pásamelo (con eso investigo yo).
+2. País donde vendes.
+3. Precio de 1, 2 y 3 (unidades o combos; cuántas trae cada combo). Léelos del widget de compra, no los deduzco.
+4. Vas a cobrar anticipado, o solo contra entrega? (si anticipado: titular, banco/entidad, número y tipo de cuenta)
+5. Cómo quieres que se llame tu asesora (la personalidad la pongo yo según el producto).
+6. Para cerrar mejor (opcional): cuántos clientes/reseñas tienes, garantía, regalo o bono, envío discreto, producto original.
+7. URL de tu tienda (opcional, solo si tienes): para redirigir si preguntan por otro producto.
+```
+Referencia del contenido (NO es un mensaje para mandar de golpe):
+```
 PAÍS (obligatorio): ...
 PRODUCTO (obligatorio): nombre y qué hace. Tienes URL o foto?
 PRECIO (obligatorio al menos 1): de 1, 2 y 3 (unidades o combos; di cuántas trae cada combo)
@@ -18,7 +26,7 @@ URL de tu tienda (opcional, solo si tienes tienda web): para redirigir si pregun
 ```
 ⛔ ENTREGA — NO SE PREGUNTA (regla de FER): los tiempos de entrega y la transportadora van PREDETERMINADOS por país (ver `paises.md`). La skill los aplica sola y los muestra en el borrador como supuesto ("dejé los tiempos estándar; si tu operación es distinta, dime"); solo cambian si el vendedor los corrige por iniciativa propia.
 - **Relleno inteligente:** con lo que responda, DEDUCE lo posible (moneda/indicativo del país, tono por producto, beneficios de la URL/foto) y PROPÓN defaults para lo que falte, marcándolos como supuestos. Solo REPREGUNTA si falta un OBLIGATORIO (precio de 1, país, producto). El resto no bloquea.
-- **Alternativa por bloques** (solo si el cliente lo prefiere o parece abrumado): 3 tandas — 1) producto · 2) precio y oferta · 3) operación y negocio. El "uno por uno" es último recurso, no default.
+- **Excepción (única) al uno-por-uno:** si el vendedor pega varios datos juntos por su cuenta, o pide explícitamente "mándame todo de una", se agrupa y se respeta su ritmo. Nunca como arranque por defecto.
 
 ## Lo que SIEMPRE se pregunta (lo necesario para un prompt perfecto)
 1. **Nombre del asesor/a** (cómo se llamará el bot) y personalidad (cálida, directa…).
@@ -72,7 +80,7 @@ Pregunta el nicho si no es obvio, y elige el pack de país (`paises.md`) + las o
 Lo investigado sirve para ACELERAR, no para inventar. El **precio real, el WhatsApp, el nombre del negocio y los claims** SIEMPRE se confirman con el cliente antes de construir. Nunca pongas un precio "de mercado" como si fuera el suyo: propónlo como supuesto y pide confirmación.
 
 ## Cómo procede la skill
-1. Manda el **formulario de una vez** (todas las preguntas juntas, país 1º, obligatorio vs opcional) + el gate de anticipado incluido.
+1. Pregunta **UNA a la vez** siguiendo el orden (producto → país → precios → gate de anticipado → asesora → opcionales), esperando cada respuesta.
 2. Toma la fuente de producto que el cliente dé (URL / foto / nada) e investiga lo que falte; deduce moneda/tono/beneficios.
 3. Arma un **borrador de ficha** y lo confirma con el cliente (precio, combos, claims): "esto entendí/encontré, lo confirmas o lo ajusto?". Solo repregunta lo OBLIGATORIO que falte.
 4. Solo entonces construye el paquete (PASO 2 en adelante).

@@ -20,6 +20,22 @@ description: |
 
 # golden-chatea-auditoria · la salud de un espacio de Chatea Pro
 
+<!-- skill v1.8 (GCA1.8) — 2026-08-26 — SIMULACION DE DIAS en vez de esperar los dias.
+El ciclo de vigilancia (auditoria → decision → cambio → re-medicion) se iba a validar dejandolo
+correr unos dias reales; eso cuesta dias y descubre los fallos EN PRODUCCION. Se construyo
+`scripts/simular_dias.py`, que corre el ciclo sobre un espacio que EVOLUCIONA (alguien corta un
+campo desde el panel, un campo cruza el techo, se borra un campo, la API falla un dia, se
+enciende pauta). Encontro el fallo de fondo el primer intento: **`reabrir_si` era PROSA que
+nadie evaluaba** — solo se imprimia. La decision de los huerfanos dice "reabre si se les carga
+un id de anuncio" y el dia que se cargara habria seguido silenciada: la promesa de que el libro
+no es una alfombra no la sostenia nada. Arreglo: la decision guarda `evidencia_al_decidir`, la
+foto de la situacion ese dia, y **CADUCA sola cuando la evidencia cambia** — cubre el caso
+general (se cargo un anuncio, el campo crecio, aparecio otro producto) sin inventar un lenguaje
+de condiciones que nadie escribiria bien. Las decisiones sin esa foto se avisan: no pueden
+caducar. LECCION DEL PROPIO BANCO: el dia 7 pasaba con el arreglo SABOTEADO, porque registraba
+el producto y el hallazgo desaparecia — la comprobacion se auto-aprobaba por una via que no
+probaba nada. Se reescribio para que el hallazgo PERSISTA y solo cambie su evidencia. Medido:
+7 de 7 dias con el arreglo vivo, 6 de 7 con el sabotaje, y el que se cae es el de la caducidad. -->
 <!-- skill v1.7 (GCA1.7) — 2026-08-26 — auditoria fresca (el numero v1.6 ya
 lo habia tomado otro chat el mismo dia con sus propios cambios; esta entrada es POSTERIOR). Tres defectos, dos de ellos de la
 MISMA clase que la skill ya habia arreglado en otro sitio y cuyo GEMELO nadie busco.
@@ -148,7 +164,7 @@ numérico. Ver detalle completo debajo. -->
 skill nació sin CHANGELOG y sin número, y sin versión el censo diario no puede ver que alguien
 la editó. -->
 
-**Versión:** `GCA1.7`
+**Versión:** `GCA1.8`
 
 Auditar aquí significa **medir el estado real del servidor contra el estándar**, no leer la
 configuración y opinar. Nada se da por bueno sin haberlo contado, y el informe se entrega en

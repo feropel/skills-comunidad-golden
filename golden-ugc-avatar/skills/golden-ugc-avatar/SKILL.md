@@ -19,6 +19,7 @@ description: >
 ---
 
 # Golden UGC Avatar — Higgsfield Pipeline
+<!-- skill v1.11 · 2026-08-24: registrada la RUTA ALTERNA Google Vids (Workspace) como forma de generar avatares sin gastar creditos de Higgsfield — con su frontera declarada (Vids para corporativo/formacion horizontal; Higgsfield para UGC vertical y ads, que es donde manda el look selfie y el control fino de identidad y coherencia voz-cuerpo) y marcada como NO verificada en vivo (no hay MCP de Vids; se opera a mano). Dato aportado por FER. -->
 <!-- skill v1.10.1 · 2026-08-24 (centro de mando, remediación del verificador de cierre): línea de RUTA del cerebro en el Paso 0 (las lectoras ordenaban LÉELO PRIMERO sin decir dónde — un chat limpio no podía ejecutar la orden) + bump que las ediciones del 23-24 dejaron sin subir. -->
 <!-- skill v1.10 · 2026-08-24 (golden-skill-auditor, auditoria fresca): resuelta la COLISION de dos pasos "0" (el cerebro de marca pasa a "Paso previo"; Step 0 sigue siendo el de toolchain, asi no se renumera nada ya referenciado); el cerebro de marca ENTRA al diagrama de pipeline (era obligatorio y no aparecia en el mapa); Step 4 sube de H3 a H2 (era un paso par de 0-3 escondido dentro de Step 3, invisible al escanear encabezados pese a salir en el diagrama); y la regla de COMPLIANCE de la adenda 2026-08-23 baja del comentario HTML al CUERPO — seccion propia en Step 3 + quinto item en la compuerta de QA del Step 4 (una instruccion que solo vive en un comentario no es una instruccion). Blindaje real: chflags uchg Y chmod 0444 (doble; reponer ambos). Cambios relevantes reportados a GOLDEN - CENTRO DE MANDO. -->
 <!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leian el cerebro de marca — esta entra a la familia que SI lo lee. Bloque identico en las 6 del CdM + fila a la fabrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
@@ -407,6 +408,32 @@ product images — it connects to the skills that do. Keep the handoffs clear so
 Golden rule: this skill's job ends when it delivers the **asset** (image and/or .mp4). Publishing,
 running ads, laying out a page, or editing belongs to the destination skill.
 
+## Alternative route — Google Vids (Workspace)
+
+Higgsfield is not the only way to put a talking avatar on screen: **Google Vids** (part of Google
+Workspace, which Golden already pays for) also generates avatars that read a script. Keep it on the
+table so nobody pays credits for a job the subscription already covers.
+
+**When Vids is the better call:** corporate / training / internal-comms pieces, announcements, and
+anything horizontal that lives inside Workspace — the avatar reads a script, the file stays in
+Drive, and it does not spend Higgsfield credits.
+
+**When this skill's Higgsfield route still wins:** vertical UGC and paid-ad creative. The whole
+point here is the *unpolished iPhone-selfie* read plus fine control of identity lock and
+voice-body coherence through the Seedance prompt — that is what makes an ad stop the scroll, and
+it is not what a clean corporate avatar tool is built for.
+
+**What transfers either way:** the script craft in this skill is model-agnostic. The 5-layer stack,
+the A–E avatar profiles with their vocabulary DNA, the voice-body coherence table
+(`references/seedance_prompt_system.md` §8) and the compliance mirror above apply exactly the same
+to a script you paste into Vids. Write the script here, render it wherever fits the job.
+
+**Status — not verified live by this skill.** There is no Google Vids MCP, so it is operated by
+hand in the Workspace UI; this skill has not measured its avatar catalog, limits, languages, or
+export specs. Before promising it to a client, check those in the product itself and report back so
+this section can be upgraded from "route exists" to "route verified". (Ruta señalada por FER,
+2026-08-24.)
+
 ## Cost reality check (why we stay on Higgsfield)
 
 Pay-per-use aggregators (self-hosted frontends over MuAPI-style gateways) look "free" because the
@@ -436,6 +463,14 @@ against this table before switching. Rule: iterate with the cheap model, spend o
 ---
 
 ## Version & changelog
+- **v1.11** — Registrada la **ruta alterna Google Vids** (Workspace) para generar avatares sin
+  gastar créditos de Higgsfield, con su frontera explícita: Vids para piezas corporativas/formación
+  y horizontal dentro de Workspace; Higgsfield para UGC vertical y creativos de pauta, donde mandan
+  el look de selfie sin pulir y el control fino de identidad y coherencia voz-cuerpo. Se deja dicho
+  que el oficio de guion de esta skill (5 capas, perfiles A-E, tabla voz-cuerpo, espejo de
+  compliance) es model-agnostic y sirve igual para un guion que se pega en Vids. Marcada como **no
+  verificada en vivo** (no hay MCP de Vids; se opera a mano en la UI de Workspace) para no prometerle
+  a un cliente capacidades no medidas. Dato aportado por FER.
 - **v1.10** — Auditoría fresca (golden-skill-auditor): resuelta la colisión de dos pasos "0" — el
   bloque del cerebro de marca pasa a **Paso previo** y Step 0 sigue siendo el de toolchain, así no
   se renumera nada ya referenciado; el cerebro de marca **entra al diagrama** de pipeline (estaba

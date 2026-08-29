@@ -15,7 +15,8 @@
     "gold_soft": "#e7c65a",
     "gold_tint_bg": "#fbf5e2",
     "gold_line": "#ecd79a",
-    "on_gold": "#1a1508"
+    "on_gold": "#1a1508",
+    "gold_text": "#8a6d1f"
   },
   "accent_status": {
     "green": "#15a34a",
@@ -68,5 +69,6 @@
     "primary_note": "Emblema oficial Golden Group Community (PNG incrustado en SVG).",
     "community_orange_original": "RETIRADO del disco (la carpeta PROYECTOS/SKOOL ya no existe); habria que re-subirlo si se quiere volver al naranja"
   },
-  "geometry_note": "audit_pdf.py lee de aqui margin_mm y footer_reserve_mm (unica fuente de verdad para el auditor). El resto es documentacion."
+  "geometry_note": "audit_pdf.py lee de aqui margin_mm y footer_reserve_mm (unica fuente de verdad para el auditor). El resto es documentacion.",
+  "contrast_note": "Los dorados de marca son ACENTO: #d4af37=2.00:1 y #b8912a=2.80:1 sobre #faf9f5, bajo el minimo WCAG de 4.5:1 para texto. El texto dorado usa gold_text #8a6d1f (4.65:1). Sobre fondo oscuro el dorado de marca no tiene problema (8.65:1 contra #1a1508). La prueba 16 del selftest lo verifica por calculo y falla si alguien lo rompe."
 }

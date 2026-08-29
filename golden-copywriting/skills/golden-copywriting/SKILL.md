@@ -19,6 +19,7 @@ description: >-
 ---
 
 # Golden Group — Copywriting Multicanal
+<!-- skill GCW1.5.0 · 2026-08-27 (chat FILTRO) · NUEVO references/anatomia-del-hook.md. ORIGEN: 00_CONTEXTO_MAESTRO.md del Agente Generador de Hooks v1.3 que trajo FER. HUECO MEDIDO: golden-ads ya sabe MEDIR el hook (17 menciones de hook rate, 15 de hold rate) pero ESTA skill, que los escribe, tenia 0 menciones de scroll-stop, snapback, context lean, trigger words, la regla de los 3 segundos y el 85% sin sonido. Se trajo el METODO, NO el pipeline de video del documento (Gemini+Seedance+ElevenLabs, ~1.52 USD/set): no esta instalado y duplicaria golden-imagen-arena, golden-ugc-avatar y golden-video-editor. Conecta con Andromeda: 4 hooks del mismo angulo con otras palabras cuentan como UNO para Meta. -->
 <!-- skill GCW1.4.0 · 2026-08-25 (corrida 4 de copywriting-tendencias-8-dias): la lectura por API NO cubre el gasto de la cuenta (GOLDEN CP6 y BLUE CP5 devuelven vacío con gasto real; BLUE CP1 al 4,7%) → regla nueva de cuadre de cobertura en estandar-meta-medido.md; se corrige la afirmación de 3 corridas de que la media del título era estable (lo estable es "cabe en 40", 79-87%); dos citas oficiales nuevas (la descripción de 25 es para info NO esencial; el generador de variantes de Meta soporta español); el banco de pruebas del reparto 2+3 se apagó. -->
 <!-- skill GCW1.3.9 · 2026-08-24 (centro de mando, remediación del verificador de cierre): línea de RUTA del cerebro en el Paso 0 (las lectoras ordenaban LÉELO PRIMERO sin decir dónde — un chat limpio no podía ejecutar la orden) + bump que las ediciones del 23-24 dejaron sin subir. -->
 <!-- GCW1.3.8 — 2026-08-24 · Barrido total del arsenal (pluma delegada del CdM). POLÍTICA DE BLINDAJE DECLARADA: esta skill va SIN BLINDAR (sin uchg, chmod 644) por decisión del CdM — la tarea copywriting-tendencias-8-dias le escribe cada 8 días y el flag venía produciendo el ciclo documentado en la bitácora (corridas encontrándola desblindada, choque de dos manos el 21-ago). La protección es la regla de manos autorizadas, no el flag. Se encontró blindada en 5 de 6 nodos contra esa política → liberada. Además: aviso DATO LOCAL agregado al puntero de tendencias-vivas.md (el rótulo existía solo dentro del archivo — quien empaque la skill leyendo SKILL.md no se enteraba de excluirlo), typo "premita"→"premia" y mini-índice en estandar-meta-medido.md, ruta de la fuente Panamá precisada en la referencia externa. tendencias-vivas.md NO se tocó (DATO LOCAL: solo la tarea de 8 días escribe ahí; su encabezado "¿Argumento en 125?" viola la regla de la casa de signos de apertura — queda reportado para que la próxima corrida lo corrija). -->
@@ -35,7 +36,7 @@ se generó sin voz de marca cargada.
 
 
 
-**Versión:** `GCW1.4.0` · **Fábrica: el CENTRO DE MANDO** (chat "🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR").
+**Versión:** `GCW1.5.0` · **Fábrica: el CENTRO DE MANDO** (chat "🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR").
 
 > 🔓 **Política de blindaje (CdM, 2026-08-24): esta skill va SIN blindar.** La tarea
 > `copywriting-tendencias-8-dias` le escribe cada 8 días; el flag `uchg` solo producía choques de
@@ -59,6 +60,11 @@ El cerebro vive en `PROYECTOS/BRAND-BRAINS/<MARCA>/` — la resolución exacta (
 
 ## Reglas de oro
 1. **El hook lo es todo.** Los primeros 3 segundos / la primera línea deciden. Siempre entrega 5+ variantes de hook.
+   **Y no se escriben a ojo: `references/anatomia-del-hook.md` trae el método.** Fórmula de 3 pasos
+   (context lean → scroll-stop → snapback, ≤14 palabras), los 4 ángulos × 6 formatos con el default
+   de COD LatAm, el banco de palabras que disparan y las prohibidas, y los 5 controles antes de dar
+   un hook por bueno. Dos datos que cambian cómo se escribe: **el 85% de las vistas en Meta son sin
+   sonido** (texto quemado siempre) y **ningún hook lleva CTA** — el hook abre, no cierra.
 2. **Un ángulo por pieza.** No mezclar dolores. Elige el ángulo más fuerte para el avatar.
 3. **Habla como el cliente, no como la marca.** Lenguaje del país, beneficios > características, prueba > promesa.
 4. **CTA único y claro**, acorde al canal **y al modelo de pago** (ver la sección de abajo).

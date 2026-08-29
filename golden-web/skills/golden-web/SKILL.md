@@ -16,8 +16,43 @@ description: >-
 ---
 
 # Golden Group — Web por Perfil
+<!-- skill GW2.5 · 2026-08-24 (centro de mando, remediación del verificador de cierre): bump que faltó por las ediciones del 24; ESPÉCIMEN cirílico sustituido a nivel de carácter — el sello anterior conservaba dentro las letras que decía haber cazado (un sello que guarda el bicho re-dispara la clase); línea de RUTA del cerebro añadida al Paso 0. -->
+<!-- adenda 2026-08-24 (centro de mando, barrido D + fila del 23-ago; fábrica GW sin sesión activa en toda la semana — ley del chat vivo: ejecuta el CdM y la fábrica revisa al despertar): (1) cazadas letras CIRÍLICAS incrustadas en 'aurora' (línea ~188, u y r cirílicas — invisibles al ojo, rompían todo grep por 'aurora'; barrido unicodedata del archivo completo: 0 residuos); (2) instalado el Paso 0 · Cerebro de marca BAJO el H1, el bloque idéntico de las 6 hermanas — golden-web era la única de las 7 skills de contenido sin él. -->
 
-**Versión:** `GW2.3` · Fábrica: este chat.
+## Paso 0 · Cerebro de marca (obligatorio antes de generar)
+
+Si la marca tiene CEREBRO creado por `golden-brand-brain` (marca.md, productos.md, avatares.md,
+competidores.md, anuncios-ganadores.md, cambios-recientes.md), LÉELO PRIMERO y genera con esa voz
+— jamás re-preguntar lo que el cerebro ya sabe. Si NO existe, ofrece crearlo con `golden-brand-brain`
+antes de continuar; si el usuario pide seguir sin cerebro, se declara en la entrega que el contenido
+se generó sin voz de marca cargada.
+
+
+**Versión:** `GW2.8` · Fábrica: este chat.
+_GW2.8 (2026-08-27) — chat FILTRO: el `catalogo-de-estilos.md` de GW2.7 estaba **DORMIDO**: citado en el
+sello pero sin un momento del flujo que mandara abrirlo, así que nadie llegaba nunca a él. Disparador puesto
+en el punto 3 ("no plantilla genérica"), que es exactamente su propósito. Y CORREGIDO un choque con la regla
+de marca de esta skill: el catálogo nombraba referencias externas y aquí las referencias **se destilan y
+desaparecen** — los nombres son de uso interno, al cliente la dirección se le presenta SIEMPRE con nombre
+Golden. Hallazgo a partir de la observación de FER: "que las skills sepan cuándo llamarlo, que no se quede
+esperando su llamada y nunca lo usen"._
+
+_GW2.7 (2026-08-26) — chat FILTRO: **nuevo `references/catalogo-de-estilos.md`**. Mapea las 26 recetas
+de estilo ancladas de `web-design-engineer` (252 KB instalados en el Mac que NINGUNA skill de Golden
+nombraba) a los TRES perfiles de esta skill, y deriva a golden-cinematica lo que es `active-theory` /
+`resn-storytelling`. No copia nada: apunta. Cada receta trae paleta hex, tipografía, espaciado,
+movimiento en milisegundos, prohibiciones y semilla de prompt para la foto — que enlaza con el
+`vocabulario-foto.md` de golden-imagen-arena._
+
+_GW2.6 (2026-08-26) — chat FILTRO, autoridad de FER: **nuevo `references/estandar-movimiento.md`**.
+Destilado de la skill `review-animations` (instalada en el Mac y que NINGUNA skill de Golden nombraba;
+estándar de Emil Kowalski). HUECO MEDIDO en esta skill antes de escribirlo: `ease-out` 0 menciones,
+`scale(0` 0, `transform-origin` 0, `@starting-style` 0, springs 0, regla de duración 0, interrumpibilidad 0.
+Lo que YA estaba bien y no se tocó: `prefers-reduced-motion` (7 menciones). Trae curvas exactas, tabla de
+duración, física del pulsado, interrumpibilidad con `@starting-style`, y el dato de que los atajos `x`/`y`/
+`scale` de Framer Motion NO van por hardware. Enganchado al checklist de movimiento._
+
+_GW2.4 (2026-08-23) — Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR._
 _GW2.3 (2026-08-21) — reparación golden-skill-auditor: `references/arte-generativo-templates/viewer.html`
 y `generator_template.js` traían tokens y comentarios de la skill Anthropic original de la que se
 rescataron (paleta "Anthropic Brand Colors", instrucción de "mantener el branding Anthropic",
@@ -42,6 +77,8 @@ _GW1.1 (2026-07-03): encadena la trifecta — `cyber-neo` (auditoría pre-deploy
 
 Webs que se ven caras y convierten, montadas rápido y publicadas en la nube. Selecciona el perfil y aplica el blueprint.
 
+El cerebro vive en `PROYECTOS/BRAND-BRAINS/<MARCA>/` — la resolución exacta (buscar con find ANTES de crear, naming MAYÚSCULAS-CON-GUIONES) la declara `golden-brand-brain`: ante cualquier duda de ruta, invócala en vez de adivinar.
+
 ## Stack (todo ya disponible)
 - **Diseño/maquetado:** skills `frontend-design`, `ui-ux-pro-max`, `web-artifacts-builder`, `theme-factory` + MCP Magic (componentes 21st.dev) + MCP Stitch (design systems).
 - **Movimiento de nivel Apple:** skills `apple-design` (motion físico/springs/gestos — úsala SIEMPRE en la capa de movimiento y en Golden Tech), `improve-animations` (audita y planea mejoras de motion de un sitio ya hecho), `animation-vocabulary` (nombrar el efecto exacto) y `emil-design-eng` (pulido de detalles invisibles).
@@ -57,6 +94,12 @@ Webs que se ven caras y convierten, montadas rápido y publicadas en la nube. Se
 1. **Mobile-first** y velocidad (LatAm, datos móviles). Imágenes WebP livianas.
 2. **Una promesa clara above-the-fold** + CTA único por objetivo.
 3. **Diseño tecnológico, no plantilla genérica** — consulta SIEMPRE `ui-ux-pro-max` (inteligencia de diseño: 67 estilos, 96 paletas, 57 pares tipográficos, guías UX por stack) ANTES de elegir estilo/paleta/tipografía, y `frontend-design` para evitar el "look IA". No inventes el sistema visual: pídeselo a la skill y adáptalo a la marca.
+   **Y ANTES de elegir dirección, abre `references/catalogo-de-estilos.md`**: 26 direcciones
+   ancladas con paleta, tipografía, espaciado y movimiento en milisegundos, mapeadas a los tres
+   perfiles de esta skill. Si el cliente no sabe qué quiere, ese archivo trae la conversación de
+   6 escuelas; si tiene un ancla en mente, lleva directo a UNA receta. **Se elige una y se respeta
+   entera, prohibiciones incluidas** — mezclar paletas y tipografías de recetas distintas ES el
+   look de plantilla que este punto 3 quiere evitar.
 4. **Siempre termina publicado** (Vercel) con URL compartible, o entrega el código listo para deploy.
 
 ## Blueprints por perfil
@@ -184,7 +227,7 @@ encima (overlay/contraste). Elegir el que sirva a la marca:
    `requestAnimationFrame` a 60 FPS, parallax por capas (cada mancha a distinta profundidad),
    bloom radial en el cursor con lerp de resorte, grano SVG sutil (feTurbulence) + viñeta
    cinematográfica, y una tarjeta **glassmorphism** (`backdrop-filter: blur`) con el mensaje
-   encima. La aурora nunca se satura de más; el texto siempre legible sobre la tarjeta de vidrio.
+   encima. La aurora nunca se satura de más; el texto siempre legible sobre la tarjeta de vidrio.
    Móvil: menos manchas + deriva automática (sin mouse), DPR cap 2; reduced-motion → frame estático
    elegante. **Uso:** héroe de landing de marca/servicio/SaaS. Destilado de un prompt "Aurora
    Gradient" de referencia (SaaS de lujo, Awwwards) — reescrito original, sin librerías de pago.
@@ -322,6 +365,11 @@ resultado de una herramienta que no corrió.
 **Definición de "terminado":** el build no está listo para entregar hasta que:
 - [ ] Carga y se ve bien en 390px (móvil), 768px (tablet) y desktop.
 - [ ] La capa de movimiento mínima está presente (reveals + un momento sticky + micro-interacciones) y `prefers-reduced-motion` se respeta donde corresponde (ver excepción de fondos decorativos en `arte-generativo-golden.md`).
+- [ ] **El movimiento cumple el estándar NUMÉRICO** (`references/estandar-movimiento.md`): curva
+      correcta por tipo (nunca `ease-in` en UI), duración de UI bajo 300 ms, nada nace en `scale(0)`,
+      el popover nace en su disparador, y **solo se animan `transform` y `opacity`** (el 74% del
+      tráfico compra en móvil: una animación que salta frames abarata la ficha justo antes de pedir
+      la dirección).
 - [ ] `cyber-neo` corrió si había login/formularios/datos, sin Critical/High abiertos.
 - [ ] Publicado con URL real (no solo localhost) y esa URL se abrió y revisó — el gotcha de Golden Secuencia (frames que no viajan al repo) se verifica siempre en producción, no en local.
 - [ ] Sección GEO/AEO (robots.txt con bots de citación, JSON-LD FAQ/LocalBusiness) presente si el sitio es de negocio real.

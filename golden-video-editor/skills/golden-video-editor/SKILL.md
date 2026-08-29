@@ -20,13 +20,17 @@ description: >-
 ---
 
 # Golden Video Editor — de grabación cruda a anuncio publicable
+<!-- skill GVE1.6 · 2026-08-27 (chat FILTRO) · FIX: multicamara-una-camara.md quedo DORMIDO en GVE1.5 — citado en el sello pero SIN disparador en el cuerpo, o sea invisible para el flujo. Lo cazo el detector golden-capacidad-huerfana, que estrena chequeo de RECURSOS DORMIDOS a peticion del CdM tras el mismo fallo en golden-web (catalogo-de-estilos). Mismo error mio dos veces la misma noche. Disparador puesto en el Paso 2, que es donde se cortan. Barrido del ecosistema: 1 dormido de 243 referencias — este. -->
+<!-- skill GVE1.5 · 2026-08-26 (chat FILTRO, autoridad de FER) · NUEVO references/multicamara-una-camara.md. Destilado de 2 PDFs de NinoDirector que FER envio el 16-ago y llevaba 10 dias en DESTILADOS sin que ninguna skill lo nombrara. Barrido previo: capacidad NUEVA, 0 de 89 skills mencionaban multicamara, punch-in ni encuadre. Numeros: cambio de encuadre ~1min30, nunca cada 10s, punch-in 113% con tope duro 125%, ventana de silencio 1,5s y si no hay silencio NO se corta. Regla que lo hace funcionar: el frontal SE GUARDA para el CTA. Enlaza con golden-imagen-arena para generar los 3 fondos. -->
+<!-- skill GVE1.4.1 · 2026-08-24 (centro de mando): bump que la reparación del barrido B dejó sin subir — 5 skills editadas sin bump las veía intactas el censo (verificador de cierre). -->
 
+<!-- skill versión GVE1.4 · 2026-08-23: Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR -->
 <!-- skill versión GVE1.3 · auditoría golden-skill-auditor 2026-08-21: cierra la inconsistencia de versión (el cuerpo ya traía los cambios de GVE1.2 pero la línea "Versión:" y el Changelog se habían quedado en GVE1.1 — ahora coinciden); documenta el blindaje (chflags uchg) en el propio SKILL.md, no solo en el filesystem; completa el ejemplo de tts con --output -->
 <!-- skill versión GVE1.2 · auditoría 2026-07-25: transcribe SIN --output (ese flag es solo para sidecar SRT/VTT; el transcript.json se escribe solo); añadido el andamio real del pipeline (npx hyperframes init --video y npx hyperframes render con quality/fps/format), que era el esqueleto que faltaba; voz em_alex marcada como no verificada; puntero a transcript-guide.md para filtrar tokens basura -->
 <!-- skill versión GVE1.1 · ruta completa a captions.md de hyperframes, transcribe con --model small --language es, dependencias TTS declaradas, estado honesto del stack, manejo de errores por paso, caso borde de producto sin claims -->
 <!-- skill versión GVE1.0 · creación: destilado del tutorial Horizontes IA + stack Golden (Whisper local, claims, checklist) -->
 
-**Versión:** `GVE1.3` · Fábrica: chat centro de mando. · Blindada con `chflags uchg` (desbloquear con `chflags -R nouchg` antes de editar, volver a blindar con `chflags -R uchg` al cerrar).
+**Versión:** `GVE1.6` · Fábrica: chat centro de mando. · Blindada con `chflags uchg` (desbloquear con `chflags -R nouchg` antes de editar, volver a blindar con `chflags -R uchg` al cerrar).
 
 Graba con el celular sin preocuparte por trabarte, repetir o quedarte callado. Esta skill
 se encarga del resto. Pensada para **anuncios COD y contenido orgánico de Golden**, no para
@@ -79,6 +83,14 @@ Paso 1 y el Paso 2 de una). El video final es un **HTML de composición** con at
 subtítulos, visuales y audio, y es lo que se renderiza al final.
 
 ### Paso 2 · Base limpia (cortes + subtítulos)
+
+**Si el video es un plano fijo que se hace largo, abre `references/multicamara-una-camara.md`
+ANTES de cortar.** Ahí está el método para fabricar tres cámaras con una sola: cuándo cambia el
+encuadre (cuando cambia la idea, ~1 min 30 s; **cada 10 s no es ritmo, es ruido**), el punch-in al
+113% con tope duro en 125%, y la regla que más pesa: **el corte cae en el silencio más cercano
+dentro de una ventana de 1,5 s, y si no hay silencio NO se corta**. Meter más gráficos encima de
+un plano fijo compra tiempo hasta el próximo corte; no arregla que el espectador siempre vuelva
+al mismo cuadro.
 Si no usaste `init --video`, transcribe aparte:
 ```bash
 npx hyperframes transcribe grabacion.mp4 --model small --language es
@@ -191,6 +203,11 @@ identidad Golden, nunca con la marca ajena (regla de referencias).
 - `hyperframes` + `hyperframes-media` + `hyperframes-cli` → el motor por debajo.
 
 ## Changelog
+
+- **GVE1.4.1** (2026-08-24): bump de las ediciones del 24 (verificador de cierre R2: la version vive en 4 caras — sello, linea Version, Changelog y REGISTRO — y el bump anterior toco solo el sello).
+- **GVE1.4** (2026-08-23) — Estándar 9 (Centro de Mando): los cambios relevantes de esta skill
+  se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. (Entrada añadida en el barrido del
+  arsenal 2026-08-24: el cambio existía solo como sello en comentario, sin su entrada aquí.)
 - **GVE1.3** (2026-08-21) — Re-auditoría con golden-skill-auditor: la línea "Versión" y este
   Changelog se habían quedado en GVE1.1 mientras el cuerpo del pipeline ya traía los cambios
   de GVE1.2 (andamio `init --video`, `transcribe` sin `--output`, voz `em_alex` marcada como

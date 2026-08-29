@@ -3,6 +3,36 @@
 Conocimiento acumulado (ex-`golden-shopify`). Esto es lo que más rompe páginas o
 mata conversión. Léelo antes de escribir copy o entregar.
 
+## Regla 0-F — UMBRAL DE RENTABILIDAD ANTES DE LA ESCALERA (no publicar precios a ciegas)
+Esta skill escribe PRECIOS, y un combo bajo el punto de equilibrio no se descubre en la pagina: se
+descubre con la pauta ya pagada. **El breakeven se calcula ANTES de proponer la escalera.**
+- **El criterio lo manda `golden-ads`** (es quien lo mide en cuentas reales): breakeven CPA = margen
+  bruto por unidad (precio - costo - envio/COD - devoluciones); breakeven ROAS = precio / margen bruto,
+  ajustado por la **tasa de entrega efectiva** en COD. Ante duda, consultarla; no adivinar aqui.
+- **En COD el flete se paga por PEDIDO, no por unidad** → la 2a y 3a unidad no pagan flete nuevo y
+  dejan mas margen: ese es el motor del combo. Pero **la devolucion golpea el pedido completo**, asi
+  que el ajuste por entrega pega MAS FUERTE en los escalones altos, justo donde mas se descuenta.
+- **Sin costo, flete, tasa de entrega (y comision si es anticipado) NO se publican precios**: quedan en
+  `[confirmar]` (REGLA #3). Estimarlos es inventar plata.
+- Cada escalon debe: dejar **margen > 0** ajustado por entrega, **subir el margen absoluto por pedido**
+  frente al anterior, y **dejar aire para el CPA**. El que no pasa, sube de precio o se elimina.
+- Se entrega al dueno el **CPA maximo rentable por escalon**, para que la pauta arranque con la linea
+  ya trazada. Detalle y checklist: `references/breakeven-combos.md`.
+
+## Regla 0-E — LA ORDEN TIENE QUE PODER DESPACHARSE (combos y bumps)
+Una pagina que convierte pero genera ordenes que el fulfillment rechaza no vendio: dejo un pedido
+trabado. Los sistemas COD (Dropi y similares) modelan la orden como **UNA fila por (producto,
+variacion) con cantidad**; Shopify permite el mismo producto en varias lineas. De ese choque sale el
+error *"no se pueden agregar variaciones duplicadas del mismo producto"*.
+- **UN combo = UNA variante con SKU PROPIO** ("Pack x2", SKU `...-P2`), nunca la misma variacion
+  repetida a otro precio.
+- **El bump SUMA CANTIDAD** a la linea existente; jamas crea una segunda linea con la misma variante.
+- **SKU unico por producto**: un producto suelto y una variante del multi-variante NO pueden compartir
+  SKU (aguas abajo se leen como el mismo item duplicado).
+- Si ya paso: fusionar las lineas iguales en una con la cantidad sumada — sabiendo que **editar la
+  orden crea una orden FANTASMA** en el fulfillment (cambia el id, la vieja cuenta doble).
+Medido en produccion el 2026-08-28 sobre ordenes reales de una tienda COD (fecha MEDIDA, no heredada).
+
 ## Regla 0-C — COHERENCIA DE PRODUCTO (el copy tiene que describir ESTE producto)
 Aprendido auditando verrugas como cliente (870/1000 por incoherencias, no por estructura).
 - **La FORMA del producto manda en el verbo.** Spray → "rocía"; gotero → "aplica una gota"; crema →

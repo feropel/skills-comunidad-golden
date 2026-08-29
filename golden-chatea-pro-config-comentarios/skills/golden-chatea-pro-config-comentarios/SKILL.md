@@ -5,6 +5,20 @@ description: Genera el JSON de configuración GENERAL del asistente de COMENTARI
 
 # Chatea Pro — Config del asistente de comentarios
 
+<!-- Fábrica: CENTRO DE MANDO (chat 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR) — sin fábrica de chat propia; turnos y filas van a la bandeja del CdM. -->
+<!-- skill v1.7 · 2026-08-26 (Centro de Mando, fila de CHATEA TOMAS VIP CHILE, medida en fXXXXXX) · GATE
+FAIL-CLOSED PARA CAMPOS ARRAY en build_config.py: los campos existentes de Comentarios son tipo
+array, su tipo NO se puede cambiar por API, y sobre ~19.000-23.000 escapados el campo muere EN
+SILENCIO (API responde 200, el asistente nace muerto; medido: 19.922 entra, 23.266 no; Tomás lo
+sufrió con 24.191). Nuevo --destino {array,longjson} con default array: si el escapado supera
+LIMITE_ESCAPADO_SEGURO (19.000) y el destino es array, ERROR DURO exit 1 SIN archivo con las dos
+salidas (compactar, o verificar longtext en el servidor y correr con --destino longjson). OJO
+DESTAPADO POR EL GATE: la plantilla stock con UN solo producto ya mide ~22.7k escapados — para un
+campo array SIEMPRE hay que compactar; la nota vieja de LONG JSON dejaba pasar esto en silencio.
+Probado en ambas direcciones: array+stock exit 1 sin archivo · longjson+sano exit 0 con archivo ·
+longjson+inflado exit 1 por tope de negocio. Los placeholders rotos que Tomás vio ("usando ,  y ]")
+NO están en assets/template.json (grep 0 ocurrencias): viven en el espacio VIVO de Golden y se
+propagan por herencia — fila de config viva, no de esta skill. -->
 <!-- skill v1.6 · 2026-08-23 (Estándar 9 del auditor, tarea liviana) · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 <!-- skill v1.5 · 2026-08-21 (auditoría golden-skill-auditor, PLATA 933→ORO) · (1) Referencia faltante a la hermana golden-chatea-pro-producto-comentarios añadida en description, Conexiones y Gotchas — esa skill existe y hace exactamente lo que la sección de gotchas describía (objeto de 5 llaves img/name/desc/rela/estado) sin que este SKILL.md la nombrara; riesgo real de que un pedido de "cargar un producto a comentarios" se intentara resolver aquí en vez de derivar. (2) build_config.py: cargar_template() y la carga de --intake ya no truenan con traceback crudo si falta el archivo o el JSON está corrupto — ahora dan ERROR legible y exit 1, igual que el resto de validaciones del script (patrón ya usado en validar_topes/validar_sin_placeholders). Probado: --intake inexistente, --intake con JSON roto, y las corridas normales (colombia, mexico con colombianismos, sin --producto) siguen exit 0/2/1 igual que antes. -->
 <!-- skill v1.4.3 · 2026-08-08 (centro de mando, spot-check final) · COLOMBIANISMOS: añadido $150.000 (aparecía en la salida junto a $90.000 y la re-derivación de F4 lo omitió; mitigado por 'pesos colombianos' en la misma frase, pero la lista debe estar completa). -->
@@ -120,12 +134,21 @@ python3 scripts/build_config.py \
   --info-extra "<info del negocio del usuario>" \
   --producto "<Nombre:dolencia que trata>" \
   --producto "<OtroNombre:su dolencia>" \
-  --out <negocio>_CONFIG.json
+  --out <negocio>_CONFIG.json \
+  --destino longjson   # SOLO tras verificar EN EL SERVIDOR que el campo es longtext
 ```
+
+**`--destino` (v1.7, fail-closed):** por defecto es `array`, porque los campos existentes de
+Comentarios son tipo array, su tipo NO se puede cambiar por API y sobre ~19.000 escapados el
+campo muere EN SILENCIO (API 200, asistente muerto; medido: 19.922 entra, 23.266 no). Con el
+default, si el escapado supera 19.000 el script da ERROR exit 1 SIN archivo — y OJO: la
+plantilla stock con un solo producto ya mide ~22.7k, así que para un campo array SIEMPRE toca
+compactar los prompts largos. Pasa `--destino longjson` únicamente después de verificar en el
+servidor que el campo destino es longtext.
 
 El campo `datos_req` (datos que la IA le pide al cliente) se genera solo según `--pais`. Solo agrega `--datos-cliente "campo1; campo2; ..."` si el usuario pide una lista distinta a la estándar del país.
 
-**Semántica de exit codes del script (v1.4.1):** `0` = config entregable (placeholders llenos, topes nativos y de negocio respetados, cabe en LONG JSON de 500.000 medido COMPACTO+escapado, que es lo que se escribe por API; el tope legado de 20.000 del tipo JSON se imprime como NOTA, no es fallo). `1` = error duro y NO se escribe archivo (placeholder sin llenar o llave simple desconocida, sin productos, producto malformado, tope nativo o de negocio excedido — jamás truncar en silencio). `2` = exceso real que muta la entrega, archivo escrito (no cabe ni en LONG JSON, o colombianismos pendientes con `--pais` no-colombia).
+**Semántica de exit codes del script (v1.4.1; v1.7 añade el exit 1 del gate array):** `0` = config entregable (placeholders llenos, topes nativos y de negocio respetados, cabe en LONG JSON de 500.000 medido COMPACTO+escapado, que es lo que se escribe por API; el tope legado de 20.000 del tipo JSON se imprime como NOTA, no es fallo). `1` = error duro y NO se escribe archivo (placeholder sin llenar o llave simple desconocida, sin productos, producto malformado, tope nativo o de negocio excedido — jamás truncar en silencio). `2` = exceso real que muta la entrega, archivo escrito (no cabe ni en LONG JSON, o colombianismos pendientes con `--pais` no-colombia).
 
 El tope del campo depende de su **TIPO**, no de la plataforma: tipo **JSON** = 20.000, tipo
 **LONG JSON** = **500.000** (medido por API el 2026-07-25). **Crea el campo como LONG JSON** y el

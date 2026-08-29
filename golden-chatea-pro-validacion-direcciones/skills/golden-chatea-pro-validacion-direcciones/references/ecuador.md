@@ -21,9 +21,9 @@ Reglas: sin emojis, sin saludos (el bot ya saludó), sin explicaciones, una sola
 Evalúa SIEMPRE la dirección completa acumulada (incluyendo lo que el cliente agregue en la conversación); responde "dirección correcta" solo cuando ya no quede duda operativa.
 
 📦 TRANSPORTADORAS HABILITADAS
-Envío a domicilio: Veloces, Gintracom, Laarcourier, Servientrega, Urbano. (En Ecuador Servientrega SÍ está habilitada.)
-Recogida en agencia: disponible con las transportadoras que operan agencia.
-No habilitada: si menciona una transportadora fuera de esta lista, es inválida aunque la dirección esté bien escrita → Para completar su envío, nos comparte una dirección con una transportadora habilitada, o prefiere recoger en agencia?
+[PENDIENTE — confirmar con el negocio antes de usar este pack: transportadoras de domicilio y cuáles operan recogida en agencia. No inventar ninguna ni heredar la lista de otro negocio. OJO: el veto a Servientrega es un criterio de la operación de Golden en COLOMBIA — no clonarlo a Ecuador ni a ningún negocio que no lo haya pedido.]
+Recogida en agencia: disponible con las transportadoras confirmadas que operan agencia.
+No habilitada: si menciona una transportadora fuera de la lista confirmada por el negocio, es inválida aunque la dirección esté bien escrita → Para completar su envío, nos comparte una dirección con una transportadora habilitada, o prefiere recoger en agencia?
 
 🧠 CÓMO ESCRIBE LA GENTE EN ECUADOR (interpreta esto)
 • Sistema de intersección con "y": calle principal + "y" + calle secundaria (la esquina). Ej: "Rocafuerte y García Moreno". La "y" marca el cruce y es dato fuerte de ubicación.
@@ -59,7 +59,7 @@ Ej: Recinto La Esperanza, vía a Daule, frente a la escuela · Parroquia Tarqui,
 Incompleta si solo el nombre (recinto/comuna/parroquia) sin referencia, o sector rural muy genérico → una referencia o punto exacto y la parroquia o cantón.
 
 🏢 RECOGIDA EN AGENCIA
-Válida: transportadora habilitada + ciudad/sector (Gintracom Guayaquil · Servientrega Quito Norte). No se requiere dirección exacta; la agencia se asigna por cobertura.
+Válida: transportadora habilitada + ciudad/sector (ej.: [Transportadora] Guayaquil · [Transportadora] Quito Norte). No se requiere dirección exacta; la agencia se asigna por cobertura.
 Incompleta si solo la transportadora sin ciudad → la ciudad o el sector de la agencia.
 
 🧠 VALIDACIÓN AVANZADA DE COMPLEMENTO

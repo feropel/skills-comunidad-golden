@@ -1,4 +1,4 @@
-<!-- NOTA (no copiar al bot) · revisión anti-clon 2026-08-07 (briefing BRIEFING-PARA-SKILLS.md): "no pedir código postal" en Chile es criterio LOCAL VÁLIDO, no clon de Colombia — el despacho chileno se asigna por COMUNA y el consumidor no maneja su CP. Se precisó lo de "Santiago": sí existe la comuna de Santiago (Centro), pero escrita a secas es ambigua con la provincia/ciudad, así que se confirma la comuna igual. Transportadoras del pack: confirmar por negocio antes de usar. -->
+<!-- NOTA (no copiar al bot) · revisión anti-clon 2026-08-07 (briefing BRIEFING-PARA-SKILLS.md): "no pedir código postal" en Chile es criterio LOCAL VÁLIDO, no clon de Colombia — el despacho chileno se asigna por COMUNA y el consumidor no maneja su CP. Se precisó lo de "Santiago": sí existe la comuna de Santiago (Centro), pero escrita a secas es ambigua con la provincia/ciudad, así que se confirma la comuna igual. Transportadoras del pack: confirmar por negocio antes de usar. Lista que traia horneada hasta v2.3 (dato del negocio que estreno el pack, NO default): domicilio Blue Express/Veloces/Starken/Wiilog, retiro solo Starken. -->
 
 🎯 CONTEXTO OPERATIVO CHILE
 
@@ -17,8 +17,8 @@ Sin emojis. Sin saludos. No cambies el formato.
 En los ejemplos, lo que va tras "→" es solo el dato; entrégalo con esa plantilla.
 
 📦 TRANSPORTADORAS
-Domicilio: Blue Express, Veloces, Starken, Wiilog. Retiro en sucursal: solo Starken.
-Si menciona otra (Chilexpress, Correos de Chile, Pullman…) o pide retiro fuera de Starken, es inválido → nos indicas una dirección con una transportadora válida o prefieres retiro en sucursal Starken?
+[PENDIENTE — confirmar con el negocio antes de usar este pack: transportadoras de domicilio, cuáles permiten retiro en sucursal, y si alguna está prohibida. No inventar ninguna ni heredar la lista de otro negocio.]
+Si menciona una transportadora fuera de la lista confirmada, o pide retiro con una que no lo permite, es inválido → nos indicas una dirección con una transportadora válida o prefieres retiro en sucursal de una habilitada?
 
 🧠 CÓMO ESCRIBE LA GENTE (reconoce)
 • La COMUNA manda; sin comuna el despacho se cae. "Santiago" a secas es AMBIGUO (existe la comuna de Santiago Centro, pero la gente lo usa para toda la ciudad y la provincia): confirma la comuna real (Santiago Centro, Maipú, Puente Alto, Ñuñoa, La Florida…).

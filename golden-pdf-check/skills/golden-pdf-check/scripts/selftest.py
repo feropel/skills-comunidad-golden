@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 GOLDEN PDF · selftest.py
-Prueba de regresión de la skill: **15 comprobaciones** sobre PDFs construidos
+Prueba de regresión de la skill: **16 comprobaciones** sobre PDFs construidos
 de verdad (nada simulado). Hay una prueba por cada versión que cambió el
 comportamiento, para que una regresión no pase en verde:
 
@@ -12,7 +12,8 @@ comportamiento, para que una regresión no pase en verde:
   10. Anti-falso-positivo: dos tarjetas seguidas no son un corte ·
   11-12. Figuras (v5.6) · 13. Bloque con estilo ::: (v5.7) · 14. El aviso de
   líneas largas dispara cuando debe (v5.8) · 15. …y la muestra oficial NO lo
-  dispara (el fixture cumple la regla que la skill enseña).
+  dispara (el fixture cumple la regla que la skill enseña) · 16. CONTRASTE
+  WCAG de los colores de texto contra su fondo (>=4.5:1).
 
 La cifra de arriba es la que imprime una corrida SANA, y es la que va en el
 sello del changelog. Si agregas una prueba, actualiza el número aquí y verifica
@@ -263,6 +264,52 @@ def main():
             okblk, detblk = False, str(e)
     results.append(("Bloque con estilo ::: (v5.7): clase propia, markdown adentro, no es tarjeta",
                     okblk, detblk))
+
+    # 16) CONTRASTE WCAG de los colores de TEXTO contra su fondo. Los dorados de
+    #     marca son de acento (#d4af37 = 2.00:1, #b8912a = 2.80:1 sobre el fondo
+    #     claro) y durante 5 versiones se usaron para texto: kicker de portada,
+    #     enlaces, kicker e índice, títulos de bloque y el pie. Un PDF que se
+    #     imprime o se lee en un móvil con brillo bajo no perdona eso. La regla
+    #     queda EJECUTABLE: si alguien vuelve a poner un dorado de acento en un
+    #     color de texto, esta prueba falla. (Fila del chat FILTRO DE
+    #     HERRAMIENTAS, método tomado de la skill dataviz, 2026-08-26.)
+    def _lum(h):
+        h = h.lstrip("#"); c = [int(h[i:i+2], 16) / 255 for i in (0, 2, 4)]
+        c = [(x / 12.92 if x <= 0.03928 else ((x + 0.055) / 1.055) ** 2.4) for x in c]
+        return 0.2126 * c[0] + 0.7152 * c[1] + 0.0722 * c[2]
+
+    def _ratio(a, b):
+        la, lb = _lum(a), _lum(b)
+        return (max(la, lb) + 0.05) / (min(la, lb) + 0.05)
+
+    css = open(os.path.join(SKILL_DIR, "assets", "golden-print.css"), encoding="utf-8").read()
+    import re as _re
+
+    def _tok(name, default=None):
+        m = _re.search(r"--%s:\s*(#[0-9a-fA-F]{6})" % name, css)
+        return m.group(1) if m else default
+
+    FONDO_CLARO = _tok("page-bg", "#faf9f5")
+    # (color de texto, fondo sobre el que cae, dónde vive)
+    PARES = [(_tok("gold-text"), FONDO_CLARO, "kicker/enlaces/índice/bloques"),
+             (_tok("gold-text"), _tok("surface", "#ffffff"), "insignia del índice"),
+             (_tok("ink"), FONDO_CLARO, "cuerpo del documento"),
+             (_tok("muted"), FONDO_CLARO, "subtítulo y pies"),
+             (_tok("on-gold"), _tok("gold", "#b8912a"), "texto sobre la banda dorada")]
+    # FALLAR-CERRADO: si un token no se resuelve (lo renombraron, el color se
+    # hereda, el fondo no está declarado), eso NO es un par que se salta en
+    # silencio — es un FALLO. Un chequeo que se apaga solo cuando no entiende
+    # lo que mira da un verde mentiroso, que es peor que no tener chequeo.
+    malos = []
+    for c, f, d in PARES:
+        if not c or not f:
+            malos.append("NO SE PUDO CALCULAR (%s): color=%r fondo=%r" % (d, c, f))
+            continue
+        r_ = _ratio(c, f)
+        if r_ < 4.5:
+            malos.append("%s sobre %s (%s) = %.2f:1" % (c, f, d, r_))
+    results.append(("Contraste WCAG de los textos (>=4.5:1, falla-cerrado)", not malos,
+                    "; ".join(malos) if malos else "%d pares calculados, todos pasan" % len(PARES)))
 
     report(results)
     core = all(ok for name, ok, _ in results if "numeración" not in name)  # motor es informativo

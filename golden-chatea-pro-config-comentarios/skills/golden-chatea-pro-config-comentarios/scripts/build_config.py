@@ -381,6 +381,13 @@ def main():
                    help="Producto de la tienda y la dolencia que trata (repetible). "
                         "Rellena el guardarrail anti-dolencias. Obligatorio: al menos 1.")
     p.add_argument("--out", required=True, help="Ruta del JSON de salida")
+    p.add_argument("--destino", choices=["array", "longjson"], default="array",
+                   help="Tipo REAL del bot field destino. Por defecto 'array' (fail-closed): "
+                        "los campos existentes de Comentarios son tipo array, su tipo NO se "
+                        "puede cambiar por API, y por encima de ~19.000 escapados el campo "
+                        "muere EN SILENCIO (la API responde 200 y el asistente nace muerto; "
+                        "medido: 19.922 entra, 23.266 ya no). Pasa 'longjson' SOLO tras "
+                        "verificar en el servidor que el campo es longtext.")
     a = p.parse_args()
 
     if a.intake:
@@ -420,6 +427,19 @@ def main():
     cfg = construir(pais, contacto, t_envio, info_extra, datos_cliente, productos)
     validar_topes(cfg)                      # exit 1 SIN archivo si un tope nativo revienta
     out, escapado, excede_total = reporte(cfg)
+    if a.destino == "array" and escapado > LIMITE_ESCAPADO_SEGURO:
+        print()
+        print("!" * 62)
+        print(f"ERROR: {escapado} escapados > {LIMITE_ESCAPADO_SEGURO} y el destino es un campo")
+        print("       tipo ARRAY: el campo muere EN SILENCIO (la API responde 200 y el")
+        print("       asistente nace muerto; medido en plataforma: 19.922 entra, 23.266 no).")
+        print("       El tipo de un bot field NO se puede cambiar por API.")
+        print("       Salidas: (a) compactar los prompts largos hasta bajar de")
+        print(f"       {LIMITE_ESCAPADO_SEGURO}, o (b) verificar EN EL SERVIDOR que el campo")
+        print("       destino es longtext y correr de nuevo con --destino longjson.")
+        print("       No se escribio ningun archivo.")
+        print("!" * 62)
+        sys.exit(1)
     destino = os.path.dirname(os.path.abspath(a.out))
     try:
         os.makedirs(destino, exist_ok=True)

@@ -5,6 +5,17 @@ description: Golden Group — Genera el PROMPT de validación de direcciones del
 
 # Golden · Chatea Pro — Validación de Direcciones (hijo del logístico)
 
+<!-- Fábrica: CENTRO DE MANDO (chat 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR) — sin fábrica de chat propia; turnos y filas van a la bandeja del CdM. -->
+<!-- skill v2.4 · 2026-08-26 (Centro de Mando, fila de CHATEA VICENTE VIP · Zolva) · DESHORNEADAS
+LAS TRANSPORTADORAS DE NEGOCIOS REALES: colombia.md traía la operación logística completa de
+Golden (7 transportadoras, veto a Servientrega) violando la propia ley de la skill ("nunca
+hornees datos de un negocio real"); misma clase en chile.md (Starken/Blue Express) y ecuador.md
+(Gintracom "preferida"). Los tres bloques pasan a hueco [PENDIENTE — confirmar con el negocio]
+como ya hacían Panamá/Perú/Paraguay; la lista de Golden se movió a
+PROYECTOS/CHATEA-PRO-ASISTENTES-MAPA/GOLDEN-TRANSPORTADORAS-COLOMBIA.md (solo espacios Golden).
+El patrón oro de Colombia declara la excepción por diseño en su cabecera. Guatemala (histórico
+fuera de plataforma) se conserva intacto, declarado. Ejemplos con marcas reales generalizados a
+[Transportadora]. -->
 <!-- skill v2.3 · 2026-08-23 (Estándar 9, golden-skill-auditor) · Estándar 9 (Centro de Mando):
 cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 <!-- skill v2.2 · 2026-08-21 (auditoría golden-skill-auditor) · añadido paso 4 de VERIFICACIÓN/QA
@@ -95,7 +106,7 @@ Dos capacidades del prompt:
    - 🇨🇴 Colombia → `references/colombia.md` **(patrón oro: estructura, tono y exigencia de referencia)**
    - 🇲🇽 México → `references/mexico.md` (CP REQUERIDO; sin recogida en oficina; emojis ✅/⚠️)
    - 🇨🇱 Chile → `references/chile.md` (la comuna es el dato rey)
-   - 🇪🇨 Ecuador → `references/ecuador.md` (Servientrega SÍ habilitada; agencia en [PENDIENTE])
+   - 🇪🇨 Ecuador → `references/ecuador.md` (transportadoras en [PENDIENTE]; el veto a Servientrega es criterio de Golden-Colombia, no clonarlo)
    - 🇵🇦 Panamá → `references/panama.md` (transportadoras en [PENDIENTE]: preguntarlas al negocio)
    - 🇵🇪 Perú → `references/peru.md` (el distrito manda; transportadoras en [PENDIENTE])
    - 🇵🇾 Paraguay → `references/paraguay.md` (esquinas c/ y e/; transportadoras en [PENDIENTE])
@@ -103,7 +114,7 @@ Dos capacidades del prompt:
 3. **Confirma con el usuario los datos operativos del negocio** que el pack necesita (no los inventes) — o recíbelos del padre `golden-chatea-pro-config-logistico`. Pídelos TODOS de una vez (intake único, no goteado):
    - **Transportadoras habilitadas** para domicilio y para recogida en oficina (varían por negocio).
    - Si hay **recogida en oficina** y con qué transportadoras.
-   - Cualquier transportadora **prohibida** (ej. en el pack de Colombia, Servientrega no se usa).
+   - Cualquier transportadora **prohibida** por el negocio (ej.: Golden prohíbe Servientrega en su operación de Colombia — dato que vive FUERA de la skill, en CHATEA-PRO-ASISTENTES-MAPA/GOLDEN-TRANSPORTADORAS-COLOMBIA.md).
    - Si conserva los emojis de estado (✅/⚠️) o no.
    - Si el negocio no puede confirmar algún dato en el momento (caso típico: Panamá, Perú, Paraguay con transportadoras en `[PENDIENTE]`), dilo explícitamente en el entregable como pendiente con dueño — nunca inventes ni dejes el placeholder sin avisar.
 4. **Verifica el prompt antes de entregarlo** (paso de QA, no te lo saltes): relee el prompt armado y confirma que cumple el contrato de salida (una sola línea, sin saludos, sin explicaciones, con o sin emoji SEGÚN el país), que las transportadoras que puso el usuario quedaron en la lista y no quedó ninguna inventada, y que ningún `[PENDIENTE]` llegó al texto final sin que el usuario lo haya resuelto o aceptado dejarlo así.

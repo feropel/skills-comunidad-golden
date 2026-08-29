@@ -26,6 +26,28 @@ están horneados en `assets/golden-brand.json` y `assets/golden-print.css`.
 
 Gradiente de marca: `linear-gradient(145deg, #f4d67a, #d4af37 55%, #9a7b1e)`.
 
+### Regla de uso del dorado (MEDIDA, no estética)
+
+Los dorados de marca son de **acento**, no de texto. Medido contra el fondo
+`#faf9f5`: `#d4af37` da **2.00:1** y `#b8912a` da **2.80:1**. El mínimo WCAG es
+4.5:1 para texto y 3.0:1 para elemento gráfico — o sea que ni siquiera llegan al
+umbral de gráfico.
+
+| Uso | Color | Por qué |
+|---|---|---|
+| Filetes, gradientes, bordes, banda de las tarjetas, fondos | `#d4af37` / `#b8912a` | ahí no hay texto que leer: la identidad manda |
+| **Texto** dorado sobre fondo claro (kicker, enlaces, índice, títulos de bloque, pie) | `--gold-text: #8a6d1f` (**4.65:1**) | mismo dorado con menos luminosidad: se lee igual de Golden y SÍ se puede leer |
+| Texto sobre fondo oscuro | `#d4af37` | sobre el negro de marca `#1a1508` da 8.65:1, sin problema |
+
+Otros tonos verificados por si algún día se quiere más contraste: `#7a5f1a`
+(5.73:1), `#6b5215` (7.01:1), `#5c4611` (8.52:1).
+
+Esto **no es opinión de diseño**: la prueba 16 del `selftest.py` calcula el
+ratio de cada color de texto contra su fondo y falla por debajo de 4.5:1. Si
+alguien vuelve a poner un dorado de acento en un color de texto, el self-test
+lo caza. Origen: fila del chat FILTRO DE HERRAMIENTAS (2026-08-26), método
+tomado de la skill `dataviz` — verificar con número, no a ojo.
+
 Se eligió un tema **claro** (no el oscuro del dashboard) porque un PDF que
 la gente imprime y del que copia-pega se lee mejor en claro y no desperdicia
 tinta. El dorado se mantiene como acento premium.

@@ -5,6 +5,15 @@ description: Golden Group — Configura el asistente LOGÍSTICO de Chatea Pro (e
 
 # Golden · Chatea Pro — Asistente Logístico (padre)
 
+<!-- Fábrica: CENTRO DE MANDO (chat 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR) — sin fábrica de chat propia; turnos y filas van a la bandeja del CdM. -->
+<!-- skill v1.6 · 2026-08-26 (CdM, edición de familia por la LLAVE DEL INTAKE respondida por FER) ·
+PASO 0 vuelve a UNA PREGUNTA A LA VEZ: la v1.5 lo había pasado a "intake único en un solo turno"
+siguiendo estandares-golden §3, pero FER resolvió hoy la contradicción en la fábrica de
+prompt-ventas ("mejor uno por uno, porque en bloque se abruma la gente") y la nota de gobierno del
+barrido pre-comprometía revertir esta skill JUNTO con prompt-ventas (v3.16.0, mismo criterio:
+bloque solo si el interlocutor pega varios datos o lo pide). Lo que se conserva del §3: el
+conjunto se releva AL INICIO y nada ya dado se re-pregunta. Fila entregada a la fábrica del
+auditor para alinear el §3 y que el próximo barrido no lo devuelva al formulario. -->
 <!-- skill v1.5 · 2026-08-24 (barrido total del arsenal, CdM): el PASO 0 decía "pregunta 1 a la vez" — goteo que contradice la ley de autonomía Golden (estandares-golden §3: los datos que solo el dueño tiene se piden UNA vez, al inicio, nunca goteados; cada repregunta es una fuga de turnos). Ahora el intake se pide completo en un solo turno. Los 6 datos, los techos (incl. adenda LONG JSON de dos niveles), gotchas de API, la LEY de no heredar datos y el resto quedan intactos. -->
 <!-- skill v1.4 · 2026-08-23 (Estándar 9 — Conexión con el Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 <!-- skill v1.3 · 2026-08-21 (auditoría golden-skill-auditor) — description con más sinónimos/frases reales de disparo y desambiguación explícita de la hija (se activa sola, no hace falta llamarla aparte); PASO 1 con manejo de error si la hija golden-chatea-pro-validacion-direcciones no está instalada o no tiene el pack del país (nunca inventar el prompt a mano, declarar pendiente con motivo); PASO 2 con checklist explícito de "terminado" (país, transportadoras, tiempos, prompt de la hija, escribir-releer si aplica, barrido si el origen fue una cuenta guía). -->
@@ -93,7 +102,12 @@ Tiene dos niveles:
 
 ## Flujo de configuración
 
-### PASO 0 — Intake operativo del negocio (pídelo COMPLETO en un solo turno — intake único, nunca goteado — y no inventes nada)
+### PASO 0 — Intake operativo del negocio (UNA PREGUNTA A LA VEZ — decisión de FER 2026-08-26 — y no inventes nada)
+Releva los 6 datos AL INICIO, conversacionalmente, **una pregunta a la vez** ("en bloque se
+abruma la gente" — FER). El bloque completo de una sola vez es la EXCEPCIÓN: solo cuando el
+interlocutor ya pegó varios datos juntos (reconócelos todos y pregunta solo lo que falte) o
+pida expresamente que se le mande todo de una. Lo que NO cambia: el conjunto se releva al
+inicio y un dato ya dado JAMÁS se re-pregunta después.
 1. **País** del workspace.
 2. **Transportadoras habilitadas** para **domicilio** (las que el negocio realmente tiene contratadas).
 3. Si ofrece **recogida en oficina** y con qué transportadoras.

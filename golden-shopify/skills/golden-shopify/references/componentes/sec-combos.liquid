@@ -10,6 +10,30 @@
 
   ⚠️ Los precios NO se inventan: se confirman con el dueño. Si aún no los tienes, deja
   [confirmar] en el precio y NO publiques la sección.
+
+  🔴 UMBRAL DE RENTABILIDAD (Regla 0-F): antes de escribir un solo precio aqui, calcula el punto de
+  equilibrio de CADA escalon — margen > 0 tras costo + flete y AJUSTADO por la tasa de entrega, que
+  el escalon suba el margen absoluto por pedido, y que quede aire para el CPA. En COD el flete se
+  paga por PEDIDO (por eso el 2o y 3o dejan mas margen) pero la devolucion golpea el pedido COMPLETO
+  (por eso el escalon alto es el mas fragil). Un combo bajo el breakeven no se ve aqui: se ve con la
+  pauta ya pagada. Formula y checklist: `references/breakeven-combos.md` (criterio de golden-ads).
+
+  🔴 REGLA DE DESPACHO (medida en produccion, 2026-08-28 — rompe el pedido, no la conversión):
+  esta sección es SOLO VISUAL (tarjetas de precio); quien materializa el combo en el carrito es
+  Releasit / el order bump. Ahí es donde se decide si la orden se puede despachar:
+   1. UN combo = UNA variante con SKU PROPIO (ej. "Pack x2 Bergamot", SKU ...-P2). JAMAS la misma
+      variacion repetida ni el mismo producto en dos lineas.
+   2. Si el bump ofrece "lleva otro igual", debe SUMAR CANTIDAD a la linea existente, nunca crear
+      una linea nueva con la misma variante.
+   3. Dos productos distintos NUNCA comparten SKU (un producto suelto y una variante del multi-
+      variante con el mismo SKU se leen como duplicado aguas abajo).
+  Por que: Shopify permite el mismo producto en varias lineas; los sistemas de fulfillment COD
+  (Dropi y similares) modelan la orden como UNA fila por (producto, variacion) con cantidad, y
+  rechazan la orden con "no se pueden agregar variaciones duplicadas del mismo producto".
+  Caso real: una orden con Bergamot x1 + Athletix x1 + Bergamot x1 (misma variante, mismo precio,
+  dos lineas) quedo trabada sin poder despacharse; otra tenia dos productos distintos con el mismo
+  SKU. Editar la orden para fusionar lineas la destraba, pero genera orden FANTASMA en el sistema
+  de fulfillment (cambia el id y la vieja cuenta doble) → mejor prevenirlo aqui.
 {% endcomment %}
 
 {% comment %}

@@ -191,3 +191,11 @@ pagan caro: medir el escapado antes de escribir, y releer del servidor después.
 Abre con **las preguntas que hay que contestar antes de tocar**: los hallazgos 🔵 que traen
 acción concreta no se corrigen a ciegas ni se tiran a la basura — se contestan, y cada uno viene
 con su `clave` lista para escribir la respuesta en el libro de decisiones.
+
+## Bloque K · El ciclo, simulado antes de vivirlo
+
+| # | auto | Control |
+|---|---|---|
+| K1 | A | **La decisión CADUCA sola cuando la situación cambia.** `reabrir_si` es prosa para humanos y ningún código puede evaluarla; lo que sí se puede verificar es si cambió la **evidencia**. Cada decisión guarda `evidencia_al_decidir` — la foto del día en que se tomó — y si la evidencia de hoy difiere, el hallazgo **vuelve a contar** con las dos fotos lado a lado. Sin esto, una decisión silencia para siempre: la de los huérfanos decía "reabre si se les carga un id de anuncio" y el día que se cargara habría seguido callada. Una decisión sin esa foto se avisa: **no puede caducar**. |
+| K2 | A | **Los días se simulan, no se esperan.** `scripts/simular_dias.py` corre el ciclo sobre un espacio que evoluciona: se corta un campo desde el panel, un campo cruza el techo, se borra un campo, la API falla un día, se enciende pauta. Validar el ciclo dejándolo correr días reales descubre los fallos en producción; simularlos cuesta minutos. |
+| K3 | A | **El banco tiene que MORDER.** Un día que pasa con el arreglo saboteado no prueba nada. Cada día del simulador se verifica con el arreglo vivo **y** con el arreglo roto: si pasa en los dos, la comprobación se está auto-aprobando por una vía que no prueba nada. Caso real: el día 7 registraba el producto, el hallazgo desaparecía y el test pasaba aunque la caducidad estuviera muerta. Se reescribió para que el hallazgo persista y solo cambie su evidencia. |

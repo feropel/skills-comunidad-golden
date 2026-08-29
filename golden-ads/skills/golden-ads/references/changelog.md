@@ -11,7 +11,7 @@
 - [G4.9 — 2026-08-18 · CAPA HUMANA parte 2](#g49--2026-08-18--capa-humana-parte-2-redes-patrones-y-sondeo-de-producto)
 - [G4.8 — 2026-08-18 · CAPA HUMANA](#g48--2026-08-18--capa-humana-audiencia-momento-y-mensaje-con-corazón)
 - [G4.7 — 2026-08-11 · RED SINÁPTICA + reconciliación de sello](#g47--2026-08-11--red-sináptica-puente-a-la-transcripción-local-de-creativos--reconciliación-de-sello)
-- [G4.5 — 2026-08-07 · Cosecha dental Chile](#g45--2026-08-07--cosecha-del-chat-estudio-360-producto-de-ejemplo-chile-vía-centro-de-mando)
+- [G4.5 — 2026-08-07 · Cosecha dental Chile](#g45--2026-08-07--cosecha-del-chat-estudio-360-dental-cavity-healing-chile-vía-centro-de-mando)
 - [Notas menores — 2026-07-30 / 2026-08-02](#notas-de-versión-menores-no-selladas--2026-07-30-y-2026-08-02)
 - [G4.6 — 2026-07-27 · Golden NO es solo contra entrega](#g46--2026-07-27--corrección-de-fondo-golden-no-es-solo-contra-entrega)
 - [G4.4 — 2026-07-18 · Aclaración Modo A/B](#g44--2026-07-18--aclaración-la-datahistórico-es-la-excepción-producto-nuevo--modo-b-por-default)

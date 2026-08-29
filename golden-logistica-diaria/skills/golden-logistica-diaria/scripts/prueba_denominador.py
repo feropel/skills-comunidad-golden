@@ -340,7 +340,7 @@ def main():
     # llevo un informe ya entregado, el otro EL TOKEN de Chatea. Si se lee algo, se lee
     # con la familia `leer_*`, que apunta el archivo y activa la guarda. Este conteo es
     # lo que impide que vuelva a colarse uno.
-    crudos = []
+    crudos, excepciones = [], []
     for f in sorted(x for x in os.listdir(aqui) if x.endswith(".py")):
         # `auditar_cierre.py` INSPECCIONA los archivos de la skill: no procesa datos de
         # la operacion, asi que sus lecturas no son insumos y apuntarlas ensuciaria el
@@ -353,10 +353,26 @@ def main():
             # `io.open`, `builtins.open` y `codecs.open` esquivaban el detector porque
             # el patron exigia que no hubiera un punto delante. Cualquier cosa que
             # termine en `open(` y no sea `urlopen` cuenta.
+            # LA EXCEPCION SE DECLARA CON MOTIVO Y QUEDA A LA VISTA.
+            # Antes se aceptaba UN literal concreto — «noqa: marca de control» — o sea
+            # una lista de excepciones de un solo elemento, escrita a mano. La segunda
+            # excepcion legitima que aparecio (leer el CODIGO FUENTE de la skill para
+            # deducir las claves de config) no cabia, y la salida era o mentir sobre su
+            # motivo o aflojar el banco. Ninguna de las dos.
+            # Ahora vale cualquier `noqa:` **con un motivo escrito**, y las excepciones
+            # se IMPRIMEN al final: permitidas, pero contadas. Una excepcion que nadie
+            # ve es una puerta que se abre sola con el tiempo.
+            _exc = re.search(r"noqa:\s*(\S.{6,})", ln)
+            if _exc:
+                excepciones.append(f"{f}:{i} · {_exc.group(1).strip()[:52]}")
             if (re.search(r"\b(?:io\.|builtins\.|codecs\.)?open\(", sin_com)
                     and "urlopen" not in sin_com
-                    and "noqa: marca de control" not in ln):
+                    and not _exc):
                 crudos.append(f"{f}:{i}")
+    if excepciones:
+        print("  excepciones declaradas de `open` (permitidas, pero contadas):")
+        for e in excepciones:
+            print("     ·", e)
     juzgar("no hay open() crudos: todo se lee con leer_json/leer_texto",
            not crudos, str(crudos))
 

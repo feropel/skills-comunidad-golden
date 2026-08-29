@@ -21,6 +21,8 @@ description: >-
 <!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leian el cerebro de marca — esta entra a la familia que SI lo lee. Bloque identico en las 6 del CdM + fila a la fabrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
 
 # Golden Cinemática — el salto de "página" a "experiencia"
+<!-- skill GC1.4.3 · 2026-08-26 (chat FILTRO, autoridad de FER) · puntero a golden-web/references/estandar-movimiento.md, destilado de review-animations (skill instalada que ninguna Golden nombraba). Esta skill tenia el EFECTO pero no los NUMEROS: medido, 0 menciones de ease-out, scale(0, transform-origin, @starting-style y springs. Solo se anadio el puntero: nada mas tocado. -->
+<!-- skill GC1.4.2 · 2026-08-26 (chat FILTRO, autoridad de FER; golden-cinematica es del CENTRO DE MANDO por REGISTRO-FABRICAS) · references/vocabulario.md: +1 fila, HORIZONTAL SCROLL (seccion con overflow hidden + pista movida por translateX() atada a ScrollTrigger). ORIGEN: carrusel de gowtham_techie con 6 efectos de scroll. MEDIDO antes de tocar: 5 de los 6 ya estaban cubiertos entre esta skill y golden-web (scroll trigger 5/5, pin 13/7, parallax 1/7, scroll progress 0/2, scroll-linked 3/4) y el stack completo tambien (gsap 14, scrolltrigger 10, lenis 5, three 54). El unico en CERO era horizontal scroll. Aporte real del carrusel: 1 de 6, no 6 de 6. Nada mas tocado. -->
 <!-- skill GC1.4.1 · 2026-08-24 (centro de mando, remediación del verificador de cierre): línea de RUTA del cerebro en el Paso 0 (las lectoras ordenaban LÉELO PRIMERO sin decir dónde — un chat limpio no podía ejecutar la orden) + bump que las ediciones del 23-24 dejaron sin subir. -->
 
 ## Paso 0 · Cerebro de marca (obligatorio antes de generar)
@@ -38,7 +40,7 @@ se generó sin voz de marca cargada.
 <!-- skill GC1.1 (2026-07-27) · filtro de 9 reels: 5 términos nuevos al vocabulario de entrada y revelado (pixel/entrance reveal por grid, smooth loader con máscara, stacked sticky sections, fondo ligado al scroll) con la nota de que se hacen a mano en CSS/JS y no hace falta Framer -->
 <!-- skill GC1.0 (2026-07-25) · nace de un diagnóstico de FER: "las páginas que me has hecho son 10 de 100". Destilado del análisis frame a frame de 6 sitios de Textura Agency (@textura.eu / getlayers.ai), donde se capturó el PROMPT REAL con sus tokens numéricos. El hallazgo central: la diferencia entre 10/100 y 100/100 no es la librería, es que el encargo lleva milisegundos, grados, radios y hex exactos en vez de adjetivos -->
 
-**Versión:** `GC1.4.1` · Fábrica: chat centro de mando.
+**Versión:** `GC1.4.3` · Fábrica: chat centro de mando.
 
 Esta skill existe por una razón concreta: las páginas Golden nombraban las librerías
 correctas y aun así salían genéricas. El diagnóstico fue que **conocer el nombre de la
@@ -146,6 +148,10 @@ completa abajo.
 - `golden-web` → estructura y blueprints por perfil, con su propia
   `references/estilo-agencia-premium.md` (tipografía display + springs + aire). Esta skill
   es su capa 3D
+- `golden-web/references/estandar-movimiento.md` → **el estándar NUMÉRICO de cómo se mueve todo**:
+  curva por tipo de movimiento, duración de UI bajo 300 ms, nunca `scale(0)`, origen en el disparador,
+  interrumpibilidad y por qué solo se animan `transform` y `opacity`. Esta skill pone el EFECTO; ese
+  archivo pone los NÚMEROS. Misma ley: tokens exactos, jamás adjetivos.
 - `three` · `gsap` (ScrollTrigger) · `apple-design` (easing físico) · `emil-design-eng`
   (pulido invisible) · `improve-animations` (auditar una web ya hecha)
 - `golden-imagen-arena` / Higgsfield → generar el render pre-hecho del fondo del hero

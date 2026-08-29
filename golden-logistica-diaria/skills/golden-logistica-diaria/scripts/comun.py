@@ -256,6 +256,65 @@ BANDERAS_CONOCIDAS = {
 }
 
 
+_CACHE_CLAVES = None
+
+
+def _claves_que_el_codigo_lee():
+    """Las claves de config que los scripts de la skill leen de verdad.
+
+    Se saca leyendo los `cfg.get("x")` y `cfg["x"]` de los hermanos. Si por lo que sea
+    no se puede leer el directorio, devuelve vacio: el aviso se apoya entonces solo en
+    la lista a mano, que es el comportamiento de antes. Fallar aqui no puede romper una
+    corrida — esto solo decide si se imprime una advertencia.
+    """
+    global _CACHE_CLAVES
+    if _CACHE_CLAVES is not None:
+        return _CACHE_CLAVES
+    # SE LEE EL CODIGO, NO EL TEXTO. La primera version buscaba con expresiones
+    # regulares y se leyo A SI MISMA: el ejemplo escrito en este docstring entro al
+    # conjunto como si fuera una clave de verdad. Es la forma exacta del detector de
+    # privacidad que llevaba dentro el telefono que perseguia — **un escaner de texto
+    # no distingue el codigo de la explicacion del codigo**.
+    # Con el arbol sintactico no hay que acordarse de excluir nada: los comentarios y
+    # los docstrings no son nodos de llamada, asi que quedan fuera por construccion.
+    import ast
+    claves = set()
+    try:
+        aqui = os.path.dirname(os.path.abspath(__file__))
+        for f in sorted(os.listdir(aqui)):
+            if not f.endswith(".py") or f.startswith("prueba_"):
+                continue
+            try:
+                # `open` directo Y APUNTADO, como la marca de autoria del PDF: esto
+                # lee el CODIGO FUENTE de la skill, no un insumo de la corrida.
+                # Pasarlo por `leer_texto` lo apuntaria como insumo y ensuciaria el
+                # registro del dia con los propios scripts — y ademas haria que el
+                # guardia de escritura creyera que los .py son datos que hay que
+                # proteger de sobrescritura. La excepcion se marca, no se esconde.
+                arbol = ast.parse(
+                    open(os.path.join(aqui, f), encoding="utf-8").read())  # noqa: codigo, no insumo
+            except SyntaxError:
+                continue
+            for n in ast.walk(arbol):
+                # cfg.get("clave")
+                if (isinstance(n, ast.Call) and isinstance(n.func, ast.Attribute)
+                        and n.func.attr == "get"
+                        and isinstance(n.func.value, ast.Name) and n.func.value.id == "cfg"
+                        and n.args and isinstance(n.args[0], ast.Constant)
+                        and isinstance(n.args[0].value, str)):
+                    claves.add(n.args[0].value)
+                # cfg["clave"]
+                if (isinstance(n, ast.Subscript)
+                        and isinstance(n.value, ast.Name) and n.value.id == "cfg"
+                        and isinstance(n.slice, ast.Constant)
+                        and isinstance(n.slice.value, str)):
+                    claves.add(n.slice.value)
+    except OSError:
+        pass
+    _CACHE_CLAVES = claves
+    return claves
+
+
 def avisar_banderas(cfg, ruta):
     """Nombra las claves que la skill no conoce. No mata: avisa.
 
@@ -264,7 +323,25 @@ def avisar_banderas(cfg, ruta):
     dueño creia haber configurado algo que nunca estuvo configurado. Un config que
     acepta cualquier cosa en silencio miente sobre lo que esta puesto.
     """
-    raras = sorted(k for k in cfg if not k.startswith("_") and k not in BANDERAS_CONOCIDAS)
+    # LA LISTA SE DERIVA DEL CODIGO, NO SE MANTIENE A MANO.
+    #
+    # Medido el 2026-08-19: el aviso marco `oficinas_inter` como «mal escrita» — una
+    # clave BUENA, que el motor lee para cruzar contra las oficinas de Interrapidisimo.
+    # Faltaba en la lista, junto con `preferencia_municipio`. Las dos las anadi yo en
+    # las ultimas rondas y las dos se me olvidaron aqui.
+    #
+    # Y el comentario que hay doce lineas mas arriba **ya advertia de esto**: «un aviso
+    # que grita en falso se ignora a los dos dias, y entonces ya no avisa de nada».
+    # Volvio a pasar igual. Escribir la advertencia no impide el fallo: **una lista que
+    # hay que acordarse de actualizar se desactualiza**, y esta encima dice lo contrario
+    # de la verdad — manda a borrar una clave que el motor necesita.
+    #
+    # Ahora el conjunto sale de LEER los scripts hermanos: las claves que la skill
+    # entiende son, por definicion, las que la skill lee. La lista a mano se conserva
+    # como respaldo y se UNE, nunca se resta: asi el aviso solo puede volverse mas
+    # silencioso, jamas mas ruidoso.
+    conocidas = BANDERAS_CONOCIDAS | _claves_que_el_codigo_lee()
+    raras = sorted(k for k in cfg if not k.startswith("_") and k not in conocidas)
     if raras:
         import sys as _s
         print(f"AVISO · {os.path.basename(ruta)} tiene claves que esta skill NO LEE: "

@@ -16,6 +16,7 @@ se le devuelven 3 opciones concretas para que elija.
 | Que la imagen se arme con cuadritos que van apareciendo en desorden | **pixel reveal / entrance reveal por grid** (celdas con `transition-delay` aleatorio o por patrón) |
 | Que el logo se dibuje solo y luego se abra la página | **smooth loader**: máscara sobre el logo + salida en `clip-path` (no un spinner) |
 | Que al bajar el scroll una sección tape a la anterior | **stacked / sticky sections** (`position: sticky` + z-index escalonado) |
+| Que al bajar en vertical el contenido se mueva de lado (vitrina de productos, pasos de uso) | **horizontal scroll**: sección con `overflow: hidden` + pista movida por `translateX()`, atada a ScrollTrigger. Entrada vertical, salida horizontal |
 | Que el fondo cambie de color según la sección donde voy | **scroll-linked background transition** por `IntersectionObserver` |
 
 **Ojo con los tres primeros:** en los reels salen hechos en Framer, que es una herramienta

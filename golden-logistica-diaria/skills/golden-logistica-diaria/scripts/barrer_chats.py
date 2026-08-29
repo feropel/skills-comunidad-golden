@@ -68,7 +68,20 @@ def main():
         raise RuntimeError("inalcanzable")
 
     C = leer_json(a.contactos)
+    # LA MISMA COMPUERTA QUE EL RESTO DE LAS PUERTAS.
+    # Esto era `C["contactos"] if isinstance(C, dict) else C`: tolerante con la forma,
+    # pero sin mirar el contenido. Con una cadena por dentro, `contactos` se volvia la
+    # cadena y el barrido iteraba SUS LETRAS — cada caracter tratado como un contacto.
+    # No revienta: pide chats de gente que no existe, gasta cuota de 429 y devuelve un
+    # resultado vacio con cara de dia tranquilo.
     contactos = C["contactos"] if isinstance(C, dict) else C
+    if not isinstance(contactos, list) or (contactos and not isinstance(contactos[0], dict)):
+        sys.exit(
+            "NO SE ENTIENDE LA LISTA DE CONTACTOS: %s\n"
+            "  Se esperaba una lista de contactos (o un objeto con 'contactos').\n"
+            "  Llego %s. Barrer sobre algo que no son contactos gasta la cuota del dia\n"
+            "  y devuelve un vacio que parece un dia sin conversaciones."
+            % (a.contactos, type(contactos).__name__))
 
     # ---- INCREMENTAL ----
     # Acepta parciales a proposito: una corrida a medias es presupuesto de 429 ya

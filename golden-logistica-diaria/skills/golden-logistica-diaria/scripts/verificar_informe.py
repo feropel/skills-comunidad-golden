@@ -331,6 +331,29 @@ def main():
         sys.exit(f"NO EXISTE EL INFORME {a.informe}: no hay nada que verificar.")
     md = leer_texto(a.informe)
     ANA = leer_json(a.analisis)
+    # EL VERIFICADOR NO PUEDE CULPAR AL PAPEL DE UNA FALTA DEL INSUMO.
+    #
+    # Medido el 2026-08-19: con un analisis que es una lista, esto moria con
+    # `AttributeError: 'list' object has no attribute 'get'` sin nombrar el archivo;
+    # con un analisis vacio corria entero y dictaminaba **«el papel no dice lo que dice
+    # el analisis»** — culpando al informe de que faltara el analisis. Falla cerrado en
+    # los dos casos (codigo 1), asi que nunca aprobo nada de mas; pero **mandaba al
+    # lector al sitio equivocado**, que en un guardia es casi tan caro como callarse:
+    # se va a revisar el generador cuando lo que falta es el insumo.
+    #
+    # Un diagnostico equivocado no es un fallo menor que un falso verde: es tiempo
+    # gastado mirando donde no esta.
+    _esperadas = ("motivos", "calientes", "conversion_universo_pct", "universo",
+                  "quien_habla_de_ultimo", "por_motivo")
+    if not isinstance(ANA, dict) or not any(k in ANA for k in _esperadas):
+        sys.exit(
+            "NO SE PUEDE VERIFICAR: el analisis %s no tiene forma de analisis.\n"
+            "  Llego %s y no trae ninguna de las claves que este verificador compara\n"
+            "  (%s).\n"
+            "  Esto NO dice que el informe este mal: dice que no hay contra que\n"
+            "  compararlo. Un verificador que reprueba el papel por una falta del\n"
+            "  insumo manda a revisar el generador cuando el problema esta al lado."
+            % (a.analisis, type(ANA).__name__, ", ".join(_esperadas[:3]) + "..."))
 
     problemas, no_juzgados = verificar(md, ANA)
     secs = partir_secciones(md)

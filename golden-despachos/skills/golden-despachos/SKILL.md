@@ -20,12 +20,13 @@ description: >
 
 # Golden Despachos — calificar antes de que se genere la guía
 
+<!-- skill GD1.4 · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 <!-- skill GD1.3 · auditoría golden-skill-auditor: decidir_vivo.py NO tenía rama prepago (calificaba TODOS los pedidos, prepago incluido, con el valor esperado de contra entrega — retorno y probabilidad de devolución que un prepago nunca paga; contradecía criterios-decision.md, que manda el precio en prepago). Ahora replica la lógica de calificar.py: descarta candidatas a más de 3 puntos de la mejor efectividad, elige la más barata salvo excepción de $1.500, retorno en cero, y la columna GANA reporta ahorro de flete (no valor esperado) para prepago. De paso: filtro explícito de HABILITADAS (antes solo vivía en calificar.py; Servientrega y otras no habilitadas podían colarse si alguna vez cotizaban), y se quitó un bucle muerto (`for c in x['cands']: pass`). CHANGELOG.md se movió a `references/changelog.md` (vivía suelto en la raíz: material que se publicaría tal cual al marketplace). Probado con fixtures sintéticos (un pedido prepago, uno contra entrega) contra el propio script: confirmado el cambio de comportamiento antes→después. -->
 <!-- skill GD1.2 · auditoría: los scripts aplican por fin el filtro de TRANSPORTADORAS-OPERATIVAS.json (la regla GD1.1 vivía solo en prosa; la corrida de prueba reprodujo el total equivocado) · retorno leído de COSTO-RETORNO.json por confianza (trampa 5) · scripts portables (DROPI_DATA + export por argumento/variable/Escritorio) · pipeline documentado (.psv de huellas y COTIZACIONES-VIVO.json) · frontera con golden-chatea-pro-validacion-direcciones también en el description · changelog deduplicado y dato de cliente anonimizado -->
 <!-- skill GD1.1 · TRANSPORTADORAS-OPERATIVAS.json se antepone a todo cálculo; el protocolo de rechazo mira el patrón acumulado -->
 <!-- skill GD1.0 · creación: seis criterios en orden, protocolo de rechazo, huella por transportadora, prepago por precio, duplicados, teléfono junto al ID -->
 
-**Versión** `GD1.3` · Fábrica: chat «✅ SKILL golden-despachos» · Historial detallado en
+**Versión** `GD1.4` · Fábrica: chat «✅ SKILL golden-despachos» · Historial detallado en
 `references/changelog.md`.
 
 En contra entrega la plata no se pierde en la venta, se pierde en el despacho. Un pedido mal

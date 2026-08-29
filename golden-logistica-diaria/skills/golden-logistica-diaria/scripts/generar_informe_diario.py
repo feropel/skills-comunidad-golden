@@ -147,6 +147,14 @@ def main():
     YA_NO_SE_REASIGNA = set(E["ya_no_se_reasigna"])
     D = leer_json(cfg["dropi"])
     X = leer_json(a.decisiones)
+    # LAS DECISIONES SON UNA LISTA. Sin esto, un archivo de otra forma moria en el
+    # `{x["id"] for x in X}` de mas abajo con un error que no nombra ni el archivo.
+    if not isinstance(X, list) or (X and not isinstance(X[0], dict)):
+        sys.exit(
+            "NO SE ENTIENDE EL ARCHIVO DE DECISIONES: %s\n"
+            "  Se esperaba la lista que produce `decidir_transportadora.py`.\n"
+            "  Llego %s. Sin las decisiones no hay informe: es de donde sale que\n"
+            "  hacer con cada pedido." % (a.decisiones, type(X).__name__))
     ords = D.get("ordenes") or []
     # LA VENTANA SALE DE UN SOLO SITIO Y DICE DE DONDE VIENE.
     # Aqui vivia `if acc:` sobre un campo opcional, y con el volcado oficial (que trae

@@ -381,8 +381,20 @@ if __name__ == "__main__":
         sys.exit("El extractor de cantidad está malo. No se sigue.")
     if len(sys.argv) < 3:
         sys.exit("uso: cruzar_chat_orden.py <dropi.json> <chatea.json>")
+    # LA PUERTA DE LINEA DE COMANDOS TAMBIEN SE DEFIENDE.
+    # Es el camino de prueba manual, no el que usan los generadores — pero es
+    # justo el que usa quien esta depurando, o sea quien menos necesita un
+    # error opaco encima del problema que ya venia a mirar.
     D = leer_json(sys.argv[1])
     C = leer_json(sys.argv[2])
+    if not isinstance(D, dict) or not isinstance(D.get("ordenes"), list):
+        sys.exit("El primer argumento tiene que ser el VOLCADO de Dropi (objeto con "
+                 "'ordenes'). Llego: %s — %s" % (type(D).__name__, sys.argv[1]))
+    if not isinstance(C, list):
+        C = C.get("contactos") if isinstance(C, dict) else None
+        if not isinstance(C, list):
+            sys.exit("El segundo argumento tiene que ser la lista de CONTACTOS de "
+                     "Chatea. Llego: %s" % sys.argv[2])
     r = cruzar(D.get("ordenes") or [], C)
     print(f"\nmodificables {r['modificables']} · comparadas de verdad {r['comparadas']} · "
           f"saltadas {len(r['saltadas'])}")

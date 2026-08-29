@@ -19,7 +19,10 @@ description: >
 
 # Golden Logística Diaria — el director de orquesta del día
 
-**Versión** `GLD1.42` · «flujo operativo cablea la orquestación» · Fábrica: chat «✅ SKILL golden-logistica-diaria»
+**Versión** `GLD1.43` · «Estándar 9 — conexión con el Centro de Mando» · Fábrica: chat «✅ SKILL golden-logistica-diaria»
+
+> **GLD1.43 (2026-08-23).** Estándar 9 (Centro de Mando): cambios relevantes de esta skill se
+> reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR.
 
 > **GLD1.42 (2026-08-21, auditoría golden-skill-auditor).** Añade «Flujo operativo · la
 > corrida de hoy, paso a paso»: hasta GLD1.41 el `description` prometía ser el

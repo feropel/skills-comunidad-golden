@@ -82,6 +82,12 @@ def main():
     a = ap.parse_args()
 
     cfg = leer_json(a.config)
+    # El config es un objeto. Sin esto, una lista pasaba el `for k in cfg` de
+    # `avisar_banderas` iterando cadenas y moria mas abajo en el primer `cfg.get`,
+    # con un error que no nombra el archivo.
+    if not isinstance(cfg, dict):
+        sys.exit("EL CONFIG NO ES UN OBJETO: %s llego como %s."
+                 % (a.config, type(cfg).__name__))
     avisar_banderas(cfg, a.config)
     empresa = a.empresa or cfg.get("tienda") or "la empresa"
     DEC, err_dec = cargar(a.decisiones, "las decisiones")

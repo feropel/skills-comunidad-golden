@@ -106,17 +106,42 @@ de vigilancia, no de salud. **Esto NO se ha medido producto por producto todaví
 que hay que correr con este archivo en la mano.
 
 ### 6. Andromeda: 100 variaciones no son 10 conceptos
-Meta agrupa creativos parecidos. Un **Similarity Score superior al 60%** dentro de un conjunto
-provoca **supresión de recuperación**: los anuncios casi iguales dejan de mostrarse.
-Umbral: una cuenta con **menos de 10 creativos genuinamente distintos** queda marcada.
+Andromeda es el motor de **RECUPERACIÓN** (retrieval) de Meta — la **primera** etapa del sistema de
+recomendación de anuncios. De **decenas de millones** de anuncios candidatos selecciona **unos pocos
+miles** que pasan a competir. **Decide quién COMPITE, no quién gana**: el ganador de la subasta lo
+deciden los modelos de ranking posteriores (fuente primaria: blog de ingeniería de Meta, "Meta
+Andromeda", 2-dic-2024, leído en vivo por el CdM el 2026-08-31).
 
-**Esto choca de frente con la forma de producir de Golden.** El estándar de 5+5+5 copys y lotes
-como los 70 videos de Toppik **solo suman si los conceptos son distintos**. Cinco formas de decir
-la misma frase cuentan como uno para Andromeda.
+Cada anuncio se representa como un **embedding precomputado** del creativo, en un **índice jerárquico**
+que escala a un volumen enorme de creativos. Consecuencia estructural (inferencia razonada, NO palabra
+literal de Meta): dos creativos casi idénticos caen cerca en ese índice y compiten por el mismo espacio
+de recuperación — repetir el mismo ángulo con otras palabras **no amplía a cuánta gente eres elegible**.
+
+⚠️ **CORRECCIÓN 2026-08-31 (verificada contra la fuente primaria):** la versión anterior de este
+control afirmaba un **"Similarity Score superior al 60% = supresión de recuperación"**. Ese umbral del
+60% **NO aparece en el blog de Meta** — venía de terceros (agencias / `claude-ads`), no de Meta. Se
+retira como cifra. Lo que la fuente SÍ sostiene es lo estructural de arriba, sin número de corte.
+
+**Esto choca de frente con la forma de producir de Golden.** El estándar de 5+5+5 copys y lotes como
+los 70 videos de Toppik **solo suman si los conceptos son distintos**: cinco formas de decir la misma
+frase caen en la misma rama del índice y no amplían el alcance de recuperación.
 
 La distinción operativa: **variación** es el mismo ángulo con otras palabras; **concepto** es otro
-ángulo, otro dolor, otro formato o otro protagonista. `golden-matriz-viral` y `golden-copywriting`
-ya trabajan por ángulos: **el ángulo es la unidad que cuenta, no el archivo**.
+ángulo, otro dolor, otro formato o otro protagonista. `golden-matriz-viral` y `golden-copywriting` ya
+trabajan por ángulos: **el ángulo es la unidad que cuenta, no el archivo**. Umbral operativo de Golden
+(criterio PROPIO, no de Meta): una cuenta con **menos de ~10 conceptos genuinamente distintos** queda
+marcada para revisar diversidad.
+
+**Lo que Meta reporta de Andromeda (cifras de la fuente primaria, con su condición):** +6% recall del
+sistema de recuperación · +8% calidad de anuncios en segmentos seleccionados · **+22% ROAS en
+anunciantes que NO usaban Advantage+ creative y activaron su targeting por IA** (la condición importa:
+no es +22% para todos) · +7% conversiones con generación de imagen. El contexto que explica el porqué:
+más de **1 millón de anunciantes generaron 15 millones de anuncios en un mes** con las herramientas de
+IA de Meta — esa avalancha de creativos es el problema que Andromeda resuelve.
+
+> Nota sobre "el primer frame es targeting": circula en agencias que Meta lee el primer fotograma del
+> video para decidir la entrega. Es **plausible** (el creativo sí determina elegibilidad vía embedding)
+> pero **NO aparece en la fuente primaria de Meta**. Queda como observación de mercado, nunca criterio.
 
 ### 7. La caída de CTR de febrero de 2025 no fue tuya
 En febrero de 2025 Meta redefinió la métrica de **link clicks**: ahora **excluye los clics de
@@ -138,6 +163,10 @@ conjunto → Andromeda → verificación de la métrica.
 - **Corrido contra cuentas reales: SOLO el control 3 (EMQ)**, el 27-ago sobre el píxel Colombia.
   Resultado arriba. Los controles 1, 2, 4, 5, 6 y 7 **siguen sin correr**: son el estándar a medir,
   no un diagnóstico. El más urgente de los que faltan es el 5 (presupuesto por conjunto).
+- **Andromeda (control 6):** lo ESTRUCTURAL (recuperación vs ranking, índice por embedding de creativo)
+  y las cifras de lift quedan verificados contra la fuente primaria de Meta (31-ago). Lo que NO tiene
+  respaldo de Meta y se retiró: el umbral "Similarity >60%". El umbral operativo de "~10 conceptos
+  distintos" es criterio propio de Golden, sin medición en cuenta real todavía.
 - **La deduplicación (control 2) NO se pudo medir** con las herramientas del conector:
   `ads_get_dataset_quality` da EMQ y cobertura de claves, pero no tasa de dedup. El pendiente de
   memoria sobre el posible Purchase doble **queda abierto**, ahora con más contexto pero sin

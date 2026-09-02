@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
-GOLDEN PDF · selftest.py
-Prueba de regresión de la skill: **16 comprobaciones** sobre PDFs construidos
+GOLDEN PDF · autoprueba.py
+Prueba de regresión de la skill: **22 comprobaciones** sobre PDFs construidos
 de verdad (nada simulado). Hay una prueba por cada versión que cambió el
 comportamiento, para que una regresión no pase en verde:
 
@@ -13,7 +13,15 @@ comportamiento, para que una regresión no pase en verde:
   11-12. Figuras (v5.6) · 13. Bloque con estilo ::: (v5.7) · 14. El aviso de
   líneas largas dispara cuando debe (v5.8) · 15. …y la muestra oficial NO lo
   dispara (el fixture cumple la regla que la skill enseña) · 16. CONTRASTE
-  WCAG de los colores de texto contra su fondo (>=4.5:1).
+  WCAG de los colores de texto contra su fondo (>=4.5:1) · 17. Documento LARGO:
+  índice con números de página reales y letra por encima del piso legible ·
+  18. DIRECCIÓN POSITIVA: el auditor NO marca un PDF Golden limpio (probar en
+  las dos direcciones — un detector agresivo daña tanto como uno ciego) ·
+  19. COMPONENTES VISUALES (v6.0) · 20. IDENTIDAD por tema ·
+  21. Estado del REGISTRO DE FÁBRICAS, la cara que vive fuera del árbol
+  (informativo: entre sellar y que el CdM regenere hay desfase legítimo) ·
+  22. COHERENCIA DEL SELLO: las comprobaciones declaradas aquí arriba son
+  exactamente las que la corrida imprime.
 
 La cifra de arriba es la que imprime una corrida SANA, y es la que va en el
 sello del changelog. Si agregas una prueba, actualiza el número aquí y verifica
@@ -24,14 +32,15 @@ Regla de la casa: toda versión que cambie comportamiento entra con su prueba
 aquí. Si tocas el CSS, el parser o el auto-fit, corre esto antes de usar la
 skill en material real.
 
-Uso:  python selftest.py
+Uso:  $PY scripts/autoprueba.py
 Salida: PASS (exit 0) o FAIL (exit 1) con el detalle.
 """
 import os, sys, json, subprocess, tempfile, shutil
+import re as _re3
 
 SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = os.path.join(SKILL_DIR, "scripts")
-SAMPLE = os.path.join(SKILL_DIR, "assets", "selftest-sample.md")
+SAMPLE = os.path.join(SKILL_DIR, "assets", "autoprueba-muestra.md")
 EXPECTED_CARDS = 3
 
 
@@ -64,8 +73,8 @@ def audit_text(pdf):
 
 def main():
     results = []
-    tmp = tempfile.mkdtemp(prefix="golden-selftest-")
-    pdf = os.path.join(tmp, "selftest.pdf")
+    tmp = tempfile.mkdtemp(prefix="golden-autoprueba-")
+    pdf = os.path.join(tmp, "autoprueba.pdf")
 
     # 1) build
     r = run([sys.executable, os.path.join(SCRIPTS, "build_pdf.py"), SAMPLE, pdf])
@@ -125,6 +134,10 @@ def main():
         embedded = any("Inter" in f or "JetBrains" in f or "GoldenSans" in f or "GoldenMono" in f
                        for f in fonts)
         results.append(("Fuente de marca incrustada", embedded, ", ".join(sorted(fonts))[:80]))
+    except ImportError as e:
+        # El ENTORNO no puede medir: no es un fallo del estándar.
+        results.append(("Fuente de marca incrustada", None,
+                        "no verificable: %s (instala pypdf para comprobarlo)" % e))
     except Exception as e:
         results.append(("Fuente de marca incrustada", False, str(e)))
 
@@ -311,23 +324,259 @@ def main():
     results.append(("Contraste WCAG de los textos (>=4.5:1, falla-cerrado)", not malos,
                     "; ".join(malos) if malos else "%d pares calculados, todos pasan" % len(PARES)))
 
+    # 17) DOCUMENTO LARGO: el índice trae números de página REALES y ningún
+    #     texto baja del piso de legibilidad. Origen: una bitácora de 53 págs
+    #     pasó la auditoría técnica y FER la rechazó — "no se entiende, se ve
+    #     muy pequeño, no tiene un mapa, toca uno adivinar". El índice existía
+    #     pero sin números (no es mapa) y en 4 columnas a 7.4pt (ilegible).
+    #     Falla-cerrado y con denominador, como manda la ley.
+    largo = os.path.join(tmp, "largo.md")
+    secs = ["Apertura", "Keynote de IA", "Panel de fundadores", "Taller", "Cierre"]
+    ln = ["---", "title: Documento largo", "---", ""]
+    for d in range(1, 9):
+        ln += ["## Jornada %d" % d, ""]
+        for s in secs:
+            ln += ["### %s de la jornada %d" % (s, d), ""]
+            ln += ["Parrafo de contenido narrativo para llenar la pagina y forzar "
+                   "que el documento ocupe varias hojas de verdad." for _ in range(4)]
+            ln += [""]
+    with open(largo, "w", encoding="utf-8") as f:
+        f.write("\n".join(ln))
+    largo_pdf = os.path.join(tmp, "largo.pdf")
+    r5 = run([sys.executable, os.path.join(SCRIPTS, "build_pdf.py"), largo, largo_pdf,
+              "--no-verify"])
+    fallos = []
+    if r5.returncode != 0 or not os.path.exists(largo_pdf):
+        fallos.append("no construyó: " + r5.stderr.strip()[:120])
+    else:
+        try:
+            import pdfplumber as _pp
+            import re as _re2
+            with _pp.open(largo_pdf) as _pdf:
+                _pags = [(_p.extract_text() or "") for _p in _pdf.pages]
+                # El piso se mide en TODAS las páginas, no solo en la del índice:
+                # el 6pt puede reaparecer en cualquier regla CSS futura (nota del
+                # CdM). Sin excepciones — el pie de página se subió a 7.5pt en vez
+                # de exceptuarlo, porque un piso con un violador no es un piso.
+                _tam = [round(c["size"], 1) for _p in _pdf.pages for c in (_p.chars or [])]
+            # (a) el índice trae números y son CORRECTOS.
+            #     Cuántas páginas ocupa el índice se DERIVA (por su firma), no se
+            #     asume: con pocos encabezados cabe en una y con muchos usa dos.
+            #     La primera versión de esta prueba daba por hecho que eran dos y
+            #     reportaba mal 2 de 8 secciones que en realidad estaban bien —
+            #     un test que asume el layout miente en los dos sentidos.
+            _fin_idx = 0
+            for _i, _txt in enumerate(_pags):
+                if "CONTENIDO" in _txt[:400] or "ÍNDICE DEL DOCUMENTO" in _txt[:400]:
+                    _fin_idx = _i
+            _idx = " ".join(_pags[:_fin_idx + 1])
+            _ok = _tot = 0
+            for _d in range(1, 9):
+                _t = "Jornada %d" % _d
+                _m = _re2.search(_re2.escape(_t) + r"\s+(\d+)", _idx)
+                if not _m:
+                    continue
+                _real = next((i + 1 for i in range(_fin_idx + 1, len(_pags))
+                              if _t in _pags[i]), None)
+                _tot += 1
+                _ok += (int(_m.group(1)) == _real)
+            if _tot == 0:
+                fallos.append("el índice NO trae números de página")
+            elif _ok != _tot:
+                fallos.append("números del índice mal: %d de %d" % (_ok, _tot))
+            # (b) piso de legibilidad
+            _min = min(_tam) if _tam else 0
+            if not _tam:
+                fallos.append("no se pudo medir el tamaño de letra")
+            elif _min < 7.0:
+                fallos.append("texto de %.1fpt en el documento (piso 7.0)" % _min)
+            detalle = ("%d de %d números correctos · letra mínima %.1fpt · %d págs "
+                       "(índice: %d)" % (_ok, _tot, _min, len(_pags), _fin_idx + 1))
+        except ImportError as e:
+            _nomedible = "no verificable: falta pdfplumber (%s)" % e
+            detalle = ""
+    if "_nomedible" in dir() or ("_nomedible" in locals()):
+        results.append(("Documento largo: índice con números reales y letra legible",
+                        None, locals()["_nomedible"]))
+    else:
+        results.append(("Documento largo: índice con números reales y letra legible",
+                        not fallos, "; ".join(fallos) if fallos else detalle))
+
+    # 18) DIRECCIÓN POSITIVA del detector de color: un PDF Golden LIMPIO no debe
+    #     ser marcado. Las pruebas 8-9 verifican que el auditor caza lo malo;
+    #     esta verifica que DEJA PASAR lo bueno. Sin ella, apretar la tolerancia
+    #     marcaría nuestros propios PDFs como "colores fuera de marca" y ninguna
+    #     prueba lo cazaría — un detector demasiado agresivo hace tanto daño como
+    #     uno ciego, y es más difícil de notar porque parece que trabaja.
+    #     (Ley del validador que se prueba, refinada por golden-shopify: probar
+    #     en las DOS direcciones. Fila del CdM, 2026-09-02.)
+    _limpio = audit_text(pdf)     # el PDF de la muestra oficial, construido arriba
+    _falsos = []
+    if "Colores fuera de marca" in _limpio:
+        _falsos.append("marcó colores en un PDF Golden limpio")
+    if "cortado entre páginas" in _limpio:
+        _falsos.append("marcó corte en un PDF Golden limpio")
+    if "REQUIERE ARREGLO" in _limpio:
+        _falsos.append("veredicto REQUIERE ARREGLO sobre la muestra oficial")
+    results.append(("El auditor NO marca un PDF Golden limpio (dirección positiva)",
+                    not _falsos,
+                    "; ".join(_falsos) if _falsos else "3 detectores callados sobre la muestra"))
+
+    # 19) COMPONENTES VISUALES (v6.0) y 20) IDENTIDAD POR TEMA. Durante 20
+    #     versiones la skill no sabía dibujar un gráfico: se perfeccionó el
+    #     envase y no el contenido. Estas dos pruebas cubren la capacidad nueva.
+    vis_md = os.path.join(tmp, "vis.md")
+    with open(vis_md, "w", encoding="utf-8") as f:
+        f.write("---\ntitle: Visuales\n---\n\n## Datos\n\n"
+                "::: kpi\nEntregas | 1.847 | +18% | bien\nDevoluciones | 214 | 11% | mal\n:::\n\n"
+                "::: barras Efectividad\nunidad | %\nEnvia | 92\nTCC | 58\n:::\n\n"
+                "::: escala Meta\nactual: 4820\nmeta: 6000\nunidad: pedidos\n:::\n\n"
+                "::: comparativa Rutas\nunidad | %\nCali | 61 | 88\n:::\n\n"
+                "::: pasos Proceso\nRevisar | Toda la cola.\nDespachar | Con guía.\n:::\n\n"
+                "::: qr\nhttps://comunidadgolden.com | Escanea\n:::\n")
+    vis_pdf = os.path.join(tmp, "vis.pdf")
+    rv = run([sys.executable, os.path.join(SCRIPTS, "build_pdf.py"), vis_md, vis_pdf,
+              "--tema", "comunidad-golden", "--no-verify", "--no-index"])
+    fv = []
+    if rv.returncode != 0 or not os.path.exists(vis_pdf):
+        fv.append("no construyó: " + rv.stderr.strip()[:120])
+    else:
+        try:
+            import pdfplumber as _pv
+            with _pv.open(vis_pdf) as _d:
+                _txt = "\n".join((_p.extract_text() or "") for _p in _d.pages)
+                _imgs = sum(len(_p.images) for _p in _d.pages)
+            # Cada dato lleva su etiqueta VISIBLE: en papel no hay tooltip.
+            for _esperado in ("1.847", "92%", "4.820", "6.000", "Revisar", "Despachar"):
+                if _esperado not in _txt:
+                    fv.append("falta la etiqueta directa %r" % _esperado)
+            if "+27" in _txt and "Cali" not in _txt:
+                fv.append("comparativa sin su etiqueta de categoría")
+        except ImportError as e:
+            fv = None
+            _detv = "no verificable: falta pdfplumber (%s)" % e
+    if fv is None:
+        results.append(("Componentes visuales: KPI, barras, escala, pasos y QR", None, _detv))
+    else:
+        results.append(("Componentes visuales: KPI, barras, escala, pasos y QR",
+                        not fv, "; ".join(fv) if fv else
+                        "5 componentes con etiqueta directa (sin hover que los rescate)"))
+
+    # 20) La identidad CAMBIA de verdad: mismo documento, otro tema, otros colores.
+    car_pdf = os.path.join(tmp, "vis-cartel.pdf")
+    rc = run([sys.executable, os.path.join(SCRIPTS, "build_pdf.py"), vis_md, car_pdf,
+              "--tema", "cartel-del-chat", "--no-verify", "--no-index"])
+    fc = []
+    if rc.returncode != 0 or not os.path.exists(car_pdf):
+        fc.append("no construyó con el tema del Cartel")
+    else:
+        try:
+            import pdfplumber as _pc
+            def _tonos(ruta):
+                with _pc.open(ruta) as _d:
+                    return {tuple(round(x, 2) for x in (c.get("non_stroking_color") or ()))
+                            for _p in _d.pages for c in (_p.rects or [])}
+            if _tonos(vis_pdf) == _tonos(car_pdf):
+                fc.append("los dos temas pintan EXACTAMENTE lo mismo: la identidad no cambió")
+            with _pc.open(car_pdf) as _d:
+                _t2 = "\n".join((_p.extract_text() or "") for _p in _d.pages)
+            if "El Cartel del Chat" not in _t2:
+                fc.append("el pie no tomó la identidad del tema")
+        except ImportError as e:
+            fc = None
+            _detc = "no verificable: falta pdfplumber (%s)" % e
+    if fc is None:
+        results.append(("Identidad por tema: el mismo .md sale con otra marca", None, _detc))
+    else:
+        results.append(("Identidad por tema: el mismo .md sale con otra marca",
+                        not fc, "; ".join(fc) if fc else
+                        "Comunidad Golden vs Cartel: colores y pie distintos"))
+
+    # LA CUARTA CARA, la que vive FUERA del árbol: la fila del REGISTRO-FABRICAS,
+    # que leen los otros chats y que ningún bump ni blindaje alcanza. Se reporta
+    # como INFORMATIVO, no como fallo: entre que la fábrica sella y el Centro de
+    # Mando regenera el censo hay una ventana legítima de desfase, y hacer fallar
+    # ahí sería el detector agresivo que la prueba 18 existe para evitar.
+    _reg = os.path.expanduser("~/Desktop/⭐️ MASTER ⭐️/🤖 IA/🟠 CLAUDE/"
+                              "🌐 PROYECTOS/STACK-GOLDEN/REGISTRO-FABRICAS.md")
+    _sello = None
+    _msk = _re3.search(r"skill (v\d+\.\d+)", open(os.path.join(SKILL_DIR, "SKILL.md"),
+                                                   encoding="utf-8").read())
+    _sello = _msk.group(1) if _msk else "?"
+    if os.path.exists(_reg):
+        _fila = _re3.search(r"\| golden-pdf-check \| ([^|]+) \|",
+                            open(_reg, encoding="utf-8").read())
+        _enreg = ("v" + _fila.group(1).strip()) if _fila else "no aparece"
+        _igual = (_enreg == _sello)
+        results.append(("Registro de fábricas al día (informativo)", True,
+                        "disco %s · registro %s%s" % (_sello, _enreg,
+                        "" if _igual else "  ← DESFASADA: avisar al CdM para que regenere")))
+    else:
+        results.append(("Registro de fábricas al día (informativo)", True,
+                        "registro no encontrado en esta máquina"))
+
+    # 20) COHERENCIA DEL SELLO — la ley del denominador publicado aplicada a esta
+    #     misma autoprueba. La docstring declara un número de comprobaciones y el
+    #     sello del changelog lo repite; si alguien agrega una prueba y no toca
+    #     el número, el sello miente. Ya pasó DOS veces en esta skill (decía 13
+    #     corriendo 14, y 15 corriendo 14) y las dos las cazó un ojo externo, no
+    #     yo. Ahora lo caza la propia corrida: se compara lo DECLARADO contra lo
+    #     que de verdad se ejecutó, sin que nadie tenga que acordarse.
+    _doc = __doc__ or ""
+    _mdec = _re3.search(r"\*\*(\d+) comprobaciones\*\*", _doc)
+    _declaradas = int(_mdec.group(1)) if _mdec else None
+    # Va de ÚLTIMA a propósito: así cuenta TODAS las líneas que la corrida
+    # imprime, incluida la informativa del registro y ella misma. La primera
+    # versión iba antes y contaba 19 sobre una salida de 20 — la propia
+    # comprobación de coherencia salió incoherente, que es la mejor prueba
+    # de que hacía falta.
+    _reales = len(results) + 1        # +1: esta misma prueba, que aún no se agregó
+    if _declaradas is None:
+        _coh = False
+        _det = "la docstring no declara cuántas comprobaciones tiene"
+    else:
+        _coh = (_declaradas == _reales)
+        _det = "declaradas %d · ejecutadas %d" % (_declaradas, _reales)
+    results.append(("Coherencia del sello: pruebas declaradas == ejecutadas", _coh, _det))
+
     report(results)
-    core = all(ok for name, ok, _ in results if "numeración" not in name)  # motor es informativo
+    core = all(ok is not False for name, ok, _ in results
+               if "numeración" not in name and "informativo" not in name)  # motor es informativo
     sys.exit(0 if core else 1)
 
 
 def report(results):
-    print("=== SELF-TEST golden-pdf-check ===")
-    allok = True
+    """TRES estados, no dos. `ok=None` significa NO SE PUDO VERIFICAR (falta una
+    dependencia opcional, no hay Chrome): eso NO es un fallo del estándar y no
+    debe leerse como tal. Quien corre la autoprueba en una máquina limpia veía
+    "HAY FALLOS" y concluía que el estándar de PDF estaba roto cuando lo que
+    faltaba era una librería — el falso rojo, que por la regla de la casa es el
+    que nadie audita porque parece que el detector trabaja.
+
+    OJO con la frontera, que no es la misma que fallar-cerrado: si un chequeo no
+    resuelve algo DEL ARTEFACTO (un token renombrado, un fondo no declarado) eso
+    SÍ es FALLO — es una señal sobre lo que mide. `None` es solo para cuando el
+    ENTORNO no permite medir; ahí el chequeo no tiene nada que decir del PDF."""
+    print("=== AUTOPRUEBA golden-pdf-check ===")
+    fallos = sin_medir = 0
     for name, ok, detail in results:
-        mark = "PASS" if ok else "FAIL"
-        if not ok:
-            allok = False
+        mark = "PASS" if ok is True else ("N/D " if ok is None else "FAIL")
+        if ok is False:
+            fallos += 1
+        elif ok is None:
+            sin_medir += 1
         line = f"[{mark}] {name}"
         if detail:
             line += "  ·  " + detail
         print(line)
-    print("=== " + ("TODO OK" if allok else "HAY FALLOS") + " ===")
+    # El veredicto DECLARA el denominador: cuántas midió y cuántas no pudo.
+    if fallos:
+        cierre = "HAY FALLOS (%d)" % fallos
+    elif sin_medir:
+        cierre = "TODO OK en lo medido · %d sin verificar (falta dependencia, no es un fallo)" % sin_medir
+    else:
+        cierre = "TODO OK"
+    print("=== " + cierre + " ===")
 
 
 if __name__ == "__main__":

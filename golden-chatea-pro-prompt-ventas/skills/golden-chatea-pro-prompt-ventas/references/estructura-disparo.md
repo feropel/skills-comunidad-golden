@@ -35,16 +35,60 @@ Buscas [PRODUCTO] para [uso A], para [uso B], o para ambos?
 ```
 Clave: que NO sea invasiva (sobre todo en productos sensibles) y que conecte con los pasos del prompt.
 
-## 4. Recordatorios (dentro de la ventana de 24h, suaves, sin presionar cantidad)
-TIEMPOS FIJOS: **Recordatorio 1 a la 1 hora, Recordatorio 2 a las 2 horas.**
-Los recordatorios NO llevan plantilla ni instrucción de IA: son solo el mensaje de texto (se envían dentro de la ventana de 24h, no necesitan plantilla de Meta).
-```
-RECORDATORIO 1:
-Te quedó alguna duda? Con gusto te ayudo 😊
+## 4. Recordatorios (dentro de la ventana de 24h)
 
-RECORDATORIO 2:
-Sigo por aquí si quieres que te lo deje listo ✨ Envío gratis y pagas al recibir 🙌
+### 🔴 LA LEY DEL RECORDATORIO
+> **El objetivo del recordatorio NO es recordar que existimos. Es darle al cliente una RAZÓN NUEVA para volver a responder.**
+
+Esa frase decide si un recordatorio sirve o es ruido. Porque el diagnóstico del recordatorio típico es demoledor: **el cliente ya sabe que estás ahí, simplemente no le importa.** Recordárselo otra vez no cambia nada.
+
+⛔ **LO QUE NO SE DEBE HACER** (es lo que manda casi todo el mercado, y por eso no funciona):
+- "Recuerda que tenemos garantía de 30 días, hay algo en lo que te pueda ayudar?"
+- "Estoy aquí por si tienes dudas" · "estoy aquí para asesorarte" · "aquí estoy para lo que necesites"
+- "Nos quedan solo las últimas 5 unidades, te gustaría apartar la tuya?" ← además suele ser urgencia inventada (ver LEY DE LA URGENCIA REAL)
+- Repetir el precio o la oferta que ya mandaste.
+Todos dicen lo mismo: *existimos, míranos, aquí estamos*. Ninguno le da al cliente algo NUEVO por lo que valga la pena escribir.
+
+### RECORDATORIO 1 (2 horas) — LA SEGUNDA CONEXIÓN
+No es un recordatorio: es volver a conectar. **La premisa: si se fue, es porque le quedó una duda** — casi siempre de confianza, no de precio. Así que en vez de empujar, pregunta cuál es esa duda y ofrece demostrar.
 ```
+Corazón, me quedó una inquietud 🙋
+
+Hay algo que esté en mis manos que me ayude a demostrarte que tenemos el producto que necesitas?
+
+Te quiero mostrar el caso de [nombre REAL de una clienta, ciudad]. Ella también tenía muchas dudas antes de empezar, mira su experiencia 👇
+[TESTIMONIO REAL en video o imagen]
+
+Si quieres, cuéntame qué es lo que más te genera duda y yo misma te digo con total sinceridad si considero que [PRODUCTO] tiene sentido para tu caso.
+```
+POR QUÉ FUNCIONA (los cuatro movimientos, no los cambies):
+1. **No vende.** No pregunta "cuál te llevas" ni reenvía la oferta: pregunta por SU duda. El cliente siente que se preocupan por él, no que lo persiguen.
+2. **Ofrece demostrar**, que es lo contrario de insistir: "hay algo que esté en mis manos para demostrarte…".
+3. **Muestra a alguien que tuvo el mismo miedo** y lo resolvió — es la respuesta exacta a una duda de confianza.
+4. **Cierra ofreciendo decirle que NO.** "Te digo con total sinceridad si considero que tiene sentido para tu caso" cambia el marco entero: lo pone en estado de EXCLUSIVIDAD y no de necesidad, y es la misma doctrina del tono asesor (recomendar con criterio aunque implique no vender). Ese giro es el que hace que responda.
+
+### RECORDATORIO 2 (6 horas) — DISRUPTIVO, para romper el hielo
+Segundo y último intento. Aquí no se vende NADA: solo se rompe la tensión con humor, porque a esas alturas el silencio ya se volvió incómodo para los dos.
+```
+Uishhh, ni mi ex me había ignorado así 😅
+[imagen de la asesora, ver regla abajo]
+```
+- **Adapta el remate al país**: "ya no lloramos, facturamos" es dicho colombiano y en otro país no aterriza. Sustitúyelo por el equivalente local o quítalo: el "ni mi ex me había ignorado así" funciona solo.
+- Funciona porque **rompe el guion comercial**: el cliente esperaba otro mensaje de venta y recibe algo humano. Pruébalo tú mismo con alguien que te tenga en visto y lo verás.
+- Un solo intento. Si no responde, se cierra y pasa a remarketing.
+
+**DOS VARIANTES DEL DISRUPTIVO — elige según lo que tengas:**
+- **A · Foto de la asesora** (la de arriba). Más personal y más creíble, pero exige una foto real con permiso y que coincida con el perfil.
+- **B · MEME.** Un meme conocido con texto tipo *"así de viejo me estoy poniendo esperando a que respondas"*. Ventajas sobre la foto: no necesita el consentimiento de nadie, no depende de un dicho local —viaja a cualquier país— y el formato ya es reconocible, así que el cliente entiende al instante que es humor y no venta. Es la opción por defecto cuando el negocio no tiene una persona real que ponga su cara.
+⚠️ Con memes: sirven como HUMOR para romper el hielo, nunca para insinuar que alguien famoso respalda el producto. Un meme que hace reír está bien; una cara conocida puesta como si avalara lo que vendes es otra cosa y no se hace.
+
+📌 **PRUÉBALO ANTES DE ADOPTARLO.** Estas dos variantes no salieron de una teoría: salieron de probarlas. Haz lo mismo — mándaselo a un amigo o a un familiar que te tenga en visto y mira si responde. Lo que funcione en esa prueba pequeña es lo que vale la pena poner en el bot; lo que te dé pena mandarle a un conocido, probablemente tampoco funcione con un cliente.
+
+⚠️ **REGLA DE LA FOTO DE LA ASESORA** (si el recordatorio 2 lleva imagen):
+- La foto debe ser de una **persona real que dio su permiso** para usarla como imagen de la asesora. Nunca una foto de banco de imágenes, nunca la de un tercero sin consentimiento, nunca una identidad robada.
+- **Debe COINCIDIR con la foto de perfil del WhatsApp.** Si el perfil muestra a una persona y el mensaje envía otra cara, la credibilidad se cae de golpe y el efecto se invierte.
+- Selfie natural, no producida: la gracia es que parezca lo que es, un mensaje de una persona.
+- No le atribuyas a esa persona credenciales que no tiene (no la presentes como doctora, nutricionista o especialista si no lo es).
 
 ## 5. Remarketing (reabre la conversación tras varias horas)
 Cada "Configuración Remarketing" en Chatea tiene un interruptor (activar) y TRES campos. La skill entrega los tres, listos:
@@ -58,6 +102,28 @@ Cada "Configuración Remarketing" en Chatea tiene un interruptor (activar) y TRE
 - **Cuerpo:** texto con **variable `{{1}}` = nombre del cliente** (ej. "Hola {{1}} 😊 ..."). Meta pide un ejemplo de {{1}} (ej. "María").
 - **Pie de página:** una línea corta y sobria; la skill la sugiere (ej. "[MARCA] · Pago contra entrega").
 - **Botón(es):** 1 a 3 (CTA, ej. "Quiero pedirlo"). ⚠️ En el MAPEO del botón dentro de Chatea, ese botón se configura como **"botón de remarketing"** (así el clic enlaza al flujo). Indícaselo SIEMPRE al vendedor.
+### 🔴 EL REMARKETING SIGUE LA MISMA LEY QUE EL RECORDATORIO
+No es "recordarle que existimos" con plantilla de Meta: es **darle una razón nueva para volver**, y ahora con más peso, porque han pasado horas y el cliente ya se enfrió del todo. La diferencia con el recordatorio no es el tono: es que **aquí ya no puedes preguntar**, tienes un solo tiro y una plantilla aprobada.
+
+**REMARKETING 1 (3h) — LA PRUEBA QUE NO ALCANZÓ A VER**
+Se fue sin decidir: dale lo que probablemente le faltó. Encabezado con imagen (antes/después o testimonio real) y cuerpo que apunta al resultado, no al producto:
+```
+Hola {{1}} 👋 Te quedé debiendo algo: mira lo que le pasó a alguien que estaba justo donde tú.
+[resultado concreto y real]
+Si te sirve, te lo dejo listo hoy y pagas cuando lo recibas.
+```
+Botón: "Quiero verlo". Nunca "Comprar ahora": pide un paso más pequeño que la compra.
+
+**REMARKETING 2 (6h) — LA PUERTA QUE SE CIERRA BIEN**
+Último contacto. No insistas: **cierra con elegancia y deja la puerta abierta.** Paradójicamente es el que más recupera, porque quita la presión.
+```
+Hola {{1}} 😊 No quiero seguir escribiéndote si no era el momento.
+Te dejo esto por aquí y tú me dices cuando quieras: [beneficio en una línea].
+Aquí estaré 💛
+```
+⛔ Prohibido en ambos: urgencia inventada, "últimas unidades" si no es cierto, y repetir la misma oferta con las mismas palabras que ya ignoró — si no leyó eso, no lo va a leer otra vez.
+📌 La **instrucción de IA** de cada remarketing (campo 3) retoma sin reiniciar: usa lo que YA dijo el cliente, no vuelve al saludo ni repregunta lo contestado.
+
 Si el vendedor no quiere plantilla (o aún no la aprueban), va "No enviar plantilla" y el remarketing funciona solo con el Campo 3.
 
 **Campo 3 — Instrucción especial del remarketing:** UN solo campo de texto, **máximo 1000 caracteres**, que contiene el MENSAJE con que el bot reabre + la instrucción para la IA entre corchetes (van juntos en el mismo campo). Ejemplo:

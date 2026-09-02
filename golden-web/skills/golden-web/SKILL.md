@@ -16,8 +16,6 @@ description: >-
 ---
 
 # Golden Group — Web por Perfil
-<!-- skill GW2.5 · 2026-08-24 (centro de mando, remediación del verificador de cierre): bump que faltó por las ediciones del 24; ESPÉCIMEN cirílico sustituido a nivel de carácter — el sello anterior conservaba dentro las letras que decía haber cazado (un sello que guarda el bicho re-dispara la clase); línea de RUTA del cerebro añadida al Paso 0. -->
-<!-- adenda 2026-08-24 (centro de mando, barrido D + fila del 23-ago; fábrica GW sin sesión activa en toda la semana — ley del chat vivo: ejecuta el CdM y la fábrica revisa al despertar): (1) cazadas letras CIRÍLICAS incrustadas en 'aurora' (línea ~188, u y r cirílicas — invisibles al ojo, rompían todo grep por 'aurora'; barrido unicodedata del archivo completo: 0 residuos); (2) instalado el Paso 0 · Cerebro de marca BAJO el H1, el bloque idéntico de las 6 hermanas — golden-web era la única de las 7 skills de contenido sin él. -->
 
 ## Paso 0 · Cerebro de marca (obligatorio antes de generar)
 
@@ -28,7 +26,16 @@ antes de continuar; si el usuario pide seguir sin cerebro, se declara en la entr
 se generó sin voz de marca cargada.
 
 
-**Versión:** `GW2.8` · Fábrica: este chat.
+**Versión:** `GW2.9` · Fábrica: este chat.
+<!-- skill GW2.5 · 2026-08-24 (centro de mando, remediación del verificador de cierre): bump que faltó por las ediciones del 24; ESPÉCIMEN cirílico sustituido a nivel de carácter — el sello anterior conservaba dentro las letras que decía haber cazado (un sello que guarda el bicho re-dispara la clase); línea de RUTA del cerebro añadida al Paso 0. -->
+<!-- adenda 2026-08-24 (centro de mando, barrido D + fila del 23-ago; fábrica GW sin sesión activa en toda la semana — ley del chat vivo: ejecuta el CdM y la fábrica revisa al despertar): (1) cazadas letras CIRÍLICAS incrustadas en 'aurora' (línea ~188, u y r cirílicas — invisibles al ojo, rompían todo grep por 'aurora'; barrido unicodedata del archivo completo: 0 residuos); (2) instalado el Paso 0 · Cerebro de marca BAJO el H1, el bloque idéntico de las 6 hermanas — golden-web era la única de las 7 skills de contenido sin él. -->
+
+_GW2.9 (2026-08-30) — CdM (fila getlayers, filtrada por el FILTRO): **criterio QUÉ VE EL ROBOT**
+para la ruta React/Next (SSR/SSG obligatorio, texto jamás dentro del componente ssr:false,
+PageSpeed 80-90 como criterio) — hueco medido: server-side rendering y PageSpeed en 0 en todo
+golden-*; las rutas HTML y Liquid no lo necesitan. VETO DE LICENCIA: material de GetLayers jamás
+entra a una skill sincronizada (su licencia prohíbe redistribución). Vestigial cerrado: los
+comentarios del 24-ago bajaron de encima del H1 a su lugar cronológico._
 _GW2.8 (2026-08-27) — chat FILTRO: el `catalogo-de-estilos.md` de GW2.7 estaba **DORMIDO**: citado en el
 sello pero sin un momento del flujo que mandara abrirlo, así que nadie llegaba nunca a él. Disparador puesto
 en el punto 3 ("no plantilla genérica"), que es exactamente su propósito. Y CORREGIDO un choque con la regla
@@ -85,6 +92,16 @@ El cerebro vive en `PROYECTOS/BRAND-BRAINS/<MARCA>/` — la resolución exacta (
 - **3D / WebGL (capa Golden Cinemática):** skill `three` (fundamentos three.js) + `gsap` (ScrollTrigger). Código React: `react-three-fiber` + `drei` + opcional `@react-three/postprocessing` / Theatre.js. No-code: `Spline` (spline.design) embebido con `@splinetool/react-spline`. Ver sección **Golden Cinemática 3D**.
 - **Imágenes/assets:** Higgsfield (`generate_image`) + **Nano Banana Pro** (imágenes de producto/escena hiperrealistas, ideal para los frames de Golden Secuencia y heroes fotográficos), `canvas-design`, `golden-imagen-arena`.
 - **Motion en React:** **Framer Motion** (`motion/react`) es el estándar para builds React/Next — reveals por scroll, entradas escalonadas y hovers suaves. Regla: si el proyecto es React, Framer Motion; si es HTML/canvas puro, CSS + GSAP. Nunca dejes una web estática.
+- **QUÉ VE EL ROBOT (obligatorio en la ruta React/Next — GW2.9):** una página inmersiva que el
+  crawler ve como un `div` vacío no existe para Google ni para las IAs. Criterio: **SSR/SSG
+  siempre** — el bot recibe el documento COMPLETO con encabezados y copy reales en el HTML
+  inicial; el visitante HIDRATA de eso a la experiencia animada (el 3D y el motion cargan aparte,
+  como ya manda la vara de cinemática: first paint sin esperar al bundle de la escena).
+  En Next: páginas server-rendered por defecto; el canvas/escena via `dynamic import` con
+  `ssr:false` PERO el texto jamás dentro de ese componente. Meta de calidad: **PageSpeed 80-90+
+  es alcanzable en un sitio inmersivo** — es CRITERIO de aceptación, no garantía automática.
+  Esta regla es SOLO de esta ruta: el HTML-de-un-archivo (cinemática) trae el texto en el marcado
+  desde el origen, y Liquid/Shopify ya renderiza en servidor.
 - **Componentes animados de referencia:** MCP Magic (21st.dev) + Aceternity UI (aceternity.com — biblioteca React/Tailwind de componentes con micro-animaciones y efectos de scroll; se DESTILA el efecto, no se pega la marca ajena).
 - **Hosting + dominio:** skill **`all-deploy`** (`/all-deploy` — detecta stack, elige hosting Vercel/Railway/VPS, preview→prod con rollback) + MCP Vercel + MCP Domains (verificar dominio).
 - **Seguridad pre-publicación:** skill **`cyber-neo`** (`/cyber-neo .`) cuando la web tenga login, formularios, datos o claves — arregla Critical/High antes de publicar.

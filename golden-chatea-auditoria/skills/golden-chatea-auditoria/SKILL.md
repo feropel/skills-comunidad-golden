@@ -20,6 +20,15 @@ description: |
 
 # golden-chatea-auditoria · la salud de un espacio de Chatea Pro
 
+<!-- skill v1.9 (GCA1.9) — 2026-09-02 — nueva seccion "Dos alcances, dos frases": FER pidio
+poder auditar SOLO la configuracion general sin que la corrida entre a leer los 12 productos
+(o al reves, solo productos), y no tener que reexplicarlo cada vez. No hacia falta una skill
+nueva: los bloques ya estaban separados en controles.md (bloque F = contenido de producto,
+el resto = estructura/config). Se documenta la convencion de dos frases disparadoras y que
+alcance de bloques activa cada una, con la cobertura declarando "fuera de alcance" en vez de
+omitir el bloque en silencio. Pendiente de implementar en auditar.py: hoy el recorte de
+alcance es una instruccion para quien ejecuta la skill (leer solo los bloques que tocan), no
+un flag del script -- --alcance config|productos en auditar.py queda como fila declarada. -->
 <!-- skill v1.8 (GCA1.8) — 2026-08-26 — SIMULACION DE DIAS en vez de esperar los dias.
 El ciclo de vigilancia (auditoria → decision → cambio → re-medicion) se iba a validar dejandolo
 correr unos dias reales; eso cuesta dias y descubre los fallos EN PRODUCCION. Se construyo
@@ -164,7 +173,7 @@ numérico. Ver detalle completo debajo. -->
 skill nació sin CHANGELOG y sin número, y sin versión el censo diario no puede ver que alguien
 la editó. -->
 
-**Versión:** `GCA1.8`
+**Versión:** `GCA1.9`
 
 Auditar aquí significa **medir el estado real del servidor contra el estándar**, no leer la
 configuración y opinar. Nada se da por bueno sin haberlo contado, y el informe se entrega en
@@ -180,6 +189,26 @@ cobertura (universo, revisados, fallas), jamás en veredicto.
 | La INSTALACIÓN: campos, asistentes, disparadores, interruptores, integraciones | Las conversaciones del día (eso es `golden-chatea-operacion`) |
 | El CONTENIDO de cada prompt de producto, su ortografía y su coherencia | Escribir o corregir la config (eso es la familia `golden-chatea-pro-config-*`) |
 | Lo que la config DICE que va a pasar | Lo que el bot respondió de verdad ayer |
+
+## Dos alcances, dos frases (FER, 2026-09-02)
+
+Por defecto esta skill corre TODOS los bloques, productos incluidos. Cuando FER pida uno de los
+dos alcances de abajo, se recorta la corrida — no hace falta otra skill, los bloques ya están
+separados en `references/controles.md`:
+
+- **"Audítame solo la configuración" / "sin entrar en productos"** → bloques A, B, D, E, G, H,
+  I, J, K, y el bloque C **solo** sobre los 2 campos generales (`[Ventas Wp] Configuracion
+  general` y `general 2`, o el equivalente de Comentarios/Logístico/Carritos). **Se salta el
+  bloque F entero**: no se lee ni un prompt de producto, no corre `valida_producto.py`, no se
+  abre ninguno de los `[Producto Ventas Wp] N`. El informe lo declara así en el encabezado:
+  "alcance: solo configuración — productos NO revisados, N de 12 fuera de esta corrida".
+- **"Audítame los productos" / "los prompts"** → bloque F completo (los N prompts leídos
+  enteros, uno por uno, contra `estandar-prompts.md`) + bloque C aplicado a cada producto + D1
+  (cruce byte a byte disparador↔producto). No se toca la configuración general.
+- **Sin ninguna de las dos frases** → alcance completo, como siempre.
+
+El paquete de corrección y la cobertura declaran igual: un control que no corrió por el recorte
+de alcance sale como `no_corrido: fuera de alcance de esta corrida`, nunca en silencio.
 
 ## Regla de oro de esta skill
 

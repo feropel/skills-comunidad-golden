@@ -10,9 +10,15 @@ Recorre este inventario de a una, esperando cada respuesta. NO lo mandes junto. 
 3. Precio de 1, 2 y 3 (unidades o combos; cuántas trae cada combo). Léelos del widget de compra, no los deduzco.
 4. Vas a cobrar anticipado, o solo contra entrega? (si anticipado: titular, banco/entidad, número y tipo de cuenta)
 5. Cómo quieres que se llame tu asesora (la personalidad la pongo yo según el producto).
-6. Para cerrar mejor (opcional): cuántos clientes/reseñas tienes, garantía, regalo o bono, envío discreto, producto original.
-7. URL de tu tienda (opcional, solo si tienes): para redirigir si preguntan por otro producto.
+6. Testimonios o casos REALES: tienes 2 o 3 (capturas, reseñas, mensajes de clientes)? Con eso armo la conexión aspiracional. Si no tienes, se construye sin ellos — jamás se inventan.
+6b. Fotos de ANTES Y DESPUÉS reales (de tus clientes, con permiso): las tienes? Es el recurso que más convierte cuando dudan si funciona. Si no las tienes, se omite: no se simulan ni se toman de otra marca.
+6e. INCENTIVO POR PAGO ANTICIPADO (opcional, decide el negocio): das algún beneficio a quien paga por transferencia/QR — un % de descuento, un bono extra, envío más rápido? Si no das ninguno, se presentan igual las dos opciones de pago sin incentivo. NUNCA se inventa un porcentaje: sale de tu margen.
+6d. INSUMOS DE LA OFERTA (para armar la oferta irresistible, ver `oferta-irresistible.md`): qué BONO puedes dar que elimine el obstáculo real por el que no te compran (guía de uso, asesoría de seguimiento, envío discreto, unidad extra) · qué GARANTÍA das de verdad (cambio, revisar antes de pagar) · hay urgencia REAL (fecha de fin, tiempos de despacho) o escasez REAL de stock? Si no las hay, se construye sin ellas: jamás se inventan.
+6c. POR QUÉ COMPRARTE A TI y no a otra tienda que vende lo mismo: qué es cierto de tu negocio (producto original, años en el mercado, N pedidos entregados, tienda física, garantía de cambio, revisar antes de pagar, quién responde si algo pasa). Esto arma la razón de preferencia; solo entra lo que confirmes.
+7. Para cerrar mejor (opcional): cuántos clientes/reseñas tienes, garantía, regalo o bono, envío discreto, producto original.
+8. URL de tu tienda (opcional, solo si tienes): para redirigir si preguntan por otro producto.
 ```
+⛔ TESTIMONIOS: si el vendedor no los tiene, se construye el prompt SIN ellos y se le dice cómo conseguirlos. NUNCA se inventan nombres, casos ni cifras (ver la LEY DE PRUEBA SOCIAL REAL en `plantilla-prompt.md` y `cumplimiento.md`): es publicidad engañosa y causal de baneo de WhatsApp.
 Referencia del contenido (NO es un mensaje para mandar de golpe):
 ```
 PAÍS (obligatorio): ...

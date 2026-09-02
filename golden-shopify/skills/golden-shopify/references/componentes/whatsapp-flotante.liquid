@@ -10,11 +10,43 @@
   WA_SIDE: "right" o "left".
 ═══════════════════════════════════════════════════
 {%- endcomment -%}
-{% assign WA_NUMBER = "573001234567" %}
-{% assign WA_MSG    = "Hola, quiero información del producto" %}
+{% comment %}
+  🔴 EL MENSAJE NO ES TEXTO: ES EL DISPARADOR DE CHATEA (medido, Regla 0-G).
+  Si el boton apunta al BOT, el mensaje debe casar BYTE A BYTE con un disparador registrado.
+  Si no casa → "Producto/Servicio no encontrado" → tablero "No automatizado" → NADIE lo atiende.
+  Por eso apuntar al bot un producto SIN disparador es PEOR que apuntar a atencion: con atencion
+  contesta una persona; con el bot mal apuntado el cliente escribe a un tablero muerto.
+  ⚠️ TRAMPA MEDIDA: el nombre del disparador es el REGISTRADO EN CHATEA, que casi nunca es igual
+  al title de Shopify (ej. Shopify "Marca Spray | Frescura que Dura 48 Horas" vs disparador "Marca").
+  Por eso WA_PRODUCTO se escribe A MANO copiandolo del bot field, NO se toma de product.title.
+  Sin emojis ni caracteres de 4 bytes en el disparador (gotcha D1: corrompen el trigger).
+{% endcomment %}
+{% assign WA_DESTINO  = "atencion" %}{% comment %} "bot" solo si comprobaste el disparador; si no, "atencion" {% endcomment %}
+{% assign WA_BOT      = "[WHATSAPP-BOT-CHATEA]" %}
+{% assign WA_ATENCION = "[WHATSAPP-ATENCION-CLIENTE]" %}
+{% assign WA_PRODUCTO = "[NOMBRE EXACTO DEL DISPARADOR EN CHATEA]" %}
+
+{% if WA_DESTINO == "bot" %}
+  {% assign WA_NUMBER = WA_BOT %}
+  {% comment %} Formula EXACTA del disparador — no la reescribas, no le pongas coma {% endcomment %}
+  {% assign WA_MSG = "Hola quiero información y precio de " | append: WA_PRODUCTO %}
+{% else %}
+  {% assign WA_NUMBER = WA_ATENCION %}
+  {% comment %} Atencion la lee una persona: aqui el texto SI es libre y puede usar el title real {% endcomment %}
+  {% if product %}{% assign WA_MSG = "Hola, tengo una pregunta sobre " | append: product.title %}
+  {% else %}{% assign WA_MSG = "Hola, necesito ayuda" %}{% endif %}
+{% endif %}
 {% assign WA_SIDE   = "right" %}
+{% comment %} ANTI-DUPLICADO (Regla 0-G): una sola burbuja por pagina. En la ficha manda ESTA.
+   Ponlo en false solo si prefieres que mande la del tema — y entonces quita esta seccion. {% endcomment %}
+{% assign WA_SUPRIMIR_OTRAS = true %}
 
 {%- comment -%} ═══ ↓ NO TOCAR DE AQUI HACIA ABAJO ↓ ═══ {%- endcomment -%}
+{% if WA_SUPRIMIR_OTRAS %}<style>
+/* Una sola burbuja por pagina: oculta las de tema/apps mas comunes, nunca la propia (.wa-float). */
+#whatsapp-chat,.whatsapp-button,.whatsapp-float,.wa-widget,.wa-chat-btn,
+[class*="whatsapp-widget"],[id*="whatsapp-button"]{display:none !important;}
+</style>{% endif %}
 <a class="wa-float wa-float--{{ WA_SIDE }}"
    href="https://wa.me/{{ WA_NUMBER }}?text={{ WA_MSG | url_encode }}"
    target="_blank" rel="noopener" aria-label="Escríbenos por WhatsApp">

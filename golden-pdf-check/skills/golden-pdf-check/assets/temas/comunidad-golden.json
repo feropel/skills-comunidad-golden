@@ -1,0 +1,33 @@
+{
+  "id": "comunidad-golden",
+  "nombre": "Comunidad Golden",
+  "kicker": "Comunidad Golden",
+  "autor": "Golden Group",
+  "pie": "Comunidad Golden",
+  "voz": "Cercana y directa, de maestro a alumna. Tutea. Explica el porqué antes del cómo.",
+  "logo": "logo-golden.svg",
+  "colores": {
+    "--page-bg": "#faf9f5",
+    "--surface": "#ffffff",
+    "--surface-soft": "#f6f5f1",
+    "--ink": "#17140d",
+    "--muted": "#6b7280",
+    "--line": "#e7e4dc",
+    "--gold": "#b8912a",
+    "--gold-strong": "#d4af37",
+    "--gold-soft": "#e7c65a",
+    "--gold-tint": "#fbf5e2",
+    "--gold-line": "#ecd79a",
+    "--on-gold": "#1a1508",
+    "--gold-text": "#8a6d1f",
+    "--pista": "#ece9e1",
+    "--s1": "#9a7b1e",
+    "--s2": "#1a6fd4",
+    "--s3": "#c1442e",
+    "--s4": "#0b93ab",
+    "--s5": "#7a4bc4",
+    "--s6": "#d4699a"
+  },
+  "nota": "Identidad por defecto. Es la que usan los entregables de la comunidad y los PDFs de prompts.",
+  "paleta_validada": "Los 6 checks del validador de la skill dataviz pasan con ESTE orden. El validador mide pares ADYACENTES: reordenar puede romperlo (medido: rosa junto a teal falla en protanopía con ΔE 4.5). Si cambias un color, re-corre el script; no lo elijas a ojo."
+}

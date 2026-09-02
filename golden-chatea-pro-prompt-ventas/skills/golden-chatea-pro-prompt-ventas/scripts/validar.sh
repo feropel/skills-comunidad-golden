@@ -2,13 +2,17 @@
 # Validador de prompts Chatea PRO — mide los DOS techos y BLOQUEA (exit != 0) si algo falla.
 # Uso: bash validar.sh <archivo.txt> [límite_crudos]        → valida un PROMPT (límite default 12000, objetivo 9000-11000)
 #      bash validar.sh --activador <archivo.txt>            → valida un ACTIVADOR (0 emojis de CUALQUIER tipo, sin BOM)
+#      bash validar.sh --minimo <archivo.txt>               → juzga contra el rango de la VARA MÍNIMA VIABLE (4.000-6.000), no contra el de la completa
+#      bash validar.sh --vara <archivo.md>                  → extrae el bloque ``` del .md y mide SOLO el prompt entregable (la unidad autoritativa)
 # Conteo por python (independiente del locale; wc -m cuenta BYTES bajo LC_CTYPE=C y miente).
 
 set -uo pipefail
-MODE="prompt"; FILE=""; LIMIT="12000"
+MODE="prompt"; FILE=""; LIMIT="12000"; MINOBJ=""; VARA=""
 for a in "$@"; do
   case "$a" in
     --activador) MODE="activador" ;;
+    --minimo) MINOBJ="1" ;;
+    --vara) VARA="1" ;;
     *) if [ -z "$FILE" ]; then FILE="$a"; elif [[ "$a" =~ ^[0-9]+$ ]]; then LIMIT="$a"; else
          echo "❌ Argumento inválido: '$a'. Uso: bash validar.sh [--activador] <archivo.txt> [límite numérico]"; exit 1; fi ;;
   esac
@@ -17,9 +21,12 @@ if [ -z "$FILE" ] || [ ! -f "$FILE" ]; then
   echo "❌ Uso: bash validar.sh [--activador] <archivo.txt> [límite]"; exit 1
 fi
 
-python3 - "$FILE" "$LIMIT" "$MODE" << 'PY'
+python3 - "$FILE" "$LIMIT" "$MODE" "$MINOBJ" "$VARA" << 'PY'
 import json, sys
 path, limit, mode = sys.argv[1], int(sys.argv[2]), sys.argv[3]
+minimo = len(sys.argv) > 4 and sys.argv[4] == "1"
+vara   = len(sys.argv) > 5 and sys.argv[5] == "1"
+LO, HI = (4000, 6000) if minimo else (9000, 11000)
 data = open(path, "rb").read()
 bom = data.startswith(b"\xef\xbb\xbf")
 try:
@@ -28,6 +35,18 @@ except UnicodeDecodeError:
     print("❌ El archivo NO es UTF-8 válido (típico al pegar desde Word/Excel).")
     print("   No se puede medir con seguridad: guárdalo como UTF-8 y vuelve a correr. NO entregues sin validar.")
     sys.exit(2)
+
+if vara:
+    # UNIDAD AUTORITATIVA = el PROMPT ENTREGABLE, no el archivo de documentación.
+    # Extrae el primer bloque ``` del .md de la vara; sin esto se mide el .md entero
+    # (anotaciones incluidas) y "cumple/no cumple" deja de significar lo mismo.
+    import re as _re
+    m = _re.search(r"```\n(.*?)```", text, _re.S)
+    if not m:
+        print("❌ --vara: no encontré un bloque ``` con el prompt en este archivo.")
+        sys.exit(1)
+    text = m.group(1)
+    print(" (modo --vara: se mide SOLO el bloque de prompt, no el archivo completo)")
 
 raw = len(text)
 escaped = len(json.dumps(text)[1:-1])  # default ensure_ascii=True: tilde=6, emoji=12 — la fórmula del briefing
@@ -65,7 +84,9 @@ else:
     if escaped >= 19000:
         fails.append(f"EXCEDE el techo ESCAPADO del bot field: {escaped} >= 19.000 (probado en vivo: 19.895 dispara, 23.266 muere en silencio). Recorta tildes/emojis o texto.")
     if not fails:
-        target = "dentro del objetivo 9.000-11.000" if 9000 <= raw <= 11000 else ("CORTO para el objetivo 9.000-11.000 (revisa qué venta falta: FAQ, objeciones, escenarios)" if raw < 9000 else "sobre el objetivo pero bajo el techo")
+        rango = f"{LO:,}-{HI:,}".replace(",", ".")
+        etiqueta = "VARA MÍNIMA VIABLE" if minimo else "objetivo"
+        target = f"dentro del {etiqueta} {rango}" if LO <= raw <= HI else ((f"CORTO para el {etiqueta} {rango}" + ("" if minimo else " (revisa qué venta falta: FAQ, objeciones, escenarios)")) if raw < LO else f"sobre el {etiqueta} {rango} pero bajo el techo")
         print(f" Estado:     ✅ VÁLIDO — {raw}/{limit} crudos ({target}); escapado {escaped}/19.000")
         print(" Recuerda:   corre también `validar.sh --activador <archivo>` sobre CADA activador (ahí el veredicto exige 0 emojis).")
 

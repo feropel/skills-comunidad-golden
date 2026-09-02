@@ -4,7 +4,29 @@
 > número vigente en su sello; el detalle completo de cada cambio vive aquí.
 
 ## Índice
+- [G5.6 — 2026-08-31 · Corrección Andromeda verificada contra fuente primaria](#g56--2026-08-31--corrección-andromeda-verificada-contra-la-fuente-primaria-de-meta)
+- [G5.5 — 2026-08-27 · Corrección medida EMQ (sellada en SKILL.md)](#g55)
+- [G5.4 — 2026-08-26 · references/23 salud de señal + Andromeda (sellada en SKILL.md)](#g54)
 - [G5.3 — 2026-08-24 · Barrido total del arsenal (CdM)](#g53--2026-08-24--barrido-total-del-arsenal-ordenado-por-fer-vía-centro-de-mando)
+
+## G5.6 — 2026-08-31 · Corrección Andromeda verificada contra la fuente primaria de Meta
+**Origen:** hallazgo del chat FILTRO, que fue a la fuente primaria; el CdM (dueño por ley de golden-ads) la leyó
+en vivo y ejecutó la corrección. **Fuente:** blog de ingeniería de Meta, "Meta Andromeda", 2026-12-02, leída
+entera el 2026-08-31.
+- **RETIRADO** el "Similarity Score >60% = supresión de recuperación" que traía `references/23` (control 6) y el
+  sello GAE_VERSION G5.4. Ese umbral NO aparece en el blog de Meta; venía de terceros (agencias / `claude-ads`).
+- **CONSAGRADO** lo que la fuente SÍ sostiene: Andromeda es RECUPERACIÓN (primera etapa), selecciona de decenas
+  de millones a unos pocos miles → **decide quién compite, no quién gana** (el ranking posterior decide el ganador);
+  cada anuncio es un embedding precomputado del creativo en un índice jerárquico → el creativo determina elegibilidad.
+- **Cifras de Meta añadidas con su condición:** +6% recall, +8% calidad, +22% ROAS (SOLO anunciantes que no usaban
+  Advantage+ creative y activaron targeting por IA), +7% conversiones con generación de imagen, 1M+ anunciantes /
+  15M anuncios en un mes.
+- **NO consagrado:** "el primer frame es targeting" — plausible pero no está en la fuente primaria; queda como
+  observación de mercado marcada, en ninguna skill como criterio.
+- **Alineación de sello:** G5.4 (GAE_VERSION) y G5.5 (comentario de EMQ) estaban desalineados con la línea Versión
+  (que seguía en G5.4). Este cambio lleva las tres caras a G5.6 y añade al índice del changelog las entradas G5.4 y
+  G5.5 que faltaban.
+
 - [G5.2 — 2026-08-24 · Sello único + rescates](#g52--2026-08-24--auditoría-golden-skill-auditor-sello-único--rescates)
 - [G5.1 — 2026-08-23 · Estándar 9 (Centro de Mando)](#g51--2026-08-23--estándar-9-centro-de-mando)
 - [G5.0 — 2026-08-21 · Auditoría: examples/ → references/, ledger fusionado](#g50--2026-08-21--auditoría-golden-skill-auditor-examples--references-ledger-fusionado)

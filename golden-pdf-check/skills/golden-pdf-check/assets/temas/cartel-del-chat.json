@@ -1,0 +1,33 @@
+{
+  "id": "cartel-del-chat",
+  "nombre": "El Cartel del Chat",
+  "kicker": "El Cartel del Chat",
+  "autor": "Fer",
+  "pie": "El Cartel del Chat",
+  "voz": "Suelta, con calle y humor. Habla de tú a tú, sin corbata. FER se presenta como Fer, NO como Golden Group.",
+  "logo": null,
+  "colores": {
+    "--page-bg": "#f7f7f8",
+    "--surface": "#ffffff",
+    "--surface-soft": "#f0f0f2",
+    "--ink": "#111114",
+    "--muted": "#61616b",
+    "--line": "#e2e2e6",
+    "--gold": "#5b34c9",
+    "--gold-strong": "#7a4bd6",
+    "--gold-soft": "#a98ce8",
+    "--gold-tint": "#f0ebfd",
+    "--gold-line": "#d6c6f5",
+    "--on-gold": "#ffffff",
+    "--gold-text": "#5327bd",
+    "--pista": "#e7e5ec",
+    "--s1": "#5b34c9",
+    "--s2": "#c1442e",
+    "--s3": "#0b93ab",
+    "--s4": "#9a7b1e",
+    "--s5": "#1a6fd4",
+    "--s6": "#d4699a"
+  },
+  "nota": "Marca personal de FER en el Cartel. Violeta, no dorado: el Cartel NO se emite bajo Golden Group (memoria: la marca multinicho no se expone).",
+  "paleta_validada": "Los 6 checks del validador de la skill dataviz pasan con ESTE orden. El validador mide pares ADYACENTES: reordenar puede romperlo (medido: rosa junto a teal falla en protanopía con ΔE 4.5). Si cambias un color, re-corre el script; no lo elijas a ojo."
+}

@@ -1,4 +1,4 @@
-<!-- ⛔ FUERA DE PLATAFORMA (2026-08-07, briefing BRIEFING-PARA-SKILLS.md): Chatea Pro solo acepta 7 países en el campo [Comentarios IA] País — COLOMBIA, ECUADOR, CHILE, MEXICO, PANAMA, PERU, PARAGUAY. GUATEMALA NO ESTÁ ENTRE ELLOS. Este pack se conserva como HISTÓRICO: no lo uses para configurar un workspace de Chatea Pro. Si algún día la plataforma acepta Guatemala, revisar transportadoras y datos antes de reactivarlo. -->
+<!-- ✅ PAÍS SOPORTADO (remedición 2026-08-29 contra el bundle vivo de instalacion-asistentes: la plataforma acepta 10 países y GUATEMALA está entre ellos con metadata completa — GTQ, +502. La marca anterior 'fuera de plataforma' venía de un briefing de 2026-08-07 nunca remedido). Este pack vuelve a ser USABLE; antes de usarlo, confirmar transportadoras con el negocio como manda el propio pack. -->
 
 🎯 VALIDACIÓN DE DIRECCIONES · GUATEMALA (HISTÓRICO — la plataforma no acepta este país)
 

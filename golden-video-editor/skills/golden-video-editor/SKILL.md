@@ -20,6 +20,20 @@ description: >-
 ---
 
 # Golden Video Editor — de grabación cruda a anuncio publicable
+<!-- skill GVE1.9 · 2026-08-31 (CdM) · compuerta de la congelacion de Higgsfield (estandar de FER 30-ago repartido por el CdM): tecnica 2 remite el movimiento a HyperFrames (0 creditos), video de Higgsfield CONGELADO, costo-antes para imagenes. Reversible al levantar la congelacion. -->
+<!-- skill GVE1.8 · 2026-08-31 (CdM, fila del FILTRO) · SEGUNDA COSECHA de la MISMA fuente externa:
+GVE1.7 tomo la estructura del carrusel; GVE1.8 toma la capa numerica del brief PDF completo (6 pag)
+que llego despues. No es duplicado — son dos entregas del mismo autor con niveles de detalle distintos.
+13 criterios numericos instalados donde cada uno trabaja (intake, corte, subtitulos, b-roll, sonido,
+render, fallos). La prueba del sonido apagado cierra el par asimetrico del 85%: copywriting lo sabia
+(5 menciones), el editor casi no (1) — ahora el lado que MONTA tambien lo ejecuta. -->
+<!-- skill GVE1.7 · 2026-08-31 (CdM, fila del FILTRO — origen externo declarado: carrusel de edicion
+con IA; se toma la PIEZA, no el archivo) · LEY DE ORDEN instalada VIVA antes del pipeline: cortar →
+subtitular → ilustrar → sonorizar con el porque de cada posicion (dependencias, no estilo), las 4
+instrucciones textuales de maquina, y el bloque "lo que la maquina NO decide". Reglas de b-roll (donde
+se nombra, objeto sobre negro, NO stock) y sfx-desacoplado ancladas en los Pasos 3 y 4. Hueco medido
+antes: orden 0, subtitular 0, b-roll 0. El pipeline ya tenia el macro-orden correcto; esto le da el
+porque y el lenguaje de instruccion. -->
 <!-- skill GVE1.6 · 2026-08-27 (chat FILTRO) · FIX: multicamara-una-camara.md quedo DORMIDO en GVE1.5 — citado en el sello pero SIN disparador en el cuerpo, o sea invisible para el flujo. Lo cazo el detector golden-capacidad-huerfana, que estrena chequeo de RECURSOS DORMIDOS a peticion del CdM tras el mismo fallo en golden-web (catalogo-de-estilos). Mismo error mio dos veces la misma noche. Disparador puesto en el Paso 2, que es donde se cortan. Barrido del ecosistema: 1 dormido de 243 referencias — este. -->
 <!-- skill GVE1.5 · 2026-08-26 (chat FILTRO, autoridad de FER) · NUEVO references/multicamara-una-camara.md. Destilado de 2 PDFs de NinoDirector que FER envio el 16-ago y llevaba 10 dias en DESTILADOS sin que ninguna skill lo nombrara. Barrido previo: capacidad NUEVA, 0 de 89 skills mencionaban multicamara, punch-in ni encuadre. Numeros: cambio de encuadre ~1min30, nunca cada 10s, punch-in 113% con tope duro 125%, ventana de silencio 1,5s y si no hay silencio NO se corta. Regla que lo hace funcionar: el frontal SE GUARDA para el CTA. Enlaza con golden-imagen-arena para generar los 3 fondos. -->
 <!-- skill GVE1.4.1 · 2026-08-24 (centro de mando): bump que la reparación del barrido B dejó sin subir — 5 skills editadas sin bump las veía intactas el censo (verificador de cierre). -->
@@ -30,7 +44,7 @@ description: >-
 <!-- skill versión GVE1.1 · ruta completa a captions.md de hyperframes, transcribe con --model small --language es, dependencias TTS declaradas, estado honesto del stack, manejo de errores por paso, caso borde de producto sin claims -->
 <!-- skill versión GVE1.0 · creación: destilado del tutorial Horizontes IA + stack Golden (Whisper local, claims, checklist) -->
 
-**Versión:** `GVE1.6` · Fábrica: chat centro de mando. · Blindada con `chflags uchg` (desbloquear con `chflags -R nouchg` antes de editar, volver a blindar con `chflags -R uchg` al cerrar).
+**Versión:** `GVE1.9` · Fábrica: chat centro de mando. · Blindada con `chflags uchg` (desbloquear con `chflags -R nouchg` antes de editar, volver a blindar con `chflags -R uchg` al cerrar).
 
 Graba con el celular sin preocuparte por trabarte, repetir o quedarte callado. Esta skill
 se encarga del resto. Pensada para **anuncios COD y contenido orgánico de Golden**, no para
@@ -55,6 +69,26 @@ baja el modelo Whisper). De ahí en adelante todo queda en caché y corre local.
 costo por minuto. Si algún día la detección de silencios queda corta, ahí sí se evalúa una
 API externa — no antes.
 
+## LEY DE ORDEN (por qué el pipeline va en este orden — GVE1.7)
+
+**Cortar → Subtitular → Ilustrar → Sonorizar. El orden no es estilo, es dependencia:**
+1. **CORTAR primero** fija la línea de tiempo; todo lo que venga después se ubica contra esos cortes.
+2. **SUBTITULAR después** porque va contra el audio YA cortado — al revés se rehace el trabajo dos veces.
+3. **ILUSTRAR (b-roll)** donde se NOMBRA algo — la escena responde al guion ya montado.
+4. **SONORIZAR al final** porque el sonido tiene que REACCIONAR a lo que ya está montado.
+
+**Las 4 instrucciones, textuales (así se le pide a la máquina):**
+- "cortá los silencios" — ritmo natural, sin que se note el corte (la ventana de 1,5 s de esta skill).
+- "subtítulos por palabra" — a la altura del pecho, la palabra clave más grande y en color.
+- "b-roll donde nombro algo" — escena de objeto sobre negro, **NO stock**.
+- "sfx desacoplado del corte" — el sonido NO cae donde cae el tijeretazo.
+
+**Lo que la máquina NO decide (el bloque que hace la pieza honesta):** qué se dice y en qué
+orden (el montaje acomoda, no decide la idea) · dónde va el silencio que INCOMODA (la
+instrucción de cortar silencios te lo come si no lo marcás antes) · si la pieza merecía
+existir — un reel bien editado sobre nada sigue siendo nada. El criterio de negocio que
+gobierna todo esto: **la IA baja el costo de PRODUCIR; no baja el costo de tener algo que decir.**
+
 ## El pipeline (6 pasos)
 
 ### Paso 0 · Intake
@@ -67,6 +101,16 @@ Antes de tocar el video, confirma:
   tumba el anuncio en Meta y el render se paga dos veces
 - **Duración objetivo** (ads COD: 25-40 s)
 - **Estilo:** el de Golden por defecto, o replicar una referencia (ver "Replicar un estilo")
+
+**Los 3 prerrequisitos del crudo (GVE1.8 — sin ellos el pipeline produce basura pulida):**
+1. **Audio de cámara/micrófono, no de celular a 3 metros** — la calidad del audio define
+   el **80% del resultado**; ningún paso posterior lo repara.
+2. **El guion COMO SE GRABÓ**, no el que se escribió — sin él la skill no sabe en qué
+   segundo se nombra cada cosa, y por eso el b-roll cae donde no va.
+3. **El look fijado** (color, tipografía del subtítulo, color del resaltado) — sin eso
+   cada reel sale distinto y la grilla se ve desprolija.
+Truco de grabación: **3 segundos en silencio al principio** — sirven para medir el ruido
+ambiente y limpiarlo.
 
 ### Paso 1 · Contexto en CLAUDE.md + andamio del proyecto
 Crea la carpeta del proyecto y un `CLAUDE.md` con: producto, destino, duración, estilo,
@@ -106,15 +150,19 @@ y deja que Whisper lo detecte.
 
 Pide la transcripción **con timestamps y SIN limpiar**. El transcript "sucio" es el que
 permite cortar: si el modelo ya borró las repeticiones, se pierde dónde estaban. Filtra
-tokens basura del transcript (`♪`, `�`, gaps largos) antes de cortar — el detalle está en
+tokens basura del transcript (`♪`, `�`, gaps largos) antes de cortar. Si una palabra se
+transcribió mal, **déjala MARCADA en vez de adivinar** qué decía — el detalle está en
 `~/.claude/skills/hyperframes/references/transcript-guide.md`.
 
 Luego, sobre esos timestamps:
-- Quita **silencios largos**, muletillas y **tomas repetidas**, quedándote con la buena
+- Quita **silencios largos**, muletillas y **tomas repetidas** — de las repetidas te quedas
+  con la **SEGUNDA** (la repetición casi siempre mejora la toma); y **si dudas entre cortar
+  o dejar, DEJA**
 - **Nunca cortes la primera ni la última palabra** de una frase
-- Deja un respiro mínimo entre frases (cortar demasiado suena robótico)
+- Deja **200 ms de aire entre frases** — es el arreglo exacto cuando los cortes suenan secos
+  y se pisan las palabras (cortar demasiado suena robótico)
 
-Subtítulos: **palabra por palabra, sincronizados**, mayúsculas, alto contraste, en
+Subtítulos: **palabra por palabra, sincronizados**, **máximo 3 palabras en pantalla** a la vez, mayúsculas, alto contraste, en
 **español de Colombia**. Convenciones de estilo y sincronía: lee
 `~/.claude/skills/hyperframes/references/captions.md` (reference de la skill `hyperframes`).
 
@@ -122,11 +170,13 @@ Subtítulos: **palabra por palabra, sincronizados**, mayúsculas, alto contraste
 > silencios" o "no seas tan estricto". Es normal y es rápido.
 
 ### Paso 3 · Visuales (lo que da el dinamismo)
+
+**Regla de b-roll (ley de orden):** se ilustra donde el guion NOMBRA algo — escena de objeto sobre negro, jamás stock genérico, y de **menos de un segundo** cada pieza.
 Mete un visual **cada vez que se menciona algo concreto**. Varía la técnica, no repitas:
 
 1. **Imágenes IA** — Higgsfield o `golden-imagen-arena`. Producto = **foto real como
    semilla**, jamás redibujado (regla Golden de imágenes fieles).
-2. **Animaciones** — clips cortos de Higgsfield para los momentos hero.
+2. **Animaciones** — para los momentos hero. **🔴 CONGELADO (FER 30-ago, `feedback_higgsfield_solo_imagenes_y_costo_antes`): CERO video en Higgsfield hasta que FER lo levante.** El movimiento se hace con HyperFrames (el motor de esta skill, 0 créditos), NO con clips de Higgsfield. Si necesitas una IMAGEN de Higgsfield para un frame, di el costo con `get_cost:true` y ESPERA el sí de FER antes de generar.
    > **Si el MCP Higgsfield no está conectado** (verifícalo antes de prometer visuales IA):
    > no te detengas — cubre esos momentos con mockups HTML/CSS, texto grande y las fotos
    > reales del producto (técnicas 3-5, gratis y locales), e INFORMA que las imágenes IA
@@ -139,10 +189,12 @@ Mete un visual **cada vez que se menciona algo concreto**. Varía la técnica, n
 Reglas: un visual no compite con la voz, la refuerza. El producto siempre se ve real.
 
 ### Paso 4 · Sonido
+
+**Regla de sfx (ley de orden):** desacoplado del corte — el efecto no cae donde cae el tijeretazo, reacciona al montaje ya hecho.
 - **Efectos** en los cortes y las apariciones (pop, whoosh, ding). Si no hay librería a
   mano, arma una carpeta `sfx/` con archivos nombrados por su uso (`pop.wav`, `whoosh.wav`)
   y la skill los coloca por nombre.
-- **Música** de fondo baja, que no tape la voz. Puede ser propia o generada.
+- **Música** de fondo con **ducking: 12 dB abajo cuando hay voz** — así nunca la tapa. Puede ser propia o generada.
 - **Voz en off** cuando haga falta:
   ```bash
   npx hyperframes tts "texto del guion" --voice ef_dora --output narracion.wav
@@ -157,9 +209,20 @@ Reglas: un visual no compite con la voz, la refuerza. El producto siempre se ve 
 
 ### Paso 5 · Render y verificación
 Renderiza con `npx hyperframes render` (añade `--quality high` y el `--fps`/`--format`
-del destino) y **míralo antes de dar por listo**. Checklist Golden:
-- Se entiende sin sonido (subtítulos legibles en móvil)
-- El gancho pega en los **primeros 3 segundos**
+del destino) y **míralo antes de dar por listo**.
+
+**Antes de renderizar, pide SIEMPRE el reporte de cortes: "dime en qué segundo quedó cada
+corte y qué frases descartaste".** Sin ese reporte, la frase importante que se comió el corte
+la descubres mirando el reel ya publicado.
+**Número de control:** un crudo de 1:40 baja a **~58 s con ~40 cortes**. Si devuelve **1:20,
+los silencios NO se cortaron** — hay ruido de fondo que impide detectarlos (ver "Si algo falla").
+
+Checklist Golden:
+- **Prueba del sonido apagado** (el **85% ve sin sonido** — ley que golden-copywriting ya
+  aplica al escribir): mira el corte MUDO. Si se entiende de qué va y en qué momento quedarse,
+  el montaje está bien; **si necesitas el audio, faltan cortes o falta b-roll**. Subtítulos
+  legibles en móvil.
+- El **primer segundo tiene algo que frena el scroll**, y el gancho pega en los **primeros 3 segundos**
 - Ningún claim prohibido del producto se coló en subtítulos ni en texto en pantalla
 - Sin marcas de agua ajenas ni CTA en inglés
 - Formato y duración correctos para el destino
@@ -177,6 +240,14 @@ visuales que funcionaron. La próxima vez es un solo comando.
   (Chrome headless, Node, permisos). La skill `hyperframes-cli` tiene el detalle.
 - **El render falla o se ve roto** → corre `npx hyperframes lint` y `npx hyperframes inspect`
   antes de reintentar: cachan tracks solapados y texto desbordado, que son las causas típicas.
+- **Cortes secos, palabras que se pisan** → falta el aire: 200 ms entre frases.
+- **Subtítulos desfasados** → se sincronizaron contra el CRUDO en vez del video ya cortado:
+  rehacer desde el Paso 2 respetando la ley de orden. Es **el error más caro** — por eso
+  subtitular va SIEMPRE después de cortar.
+- **B-roll fuera de lugar** → no se entregó el guion COMO SE GRABÓ (prerrequisito 2 del intake).
+- **La música tapa la voz** → falta el ducking de −12 dB del Paso 4.
+- **El video sale largo (1:20 en vez de ~58 s)** → los silencios no se detectaron por ruido
+  de fondo: limpiar el audio con la muestra de los 3 s iniciales y recortar de nuevo.
 - **MCP Higgsfield ausente** → plan B del paso 3 (mockups + texto grande + fotos reales).
 - **TTS sin dependencias** → nota del paso 4 (instalar o entregar sin voz en off, informando).
 
@@ -204,6 +275,9 @@ identidad Golden, nunca con la marca ajena (regla de referencias).
 
 ## Changelog
 
+- **GVE1.9** (2026-08-31) — Compuerta de la CONGELACIÓN de Higgsfield (cambio de estándar de FER 30-ago, repartido por el CdM): la técnica 2 de visuales deja de ofrecer clips de video de Higgsfield (congelados) y remite el movimiento a HyperFrames (0 créditos); recuerda el costo-antes-con-aprobación para imágenes. Reversible cuando FER levante la congelación.
+- **GVE1.8** (2026-08-31) — SEGUNDA COSECHA de la misma fuente (GVE1.7 vino del carrusel; esto del brief PDF completo de 6 páginas, fila del FILTRO): la capa NUMÉRICA — 200 ms de aire entre frases, máx 3 palabras en pantalla, b-roll <1 s, ducking −12 dB, quedarse con la SEGUNDA toma, palabra mal transcrita se marca no se adivina, 3 prerrequisitos del crudo (audio de cámara = 80% del resultado, guion como se grabó, look fijado, 3 s de silencio inicial), reporte de cortes obligatorio antes de renderizar, número de control 1:40→~58 s (1:20 = ruido), tabla de 5 fallos con causa y arreglo, prueba del sonido apagado (ley del 85% que ya vivía en golden-copywriting, ahora también en el lado que MONTA), y el criterio de negocio de cierre.
+- **GVE1.7** (2026-08-31) — LEY DE ORDEN instalada viva antes del pipeline (cortar→subtitular→ilustrar→sonorizar con el porqué de cada dependencia), las 4 instrucciones textuales de máquina, el bloque "lo que la máquina NO decide", y reglas de b-roll (donde se nombra, objeto sobre negro, NO stock) y sfx-desacoplado en los Pasos 3 y 4. Origen externo declarado; fila del FILTRO, horneado en el CdM.
 - **GVE1.4.1** (2026-08-24): bump de las ediciones del 24 (verificador de cierre R2: la version vive en 4 caras — sello, linea Version, Changelog y REGISTRO — y el bump anterior toco solo el sello).
 - **GVE1.4** (2026-08-23) — Estándar 9 (Centro de Mando): los cambios relevantes de esta skill
   se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. (Entrada añadida en el barrido del

@@ -19,13 +19,12 @@ description: >-
 
 # Golden Group — Centro de Comando de Pauta (Golden Ads)
 
-<!-- GAE_VERSION: G5.4 — 2026-08-26 22:54 (CdM cierra el sello de un cambio del FILTRO DE
+<!-- GAE_VERSION: G5.6 — 2026-08-31 (CdM) · CORRECCION ANDROMEDA verificada contra la fuente primaria de Meta (blog de ingenieria, 2-dic-2024, leido en vivo): se RETIRA el "Similarity >60% = supresion" (NO esta en Meta, venia de terceros/claude-ads) y se consagra lo estructural: Andromeda es RECUPERACION, decide quien COMPITE no quien gana; el creativo determina elegibilidad via embedding en indice jerarquico. Cifras reales de Meta anadidas con su condicion. "El primer frame es targeting" NO se consagra (no esta en la fuente). Detalle en changelog G5.6. — El bloque de abajo es el historico G5.4:
 HERRAMIENTAS autorizado por FER en directo) — NUEVO references/23-salud-de-senal-y-andromeda.md:
 7 controles de CALIDAD DE SEÑAL que faltaban (0 menciones previas medidas por grep): CAPI activo,
 deduplicación >=90% por event_id, EMQ >=8.0 con palanca COD (mandar por CAPI el teléfono/ciudad
 que ya están en Dropi/Chatea), Learning Limited <30% de conjuntos, presupuesto del conjunto >=5x
-CPA objetivo (<2x = falla — PENDIENTE medirlo producto por producto), ANDROMEDA (Similarity >60%
-= supresión; el ÁNGULO es la unidad creativa, no el archivo — matiza el 5+5+5: cinco redacciones
+CPA objetivo (<2x = falla — PENDIENTE medirlo producto por producto), ANDROMEDA (⟶ el "Similarity >60%" fue RETRACTADO en G5.6: no está en la fuente primaria de Meta; lo que queda es que el ÁNGULO es la unidad creativa, no el archivo — matiza el 5+5+5: cinco redacciones
 del mismo ángulo cuentan como UNA), y la redefinición de link clicks de feb-2025 (CTR cae sin que
 el creativo empeore). +3 controles en 13-auto-check.md ANTES de leer rendimiento. 07-benchmarks-kpis
 INTACTO (md5 idéntico verificado): sus umbrales COD siguen mandando en RENDIMIENTO; el 23 mide
@@ -41,7 +40,7 @@ SKILL.md reglas que viven en la memoria de la casa. Estándar 9 (Centro de Mando
 G5.1: los cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR.
 Detalle en `references/changelog.md`. -->
 <!-- skill G5.5 · 2026-08-27 (chat FILTRO) · CORRECCION MEDIDA en 23-salud-de-senal: yo habia escrito que en COD el EMQ tendria techo bajo por el 1,7% de consentimiento. FALSO para el Purchase: medido en el pixel 375426632099018, EMQ 9.3 con cobertura 100% en las 13 claves. AddPaymentInfo 8.7. Lo que SI falla es el embudo previo: Search 4.4, ViewContent 6.1, PageView 6.2, AddToCart 6.4, todos bajo el umbral 8.0. Ademas: InitiateCheckout EXISTE en este pixel (167 en 7 dias) cuando benchmarks dice que en COD no existe — no se usa de corte hasta saber por que. Y el Purchase aparece partido en dos entradas (63 y 60): NO es prueba de doble conteo, la herramienta no da tasa de dedup. Origen: pendiente #1 que llevaba meses guardado en memoria. -->
-<!-- skill v: 2026-08-26 (chat FILTRO, autoridad de FER) · NUEVO references/23-salud-de-senal-y-andromeda.md + 3 controles en el auto-check. ORIGEN: extraccion de claude-ads v2.4.0 (33 MB instalados en el Mac y NUNCA corridos). HUECO MEDIDO con grep sobre golden-ads: 0 menciones de EMQ, deduplicacion, Learning Limited, Andromeda y la regla de presupuesto >=5x CPA. NO se toco 07-benchmarks-kpis.md: sus umbrales COD son MAS exigentes que los del auditor generico (CTR >1.5% vs 1.0%, frecuencia <2 vs <3) y siguen mandando sobre rendimiento. El archivo nuevo mide otra cosa: la calidad de la senal que Meta recibe. Hallazgo a verificar: Andromeda suprime creativos con Similarity >60%, lo que choca con producir 5+5+5 variaciones del mismo angulo. -->
+<!-- skill v: 2026-08-26 (chat FILTRO, autoridad de FER) · NUEVO references/23-salud-de-senal-y-andromeda.md + 3 controles en el auto-check. ORIGEN: extraccion de claude-ads v2.4.0 (33 MB instalados en el Mac y NUNCA corridos). HUECO MEDIDO con grep sobre golden-ads: 0 menciones de EMQ, deduplicacion, Learning Limited, Andromeda y la regla de presupuesto >=5x CPA. NO se toco 07-benchmarks-kpis.md: sus umbrales COD son MAS exigentes que los del auditor generico (CTR >1.5% vs 1.0%, frecuencia <2 vs <3) y siguen mandando sobre rendimiento. El archivo nuevo mide otra cosa: la calidad de la senal que Meta recibe. Hallazgo a verificar: Andromeda suprime creativos con Similarity >60%, lo que choca con producir 5+5+5 variaciones del mismo angulo. (⟶ RESUELTO en G5.6: verificado contra la fuente primaria de Meta — el umbral 60% NO aparece en el blog; se retracta. Lo estructural (recuperacion, elegibilidad por creativo) SI se sostiene.) -->
 
 <!-- 2026-08-07 · DESCRIPCIÓN RECORTADA: superaba el tope de ~1.536 caracteres del listado de skills y se estaba TRUNCANDO, así que las frases del final NO disparaban. Medido antes/después: 2211 → 991 chars. Lo que se movió al cuerpo son rutas de references y explicaciones; se conservaron y ampliaron las frases reales del usuario, que son lo que dispara. -->
 
@@ -176,7 +175,7 @@ Estructura de testeo (1 campaña, N conjuntos = N ángulos, público amplio, 2�
 ---
 
 ## Sello de versión
-**Versión:** `G5.4` · **Última modificación:** 2026-08-26 · **Validada en vivo** contra cuentas Meta
+**Versión:** `G5.6` · **Última modificación:** 2026-08-31 · **Validada en vivo** contra cuentas Meta
 reales (COP, COD) — GOLDEN PRO construido y replicado en vivo. El sello vive SOLO aquí y en el
 comentario `GAE_VERSION` bajo el H1; el historial completo, en `references/changelog.md`.
 

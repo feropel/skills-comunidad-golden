@@ -11,7 +11,7 @@ description: |
   responder el bot", "el bot está diciendo cosas raras", "audita las conversaciones de ayer",
   "revisa el desempeño del asistente", "por cuál anuncio están llegando", "el bot mencionó pago
   anticipado cuando no debía", o pida la corrida diaria centrada en LO QUE DIJO EL BOT.
-  Aplica a cualquier workspace y a los 7 países. Solo lee: no escribe en Chatea.
+  Aplica a cualquier workspace y a los 10 países. Solo lee: no escribe en Chatea.
   FRONTERAS: el PEDIDO (qué se despacha, qué se frena, direcciones, duplicados) =
   golden-logistica-diaria, y lo que aparezca de eso se le pasa en una línea; la INSTALACIÓN
   (campos, disparadores, topes, interruptores) = golden-chatea-auditoria. Esta mira el DÍA: si
@@ -20,6 +20,7 @@ description: |
 
 # golden-chatea-operacion · qué pasó ayer con el bot
 
+<!-- corrección CdM 2026-08-29 · CAMBIO DE ESTÁNDAR países: la plataforma acepta 10, no 7 (doble medición contra el bundle vivo index-BrZVg7KW.js, sha256 2c947877…; deroga 'solo 7' y 'Guatemala fuera de plataforma'; detalle en la gaceta). Menciones del conteo viejo actualizadas a 10; el resto intacto. -->
 <!-- skill v1.7 (GCO1.7) — 2026-08-22 — TERCERA auditoría golden-skill-auditor, en frío,
 sobre GCO1.6 (protocolo completo, sin reutilizar la memoria de la auditoría anterior, tal
 como manda la regla v1.15 del auditor). Inventario limpio (0 rotas, 0 huérfanos, 0 dudosos,
@@ -230,7 +231,7 @@ al día auditado) es una medición de UN solo espacio (Colombia) — no está co
 panel de Chatea (solo contra la relación interna `last_message_at` ↔ `ts` dentro de los DUMPs
 medidos), no cubre horario de verano (irrelevante para Colombia, relevante para otros países
 de la plataforma que sí lo observan), y solo acepta offsets enteros de horas. La plataforma
-sirve 7 países; para un espacio de otro país se debe pasar `--zona-horas` explícito hasta
+sirve 10 países; para un espacio de otro país se debe pasar `--zona-horas` explícito hasta
 confirmar el offset real de ese servidor.
 
 Operar aquí significa **medir lo que el bot escribió de verdad contra lo que debía pasar**, no

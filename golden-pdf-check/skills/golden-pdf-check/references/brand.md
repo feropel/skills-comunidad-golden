@@ -42,9 +42,9 @@ umbral de gráfico.
 Otros tonos verificados por si algún día se quiere más contraste: `#7a5f1a`
 (5.73:1), `#6b5215` (7.01:1), `#5c4611` (8.52:1).
 
-Esto **no es opinión de diseño**: la prueba 16 del `selftest.py` calcula el
+Esto **no es opinión de diseño**: la prueba 16 del `autoprueba.py` calcula el
 ratio de cada color de texto contra su fondo y falla por debajo de 4.5:1. Si
-alguien vuelve a poner un dorado de acento en un color de texto, el self-test
+alguien vuelve a poner un dorado de acento en un color de texto, la autoprueba
 lo caza. Origen: fila del chat FILTRO DE HERRAMIENTAS (2026-08-26), método
 tomado de la skill `dataviz` — verificar con número, no a ojo.
 

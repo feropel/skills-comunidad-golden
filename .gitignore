@@ -1,1 +1,10 @@
 .DS_Store
+
+# copias de conflicto de iCloud: la carpeta vive en Desktop (sincronizado), y iCloud
+# crea "SKILL 2.md", "references 2/" etc. Como se publica con `git add -A`, sin este
+# candado entrarian al repo publico como basura. Medido el 2026-09-02: 85 rutas.
+* 2
+* 3
+* 2.*
+* 3.*
+.DS_Store

@@ -20,6 +20,7 @@ description: >
 
 # golden-imagen-arena — Varias IAs compiten, una gana
 
+<!-- skill v1.12 · 2026-08-30 (chat FILTRO, autoridad de FER) · NUEVO references/formato-por-destino.md. Origen: el documento "Un post en todas partes" (Maurys Alvarez) que FER trajo el 30-ago; se toma su TABLA DE FORMATO POR RED y se descarta su herramienta (Metricool de pago, Make/n8n), que no esta contratada. HUECO MEDIDO con sinapsis: la frase "formato por red social" daba 0 de 93 skills, y sobre esta skill 9:16 cero menciones, 16:9 cero, 2:3 cero. El prompt maestro solo ofrecia {1080x1080 | 1080x1350}: faltaban TRES de los cinco formatos, incluido el vertical de reel y story. VERIFICADO CONTRA EL SCHEMA VIVO del MCP de Higgsfield: outpaint_image (imagen) cubre los cinco ratios, pero reframe (video) NO soporta 4:5 ni 2:3, y 4:5 es justo el feed de Instagram; para llevar video a 4:5 el camino es recorte con ffmpeg en golden-video-editor. EJECUTADO get_cost (no lanza job): reframe cuesta 72 creditos a 15s/720p, 139,5 a 15s/1080p y 277,5 a 30s/1080p, mientras el saldo de la cuenta ese dia era 223,5 en plan plus, o sea que UN reframe de 30s a 1080p NO ALCANZA. Se añadieron TRES disparadores en el cuerpo (preflight, paso 4 y archivos de referencia) para que no nazca dormido. NO VERIFICADO: el costo de outpaint_image, que exige un image_id real ya subido y no acepta estimacion en seco; y las zonas seguras de cada red, que no se contrastaron con la documentacion oficial y por eso no llevan numero. No se tocaron las 5 leyes, ni la rubrica, ni el disparador de la skill. -->
 <!-- skill v1.11 · 2026-08-26 (chat FILTRO, autoridad de FER; corregido: sello el v1.9 estando la skill en v1.10 — DUPLIQUE un numero existente del 23-ago por leer el registro y no el historial de sellos del propio archivo. Leccion: el numero se saca del SKILL.md, que es la fuente, no del registro, que puede ir atrasado) · NUEVO references/motores-y-plan-b.md. Recoge DOS destilados que llevaban dias en STACK-GOLDEN/DESTILADOS sin que ninguna skill los nombrara (medido: 0 skills). Aporta: (1) la regla de reparto con Ecom Magic — plantilla vs motor — y sus capacidades GRATIS sin usar (financial_analyze da CPA objetivo y ROAS de equilibrio; research_generic_angle da angulo y avatar); (2) los 4 motores que la API REST expone y el MCP NO lista, incluido Veo 3.1, SIN VERIFICAR contra la cuenta de FER; (3) el plan B por API directa con polling de retroceso exponencial y jitter, porque el MCP se cayo dos veces en una sesion. -->
 <!-- skill v1.9 · 2026-08-23 (Estándar 9 del auditor) · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 <!-- skill v1.10 · 2026-08-24 (barrido total del arsenal, CdM) · CAZADO Y CORREGIDO: el flujo mandaba consultar `job_status {job_id}` hasta completed (paso 4 del SKILL.md + references/motores.md) y ese tool NO EXISTE en el MCP de Higgsfield — verificado contra el schema vivo del servidor y contra golden-ugc-avatar (misma casa, verificada en producción, que ya lo advertía: "There is no job_status polling tool"). Dos skills hermanas sobre el mismo servidor se contradecían. La espera real es `jobs_wait` (bloqueante, acepta los ids de la tanda) o `job_display` por job + `show_generations` para historial. Sin más cambios. -->
@@ -101,6 +102,11 @@ generate_image {model, prompt, get_cost:true}  → costo en créditos, sin gener
 
 Reporta: "la arena de 4 motores cuesta N créditos, tienes M. Disparo." Una confirmación,
 no cuatro.
+
+**En el mismo preflight se fija la RELACIÓN DE ASPECTO**, porque regenerar en otra medida
+cuesta una arena entera. Pregunta a dónde va la pieza y saca la medida de
+`references/formato-por-destino.md`: feed de Instagram 1080×1350, reel o TikTok 1080×1920,
+LinkedIn 1080×1080. Si no te lo dicen, el default de Golden es **4:5 (1080×1350)**.
 
 ### 1. Meter la foto real (el desbloqueo)
 
@@ -225,6 +231,11 @@ conviértelas con `scripts/optimizar-webp.py`, que acepta dimensión rectangular
 python3 ~/.claude/skills/golden-imagen-arena/scripts/optimizar-webp.py entrada.png salida.webp 1080x1350 150
 ```
 
+El tercer argumento es la medida, y **sale de la tabla de `references/formato-por-destino.md`**
+según a qué red va la pieza. Si hay que llevar una pieza YA hecha a otro formato, esa misma
+tabla manda: recortar es gratis y `outpaint_image` cuesta créditos, y para VIDEO la
+herramienta `reframe` no soporta 4:5 ni 2:3.
+
 Guarda todo en `PROYECTOS/<PRODUCTO>/IMAGENES/` con el naming de Golden:
 `PRODUCTO - Contexto NN.webp` (ej. `TAG RECEDE - Hero nanobananapro 01.webp`). Jamás
 `1.jpg`. Meta de peso: **< 150 KB**.
@@ -284,6 +295,10 @@ Si falta cualquier casilla, la arena no está lista para pasar a `golden-shopify
   pagados que el MCP no lista** (Veo 3.1 entre ellos) y el **plan B por API directa** si el MCP cae.
 - `references/prompt-maestro.md` — plantilla del prompt de ecom y cómo escribir el texto
   que va dentro de la imagen. Léelo antes de generar.
+- `references/formato-por-destino.md` — **en qué medida sale cada pieza según la red a la que
+  va**, los cinco formatos con sus píxeles, cuándo recortar gratis y cuándo pagar por rellenar,
+  qué formatos NO cubre `reframe` en video, y el costo medido del reencuadre. Léelo en el
+  preflight, antes de disparar la arena.
 - `references/rubrica.md` — rúbrica de conversión para calificar y rankear. Léelo antes de
   dar el veredicto.
 - `scripts/optimizar-webp.py` — convierte a WebP < 150 KB en cualquier proporción.

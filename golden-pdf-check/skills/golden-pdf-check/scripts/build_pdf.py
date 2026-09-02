@@ -27,6 +27,8 @@ Todo lo que va en ``` ``` ``` (o ~~~ ~~~) o en ::: prompt ::: es una tarjeta
 copiable atómica.
 """
 import sys, os, re, html, argparse, subprocess, tempfile, json, shutil, logging, base64
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+import visuales
 
 logging.getLogger("pdfminer").setLevel(logging.ERROR)
 logging.getLogger("pdfplumber").setLevel(logging.ERROR)
@@ -188,6 +190,15 @@ def md_to_html(md):
             while i < len(lines) and not re.match(r"^:::\s*$", lines[i]):
                 buf.append(lines[i]); i += 1
             i += 1
+            # ¿es un COMPONENTE VISUAL (v6.0)? Un gráfico, una escala, un
+            # esquema o un QR se dibujan; cualquier otro nombre sigue siendo el
+            # bloque con estilo de siempre. Los visuales NO son texto copiable,
+            # así que no entran a `cards` ni a la compuerta verbatim.
+            if cls in visuales.NOMBRES:
+                vis = visuales.render_bloque(cls, btitle, "\n".join(buf))
+                if vis:
+                    out.append(vis)
+                    continue
             inner_html, inner_cards = md_to_html("\n".join(buf))
             cards.extend(inner_cards)
             head = ('<p class="block-title">' + inline(btitle) + "</p>") if btitle else ""
@@ -288,7 +299,7 @@ def outline(body_md):
     return items
 
 
-def build_index(body_md):
+def build_index(body_md, pages_map=None):
     """Página de CONTENIDO: todo lo que hay en el documento, línea por línea.
     Va SIEMPRE justo después de la portada (norma FER v5.4)."""
     items = outline(body_md)
@@ -305,10 +316,15 @@ def build_index(body_md):
         rows.append((it["lvl"], it["text"], n))
     total = sum(it["cards"] for it in items)
     lis = []
-    for lvl, text, n in rows:
+    for idx_, (lvl, text, n) in enumerate(rows):
         badge = ('<span class="toc-count">' + str(n) + '</span>') if n else ""
-        lis.append('<li class="toc-h%d">%s<span class="toc-text">%s</span></li>'
-                   % (lvl, badge, inline(text)))
+        # Número de página REAL (segunda pasada). Sin él, un índice de 130
+        # líneas no es un mapa: el lector ve los títulos y no puede ir a
+        # ninguno — "toca uno adivinar" (FER sobre una bitácora de 53 págs).
+        pg = pages_map.get(idx_) if pages_map else None
+        num = ('<span class="toc-page">' + str(pg) + '</span>') if pg else ""
+        lis.append('<li class="toc-h%d">%s<span class="toc-text">%s</span>%s</li>'
+                   % (lvl, badge, inline(text), num))
     hint = ("Todo lo que hay en este documento, en orden de ejecución. El número al lado de una "
             "línea es la cantidad de textos listos para copiar y pegar que trae esa parte"
             + (" (%d en total)." % total if total else "."))
@@ -316,8 +332,9 @@ def build_index(body_md):
     # se derrama a una segunda hoja que queda medio vacía — el mismo defecto de
     # la portada vacía. A partir de 70 líneas pasa a 3 columnas y vuelve a caber
     # en la hoja de la portada.
-    dense = (" dense dense-4" if len(rows) > 105 else
-             " dense" if len(rows) > 70 else "")
+    # Sin nivel de 4 columnas: por debajo de cierto tamaño el índice deja de
+    # ser legible y un mapa ilegible no orienta a nadie (v5.15).
+    dense = " dense" if len(rows) > 70 else ""
     return ('<section class="toc' + dense + '">'
             '<p class="kicker">Índice del documento</p>'
             '<h1 class="toc-title">CONTENIDO</h1>'
@@ -356,6 +373,32 @@ def build_cover(meta, logo_path=None):
     )
 
 
+def cargar_tema(nombre):
+    """Identidad CON NOMBRE (v6.0). Antes existían --css/--logo/--footer sueltos:
+    eso es un parche, no una identidad. Un tema declara de una vez la voz, el
+    kicker, el autor, el pie, el logo y la paleta — para que un PDF del Cartel
+    del Chat NO salga con la cara de Comunidad Golden, que es lo que pidió FER.
+    Devuelve (dict, css) o (None, "") si el tema no existe."""
+    if not nombre:
+        return None, ""
+    ruta = nombre if os.path.exists(nombre) else os.path.join(
+        ASSETS, "temas", nombre.replace(".json", "") + ".json")
+    if not os.path.exists(ruta):
+        disponibles = sorted(f[:-5] for f in os.listdir(os.path.join(ASSETS, "temas"))
+                             if f.endswith(".json"))
+        sys.stderr.write("⚠️  Tema desconocido: %s · disponibles: %s\n"
+                         % (nombre, ", ".join(disponibles)))
+        return None, ""
+    with open(ruta, encoding="utf-8") as fh:
+        tema = json.load(fh)
+    # La paleta del tema se inyecta como variables CSS: TODO el documento y los
+    # componentes visuales leen roles, no hex, así que la identidad cambia sin
+    # tocar una sola regla de estilo.
+    cols = "".join("%s:%s;" % (k, v) for k, v in (tema.get("colores") or {}).items())
+    css = ("<style>:root{" + cols + "}</style>") if cols else ""
+    return tema, css
+
+
 def fonts_style():
     """Incrusta las fuentes de marca (Inter + JetBrains Mono, OFL) como data
     URIs. Así el documento se ve IDÉNTICO en cualquier equipo, no depende de las
@@ -384,7 +427,13 @@ def fonts_style():
     return override
 
 
-def build_html(meta, body_md, with_index=True, logo_path=None, theme_css=None):
+def build_html(meta, body_md, with_index=True, logo_path=None, theme_css=None,
+               pages_map=None, tema_css=""):
+    # La numeración de figuras arranca de 1 en CADA construcción del documento.
+    # Vive aquí y no en main() porque la segunda pasada (números del índice)
+    # vuelve a construir: sin este reinicio los pies salían "Figura 3, Figura 4"
+    # en un documento de dos figuras — bug medido al instalar la doble pasada.
+    FIG_COUNTER["n"] = 0
     css = load_asset("golden-print.css")
     # TEMA ALTERNO (v5.7): una hoja de estilo que se anexa DESPUES de la de
     # marca y solo redefine variables/colores. La identidad Golden sigue
@@ -406,18 +455,24 @@ def build_html(meta, body_md, with_index=True, logo_path=None, theme_css=None):
     geom = "<style>:root{--card-max-mm:%d}</style>" % card_max_mm
     return (
         "<!doctype html><html lang='es'><head><meta charset='utf-8'>"
-        "<style>" + css + "</style>" + geom + fonts_style() + "</head><body>"
+        "<style>" + css + "</style>" + geom + fonts_style() + tema_css + "</head><body>"
         + build_cover(meta, logo_path)
-        + (build_index(body_md) if with_index else "") +
+        + (build_index(body_md, pages_map) if with_index else "") +
         '<main class="doc">' + body + "</main>"
         "<script>" + autofit + "</script></body></html>"
     ), cards
 
 
 # ---------------- render a PDF ----------------
-def footer_template(label="Comunidad Golden"):
+def footer_template(label="Comunidad Golden", color="#8a6d1f"):
     return (
-        '<div style="width:100%;font-size:8px;color:#8a6d1f;'
+        # 10px = 7.5pt: el pie era el ÚNICO texto del PDF bajo el piso de
+        # legibilidad (6.0pt, medido en las 23 páginas de la bitácora de prueba).
+        # Se sube en vez de darle una excepción a la regla: un piso con un solo
+        # violador no es un piso. El COLOR llega por parámetro porque el pie vive
+        # en un contexto de Playwright que no hereda el CSS del documento — con
+        # el dorado clavado, un tema violeta sacaba el pie dorado (medido).
+        f'<div style="width:100%;font-size:10px;color:{color};'
         'font-family:Helvetica,Arial,sans-serif;padding:0 15mm;'
         'display:flex;justify-content:space-between;align-items:center;">'
         "<span>" + html.escape(label) + "</span>"
@@ -426,7 +481,8 @@ def footer_template(label="Comunidad Golden"):
     )
 
 
-def render_with_playwright(html_str, out_path, footer_label="Comunidad Golden"):
+def render_with_playwright(html_str, out_path, footer_label="Comunidad Golden",
+                           footer_color="#8a6d1f"):
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
         browser = p.chromium.launch()
@@ -445,7 +501,7 @@ def render_with_playwright(html_str, out_path, footer_label="Comunidad Golden"):
         pdf_kwargs = dict(
             path=out_path, format=PAGE, print_background=True,
             display_header_footer=True, header_template="<div></div>",
-            footer_template=footer_template(footer_label),
+            footer_template=footer_template(footer_label, footer_color),
             margin={"top": f"{MARGIN_MM}mm", "bottom": f"{FOOTER_MM}mm",
                     "left": f"{MARGIN_MM}mm", "right": f"{MARGIN_MM}mm"},
         )
@@ -492,10 +548,11 @@ def render_with_chrome(html_str, out_path):
     return "chrome-cli (sin numeración en pie; instala Playwright para numeración)", []
 
 
-def render_pdf(html_str, out_path, footer_label="Comunidad Golden"):
+def render_pdf(html_str, out_path, footer_label="Comunidad Golden",
+               footer_color="#8a6d1f"):
     try:
         import playwright  # noqa
-        return render_with_playwright(html_str, out_path, footer_label)
+        return render_with_playwright(html_str, out_path, footer_label, footer_color)
     except ImportError:
         return render_with_chrome(html_str, out_path)
 
@@ -556,6 +613,47 @@ def verbatim_gate(pdf_path, cards):
     return (len(fails) == 0), fails
 
 
+def locate_headings(pdf_path, items):
+    """Segunda pasada: en qué página cae cada encabezado del esquema.
+
+    Se busca el título en el texto de cada página avanzando en orden (los
+    encabezados aparecen en el documento en el mismo orden del índice), así
+    que un título repetido no confunde: se toma su siguiente aparición.
+    Devuelve {indice_en_el_esquema: numero_de_pagina}. Si no se puede
+    localizar (pdfplumber ausente, título no encontrado), esa entrada
+    simplemente no lleva número — nunca un número inventado."""
+    try:
+        import pdfplumber
+    except ImportError:
+        return {}
+    mapa, cursor = {}, 0
+    try:
+        with pdfplumber.open(pdf_path) as pdf:
+            paginas = [_norm(p.extract_text() or "") for p in pdf.pages]
+        # El índice LISTA todos los encabezados, así que buscar desde la página 1
+        # los encuentra todos ahí y el índice sale con puros "1" (bug medido en
+        # la primera versión de esta pasada). Se arranca DESPUÉS de la última
+        # página del propio índice, identificada por su firma.
+        FIRMA = _norm("ÍNDICE DEL DOCUMENTO CONTENIDO")[:20]
+        for pno, txt in enumerate(paginas):
+            if FIRMA and FIRMA in txt:
+                cursor = pno + 1
+        if cursor >= len(paginas):        # documento que es solo índice
+            cursor = 0
+        for i, it in enumerate(items):
+            objetivo = _norm(it["text"])
+            if not objetivo:
+                continue
+            for pno in range(cursor, len(paginas)):
+                if objetivo in paginas[pno]:
+                    mapa[i] = pno + 1      # 1-based, como el pie de página
+                    cursor = pno           # monotónico: nunca retrocede
+                    break
+    except Exception:
+        return {}
+    return mapa
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("input"); ap.add_argument("output")
@@ -568,6 +666,7 @@ def main():
     ap.add_argument("--css", help="hoja de estilo de tema que se anexa a la de marca")
     ap.add_argument("--footer", default="Comunidad Golden",
                     help="texto del pie de pagina (por defecto: Comunidad Golden)")
+    ap.add_argument("--tema", help="identidad con nombre: comunidad-golden, cartel-del-chat…")
     ap.add_argument("--no-index", action="store_true",
                     help="omite la página de CONTENIDO (por defecto SÍ va · norma FER v5.4)")
     args = ap.parse_args()
@@ -579,12 +678,27 @@ def main():
     IMAGE_BASE[0] = os.path.dirname(os.path.abspath(args.input)) or os.getcwd()
     FIG_COUNTER["n"] = 0
     meta, body = parse_front_matter(raw)
+    tema, tema_css = cargar_tema(args.tema)
+    # El pie vive en un contexto aparte de Playwright que NO hereda el CSS del
+    # documento: su color hay que pasarlo a mano o se queda dorado en un tema
+    # violeta (medido con el tema del Cartel).
+    pie_color = ((tema or {}).get("colores") or {}).get("--gold-text", "#8a6d1f")
+    if tema:
+        # El tema pone los defaults de identidad; el documento manda si lo declara
+        # explícitamente, y los flags de línea de comandos mandan sobre los dos.
+        meta.setdefault("kicker", tema.get("kicker", ""))
+        meta.setdefault("author", tema.get("autor", ""))
+        if not args.footer or args.footer == "Comunidad Golden":
+            args.footer = tema.get("pie", args.footer)
+        if not args.logo and tema.get("logo"):
+            args.logo = os.path.join(ASSETS, tema["logo"])
     for k in ("title", "subtitle", "kicker", "author"):
         if getattr(args, k):
             meta[k] = getattr(args, k)
 
     html_str, cards = build_html(meta, body, with_index=not args.no_index,
-                                 logo_path=args.logo, theme_css=args.css)
+                                 logo_path=args.logo, theme_css=args.css,
+                                 tema_css=tema_css)
 
     # v5.8 · AVISO DE LÍNEAS LARGAS EN TARJETAS (chat dental Chile, 2026-08-07):
     # dentro de una tarjeta monoespaciada, una línea de más de ~76 caracteres se
@@ -613,7 +727,44 @@ def main():
         with open(args.save_html, "w", encoding="utf-8") as f:
             f.write(html_str)
 
-    engine, fit_warnings = render_pdf(html_str, args.output, args.footer)
+    engine, fit_warnings = render_pdf(html_str, args.output, args.footer, pie_color)
+
+    # SEGUNDA PASADA (v5.15): el índice ya existe, pero sin números de página no
+    # es un mapa. Se localiza cada encabezado EN EL PDF recién construido y se
+    # reconstruye con los números reales — medidos, nunca estimados. Si la
+    # localización falla, el PDF de la primera pasada queda tal cual: un índice
+    # sin números es peor que uno con números, pero mucho mejor que uno con
+    # números inventados.
+    if not args.no_index:
+        items_ = outline(body)
+        # PUNTO FIJO. Añadir los números puede empujar el índice a una hoja más,
+        # y entonces TODO el cuerpo se corre y los números quedan desfasados por
+        # uno — el error clásico de las tablas de contenido. Se repite la pasada
+        # hasta que el mapa deja de cambiar (converge en 1-2 vueltas). Si no
+        # converge, se deja la última y se avisa: mejor declararlo que sellar un
+        # índice que miente.
+        pages_map, estable = {}, False
+        for intento in range(4):
+            nuevo_mapa = locate_headings(args.output, items_)
+            if not nuevo_mapa:
+                break
+            if nuevo_mapa == pages_map:
+                estable = True
+                break
+            pages_map = nuevo_mapa
+            html2, _ = build_html(meta, body, with_index=True, logo_path=args.logo,
+                                  theme_css=args.css, pages_map=pages_map,
+                                  tema_css=tema_css)
+            engine, fit_warnings = render_pdf(html2, args.output, args.footer, pie_color)
+            if args.save_html:
+                with open(args.save_html, "w", encoding="utf-8") as f:
+                    f.write(html2)
+        if not pages_map:
+            sys.stderr.write("ℹ️  Índice sin números de página: no se pudo localizar "
+                             "los encabezados (¿falta pdfplumber?).\n")
+        elif not estable:
+            sys.stderr.write("⚠️  Los números del índice no se estabilizaron en 4 pasadas: "
+                             "verifícalos a mano antes de entregar.\n")
 
     if fit_warnings:
         sys.stderr.write("\nℹ️  AUTO-FIT: estos prompts quedaron muy reducidos "

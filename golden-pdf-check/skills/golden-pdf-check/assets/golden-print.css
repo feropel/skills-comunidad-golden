@@ -287,22 +287,33 @@ tbody tr:nth-child(even) td { background: var(--surface-soft); }
   padding: 0 3px; line-height: 1.5;
 }
 .toc-list .toc-text { flex: 1 1 auto; }
+/* Número de página del índice (v5.15): alineado a la derecha, en cifras de
+   ancho fijo para que la columna quede recta. Sale de la SEGUNDA PASADA sobre
+   el PDF ya construido, así que es el número real, no una estimación. */
+.toc-page {
+  flex: 0 0 auto; margin-left: 6px; text-align: right;
+  font-size: 8.4pt; font-weight: 700; color: var(--gold-text);
+  font-variant-numeric: tabular-nums;
+}
+.toc.dense .toc-page { font-size: 7.8pt; margin-left: 4px; }
 
 /* Índice DENSO: lo activa build_pdf.py cuando el documento pasa de 70 líneas.
    Tres columnas y tipo un punto más chico para que un manual largo no derrame
    el índice a una segunda hoja medio vacía. */
 .toc.dense .toc-list { columns: 3; column-gap: 7mm; }
 .toc.dense .toc-list li { padding: 0.6px 0; gap: 4px; }
-.toc.dense .toc-list .toc-h2 { font-size: 8.9pt; margin-top: 4px; }
-.toc.dense .toc-list .toc-h3 { font-size: 8pt; padding-left: 6px; }
-.toc.dense .toc-count { min-width: 14px; font-size: 6.8pt; }
+.toc.dense .toc-list .toc-h2 { font-size: 9.4pt; margin-top: 4px; }
+.toc.dense .toc-list .toc-h3 { font-size: 8.6pt; padding-left: 6px; }
+.toc.dense .toc-count { min-width: 15px; font-size: 7.4pt; }
 .toc.dense .toc-hint { font-size: 8.5pt; margin-bottom: 8px; }
-/* Nivel 2 del índice denso (más de 105 líneas): cuatro columnas. Es el caso de
-   un manual de módulo completo; con tres seguía derramando media hoja. */
-.toc.dense-4 .toc-list { columns: 4; column-gap: 5mm; }
-.toc.dense-4 .toc-list .toc-h2 { font-size: 8.2pt; margin-top: 3px; line-height: 1.25; }
-.toc.dense-4 .toc-list .toc-h3 { font-size: 7.4pt; padding-left: 4px; line-height: 1.25; }
-.toc.dense-4 .toc-count { min-width: 12px; font-size: 6.2pt; padding: 0 2px; }
+/* PISO DE LEGIBILIDAD DEL ÍNDICE (v5.15). Existía un nivel dense-4 que a
+   partir de 105 líneas metía el índice en 4 columnas a 7.4pt (y las insignias
+   a 6.2pt). Medido sobre una bitácora de 22 páginas: ilegible — FER rechazó un
+   documento real por "se ve muy pequeño". El índice de un documento largo es su
+   MAPA: antes de comprimirlo hasta que no se pueda leer, que fluya a la hoja
+   siguiente. La portada compacta era para no desperdiciar hoja, no para volver
+   ilegible lo que orienta al lector. */
+.toc.dense .toc-list { columns: 3; }
 
 /* Evita que un título quede huérfano al final de página */
 h2, h3 { break-after: avoid-page; }
@@ -325,3 +336,166 @@ p, li { orphans: 2; widows: 2; }
   font-size: 8pt; font-weight: 700; letter-spacing: 0.13em;
   text-transform: uppercase; color: var(--gold-text); margin: 0 0 7px;
 }
+
+/* ==============================================================
+   COMPONENTES VISUALES (v6.0) — lo que faltaba durante 20 versiones
+   Paleta categórica VALIDADA con el script de la skill `dataviz`:
+   los 6 checks pasan sin avisos (croma, banda de luminosidad,
+   separación para daltonismo ΔE 13.3, visión normal 20.3, contraste
+   ≥3:1). No se eligió a ojo: la primera candidata fue rechazada.
+
+   ESTÉTICA: aire, jerarquía y contención — la cifra manda, el adorno
+   calla. Sin sombras dramáticas ni degradados de relleno: el color
+   solo aparece donde codifica un dato.
+
+   EL MEDIO ENDURECE EL MÉTODO: en papel no hay hover ni tooltip, así
+   que TODO dato lleva su etiqueta visible. Nada depende del color solo.
+   ============================================================== */
+:root {
+  --s1: #9a7b1e;   /* oro profundo — ya vive en el gradiente de marca */
+  --s2: #1a6fd4;
+  --s3: #c1442e;
+  --s4: #0b93ab;
+  --s5: #7a4bc4;
+  --s6: #d4699a;
+  --pista: #ece9e1;          /* canal vacío de las barras */
+}
+
+.viz {
+  break-inside: avoid; page-break-inside: avoid;
+  margin: 16px 0; padding: 0;
+}
+.viz-titulo {
+  font-size: 8pt; font-weight: 700; letter-spacing: 0.12em;
+  text-transform: uppercase; color: var(--gold-text); margin: 0 0 9px;
+}
+
+/* ---------- KPI: la cifra como protagonista ---------- */
+.kpi-fila {
+  display: flex; gap: 10px; margin: 16px 0;
+  break-inside: avoid; page-break-inside: avoid;
+}
+.kpi-celda {
+  flex: 1 1 0; min-width: 0;
+  border: 1px solid var(--line); border-radius: var(--radius);
+  background: var(--surface); padding: 12px 14px;
+  border-top: 3px solid var(--gold);
+}
+.kpi-etq {
+  font-size: 7.6pt; font-weight: 600; letter-spacing: 0.09em;
+  text-transform: uppercase; color: var(--muted); margin-bottom: 5px;
+}
+/* La cifra grande es el gesto entero del componente: si se achica, el
+   KPI deja de ser un titular y se vuelve una fila de tabla. */
+.kpi-val {
+  font-size: 21pt; font-weight: 800; line-height: 1;
+  letter-spacing: -0.02em; color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.kpi-nota { font-size: 8pt; color: var(--muted); margin-top: 5px; }
+.kpi-nota.kpi-bien { color: #15803d; font-weight: 700; }
+.kpi-nota.kpi-mal  { color: #b91c1c; font-weight: 700; }
+
+/* ---------- Barras horizontales ---------- */
+.barras { display: flex; flex-direction: column; gap: 7px; }
+.bar-fila { display: flex; align-items: center; gap: 10px; }
+.bar-etq {
+  flex: 0 0 34%; font-size: 9pt; color: var(--ink);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.bar-pista {
+  flex: 1 1 auto; height: 13px; border-radius: 7px;
+  background: var(--pista); overflow: hidden;
+}
+/* Extremo redondeado y anclado a la base: la marca nace del cero, no
+   flota. Fina a propósito — una barra gruesa pesa más que su dato. */
+.bar-marca { height: 100%; border-radius: 7px; min-width: 3px; }
+.bar-val {
+  flex: 0 0 auto; min-width: 44px; text-align: right;
+  font-size: 9pt; font-weight: 700; color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.bar-s1 { background: var(--s1); } .bar-s2 { background: var(--s2); }
+.bar-s3 { background: var(--s3); } .bar-s4 { background: var(--s4); }
+.bar-s5 { background: var(--s5); } .bar-s6 { background: var(--s6); }
+
+/* ---------- Escala contra meta ---------- */
+.esc-pista {
+  position: relative; height: 17px; border-radius: 9px;
+  background: var(--pista); overflow: hidden;
+}
+.esc-marca {
+  height: 100%; border-radius: 9px;
+  background: linear-gradient(90deg, var(--gold-soft), var(--gold));
+  min-width: 4px;
+}
+.esc-pie {
+  display: flex; align-items: baseline; gap: 6px; margin-top: 7px;
+  font-size: 9pt; color: var(--muted);
+}
+.esc-actual {
+  font-size: 15pt; font-weight: 800; color: var(--ink);
+  font-variant-numeric: tabular-nums; letter-spacing: -0.01em;
+}
+.esc-total { font-weight: 700; color: var(--ink); }
+.esc-falta { margin-left: auto; font-size: 8.4pt; }
+
+/* ---------- Comparativa antes/después ---------- */
+.cmp-bloque {
+  display: flex; align-items: center; gap: 12px;
+  padding: 9px 0; border-bottom: 1px solid var(--line);
+  break-inside: avoid;
+}
+.cmp-bloque:last-child { border-bottom: none; }
+.cmp-etq { flex: 0 0 26%; font-size: 9pt; font-weight: 600; color: var(--ink); }
+.cmp-par { flex: 1 1 auto; display: flex; flex-direction: column; gap: 4px; }
+.cmp-linea { display: flex; align-items: center; gap: 8px; }
+.cmp-rot {
+  flex: 0 0 46px; font-size: 7.4pt; text-transform: uppercase;
+  letter-spacing: 0.08em; color: var(--muted);
+}
+.cmp-antes   { background: #c9c4b6; }        /* el pasado, en gris: no compite */
+.cmp-despues { background: var(--s1); }
+.cmp-delta {
+  flex: 0 0 auto; min-width: 52px; text-align: right;
+  font-size: 10pt; font-weight: 800; font-variant-numeric: tabular-nums;
+}
+.cmp-bien { color: #15803d; } .cmp-mal { color: #b91c1c; }
+.cmp-neutro { color: var(--muted); }
+
+/* ---------- Esquema de pasos ---------- */
+.pasos { list-style: none; margin: 0; padding: 0; counter-reset: none; }
+.paso {
+  display: flex; gap: 11px; padding: 0 0 13px 0; position: relative;
+  break-inside: avoid;
+}
+/* El conector vertical convierte una lista en un CAMINO: se ve que un
+   paso lleva al siguiente, que es justo lo que una viñeta no dice. */
+.paso::before {
+  content: ""; position: absolute; left: 11px; top: 24px; bottom: 0;
+  width: 2px; background: var(--gold-line);
+}
+.paso:last-child { padding-bottom: 0; }
+.paso:last-child::before { display: none; }
+.paso-num {
+  flex: 0 0 24px; height: 24px; border-radius: 50%;
+  background: linear-gradient(145deg, var(--gold-soft), var(--gold));
+  color: var(--on-gold); font-size: 9.5pt; font-weight: 800;
+  display: flex; align-items: center; justify-content: center;
+  font-variant-numeric: tabular-nums; position: relative; z-index: 1;
+}
+.paso-tit { font-size: 10.5pt; font-weight: 700; color: var(--ink); line-height: 1.3; }
+.paso-desc { font-size: 9pt; color: var(--muted); margin-top: 2px; line-height: 1.45; }
+
+/* ---------- Código QR ---------- */
+.qr-bloque {
+  display: flex; align-items: center; gap: 14px;
+  border: 1px solid var(--gold-line); border-radius: var(--radius);
+  background: var(--gold-tint); padding: 12px 15px;
+}
+.qr-lienzo { flex: 0 0 auto; width: calc(var(--qr-mm) * 1mm); height: calc(var(--qr-mm) * 1mm); }
+.qr-lienzo svg { width: 100%; height: 100%; display: block; }
+.qr-lado { flex: 1 1 auto; min-width: 0; }
+.qr-pie { font-size: 9.5pt; font-weight: 700; color: var(--ink); margin: 0 0 4px; }
+.qr-url { font-size: 8.2pt; color: var(--gold-text); word-break: break-all; }
+.qr-hueco { font-size: 8pt; color: #b91c1c; }

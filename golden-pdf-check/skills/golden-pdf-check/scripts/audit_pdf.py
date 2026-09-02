@@ -302,6 +302,15 @@ def main():
         with open(args.palette, encoding="utf-8") as fh:
             ALLOWED = set(h.lower() for h in json.load(fh)["allowed_hex_for_audit"])
 
+    # Un archivo que no existe o no se puede abrir es un error del USUARIO, no un
+    # crash: hasta ahora salía un traceback de Python, que no le dice a nadie qué
+    # hacer. (Medido al correr el auditor contra una ruta borrada.)
+    if not os.path.exists(args.pdf):
+        print("No encuentro el PDF: %s" % args.pdf, file=sys.stderr)
+        print("Revisa la ruta (ojo con el directorio desde el que corres el comando).",
+              file=sys.stderr)
+        sys.exit(2)
+
     try:
         f = audit_with_pdfplumber(args.pdf)
         f["colors_pixel"] = audit_colors_pixels(args.pdf)   # None si falta Pillow/pdftoppm

@@ -19,6 +19,7 @@ description: >-
 ---
 
 # Golden Group — Copywriting Multicanal
+<!-- skill GCW1.6.0 · 2026-09-01 (corrida 5 de copywriting-tendencias-8-dias) · TRES cambios de base y UNA corrección grande. (1) SE REFUTA el titular de la corrida 4: el "hueco estructural de la API de lectura" era TRANSITORIO — GOLDEN CP6 pasó de 0% a 98,8% de cobertura y BLUE CP1 de 4,7% a 99,8% con el mismo método ocho días después; la regla de cuadrar cobertura NO se deroga, se refuerza a chequeo de cada corrida. (2) SUBE A LA BASE: WhatsApp le gana a SHOP_NOW con el mismo texto byte por byte, 1,7x-2,3x, TRES mediciones independientes (29 vs 16 vs 12 compras la última, mapeo creativo→anuncio verificado con ads_get_creative_ads). (3) SUBE A LA BASE: la oferta logística va al TÍTULO, no forzada en los 125 — 0 de 5 cuerpos del mercado la meten en 125, 4 de 5 la ponen en título o descripción. (4) Se retira "cabe en 40 = 79-87% estable" que afirmó la corrida 4: el rango real de cinco corridas es 79-93%; lo que aguanta es el enunciado, no la cifra. Hallazgo limpio nuevo: el emoji del título va al principio o al final, NUNCA en el medio (66 de 66). Censo de cuentas: 76 (eran 74). Cita nueva del artículo canónico 223409425500940 que respalda el 5+5+5 con opciones cargadas por el anunciante, y hueco declarado: placement asset customization no está en la skill. -->
 <!-- skill GCW1.5.0 · 2026-08-27 (chat FILTRO) · NUEVO references/anatomia-del-hook.md. ORIGEN: 00_CONTEXTO_MAESTRO.md del Agente Generador de Hooks v1.3 que trajo FER. HUECO MEDIDO: golden-ads ya sabe MEDIR el hook (17 menciones de hook rate, 15 de hold rate) pero ESTA skill, que los escribe, tenia 0 menciones de scroll-stop, snapback, context lean, trigger words, la regla de los 3 segundos y el 85% sin sonido. Se trajo el METODO, NO el pipeline de video del documento (Gemini+Seedance+ElevenLabs, ~1.52 USD/set): no esta instalado y duplicaria golden-imagen-arena, golden-ugc-avatar y golden-video-editor. Conecta con Andromeda: 4 hooks del mismo angulo con otras palabras cuentan como UNO para Meta. -->
 <!-- skill GCW1.4.0 · 2026-08-25 (corrida 4 de copywriting-tendencias-8-dias): la lectura por API NO cubre el gasto de la cuenta (GOLDEN CP6 y BLUE CP5 devuelven vacío con gasto real; BLUE CP1 al 4,7%) → regla nueva de cuadre de cobertura en estandar-meta-medido.md; se corrige la afirmación de 3 corridas de que la media del título era estable (lo estable es "cabe en 40", 79-87%); dos citas oficiales nuevas (la descripción de 25 es para info NO esencial; el generador de variantes de Meta soporta español); el banco de pruebas del reparto 2+3 se apagó. -->
 <!-- skill GCW1.3.9 · 2026-08-24 (centro de mando, remediación del verificador de cierre): línea de RUTA del cerebro en el Paso 0 (las lectoras ordenaban LÉELO PRIMERO sin decir dónde — un chat limpio no podía ejecutar la orden) + bump que las ediciones del 23-24 dejaron sin subir. -->
@@ -36,7 +37,7 @@ se generó sin voz de marca cargada.
 
 
 
-**Versión:** `GCW1.5.0` · **Fábrica: el CENTRO DE MANDO** (chat "🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR").
+**Versión:** `GCW1.6.0` · **Fábrica: el CENTRO DE MANDO** (chat "🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR").
 
 > 🔓 **Política de blindaje (CdM, 2026-08-24): esta skill va SIN blindar.** La tarea
 > `copywriting-tendencias-8-dias` le escribe cada 8 días; el flag `uchg` solo producía choques de
@@ -217,6 +218,42 @@ lo señala.
 
 ## Changelog
 
+- **GCW1.6.0** (2026-09-01) — **Quinta corrida de la tarea de 8 días.** Cobertura: **76 cuentas**
+  inventariadas (eran 74 en las corridas 2-4), **59 barridas una por una**, 15 con gasto, 5 bajadas
+  a nivel anuncio (100 anuncios), 21 creativos con cuerpo completo. Mercado: 3 términos, 150
+  anuncios, 52 páginas, 132 títulos, **5 de 5 cuerpos leídos** (primera vez sin vacíos). Tres
+  scripts con autotest y casos negativos deliberados; el primero **falló a la primera y el fallo era
+  mío** (esperaba 26 caracteres donde había 25, por contar el emoji como si ocupara dos).
+  **(1) SE REFUTA el titular de la corrida 4.** Su "hueco estructural de la API de lectura" era
+  **transitorio**: mismas cuentas, mismo método, ocho días después → GOLDEN CP6 **0% → 98,8%**,
+  BLUE CP1 **4,7% → 99,8%**, GOLDEN CP1 23% → 93,9%, Le'côterra CP2 46% → 81,5%. La medición del
+  25-ago fue real; la conclusión no. **La regla de cuadrar cobertura NO se deroga: se refuerza** a
+  chequeo obligatorio de cada corrida, justamente porque puede caer a 0% y volver sin avisar.
+  **(2) SUBE A LA BASE (§6): WhatsApp le gana a SHOP_NOW con el mismo texto byte por byte**, entre
+  **1,7x y 2,3x**, en **tres mediciones independientes** (21-ago, 25-ago, 01-sep). Última: 29 vs 16
+  vs 12 compras, con el mapeo creativo→anuncio **verificado** con `ads_get_creative_ads`, no
+  inferido del nombre. Límite declarado: el video no es idéntico, la dirección es de fiar, el número
+  exacto no.
+  **(3) SUBE A LA BASE (§3): la oferta logística va al TÍTULO, no forzada en los 125.** Medido con
+  script: **0 de 5** cuerpos del mercado la meten en los primeros 125 (la más temprana en el
+  carácter 172); **4 de 5** la ponen en título o descripción del enlace, que nunca se truncan.
+  **(4) Corrección a la corrida 4 (§4):** afirmó que "cabe en 40" era la cifra estable en 79-87%.
+  **El rango real de cinco corridas es 79-93%.** Lo que aguanta es el enunciado —cuatro de cada
+  cinco títulos o más caben en 40—, no el porcentaje. Se añade tabla de las 6 métricas de título con
+  su rango de 5 corridas y su veredicto de usable/no usable.
+  **(5) Hallazgo estructural limpio:** de 66 títulos con emoji, **45 al principio, 21 al final, CERO
+  en el medio**, con tres formas distintas de deduplicar.
+  **(6) §1, cita nueva del artículo canónico 223409425500940** que respalda el 5+5+5 con **opciones
+  que carga el anunciante** (hasta ahora se apoyaba en el artículo de generación por IA). Límites
+  **125/40/25 confirmados por quinta vez.** Hueco declarado: **`placement asset customization`** no
+  se menciona en la skill. **(7) §4, dos mecanismos nuevos del mercado:** la pregunta que hace
+  ELEGIR (no asentir) y los hashtags al cierre; y la prueba social numérica ya no va en el cuerpo,
+  va en título o descripción.
+  **Blindaje: NO se re-blindó, a propósito** — segunda corrida seguida que lo reporta: la política
+  del CdM (GCW1.3.8) derogó el `uchg` y el mandato de la tarea todavía lo ordena. Respaldo previo:
+  `RESPALDOS-SKILLS/golden-copywriting_2026-09-01_pre-corrida5.tar.gz`.
+  **Nota de higiene encontrada:** el changelog **no tiene entrada para GCW1.5.0** (el sello del
+  27-ago la trae, el changelog salta de 1.4.0 a 1.3.9). No la invento — va a la bandeja.
 - **GCW1.4.0** (2026-08-25) — **Cuarta corrida de la tarea de 8 días.** Cobertura: 74 cuentas
   inventariadas, **58 barridas — el censo completo de lo legible** (las corridas anteriores llegaban
   a 42), 16 con gasto, 6 bajadas a nivel anuncio, 13 creativos leídos, mercado de 150 anuncios /

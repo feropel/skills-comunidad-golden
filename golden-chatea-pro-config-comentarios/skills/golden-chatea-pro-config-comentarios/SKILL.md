@@ -6,6 +6,7 @@ description: Genera el JSON de configuración GENERAL del asistente de COMENTARI
 # Chatea Pro — Config del asistente de comentarios
 
 <!-- Fábrica: CENTRO DE MANDO (chat 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR) — sin fábrica de chat propia; turnos y filas van a la bandeja del CdM. -->
+<!-- corrección CdM 2026-08-29 · CAMBIO DE ESTÁNDAR países: la plataforma acepta 10, no 7 (doble medición contra el bundle vivo index-BrZVg7KW.js, sha256 2c947877…; deroga 'solo 7' y 'Guatemala fuera de plataforma'; detalle en la gaceta). Menciones del conteo viejo actualizadas a 10; el resto intacto. -->
 <!-- skill v1.7 · 2026-08-26 (Centro de Mando, fila de CHATEA TOMAS VIP CHILE, medida en fXXXXXX) · GATE
 FAIL-CLOSED PARA CAMPOS ARRAY en build_config.py: los campos existentes de Comentarios son tipo
 array, su tipo NO se puede cambiar por API, y sobre ~19.000-23.000 escapados el campo muere EN
@@ -96,7 +97,7 @@ Lo único que cambia entre tiendas es la **información del negocio**, que se pr
 
 Pregunta estos 5 datos, **uno a la vez** y en este orden. No los pidas todos de golpe.
 
-1. **País** donde opera la tienda (ej: colombia). **La plataforma solo acepta 7** (campo `[Comentarios IA] País`, MAYÚSCULA y sin acentos): COLOMBIA, ECUADOR, CHILE, MEXICO, PANAMA, PERU, PARAGUAY. Si el usuario da otro (Guatemala, Argentina, Bolivia, Costa Rica…), avísale que la plataforma no lo acepta antes de seguir.
+1. **País** donde opera la tienda (ej: colombia). **La plataforma acepta 10 (remedido 2026-08-29)** (campo `[Comentarios IA] País`, MAYÚSCULA y sin acentos): COLOMBIA, ECUADOR, CHILE, MEXICO, PANAMA, PERU, PARAGUAY. Si el usuario da otro (Guatemala, Argentina, Bolivia, Costa Rica…), avísale que la plataforma no lo acepta antes de seguir.
 2. **Contacto**: una página web, un WhatsApp **o** un correo. Solo uno; es dato de referencia, no para mandar al cliente a otro canal.
 3. **Tiempos de envío**: cuánto demora la entrega (ej: ciudad principal 2-3 días, intermedia 3-4, rural 5-7). Este dato **se pregunta siempre**, no se asume.
 4. **Información adicional del negocio**: una o dos líneas de respaldo (sede, pago contra entrega, originalidad; si el usuario aporta años o clientes, que sean los REALES de SU negocio — jamás los del template ni los de otra tienda).

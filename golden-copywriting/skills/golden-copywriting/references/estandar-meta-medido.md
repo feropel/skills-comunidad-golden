@@ -29,6 +29,23 @@ silencio**, no rechaza: el copy entra, se ve cortado y nadie se entera.
 Meta también recomienda **de forma explícita cargar varias opciones por campo** para que el
 sistema optimice la entrega. El estándar 5+5+5 de esta skill está respaldado por la fuente.
 
+**Cita textual del artículo canónico, recuperada el 2026-09-01** — hasta ahora el 5+5+5 se apoyaba
+en el artículo de generación por IA; ahora está en el de buenas prácticas de texto, y descrito como
+opciones que **carga el anunciante**, no generadas por Meta: *"input multiple text options for the
+primary text, headline and description fields when creating single image or video ads. This allows
+our ad system to optimize for delivery and performance using variations of the text options
+provided"*. Aplica a **imagen única o video único**.
+
+> **Consecuencia operativa, medida el 25-ago y confirmada el 01-sep:** los textos van como
+> **opciones múltiples DENTRO de un anuncio**, no como anuncios hermanos. Cargados como anuncios
+> hermanos, el algoritmo le da casi todo el presupuesto a uno en las primeras horas y **los demás no
+> llegan a tener muestra** — dos piezas medidas recibieron 436 y 9 pesos. Eso no es un test, es un
+> copy con testigos.
+
+**Capacidad de Meta que esta skill NO cubre (hueco declarado 2026-09-01):** el mismo artículo nombra
+**`placement asset customization`** — copy distinto por ubicación (más corto en Stories, más de marca
+en Instagram). La skill no lo menciona en ninguna parte y podría cambiar cómo se reparten los 5+5+5.
+
 **La descripción de 25 NO es donde va el argumento de venta, y lo dice Meta.** Artículo
 **497610041230617**: *"your description should contain only nonessential information"*. No pelees
 por meter la oferta en 25 caracteres — ese campo es para información prescindible. (Medido
@@ -132,6 +149,23 @@ Ahí cae el **"Ver más"** y la mayoría no lo abre.
 **Regla dura: en todo texto largo, el argumento de venta —precio, garantía de duración, envío
 gratis, prueba social— tiene que caber dentro de los primeros 125 caracteres.**
 
+> ### La salida que el mercado usa, y funciona mejor (subida a la base el 2026-09-01)
+>
+> La oferta **logística** (envío gratis, paga al recibir) tiene una casa mejor que los 125:
+> **el título o la descripción del enlace, que NUNCA se truncan.**
+>
+> Medido con script sobre los cuerpos completos del mercado CO: **0 de 5 meten la oferta logística
+> en los primeros 125 caracteres** (la más temprana cae en el carácter 172, la más tardía en el 509)
+> **pero 4 de 5 la ponen en el título o la descripción** — `PAGA AL RECIBIR`, `PAGA EN CASA`,
+> `Envío Gratis🎁`, `Cuadros Religiosos 90x60 | Envío Gratis + Contra Entrega`. El quinto usa el
+> título para prueba social (`⭐ +2.354 Pijamas Vendidas`).
+>
+> Tres corridas en la misma dirección: 2 de 4 el 25-ago, **4 de 5 el 01-sep**.
+>
+> **Cómo se aplica:** los 125 son para el **gancho y el argumento** (dolor, mecanismo, credibilidad).
+> La **oferta logística va al título**. No hay que pelear por meterlas todas en la misma ventana —
+> forzarlo es lo que produce el copy amontonado que la auditoría caza.
+
 Esta es **la clase de fallo más común al auditar copys largos**: el gancho se come la ventana
 visible y el argumento queda escondido detrás del "Ver más". En la corrida de Le'côterra,
 **13 de 33 textos largos fallaban esto** en el primer borrador. Revísalo siempre, uno por uno.
@@ -220,6 +254,21 @@ Qué es el producto y qué hace
 **Una idea por línea, línea en blanco entre bloques, emoji al inicio de cada línea.** Muy
 escaneable en móvil, que es donde compra el 74% del tráfico LatAm.
 
+### Dos mecanismos de apertura vistos en el mercado el 2026-09-01
+
+**1 · La pregunta que hace ELEGIR, no asentir.** Cuadros Colombia abre con *"¿Te inspira más La
+Última Cena, una imagen de Jesús, o la protección de la Virgen de Guadalupe?"*. La pregunta de dolor
+que enseña la skill se responde sí o no; esta **obliga a escoger entre opciones, y escoger ya es un
+micro-compromiso.** Úsala cuando el producto tenga variantes, referencias o sabores.
+
+**2 · Hashtags al cierre del cuerpo.** Danifit remata con siete (`#pijamas #emprendimientocolombia`
+…). **Primera aparición en cinco corridas.** Un caso no es un patrón: anotado, no recomendado.
+
+**Y la prueba social numérica se mudó de sitio.** De los 5 cuerpos leídos, **ninguno** la mete en el
+cuerpo: Danifit la pone en el **título** (`⭐ +2.354 Pijamas Vendidas`) y Total Life en la
+**descripción** (`Calificación ⭐⭐⭐⭐⭐(5/5)`). Coherente con la regla de arriba: **lo que no puede
+truncarse va al título.**
+
 ### Títulos: 57 anuncios activos medidos con script
 
 Medición del **2026-08-10 (tarde)**, 3 términos de búsqueda, títulos únicos por página, 45
@@ -246,6 +295,29 @@ con script, que es la que se puede repetir.**
 El accionable no cambia: **un tercio largo del mercado colombiano usa el título para la oferta
 y no para el beneficio.** Reparto recomendado por concepto: **3 títulos de beneficio + 2 de
 oferta.** Y el 19% que desperdicia el titular es el hueco más barato de aprovechar.
+
+### Lo que aguanta CINCO corridas y lo que no (consolidado 2026-09-01)
+
+Cinco mediciones con el mismo script y los mismos 3 términos (10-ago, 16-ago, 21-ago, 25-ago,
+01-sep). Puesto junto, se separa lo estable de lo que solo parecía estable:
+
+| Métrica | Rango en 5 corridas | Veredicto |
+|---|---|---|
+| **Cabe en 40** | 79% – 93% | **Lo único usable**, pero como enunciado, no como cifra |
+| Longitud media | 24,7 – 32,5 | **NO usar.** La arrastran títulos excéntricos de 300+ car. |
+| Mediana | 21 – 31 | No usar sola |
+| Emoji | 26% – 65% | **NO medible** con 150 anuncios por recencia |
+| MAYÚSCULAS | 13% – 37% | **NO medible** |
+| Título = OFERTA | 22% – 32% | **NO medible.** Su racha descendente se rompió el 01-sep |
+
+> **La única regla de títulos que aguanta cinco corridas: cuatro de cada cinco títulos del mercado
+> colombiano, o más, caben en 40 caracteres.** Escrito como porcentaje exacto es falsa precisión;
+> la corrida del 25-ago afirmó "79-87% estable" y ocho días después salió 93%.
+
+**Y un hallazgo estructural, ese sí limpio (01-sep):** de los **66 títulos con emoji**, **45 lo
+llevan al principio, 21 al final y CERO en el medio.** Tres formas distintas de deduplicar dan lo
+mismo. **El emoji del título va al principio o al final, nunca intercalado.** No es estilo: son
+66 de 66.
 
 ### Emojis
 
@@ -311,12 +383,26 @@ Rankear copys sobre lo que la API entrega, sin cuadrar, es cherry-picking con pa
 > **Regla dura: antes de comparar CPA entre copys, cuadra la cobertura. Si el gasto de los anuncios
 > leídos no se acerca al de la cuenta, no reportes el ranking de copys — reporta la cobertura.**
 
+> ### 🔴 CORRECCIÓN 2026-09-01 · el hueco era TRANSITORIO, no estructural
+>
+> Ocho días después, mismas cuentas y mismo método: **GOLDEN CP6 pasó de 0% a 98,8%** de cobertura,
+> **BLUE CP1 de 4,7% a 99,8%**, GOLDEN CP1 de 23% a 93,9%, Le'côterra CP2 de 46% a 81,5% — y eso
+> pidiendo solo los 20 primeros anuncios por gasto de cada una.
+>
+> **La medición del 25-ago fue real; la conclusión de que era un hueco estructural de la API NO se
+> sostiene.** No hay fuente que explique el cambio y no se inventa una.
+>
+> **La regla de cuadrar la cobertura NO se deroga: se refuerza.** Precisamente porque la cobertura
+> puede caer a 0% y volver sin avisar, el cuadre es un chequeo **de cada corrida**, no una lección
+> aprendida una vez. La tabla de arriba se conserva como el caso peor documentado.
+
 ### Cuántas cuentas hay que mirar
 
-`ads_get_ad_accounts` con `limit: 100`. El 2026-08-25 devolvió **74 cuentas** (sin `next_cursor`;
-mismo número las corridas del 16 y 21 de agosto). Descontando 13 no consultables, 2 con Ads MCP
-deshabilitado y `GOLDEN CP BACK UP`, quedan **58 barribles — el censo completo de lo legible**, y de
-esas **16 tuvieron gasto en 30 días**. Ese embudo 74 → 58 → 16 es el denominador del informe.
+`ads_get_ad_accounts` con `limit: 100`. El **2026-09-01 devolvió 76 cuentas** (sin `next_cursor`) —
+**eran 74 el 16, el 21 y el 25 de agosto: el censo crece, vuelve a contarse cada corrida y se
+guardan los ids para poder hacer el diff.** Descontando 14 no consultables, 2 con Ads MCP
+deshabilitado y `GOLDEN CP BACK UP`, quedan **59 barribles — el censo completo de lo legible**, y de
+esas **15 tuvieron gasto en 30 días**. Ese embudo 76 → 59 → 15 es el denominador del informe.
 No te quedes en las que tienen medio de pago: **6 cuentas sin medio de pago entraron al barrido y
 confirmaron cero**, y solo por mirarlas dejaron de ser un hueco.
 **`GOLDEN CP BACK UP` (408753721820872) no se toca ni se lee** — orden del Centro de Mando.
@@ -341,6 +427,29 @@ El de CPA 119.346 tiene 2 compras y no aguanta conclusión.
 **Qué obliga esto:** un copy no se juzga contra su CPA a secas. Si dos piezas con el mismo texto
 se separan 8x, el texto no explica la diferencia. Al auditar, pregunta primero **a dónde manda el
 anuncio y con qué creativo corre**, y solo después toca las palabras.
+
+### WhatsApp le gana a SHOP_NOW · TRES mediciones independientes (subido a la base el 2026-09-01)
+
+Mismo hallazgo, tres ventanas de 30 días, tres muestras distintas, misma cuenta y mismo cuerpo
+byte por byte. Última medición, con el mapeo creativo→anuncio **verificado** con
+`ads_get_creative_ads` (no inferido del nombre):
+
+| Fecha | CTA ganador | CPA WhatsApp | CPA SHOP_NOW | Ventaja | Muestra |
+|---|---|---|---|---|---|
+| 2026-08-21 | WhatsApp | 14.794 | 33.622 | 2,3x | 16 vs 13 compras |
+| 2026-08-25 | WhatsApp | 18.457 | 33.591 / 41.353 | 1,8x / 2,2x | 21 vs 16 vs 12 |
+| **2026-09-01** | **WhatsApp** | **19.730** | **34.370 / 41.353** | **1,7x / 2,1x** | **29 vs 16 vs 12** |
+
+**Tres corridas, misma dirección, magnitud entre 1,7x y 2,3x.** Y el de WhatsApp es el único que
+siguió escalando gasto sin degradar su CPA (387.596 → 572.166 COP, CPA 18.457 → 19.730), mientras
+uno de los SHOP_NOW dejó de gastar y quedó congelado.
+
+> **Regla: en COD colombiano, con el mismo texto, el destino WhatsApp rinde entre 1,7x y 2,3x mejor
+> que SHOP_NOW. Si un copy rinde mal y manda a web, cambia el destino ANTES de reescribir el texto.**
+
+**Su límite, dicho claro:** el creativo de video no es idéntico entre las piezas, así que **no es un
+A/B controlado y el número exacto no es de fiar. Lo que sí es de fiar, tres veces seguidas, es la
+dirección.**
 
 ## 7 · Qué del mercado se puede medir y qué no (método, 2026-08-21)
 

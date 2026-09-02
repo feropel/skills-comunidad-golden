@@ -14,6 +14,246 @@ una impresión sin medir, manda la base.
 
 ---
 
+## 2026-09-01 · corrida 5 de la tarea automática
+
+**Nota de higiene previa:** la skill se encontró **sin blindar, y sigue siendo lo correcto.**
+`GCW1.3.8` (24-ago) derogó el `uchg` para esta skill. **El texto de la tarea programada TODAVÍA
+ordena `chflags -R uchg` y comprobar que el blindaje volvió: esa instrucción sigue vencida y NO se
+ejecutó** — la fábrica declarada manda. Es la segunda corrida seguida que lo reporta. Respaldo
+previo sí se hizo (`RESPALDOS-SKILLS/golden-copywriting_2026-09-01_pre-corrida5.tar.gz`, 7 entradas).
+
+**Cobertura:** **76 cuentas inventariadas** (`limit:100`, sin `next_cursor`) — **eran 74 en las
+corridas 2, 3 y 4: entraron 2**. **59 barridas una por una a nivel cuenta** (76 − 14 no consultables
+− 2 con Ads MCP deshabilitado − `GOLDEN CP BACK UP`, excluida por orden del CdM y ni leída).
+**15 con gasto en 30 días** (eran 16). 5 cuentas bajadas a nivel anuncio (100 anuncios), **21
+creativos leídos con cuerpo completo**. Mercado: 3 términos, 150 anuncios, 52 páginas, 132 títulos
+medibles, 5 cuerpos pedidos por firecrawl, **5 leídos (5 de 5, primera vez sin vacíos)**.
+Tres scripts con autotest (16 + 8 + 12 comprobaciones, con casos negativos deliberados); **el
+primero falló a la primera y el fallo era mío, no del script** — esperaba 26 caracteres donde había
+25 porque conté el emoji como si ocupara dos. Corregida la expectativa, 0 fallos en los tres.
+
+### 🔴 Lo más importante: el "hueco de la API" de la corrida 4 NO se reproduce
+
+La corrida 4 tituló que **la lectura por API no cubre el gasto de la cuenta** y sacó de ahí una
+regla de método. **Hoy, mismas cuentas, mismo método, mismo tipo de consulta:**
+
+| Cuenta | Gasto CUENTA 30d | Suma de los anuncios leídos | Cobertura HOY | Cobertura 25-ago |
+|---|---|---|---|---|
+| GOLDEN CP6 COL | 2.619.585 COP | 2.587.770 | **98,8%** | **0% (lista vacía)** |
+| BLUE CP1 COL | 2.110.429 COP | 2.106.648 | **99,8%** | 4,7% |
+| GOLDEN CP1 COL | 3.385.514 COP | 3.180.426 | **93,9%** | 23% |
+| Le'côterra CP2 | 1.942.691 COP | 1.582.800 | **81,5%** | 46% |
+| otra marca CP1 | 7.942.426 COP | 7.086.053 | **89,2%** | no medida |
+
+**GOLDEN CP6 pasó de devolver lista vacía a devolver el 98,8% del gasto. BLUE CP1, de 4,7% a 99,8%.**
+Y eso con solo los **20 primeros anuncios por gasto** de cada cuenta: hay más páginas sin pedir.
+
+**Qué significa, dicho con cuidado:** lo que la corrida 4 midió fue real —lo probó contra el caso
+que sabía malo, a tres niveles— pero **la conclusión de que era un hueco estructural de la API de
+lectura no se sostiene. Era un fallo TRANSITORIO.** No sé si fue una incidencia de Meta, un
+reprocesamiento de la ventana de 30 días o un cambio del lado del MCP; **no tengo fuente que lo
+explique y no voy a inventarla.**
+
+**Lo que SÍ sobrevive de la corrida 4, y hay que conservarlo:** la regla de cuadrar el gasto de los
+anuncios leídos contra el gasto de la cuenta **antes** de comparar CPA entre copys. Precisamente
+porque la cobertura puede irse a 0% sin avisar, **el cuadre deja de ser una lección puntual y pasa a
+ser un chequeo permanente de cada corrida**. Hoy pasa; hace ocho días no pasaba. Esa es la razón de
+medirlo siempre, no de medirlo una vez.
+
+### 🔴 Lo segundo: el CTA le gana al texto por TERCERA medición independiente, y ya es promovible
+
+otra marca CP1, **mismo cuerpo byte por byte** (485 caracteres, "👜 \*\*¿Cansada de cargar bolsos
+grandes…"), mismo producto, mismos 30 días. Mapeo creativo→anuncio verificado con
+`ads_get_creative_ads`, no inferido por el nombre:
+
+| Anuncio | Creativo | CTA | Gasto | Compras | CPA | ROAS |
+|---|---|---|---|---|---|---|
+| Anuncio 3 Drive | 1363885315721657 | **WHATSAPP_MESSAGE** | 572.166 | **29** | **19.730** | 4,05 |
+| Anuncio 19 Drive | 27989016884027390 | SHOP_NOW | 549.919 | 16 | 34.370 | 3,36 |
+| Anuncio 20 Drive | 939600362502516 | SHOP_NOW | 496.237 | 12 | 41.353 | 2,42 |
+
+**WhatsApp 1,74x y 2,10x mejor que SHOP_NOW. 57 compras sobre 1.618.322 COP de gasto.**
+Corrida 3 midió 2,3x, corrida 4 midió 1,82x y 2,24x, corrida 5 mide 1,74x y 2,10x. **Tres corridas,
+tres muestras, misma dirección, magnitud entre 1,7x y 2,3x.** El pie de página sigue en pie: el
+creativo de video no es idéntico entre las tres piezas, así que **no es un A/B controlado y el
+número exacto no es de fiar; la DIRECCIÓN sí lo es, tres veces seguidas.**
+
+**Esto se sube a `estandar-meta-medido.md` en esta corrida.** Deja de ser tendencia y pasa a base.
+
+**Detalle que vale la pena:** `Anuncio 20 Drive` reporta **exactamente** 496.237 / 12 / 41.353, las
+mismas tres cifras que el 25-ago. No es un error de copia: **ese anuncio dejó de gastar** y sus
+números quedaron congelados dentro de la ventana. El de WhatsApp, en cambio, siguió corriendo
+(387.596 → 572.166) y su CPA se movió apenas (18.457 → 19.730). **El que aguanta el gasto sin
+degradarse es el de WhatsApp.**
+
+### El estándar 2+3 sigue sin banco de pruebas, pero apareció un contraste mejor
+
+El experimento de los 165 copys con reparto 2 cortos + 3 largos **sigue apagado** (se apagó en la
+corrida 4). Lo que hay hoy en Le'côterra es otra cosa, y es más útil: **anuncios con varios textos
+DENTRO de uno** (`15 copys` en el nombre) contra **su hermano de un solo texto, mismo video, mismo
+producto**, en tres cuentas a la vez:
+
+| Cuenta | Anuncio | Gasto | Compras | CPA | ROAS |
+|---|---|---|---|---|---|
+| BLUE CP1 | **V6 · Bergamot · 15 copys** | 45.091 | 3 | **15.030** | **6,27** |
+| BLUE CP1 | Video 6 · Bergamot · mejor CPA | 414.921 | 4 | 103.730 | 0,97 |
+| BLUE CP1 | Video 6 · Bergamot · mejor CPA | 332.564 | 8 | 41.571 | 2,38 |
+| GOLDEN CP6 | **V6 · Bergamot · 15 copys** | 41.416 | 1 | **41.416** | 1,90 |
+| GOLDEN CP6 | Video 6 · Bergamot · mejor CPA | 263.187 | 3 | 87.729 | 1,11 |
+| GOLDEN CP6 | Video 6 · Bergamot · mejor CPA | 61.488 | 1 | 61.488 | 1,95 |
+| GOLDEN CP1 | **V6 · Bergamot · 15 copys** | 43.771 | 1 | **43.771** | 1,89 |
+
+**En las tres cuentas el anuncio de "15 copys" tiene mejor CPA que su hermano de un solo texto con
+el mismo video.** Y en BLUE CP1 el mejor ROAS de toda la cuenta (6,27) es suyo.
+
+**Los tres descargos, y son grandes:** (1) la muestra es de **3, 1 y 1 compras** — es una señal, no
+una prueba; (2) **el mecanismo NO está verificado**: el nombre dice "15 copys" pero `asset_feed_spec`
+sigue sin poder leerse por API (quinta corrida), así que **estoy infiriendo del nombre del anuncio
+qué tiene dentro**; (3) el algoritmo volvió a estrangular el presupuesto — los de "15 copys"
+recibieron 41-45k contra los 263-414k de sus hermanos. **Otra vez el creativo que mejor rinde es el
+que menos entrega recibe.** Va a la bandeja como propuesta de test, no como conclusión.
+
+### Le'côterra relanzó hoy, y relanzó TODO CORTO
+
+Los creativos de BLUE CP1 fechados **2026-09-01** son los tres cuerpos que la corrida 4 vio morir de
+inanición, vueltos a lanzar tal cual:
+
+| Cuerpo | Caracteres |
+|---|---|
+| `BERGAMOT 36 es cítrica y fresca 🧊` | 33 |
+| `La segunda te sale en $60.000. 🎁` | 32 |
+| `VANILLA 26 es vainilla cálida y dura 48 horas ✨` | 47 |
+
+Los 8 cuerpos leídos de la cuenta van de **32 a 47 caracteres, media 41,9, y los 8 caben en 125.**
+**El reparto 2+3 no existe hoy en la cuenta: es 100% corto.** Si el CdM quiere el veredicto
+corto-vs-largo, hay que montarlo a propósito; **la operación real lo eligió por su cuenta y eligió
+corto**, sin decir por qué y sin dejar rastro de comparación.
+
+### Los dos fallos de higiene de otra marca: quinta corrida vivos, y el de asteriscos SE EXTENDIÓ
+
+Reportados el 16-ago, 21-ago, 25-ago; verificados hoy otra vez leyendo el creativo en vivo:
+
+- **Negrita Unicode falsa** (`👜𝐔𝐬𝐚 𝐭𝐮 𝐜𝐞𝐥𝐮𝐥𝐚𝐫…`, Mathematical Bold): sigue ACTIVE en
+  `970698286006700` y `892892237194757`. Sin cambio.
+- **`**asteriscos**` de Markdown literales sin renderizar: 1 → 3 → 3 → AL MENOS 5.** Entraron
+  `1024746030375878` y `1268655375309360`, creados el **23-ago**, con el cuerpo copiado byte por
+  byte de los anteriores. **La corrida 4 dijo "rota, cada clonación arrastra el fallo dentro" y
+  esta corrida lo confirma con dos casos nuevos y fechados: no rota, CRECE.** Y ahora está dentro de
+  los creativos de **catálogo dinámico** (`{{product.name}}`), que son los que se multiplican solos.
+- **Hallazgo nuevo:** el creativo `936992396112676` está `ACTIVE` con `object_type:
+  PRIVACY_CHECK_FAIL` y **`body` vacío**. Fuera de mi dominio diagnosticarlo; va a la bandeja.
+
+Fuera de mi dominio ejecutarlo. Va a la bandeja por **cuarta** vez, ahora con el mecanismo probado.
+
+### Mercado colombiano · 132 títulos medibles (52 páginas)
+
+| Métrica | c1 (57) | c2 (52) | c3 (62) | c4 (142) | **c5 · 1er seg. (132)** | c5 · únicos (54) | c5 · 1 tít./pág. (41) |
+|---|---|---|---|---|---|---|---|
+| Longitud media | 30,1 | 29,6 | 30,0 | 32,5 | **24,7** | 25,8 | 24,9 |
+| Mediana | 31 | 27 | 28 | 25,5 | **23** | 23,5 | 21 |
+| Cabe en 40 | 82% | 81% | 84% | 79% | **93%** | 91% | 93% |
+| Emoji | 51% | 65% | 26% | 58% | **50%** | 41% | 41% |
+| MAYÚSCULAS | 26% | 37% | 13% | 27% | **25%** | 17% | 20% |
+| Título = OFERTA | 32% | 31% | 26% | 22% | **26%** | 17% | 22% |
+
+**La media vuelve a moverse fuerte (32,5 → 24,7): la corrida 4 tenía razón al retirarla.** Su causa
+está a la vista: el 25-ago dos anunciantes metieron títulos de 300+ caracteres; hoy **el más largo
+de los 150 anuncios mide 89**. La media mide a los excéntricos, no al típico.
+
+**Corrección a la corrida 4, que se pasó de confiada con `cabe en 40`.** Dijo que era "la cifra que
+sí aguanta, 79-87%". **Hoy da 93%: el rango real de cinco corridas es 79-93%, catorce puntos.**
+Lo que aguanta no es el número, es el enunciado: **cuatro de cada cinco títulos del mercado, o más,
+caben en 40 caracteres.** Escrito así es una regla usable; escrito como porcentaje es falsa precisión.
+
+**Y "título = OFERTA" rompió su racha.** Iba 32 → 31 → 26 → 22 y hoy sube a 26. La corrida 4 lo
+señaló como "la única señal de mercado que merece vigilarse" **por ser monótona: ya no lo es.**
+Queda en la misma bolsa que emoji y MAYÚSCULAS: **no medible con 150 anuncios por recencia.**
+
+**Lo único estructural que sí apareció, y es nuevo:** de los 66 títulos con emoji del conjunto
+completo, **45 lo llevan al principio, 21 al final y CERO en el medio.** Tres conjuntos distintos
+(todos, únicos, 1 por página) dan lo mismo: **el emoji del título nunca va en el medio.** No es
+opinión de estilo, son 66 de 66.
+
+### Molde COD: intacto, y los 5 cuerpos se leyeron enteros
+
+Primera corrida con **5 de 5** cuerpos recuperados. **No apareció ningún molde nuevo que reemplace
+al canónico**, y salieron dos variantes que vale la pena nombrar:
+
+| Anunciante | Car. | Líneas | Registro | Destino |
+|---|---|---|---|---|
+| Danifit (pijamas) | 542 | 9 | molde canónico, logística en **dos líneas** (📦 / 💰) | WhatsApp |
+| TOP jackets (chaqueta) | 634 | 8 | alerta + dolor **muy específico** (moto/bus), logística en **una línea** | WhatsApp |
+| Andino (morral) | 381 | 9 | **oferta pura**: cero dolor, cero historia, todo son líneas de dato | web |
+| Total Life (car care) | 443 | 3 | **sin bullets**, tres párrafos, logística dentro de la frase de cierre | web |
+| Cuadros Colombia (religioso) | 790 | 19 | el más largo, catálogo de referencias en viñetas | web |
+
+**Dos mecanismos nuevos para el arsenal:**
+
+1. **Pregunta que hace ELEGIR, no asentir.** Cuadros Colombia abre con *"¿Te inspira más La Última
+   Cena, una imagen de Jesús, o la protección de la Virgen de Guadalupe?"*. No es la pregunta de
+   dolor que enseña la skill —que se responde sí o no—: **obliga a escoger entre opciones, y la
+   elección ya es un micro-compromiso.** Encaja donde el producto tiene variantes.
+2. **Hashtags al cierre del cuerpo.** Danifit remata con siete (`#pijamas #emprendimientocolombia…`).
+   **Primera aparición en cinco corridas de bitácora.** Un caso no es un patrón; queda anotado.
+
+**Y la prueba social numérica se mudó de sitio.** Danifit la pone en el **título** (`⭐ +2.354 Pijamas
+Vendidas`) y Total Life en la **descripción** (`Calificación ⭐⭐⭐⭐⭐(5/5)`). Ninguno de los cinco la
+mete en el cuerpo. Van cuatro corridas con el dato numérico presente de una forma u otra.
+
+### La regla de los 125: 0 de 5, y la tesis alternativa sube a 4 de 5
+
+Medido con script, no a ojo. **Ninguno de los cinco mete la oferta logística en los primeros 125
+caracteres** (la más temprana es Andino, en el carácter 172; la más tardía, Cuadros, en el 509).
+Los cuerpos van de 381 a 790 caracteres: **ninguno cabe entero en 125.**
+
+**Pero 4 de 5 la ponen en el TÍTULO o en la DESCRIPCIÓN del enlace**, que nunca se truncan:
+`PAGA AL RECIBIR` (Andino), `PAGA EN CASA` (TOP jackets), `Envío Gratis🎁` (Total Life),
+`Cuadros Religiosos 90x60 | Envío Gratis + Contra Entrega` (Cuadros). **El quinto, Danifit, usa el
+título para prueba social en vez de para la oferta.**
+
+La corrida 3 propuso esto como tesis, la 4 lo vio en 2 de 4, la 5 lo mide en **4 de 5**.
+**Se sube a la base:** poner la oferta donde nunca se trunca es mejor solución que forzarla dentro
+de los primeros 125.
+
+### Límites oficiales de Meta: SIN CAMBIO, quinta verificación — y una cita que faltaba
+
+`ads_get_help_article`, artículo **223409425500940**, corrido hoy: **125 / 40 / 25, sin cambio**,
+y sigue *"primary text should span 1-3 lines at most"*. Cinco corridas, misma fuente.
+
+**Cita nueva, y cierra el hueco del 5+5+5.** El mismo artículo canónico trae un bullet que la
+bitácora no había citado: *"input multiple text options for the primary text, headline and
+description fields when creating single image or video ads. This allows our ad system to optimize
+for delivery and performance using variations of the text options provided"*. Hasta ahora el
+mecanismo de opciones múltiples se apoyaba en el artículo de **generación por IA** (180641596861873).
+**Ahora está confirmado en el artículo de buenas prácticas de texto y descrito como opciones que
+CARGA EL ANUNCIANTE, no generadas por Meta.** Es exactamente lo que el 5+5+5 necesita, y respalda
+por fuente lo que la tabla de "15 copys" insinúa por datos.
+
+El mismo artículo nombra **`placement asset customization`** (copy distinto por ubicación, más corto
+en Stories) — **capacidad que la skill no menciona en ninguna parte.** Anotado como hueco.
+
+### GOLDEN CP BACK UP
+
+No se tocó ni se leyó (`408753721820872`) — orden del Centro de Mando respetada.
+
+### Qué quedó SIN VERIFICAR
+
+- **`asset_feed_spec`: quinta corrida sin poder leerlo.** La corrida 4 recomendó dejar de
+  reintentarlo por API y **se respetó: no se reintentó.** Sigue haciendo falta una mirada MANUAL en
+  el Administrador. **Y ahora cuesta caro:** sin él, la tabla de "15 copys" se apoya en el nombre
+  del anuncio y no en el contenido real.
+- **Por qué la API devolvía vacío el 25-ago y hoy no.** No tengo fuente. Lo reporto como
+  transitorio observado, no como explicado.
+- **Las 2 cuentas nuevas** (76 vs 74) no las identifiqué contra el censo anterior: **la corrida 4
+  guardó el total, no la lista.** Desde esta corrida quedan los 76 ids en el parte de la bandeja
+  para que la siguiente pueda hacer el diff.
+- **El 6-19% del gasto restante** de las 5 cuentas bajadas a nivel anuncio: hay más páginas
+  (`next_cursor`) que no pedí. Cobertura declarada, no completa.
+- **Las 10 cuentas con gasto que no se bajaron a nivel anuncio** (GOLDEN CP3, CP5, CP8, CP9, BLUE
+  CP2, CP3, CP5, INTER CP1, CP2, CP3): se conoce su gasto, **no qué copy lo gastó.**
+
+---
+
 ## 2026-08-25 · corrida 4 de la tarea automática
 
 **Nota de higiene previa:** la skill se encontró **sin blindar, y esta vez eso es lo correcto.**

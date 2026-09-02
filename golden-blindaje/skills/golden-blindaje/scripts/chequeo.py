@@ -392,6 +392,25 @@ def revisar_mcp(hallazgos):
 
 # ─────────────────────────── 5 · BLINDAJE ───────────────────────────
 
+def candado_muerde(skill_md):
+    """Prueba el candado con un append de CERO bytes (propuesta FILTRO 2026-08-30):
+    open(..,'ab') sin escribir nada. Si uchg esta, el open mismo falla con EPERM;
+    si no esta, no se escribe ni un byte y el contenido no se mueve. Convierte el
+    chequeo de LEER el candado (flags) a PROBARLO — la diferencia que costo el
+    lote del 29-ago (chflags aplicado que no mordia). True = muerde.
+    MATIZ SEMANTICO (verificacion externa del FILTRO, GB1.6.1): muerde=True significa
+    "no se puede escribir", NO "tiene uchg" — un SKILL.md en 444 SIN uchg tambien muerde.
+    Para el proposito del chequeo es MEJOR que leer el flag (lo que importa es que nadie
+    escriba por accidente), pero si depuras por que una skill muerde sin uchg, es esto.
+    Solo se llama tras os.path.exists(skill_md): el 'ab' no puede crear fantasmas."""
+    try:
+        with open(skill_md, "ab"):
+            pass
+        return False
+    except OSError:  # PermissionError es subclase; cubre EPERM de uchg y EACCES de 444
+        return True
+
+
 def revisar_blindaje(hallazgos):
     """Las skills golden-* van con chflags uchg para que nada las edite sola."""
     base = os.path.join(CLAUDE, "skills")
@@ -405,7 +424,7 @@ def revisar_blindaje(hallazgos):
     # seguir el consejo de este mismo chequeo.
     SIN_BLINDAJE_POR_DISENO = {"golden-copywriting",  # su rutina de 8 dias le escribe
                            "golden-chatea-operacion"}  # politica de su fabrica (22-ago): sin blindar hasta validar el offset horario contra un pais distinto de Colombia — la primera corrida real de otro pais levanta la excepcion
-    protegidas, abiertas, exentas = 0, [], []
+    protegidas, abiertas, exentas, falsos_candados = 0, [], [], []
     for d in sorted(os.listdir(base)):
         if not d.startswith("golden"):
             continue
@@ -426,8 +445,19 @@ def revisar_blindaje(hallazgos):
             continue
         if blindada:
             protegidas += 1
+            # el flag dice blindada: PROBAR que el candado muerde (falso candado = ALTO)
+            if not candado_muerde(skill_md):
+                falsos_candados.append(d)
         else:
             abiertas.append(d)
+    if falsos_candados:
+        hallazgos.append(Hallazgo(
+            "ALTO", "Blindaje",
+            f"{len(falsos_candados)} skill(s) con FALSO CANDADO: el flag dice blindada y el append NO es rechazado",
+            ", ".join(falsos_candados),
+            "El candado se prueba, no se pone (ley 2026-08-30). Reaplicar: "
+            "chmod -R 444/555 && chflags -R uchg <skill>, y verificar con un append.",
+        ))
     if exentas:
         hallazgos.append(Hallazgo(
             "ALTO", "Blindaje",

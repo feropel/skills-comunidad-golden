@@ -1,11 +1,12 @@
 ---
 name: golden-chatea-pro-config-logistico
-description: Golden Group — Configura el asistente LOGÍSTICO de Chatea Pro (el PADRE). Deja listo el asistente que valida la dirección del cliente antes del envío contra entrega (COD) para minimizar devoluciones: define los datos operativos del negocio (transportadoras habilitadas para domicilio y recogida en oficina, transportadoras prohibidas, tiempos de entrega por zona) y arma el prompt de validación llamando a su skill HIJA golden-chatea-pro-validacion-direcciones (packs de los 7 países que acepta la plataforma: Colombia patrón oro, México, Chile, Ecuador, Panamá, Perú, Paraguay). Úsala SIEMPRE que el usuario quiera montar o configurar el asistente logístico / de direcciones de Chatea Pro, "configurar logística de chatea pro", "el bot que revisa direcciones antes de despachar", "el bot valida mal las direcciones", "configura las transportadoras del bot", "arma el asistente que evita devoluciones", o dejar listo el asistente logístico completo. Para configurar TODOS los asistentes a la vez, usa golden-chatea-pro-full-configuracion; para el prompt de validación en sí (el cerebro que decide si la dirección es entregable), la skill hija golden-chatea-pro-validacion-direcciones se activa sola desde aquí — no hace falta llamarla aparte.
+description: Golden Group — Configura el asistente LOGÍSTICO de Chatea Pro (el PADRE). Deja listo el asistente que valida la dirección del cliente antes del envío contra entrega (COD) para minimizar devoluciones: define los datos operativos del negocio (transportadoras habilitadas para domicilio y recogida en oficina, transportadoras prohibidas, tiempos de entrega por zona) y arma el prompt de validación llamando a su skill HIJA golden-chatea-pro-validacion-direcciones (packs por país vía su hija — la plataforma acepta 10 países, hay packs para 8; Argentina y Brasil sin pack aún). Úsala SIEMPRE que el usuario quiera montar o configurar el asistente logístico / de direcciones de Chatea Pro, "configurar logística de chatea pro", "el bot que revisa direcciones antes de despachar", "el bot valida mal las direcciones", "configura las transportadoras del bot", "arma el asistente que evita devoluciones", o dejar listo el asistente logístico completo. Para configurar TODOS los asistentes a la vez, usa golden-chatea-pro-full-configuracion; para el prompt de validación en sí (el cerebro que decide si la dirección es entregable), la skill hija golden-chatea-pro-validacion-direcciones se activa sola desde aquí — no hace falta llamarla aparte.
 ---
 
 # Golden · Chatea Pro — Asistente Logístico (padre)
 
 <!-- Fábrica: CENTRO DE MANDO (chat 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR) — sin fábrica de chat propia; turnos y filas van a la bandeja del CdM. -->
+<!-- corrección CdM 2026-08-29 · CAMBIO DE ESTÁNDAR países: la plataforma acepta 10, no 7 (doble medición contra el bundle vivo index-BrZVg7KW.js, sha256 2c947877…; deroga 'solo 7' y 'Guatemala fuera de plataforma'; detalle en la gaceta). Menciones del conteo viejo actualizadas a 10; el resto intacto. -->
 <!-- skill v1.6 · 2026-08-26 (CdM, edición de familia por la LLAVE DEL INTAKE respondida por FER) ·
 PASO 0 vuelve a UNA PREGUNTA A LA VEZ: la v1.5 lo había pasado a "intake único en un solo turno"
 siguiendo estandares-golden §3, pero FER resolvió hoy la contradicción en la fábrica de
@@ -83,7 +84,7 @@ Tiene dos niveles:
 2. **El prompt de validación (la skill hija):** el cerebro que lee la dirección y decide si es entregable. Lo genera `golden-chatea-pro-validacion-direcciones`.
 
 > **Regla de Chatea Pro:** 1 espacio de trabajo = 1 país. Este asistente se configura con el país del workspace.
-> **La plataforma solo acepta 7 países** (campo `[Comentarios IA] País`, en MAYÚSCULA y sin acentos): COLOMBIA, ECUADOR, CHILE, MEXICO, PANAMA, PERU, PARAGUAY. Nada de Guatemala, Argentina, Bolivia ni Costa Rica.
+> **La plataforma acepta 10 (remedido 2026-08-29) países** (campo `[Comentarios IA] País`, en MAYÚSCULA y sin acentos): COLOMBIA, ECUADOR, CHILE, MEXICO, PANAMA, PERU, PARAGUAY. Nada de Guatemala, Argentina, Bolivia ni Costa Rica.
 
 ## Los dos techos (antes de escribir cualquier campo)
 

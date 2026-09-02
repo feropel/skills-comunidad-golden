@@ -3,6 +3,228 @@
 Registro de versiones de la skill. Cada vez que se absorbe una mejora de una página
 real, se sube una versión aquí (ver el ritual de auto-mejora en SKILL.md).
 
+## G4.17b — 2026-09-02 — Un falso positivo destapo una clase: la funcion de "texto visible"
+El check 27 (rayas) dio falso positivo en su primera corrida y el caso bueno lo cazo. La causa no
+era el check: era **la funcion que decide que texto se PUBLICA**, que solo quitaba `{% comment %}`
+y dejaba pasar dos cosas muy frecuentes aqui — `{%- comment -%}` (con guiones de control de
+espacios, como escribe media skill) y los comentarios de JavaScript `/* ... */`.
+- **Lo que marcaba:** los separadores decorativos que los componentes usan para orientar a quien
+  EDITA el codigo (`/* ═══ EDITAR LAS RESEÑAS AQUI ═══ */`). Nunca se publican.
+- **La usaban CUATRO checks**: DEMO visible, apertura ¿¡, rayas y lenguaje de tienda. Un solo
+  arreglo (`solo_visible()`, que ahora quita comentarios Liquid con y sin guiones, JS/CSS y HTML)
+  corrige los cuatro. **Buscar la CLASE, no el caso.**
+- **Caso bueno nuevo**: un separador dentro de un comentario de codigo NO debe fallar.
+- Nota de metodo: el caso bueno lo cazo porque mide sobre la plantilla real. Si lo hubiera probado
+  solo contra el fragmento inyectado, el falso positivo entra a produccion sin ruido.
+
+## G4.17 — 2026-09-02 — Las SEIS reglas duras, antes de repartir la fila
+Coherencia elemental: el CdM va a repartir una fila preguntando a cada fabrica **"tu validador
+comprueba las seis reglas duras de la casa?"** — propuesta que salio de aqui — y esta skill
+comprobaba **dos**. No se reparte una vara que uno mismo no pasa.
+- **Check 27 · rayas separadoras** (3+ seguidas o `<hr>`). Caso bueno: **una raya em suelta en prosa
+  es correcta** ("natural — sin quimicos") y marcarla empujaria a escribir peor.
+- **Check 28 · lenguaje de TIENDA** (`nuestra/la/esta/mi tienda`). Caso bueno: **"tiendas fisicas"
+  sin posesivo no es el vicio** que la regla persigue — es un dato de distribucion.
+- **Check 29 · credenciales en el entregable** (sk-, ghp_, shpat_, Bearer, AIza). La skill se comparte
+  con la comunidad y el JSON se pega en tiendas de clientes: un token filtrado **viaja con la
+  plantilla**. Se buscan formas inequivocas de credencial y **NO correos**: el correo de contacto de
+  una marca es legitimo en una ficha. Caso bueno: **una clase CSS larga no es un token**.
+- Los tres **FALLAN**, ninguno avisa. Cada uno con su caso en las dos direcciones, que en estos era
+  el riesgo entero: los tres tienen una version legitima muy parecida a la prohibida.
+- **6 de 6 reglas duras comprobadas** · 29 checks · **29/29 pruebas**.
+
+## G4.16 — 2026-09-02 — El validador no comprobaba NINGUNA regla dura de FER
+FER amplio la ley a **cada skill, cada agente y cada proceso**, sin la frontera que le habiamos
+puesto. Al aplicarla aqui salio un hueco peor que el que veniamos persiguiendo.
+- **Medido: cero menciones de los signos de apertura y de los acentos**, ni en `scripts/autocheck.py`
+  ni en `references/auto-check.md` — mientras la nota del proyecto afirmaba que el auto-check de 19
+  puntos incluia "apertura ¿¡". La documentacion daba por cubierta una regla que **nadie comprobaba**.
+- Sale de la clase que `golden-verificador` midio en `golden-presenta`: los validadores degradan
+  reglas duras a AVISO y devuelven exit 0 — **gana el script**, que es quien da el semaforo verde.
+  Aqui ni siquiera hubo degradacion: no existia el check.
+- **Check 25** (apertura ¿ ¡ en texto VISIBLE, fuera de comentarios) y **check 26** (acentos rotos /
+  mojibake). Los dos **FALLAN, nunca avisan**.
+- **Casos en las DOS direcciones**, que es donde estaba el riesgo real de estos dos:
+  · un `¿` **dentro de un comentario Liquid** no se publica → NO debe fallar;
+  · **las tildes correctas NO son mojibake** → NO deben fallar. Este es el falso positivo que mas
+    dano haria, porque empujaria a quitar acentos correctos del copy, justo al reves de la regla.
+  Por eso el check 26 busca las secuencias inequivocas de UTF-8 mal decodificado y **no** la ausencia
+  de tildes: exigir tildes daria falsos positivos en marcas y siglas. **23/23.**
+- Regla 0-H ampliada: regla dura → FALLA. Con la distincion explicita frente al registro de fabricas,
+  que avisa por una razon legitima y distinta (otro escritor, ventana normal). Sin ventana, falla.
+
+## G4.15 — 2026-09-02 — Escritor unico del registro, y por que ese chequeo NO debe bloquear
+El Centro de Mando zanjo una contradiccion que salio de este mismo ciclo: esta fabrica editaba su
+fila del registro y `golden-pdf-check` no la tocaba (el archivo dice "no editar a mano") — los dos
+con argumento, pero **dos escritores sin coordinacion es exactamente la carrera que describimos
+aqui**, y que un dia se salvo solo por el orden de llegada.
+- **Zanjado: escritor unico = el CdM.** La fabrica sella y reporta; el CdM escribe la fila. Un
+  escritor unico elimina la carrera de raiz, que es mejor que un acuerdo de tener cuidado entre dos.
+  Esta skill deja de editar `REGISTRO-FABRICAS.md`.
+- **La consecuencia, que es la parte fina:** entre sellar aqui y que el CdM regenere hay una
+  **ventana de desfase LEGITIMA**. Si `sellos.py` fallara ahi, saltaria durante algo normal — el
+  detector agresivo que la Regla 0-H persigue, y el camino mas corto a que la gente ignore la
+  salida entera. Asi que `revisar()` ahora devuelve **(caras, fallos, avisos)**:
+  **BLOQUEA** el sello y el changelog (viven dentro del arbol, los toca el mismo ritual, un desfase
+  ahi nunca es legitimo) y **AVISA** por el registro, siempre visible, sin romper la corrida.
+- **Los casos se actualizaron con el mismo criterio**, y S2 gano una exigencia extra: el desfase del
+  registro debe aparecer en avisos **y NO contaminar los fallos**, o volveria a ser bloqueante por
+  la puerta de atras. S4 y S5 siguen probando que un registro ausente o sin la fila **no se da por
+  bueno** — ahora avisando. **19/19.**
+- Patron general que deja: **lo que vive dentro de tu arbol y solo tu tocas, bloquea; lo que
+  comparte escritor con otro, avisa.** Confundirlos produce o falsos positivos o silencios.
+
+## G4.14 — 2026-09-02 — `sellos.py` tenia el defecto que su propia ley prohibe
+Lo cazo el Centro de Mando y el punto es contra mi: **hornee un validador nuevo (`sellos.py`) el
+mismo dia que consagre la Regla 0-H, y nacio sin una sola prueba**. La autoprueba pasaba 14/14 con
+cero menciones de sellos. Tercera vez en el dia que 0-H se aplica a si misma.
+- **El modo de fallo era silencioso, que es lo grave:** si un regex dejaba de casar y el codigo
+  tratara "no encontre version" como "coinciden", `sellos.py` saldria 0 **siempre** y nadie se
+  enteraria. El verde eterno que la propia regla persigue. Hoy solo se le habia visto pasar.
+- **Refactor:** `revisar()` separado de `main()` y con rutas inyectables, para que las pruebas
+  corran sobre **copias temporales** y jamas toquen `REGISTRO-FABRICAS.md`. Un validador que para
+  probarse tiene que escribir en produccion no es un validador, es un riesgo. Ademas `None`
+  (no se pudo leer) ya nunca se confunde con "coincide": es un fallo con nombre.
+- **5 casos nuevos**: (S1) tres caras iguales → sin fallos, que de paso garantiza que **GFS_VERSION
+  distinta NO cuenta como desfase** — si alguien "sincroniza" eso, rompe el otro eje; (S2) registro
+  desfasado, el caso que el CdM regalo ya corrido; (S3) sello != changelog; (S4) registro ausente
+  → falla en vez de dar por bueno; (S5) registro presente pero sin la fila, mismo trato. **19/19.**
+- **Higiene de parte, tambien anotada:** mande al CdM una huella md5 y segui horneando despues, asi
+  que la huella nacio vieja y no le cuadro al verificar. El parte se manda **al cerrar de verdad**,
+  no a mitad de ronda.
+
+## G4.13b — 2026-09-02 — La cuarta cara tiene DOS escritores (condicion de carrera observada)
+Apunte corto pero con consecuencia. El Centro de Mando tambien corrige `REGISTRO-FABRICAS.md`
+cuando detecta desfase, asi que esa cara tiene **dos escritores sin coordinacion**. Hoy escribimos
+casi a la vez: el CdM la puso en G4.12 mientras aqui se ponia en G4.13. Medido despues del cruce,
+quedo G4.13 — pero **se salvo por el orden de llegada**: si la escritura vieja hubiera aterrizado
+de ultima, el registro habria RETROCEDIDO y el desfase volveria en silencio, porque nadie relee esa
+cara por su cuenta. De ahi la regla practica: se MIDE al cerrar version con `scripts/sellos.py`, y
+**con mas razon cuando otro chat dice haberla corregido** — que es justo cuando uno baja la guardia.
+
+## G4.13 — 2026-09-02 — La cuarta cara de la version (y por que se desfasa sola)
+Aviso del Centro de Mando: `REGISTRO-FABRICAS.md` declaraba **G4.7** mientras el disco iba por
+**G4.11b** — cuatro versiones de desfase justo en la cara que leen los OTROS chats para saber en
+que va esta skill. El CdM la corrigio, y **al medirla aqui ya estaba desfasada otra vez** (registro
+G4.11b vs disco G4.12), en cuestion de minutos.
+- **El diagnostico no es descuido, es estructura:** tres caras de la version viven dentro de la
+  skill y el ritual de blindaje las toca; **la cuarta vive fuera del arbol**, en STACK-GOLDEN, asi
+  que ningun bump la alcanza y nada avisa. Un fallo que se repite solo no se arregla acordandose
+  mejor: se arregla con un instrumento.
+- **`scripts/sellos.py`**: compara sello de SKILL.md, changelog y registro, y sale con codigo 1 si
+  divergen. Respeta que **GFS_VERSION es el OTRO eje** (solo sube si cambia lo que la pagina
+  produce): tratarlo como desfase y "sincronizarlo" a ciegas seria el error contrario. Si no
+  encuentra el registro NO lo da por bueno: avisa y falla (ausencia no es prueba).
+- Regla 0-H ampliada con la cuarta cara. Es la segunda vez en el dia que 0-H se aplica a si misma:
+  primero con el WhatsApp corregido en el componente pero no en el generador, ahora con la version.
+
+## G4.12 — 2026-09-02 — La prueba se llama `autoprueba.py` (y ahora caza falsos positivos)
+Correccion del Centro de Mando sobre un error MIO de medicion, y es de clase, no de dato: en el
+barrido de G4.10 busque **"selftest"** para contar cuantas skills prueban su validador, y conte 2.
+Buscando tambien **"autoprueba"** son **SEIS**: golden-pdf-check, golden-chatea-auditoria,
+golden-chatea-operacion, golden-skill-auditor y esta. **Esta casa nombra sus pruebas en espanol**,
+asi que mi instrumento estaba ciego al idioma — el mismo fallo que la ley del grep con tilde.
+- **`scripts/selftest.py` → `scripts/autoprueba.py`.** No es cosmetico: un archivo con nombre en
+  ingles es invisible al proximo censo del arsenal, incluido el mio. Se arregla el instrumento, no
+  el acuerdo.
+- **Cambia la historia de la mejora:** esto no era inventar un patron, era **generalizar lo que 5
+  skills de la casa ya hacian**. Hay arte previo del que copiar
+  (`golden-chatea-auditoria/scripts/autoprueba.py`, 521 lineas, sabotea con casos CON y SIN tilde).
+- **CASOS BUENOS anadidos** — el hueco que quedaba: la autoprueba solo verificaba que el validador
+  CAZA lo malo, nunca que **deja pasar lo bueno**. Un check demasiado agresivo marca contenido
+  legitimo y nadie se entera. Ahora se exige que NO dispare con: disparador correcto **con** tilde,
+  disparador correcto **sin** tilde (Chatea admite ambas grafias) y mensaje libre a atencion.
+  Un falso positivo entrena a ignorar la salida entera: es tan grave como no cazar.
+- Nota de coherencia, cazada en la misma corrida: al renombrar el archivo quedo el `print` de
+  cabecera anunciandose todavia como "selftest" — una cara sin tocar del mismo cambio, que es
+  justo lo que la Regla 0-H prohibe. Corregido antes de cerrar la version.
+
+## G4.11b — 2026-09-02 — El check 24 daba falso positivo: "block" contiene "lock"
+Reparacion en caliente, cazada por el selftest en la primera corrida del check que acababa de
+escribir. El check 24 buscaba `"lock" in bk.lower()` sobre los ids de bloque, y **"block" contiene
+"lock" como substring**: cualquier id tipo `releasit_cod_form_button_app_block_ajGjx3` se leia como
+candado, asi que el generador ya limpio seguia marcado como duplicado. Corregido con `(?<!b)lock`
+en el check y en el sabotaje del selftest.
+Vale dejarlo escrito: es exactamente la trampa de substring de la FAMILIA DE TRAMPAS DE CONTEO, y
+la cometio quien acababa de escribir la regla que obliga a probar los validadores. Un check sin su
+caso de prueba habria entrado a la skill mintiendo, y el falso positivo habria entrenado a ignorar
+la salida — que es justo lo que la Regla 0-H prohibe.
+
+## G4.11 — 2026-09-02 — Candado duplicado en el generador (lo destapo el selftest de G4.10)
+La Regla 0-H estrenandose el mismo dia que se escribio. Al arreglar un caso de prueba que fallaba,
+salio a la luz que **`assets/product.base.json` traia el candado DOS VECES**: el bloque
+`custom_liquid_lock` dentro de `main` (1.005 bytes, sello **G3.14**, activo y en `block_order`) y
+la seccion suelta `sec_lock` (2.128 bytes, version vigente) — con contenidos **distintos**.
+- **Por que estaba:** G4.0 saco candado/ignition/whatsapp del main a secciones sueltas, pero el
+  bloque viejo nunca se borro. Fosil de cuatro versiones atras.
+- **Por que importa aunque no rompa nada:** ambos hacen `display:none`, asi que la pagina se veia
+  bien — por eso sobrevivio. Pero son **dos fuentes de verdad**: quien edite el candado toca una y
+  deja la otra viva con el comportamiento anterior, que es como nacen los bugs que nadie explica.
+  Ademas cada pagina generada cargaba ~1 KB de CSS repetido.
+- **Check 24** (candado duplicado) + su caso en el selftest, que reintroduce el fosil y exige que
+  se cace. **11 de 11 pruebas pasan.**
+- Corregido tambien el caso de prueba del candado ausente: apagaba una sola de las dos senales que
+  mira el check. Era fallo del CASO, no del validador — y conviene dejarlo escrito, porque un caso
+  de prueba mal hecho da una falsa tranquilidad identica a la de no tener prueba.
+
+## G4.10 — 2026-09-02 — El auto-check pasa de prosa a HERRAMIENTA (+ Regla 0-H)
+Salido de un barrido del arsenal instalado con denominador medido: **236 SKILL.md** (187 en
+~/.claude/skills, 25 de ellos symlinks que un grep ingenuo no ve, + 49 de plugins). De esas,
+**38 tienen scripts ejecutables y golden-shopify tenia 0**: sus checks vivian como un bloque
+de codigo dentro de `references/auto-check.md` con la ruta escrita a mano.
+- **`scripts/autocheck.py`** (23 checks, argumento de ruta, codigo de salida 0/1, flag `--base`).
+- **`scripts/selftest.py`** — patron copiado de `golden-pdf-check` (`selftest.py`, "una prueba
+  por cada version que cambio"): sabotea la plantilla base REAL con cada bug ya pagado
+  (fuga `{# #}`, padding que Shrine rechaza, texto DEMO, candado ausente, tope de 50 KB en
+  bytes UTF-8, disparador que no casa, WhatsApp placeholder, related encendido, hex huerfano)
+  y exige que el validador los cace.
+- 🔴 **Lo que encontro al primer intento** (por eso existe): (a) **4 falsos positivos** del check
+  de colores — marcaba como huerfanos la DEFINICION de la paleta y los fallbacks de
+  `var(--brand-*,#hex)`, que son el patron que la skill EXIGE; un validador que siempre grita en
+  falso ensena a ignorar su salida. (b) **Un fallo real a medias: G4.9 corrigio el mensaje de
+  WhatsApp en `componentes/whatsapp-flotante.liquid` pero NO en `assets/product.base.json`**, que
+  es lo que de verdad genera las paginas — cada pagina habria nacido con el mensaje que no casa
+  con ningun disparador. Corregido aqui.
+- **Regla 0-H**: todo fallo que se paga se convierte en check + su caso de prueba; el validador
+  se ejecuta y ademas se prueba; cero falsos positivos; buscar la CLASE, no el caso; y al tocar
+  una regla, revisar TODAS sus caras (el fallo de arriba es la prueba).
+
+## G4.9 — 2026-09-02 — El mensaje del boton es un DISPARADOR, no un texto (correccion de G4.8)
+Precision del Centro de Mando sobre la Regla 0-G, verificada aqui contra la fuente autoritativa (las
+skills de Chatea) antes de aplicarla: la formula real del disparador es
+`Hola quiero información y precio de <PRODUCTO>` — **sin coma tras "Hola" y CON "y precio"** — y casa
+**byte a byte** (gotcha D1: un emoji de 4 bytes corrompe el trigger).
+- 🔴 **Defecto propio corregido:** el componente que hornee en G4.8 generaba
+  `"Hola, quiero informacion de <producto>"` → **no casaba con ningun disparador**. Un cliente que
+  pulsara ese boton caia en "Producto/Servicio no encontrado" → tablero **"No automatizado"**, que no
+  mira nadie. Peor que no tener bot.
+- ⚠️ **Hallazgo propio, mas fino que la fila:** el nombre del disparador es el **REGISTRADO EN CHATEA**,
+  que casi nunca coincide con `product.title` de Shopify (titulo "Marca Spray | Frescura que Dura 48
+  Horas" vs disparador "Marca"). Es decir: **tomar el titulo automaticamente era justo lo que rompia el
+  byte a byte**. Ahora `WA_PRODUCTO` se copia A MANO del bot field; `product.title` queda solo para el
+  mensaje de ATENCION, que lo lee una persona y admite texto libre.
+- **Componente rehecho con destino explicito** `WA_DESTINO = "bot" | "atencion"`, dos numeros separados
+  y **default seguro en "atencion"**: si no se puede comprobar el disparador, atencion — con atencion
+  contesta una persona, con el bot mal apuntado el cliente escribe a un tablero muerto.
+- **Regla corta anadida a 0-G:** boton CON contexto de producto → bot; boton GENERICO → atencion. Por eso
+  la burbuja del TEMA (generica por diseno, sin product.title) va a atencion y nunca al bot.
+
+## G4.8 — 2026-09-02 — Regla 0-G: canal humano siempre visible (WhatsApp en toda la tienda)
+Regla dictada por FER: toda la tienda debe tener boton de WhatsApp — al bot de Chatea o, en su defecto,
+a atencion al cliente. Un COD sin canal para preguntar pierde la venta en la duda.
+- **Hueco medido:** la skill ya ponia el WhatsApp en la ficha y lo listaba como obligatorio, pero **no
+  decia NADA sobre el duplicado con el tema**. Si el tema pone su burbuja para toda la tienda (que es lo
+  que la regla exige) y la ficha pone la suya → **dos burbujas en la pagina de producto**.
+- **Regla 0-G**: dos capas que no se pisan — el TEMA cubre toda la tienda (fuera de esta skill), la FICHA
+  lleva la suya y manda ahi porque su mensaje sale con `product.title` (el bot/asesor sabe de que hablan
+  sin preguntar). Nunca dos burbujas: `WA_SUPRIMIR_OTRAS = true` oculta las de tema/apps solo en la ficha.
+- **`whatsapp-flotante.liquid` mejorado**: mensaje con el nombre del producto (antes era generico
+  "informacion del producto") + bloque anti-duplicado apagable + nota de verificar en render real.
+- Verificado: el candado landing NO afecta la burbuja (es position:fixed, no vive en header/footer).
+- Numeracion censada antes de numerar: 0 a 0-F ocupados, sin duplicados → 0-G.
+- FUERA DE ALCANCE de esta skill (fila para el chat del TEMA): poner la burbuja en home, colecciones,
+  carrito y politicas. Esta skill solo hace la ficha de producto.
+
 ## G4.7 — 2026-08-28 — Regla 0-F: umbral de rentabilidad antes de la escalera (capacidad asimetrica)
 Fila del Centro de Mando (analisis de capacidad asimetrica): esta skill **escribe precios y arma la
 escalera de combos** pero tenia **CERO menciones de breakeven** (medido: 0 apariciones en los 76

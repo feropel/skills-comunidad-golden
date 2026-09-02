@@ -3,6 +3,86 @@
 Conocimiento acumulado (ex-`golden-shopify`). Esto es lo que más rompe páginas o
 mata conversión. Léelo antes de escribir copy o entregar.
 
+## Regla 0-H — LA SKILL SE AUTO-CRITICA Y SE MEJORA (con datos, no con intencion)
+Ley de FER: una skill no se termina, se mejora. Pero "mejorar siempre" sin mecanismo es una
+buena intencion — y las buenas intenciones no cazan bugs. El mecanismo es este:
+- **Todo fallo que se paga se convierte en CHECK.** Cuando algo se rompe en una pagina real,
+  no basta con arreglar esa pagina: se agrega el check a `scripts/autocheck.py` y su caso a
+  `scripts/autoprueba.py`. Asi el fallo no puede volver en silencio. Lo que no se automatiza,
+  se vuelve a pagar.
+- **El validador se ejecuta, no se lee.** `python3 scripts/autocheck.py <product.json>`.
+  Un check que vive solo en prosa depende de que alguien se acuerde; uno que corre, no.
+- **El validador tambien se prueba.** `scripts/autoprueba.py` sabotea la plantilla base con los
+  bugs ya pagados y exige que el validador los cace. Ley de higiene de FER: *si tu script dice
+  que todo esta bien a la primera, sospecha del script*. Un validador sin autoprueba se pudre en
+  silencio: sigue imprimiendo el tic verde despues de haber dejado de mirar.
+- **Las REGLAS DURAS de FER fallan, nunca avisan.** Clase de fallo medida el 2026-09-02 en
+  `golden-presenta`: el SKILL.md declara una vara dura ("no se entrega si falla esto") y el script
+  la emite como AVISO con exit 0. **Gana el script**, porque es el que da el semaforo verde, y un
+  entregable que viola una regla de FER pasa la auditoria. Aqui era peor: los signos de apertura y
+  los acentos **no se comprobaban en absoluto**, ni como aviso, mientras la documentacion daba por
+  hecho que si. Y vigilar tambien al hermano del patron: **toda variable que se calcula y se
+  imprime tiene que terminar en una comprobacion** — si solo se imprime, no valida nada.
+  No confundir esto con el registro de fabricas, que avisa por una razon distinta y legitima: alli
+  hay OTRO escritor y una ventana normal (ver mas abajo). Regla dura sin ventana → FALLA.
+- **Cero falsos positivos.** Un aviso que siempre suena y siempre se ignora es peor que no
+  tenerlo, porque entrena a saltarse la salida entera. Si un check grita en falso, se arregla
+  el check — no se acostumbra uno al ruido.
+- **Buscar la CLASE, no el caso.** Cuando aparece un fallo, la pregunta no es "como arreglo
+  esta pagina" sino "que otras piezas tienen este mismo hueco". Un acento roto suele ser cien.
+- **La version tiene CUATRO caras y una vive FUERA de la skill.** Sello de `SKILL.md`,
+  primera entrada del `changelog.md`, `GFS_VERSION` (otro eje: solo sube si cambia lo que la
+  pagina produce) y **la fila de `STACK-GOLDEN/REGISTRO-FABRICAS.md`**, que es la que leen los
+  OTROS chats para saber en que va esta skill. Al quedar fuera del arbol, el ritual de blindaje
+  no la toca y un bump la deja atras sin que nada avise: se desfaso 4 versiones, se corrigio, y
+  **volvio a desfasarse en minutos** con el siguiente bump. No es descuido, es estructural →
+  `python3 scripts/sellos.py` lo mide, y se corre al cerrar cada version.
+  **Esa cara la escribe SOLO el Centro de Mando** (zanjado 2026-09-02). Antes escribian dos y un
+  dia escribieron a la vez: se salvo por el orden de llegada. Un escritor unico elimina la carrera
+  de raiz, mejor que un acuerdo de tener cuidado entre dos. **La fabrica sella y reporta; el CdM
+  escribe la fila** — no editarla desde aqui.
+  Y de ahi sale el matiz que hace util al chequeo: entre sellar y que el CdM regenere hay una
+  **ventana de desfase LEGITIMA**, asi que el registro es **AVISO, no fallo**. Hacerlo bloquear
+  seria el detector agresivo que esta misma regla persigue: un aviso que salta durante algo normal
+  entrena a ignorar la salida entera. **Sello y changelog SI bloquean**: viven dentro del arbol,
+  los toca el mismo ritual y ahi un desfase nunca es legitimo. Lo de fuera avisa, lo de dentro para.
+- **Cambiar es cambiar TODO.** Medido el 2026-09-02: G4.9 corrigio el mensaje de WhatsApp en
+  `componentes/whatsapp-flotante.liquid` pero NO en `assets/product.base.json`, que es lo que
+  de verdad genera las paginas. El arreglo estaba a medias y **nadie lo habria notado hasta
+  produccion**: lo caza el selftest en su primera corrida. Al tocar una regla, revisar TODAS
+  sus caras (componente + generador + documentacion + checks).
+
+## Regla 0-G — CANAL HUMANO SIEMPRE VISIBLE (WhatsApp en toda la tienda)
+Regla de FER: **toda la tienda lleva boton de WhatsApp** — al bot de Chatea o, en su defecto, a
+atencion al cliente. Un COD sin canal para preguntar pierde la venta en la duda: el cliente no
+escribe un correo, se va.
+- **Dos capas, y no se pisan.** (a) El TEMA pone la burbuja en TODA la tienda (home, colecciones,
+  carrito, politicas, 404) — eso vive en `theme.liquid` o en una app, **fuera de esta skill**.
+  (b) La FICHA DE PRODUCTO lleva la suya (`whatsapp-flotante.liquid`), que es la que manda ahi.
+- **Por que manda la de la ficha:** su mensaje sale con el **nombre del producto** (`product.title`),
+  asi el bot o el asesor saben de que hablan sin preguntar. La del tema es generica.
+- **NUNCA dos burbujas en la misma pagina.** El componente trae `WA_SUPRIMIR_OTRAS = true`, que oculta
+  las burbujas de tema/apps solo en la ficha. Si prefieres que mande la del tema, quita esta seccion
+  — pero una sola, siempre. **Verificar en render real**, que los selectores de apps cambian.
+- **El candado landing NO la afecta**: es `position:fixed`, no vive en header ni footer (verificado).
+- **QUE NUMERO VA — regla corta:** boton **con contexto de producto → BOT**; boton **generico →
+  ATENCION**. La burbuja del TEMA es generica por diseno (en home o carrito no hay `product.title`),
+  asi que su mensaje no puede casar con ningun disparador: **va a atencion, nunca al bot**.
+- 🔴 **El mensaje NO es texto: es el DISPARADOR de Chatea.** Formula exacta:
+  `Hola quiero información y precio de <PRODUCTO>` (sin coma tras "Hola", CON "y precio"). Debe casar
+  **BYTE A BYTE** con un disparador registrado; si no casa cae en "Producto/Servicio no encontrado" →
+  tablero **"No automatizado"** → no lo atiende nadie. Sin emojis ni caracteres de 4 bytes (gotcha D1:
+  corrompen el trigger). Medido en la casa: paso con el mensaje post-compra de Releasit, verificado
+  contra tres volcados de bot fields con cero coincidencias.
+- ⚠️ **NO uses `product.title` para el disparador.** El nombre que reconoce Chatea es el **registrado
+  en el bot field**, y casi nunca coincide con el titulo de Shopify (ej. titulo "Marca Spray | Frescura
+  que Dura 48 Horas" vs disparador "Marca"). Se copia A MANO del bot field. `product.title` solo sirve
+  para el mensaje de ATENCION, que lo lee una persona y admite texto libre.
+- **Default seguro:** si no puedes comprobar el disparador en el momento, el destino es **atencion**.
+  Apuntar al bot un producto sin disparador es PEOR que atencion: con atencion contesta una persona;
+  con el bot mal apuntado el cliente escribe a un tablero que nadie mira.
+- Nunca el placeholder `573001234567` (Regla 0-C: un solo WhatsApp REAL).
+
 ## Regla 0-F — UMBRAL DE RENTABILIDAD ANTES DE LA ESCALERA (no publicar precios a ciegas)
 Esta skill escribe PRECIOS, y un combo bajo el punto de equilibrio no se descubre en la pagina: se
 descubre con la pauta ya pagada. **El breakeven se calcula ANTES de proponer la escalera.**

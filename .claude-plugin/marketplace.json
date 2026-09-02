@@ -26,7 +26,7 @@
       "name": "golden-chatea-pro-prompt-ventas",
       "source": "./golden-chatea-pro-prompt-ventas",
       "description": "Crea el paquete de venta por producto para Chatea Pro: saludo, multimedia, pregunta de entrada, prompt de venta, recordatorios y remarketing.",
-      "version": "3.16.0",
+      "version": "3.39.0",
       "category": "marketing"
     },
     {
@@ -61,7 +61,7 @@
       "name": "golden-ads",
       "source": "./golden-ads",
       "description": "Centro de comando de pauta en Meta, TikTok y Google, con o sin métricas.",
-      "version": "5.4.0",
+      "version": "5.6.0",
       "category": "marketing"
     },
     {
@@ -82,7 +82,7 @@
       "name": "golden-blindaje",
       "source": "./golden-blindaje",
       "description": "Auditoría de seguridad de tu propio entorno de agentes y credenciales.",
-      "version": "1.5.2",
+      "version": "1.6.1",
       "category": "operations"
     },
     {
@@ -103,7 +103,7 @@
       "name": "golden-copywriting",
       "source": "./golden-copywriting",
       "description": "Copy de respuesta directa para Meta, TikTok y mensajes orgánicos.",
-      "version": "1.5.0",
+      "version": "1.6.0",
       "category": "marketing"
     },
     {
@@ -138,7 +138,7 @@
       "name": "golden-imagen-arena",
       "source": "./golden-imagen-arena",
       "description": "La misma imagen generada en varios motores de IA y calificada por conversión.",
-      "version": "1.11.0",
+      "version": "1.12.0",
       "category": "design"
     },
     {
@@ -180,7 +180,7 @@
       "name": "golden-pdf-check",
       "source": "./golden-pdf-check",
       "description": "El estándar de PDF de la comunidad: marca, márgenes y bloques que no se parten.",
-      "version": "5.14.0",
+      "version": "5.18.0",
       "category": "education"
     },
     {
@@ -194,7 +194,7 @@
       "name": "golden-shopify",
       "source": "./golden-shopify",
       "description": "Construye páginas de producto Shopify de alta conversión para contra entrega.",
-      "version": "4.7.0",
+      "version": "4.17.0",
       "category": "ecommerce"
     },
     {
@@ -208,14 +208,14 @@
       "name": "golden-ugc-avatar",
       "source": "./golden-ugc-avatar",
       "description": "Avatares con IA hiperrealistas y videos de testimonio hablando.",
-      "version": "1.11.0",
+      "version": "1.12.0",
       "category": "marketing"
     },
     {
       "name": "golden-video-editor",
       "source": "./golden-video-editor",
       "description": "De grabación cruda a anuncio terminado: corta silencios, subtitula y arma.",
-      "version": "1.6.0",
+      "version": "1.9.0",
       "category": "marketing"
     },
     {
@@ -229,7 +229,7 @@
       "name": "golden-web",
       "source": "./golden-web",
       "description": "Sitios y landings de alta conversión por perfil de cliente.",
-      "version": "2.8.0",
+      "version": "2.9.0",
       "category": "design"
     },
     {
@@ -257,7 +257,7 @@
       "name": "golden-chatea-auditoria",
       "source": "./golden-chatea-auditoria",
       "description": "Revisa tu espacio de Chatea entero y te dice campo por campo qué está sano y qué está roto.",
-      "version": "1.8.0",
+      "version": "1.9.0",
       "category": "marketing"
     },
     {

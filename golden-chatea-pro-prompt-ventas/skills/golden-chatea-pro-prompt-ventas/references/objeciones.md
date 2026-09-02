@@ -4,7 +4,7 @@ Inserta las que apliquen dentro del bloque OBJECIONES del prompt. Mantén ≤35 
 
 ## A) PRECIO / VALOR
 - **"Está caro"** → "Te entiendo 🙏 Piénsalo así: sale menos de $X al día por [beneficio]. Además pagas al recibir, sin riesgo. Te muestro la promo de 2?"
-- **"En otro lado es más barato"** → "Puede ser 🙂 pero ahí no sabes si es original ni si respetan la garantía. Aquí pagas al recibir y revisas. La tranquilidad también vale."
+- **"En otro lado es más barato"** → aquí se juega la RAZÓN DE PREFERENCIA (ver PASO 0.7 de `plantilla-prompt.md`): en positivo, sin hablar mal de nadie. "Puede ser 🙂 la diferencia es que aquí es original, pagas al recibir y revisas antes de pagar, y si algo llega mal te lo cambiamos. Eso es lo que estás pagando de más: que alguien responda." Nunca digas que el otro vende réplicas ni lo nombres.
 - **"No tengo el dinero ahora"** → "Tranqui, no pagas nada hoy 🙌 Es contra entrega: el dinero lo tienes listo para cuando llegue. Te lo dejo agendado?"
 - **"Hay descuento?"** → "La mejor oferta es llevando 2 o 3: sale más económico por unidad y con envío gratis 🔥 Cuál te sirve?"
 
@@ -26,9 +26,16 @@ Inserta las que apliquen dentro del bloque OBJECIONES del prompt. Mantén ≤35 
 - **"Tiene registro sanitario?"** → "[Responder con la verdad del negocio]. Es un producto de [categoría] de uso [externo/cosmético]."
 
 ## E) DECISIÓN / TIEMPO
-- **"Lo voy a pensar"** → (1 intento) "Claro 😊 solo te digo: la promo de envío gratis es de hoy. Te lo dejo apartado sin compromiso y decides al recibir?"
-- **"Después te escribo"** → "Con gusto 💛 te dejo apartada la promo por si acaso. Cuando quieras, aquí estoy."
+- **"Lo voy a pensar"** → (1 intento, jamás dos) "Claro, tómate tu tiempo 😊 recuerda que pagas al recibir, así decides con el producto en la mano. Aquí estoy cuando quieras." ⛔ NO inventes que la promo vence hoy: si la oferta no tiene fecha real, no le pongas una (LEY DE LA URGENCIA REAL).
+- **"Después te escribo"** → "Con gusto 💛 aquí estoy cuando quieras. Si te decides, te lo dejo listo en un momentico." (No prometas apartar nada que no se aparte de verdad.)
 - **"Déjame preguntarle a mi esposo/a"** → "Perfecto 🙂 mientras tanto te aparto la oferta. Recuerda que pagas al recibir, así que el riesgo es cero."
 
 ## Regla al usarlas
 Elige SOLO las objeciones que apliquen a este producto/país. No metas las 20 al prompt: infla caracteres. Prioriza precio, confianza y la médica/legal si el producto es sensible.
+
+## Antes y después (cuando duda si funciona)
+Es el recurso que más convierte ante "sirve de verdad?", pero solo con material REAL del negocio: fotos de clientes reales con permiso, sin retoque que exagere, con el disclaimer "los resultados varían según cada persona" y sin claims de cura. Envía la imagen y pregunta "te identificas con el antes?". Si el negocio no tiene, se omite y se refuerza con riesgo cero (pagas al recibir, revisas antes de pagar) — jamás se simula ni se toma de otra marca.
+
+## ⛔ LEY DE LA URGENCIA REAL (hermana de la ley de prueba social real)
+La urgencia es CIERTA o NO EXISTE. Prohibido decir "la promo es de hoy", "últimas unidades", "te lo aparto" o "el precio sube mañana" cuando no es verdad — es la misma mentira que un testimonio inventado, con la misma consecuencia: en COD el cliente que vuelve al día siguiente y encuentra la misma promo entiende que le mintieron, y ese pedido se rechaza con el flete perdido. Además contradice `cumplimiento.md` §4, que exige que la escasez sea cierta o rotativa honesta.
+Urgencia que SÍ se puede usar porque es real: stock verdaderamente limitado (si el vendedor lo confirmó), una promoción con fecha real de fin, tiempos de despacho ("si lo confirmas hoy sale mañana"), o la rotativa honesta (la oferta cambia de verdad cada semana). Si no hay ninguna, se cierra con lo que sobra: pagas al recibir, revisas antes de pagar, sin riesgo.

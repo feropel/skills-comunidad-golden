@@ -20,6 +20,20 @@ description: >-
 ---
 
 # Golden Blindaje — auditoría del entorno de agentes
+<!-- skill GB1.6.1 · 2026-08-30 (CdM, verificacion externa del FILTRO sobre GB1.6) · documentado el
+MATIZ SEMANTICO en el docstring de candado_muerde (muerde = "no se puede escribir", no "tiene uchg";
+un 444 sin uchg tambien muerde — mejor para el proposito, pero explicado para el depurador futuro) y
+simplificada la tupla redundante (PermissionError subclase de OSError). El FILTRO verifico ademas el
+caso duro: huella intacta en 4 skills incl. 2 ABIERTAS donde el open SI tiene exito, y leyo que el
+probe solo corre tras os.path.exists (no crea SKILL.md fantasma). Sin cambio funcional. -->
+<!-- skill GB1.6 · 2026-08-30 (CdM, propuesta del FILTRO) · EL CHEQUEO PASA DE LEER EL CANDADO A
+PROBARLO: nueva funcion candado_muerde() en chequeo.py — append de CERO bytes (open 'ab' sin
+escribir) sobre toda skill que uchg_arbol juzgue blindada; si el open NO es rechazado = hallazgo
+ALTO "FALSO CANDADO". Motivo: el lote del 29-ago aplico chflags que no mordia y el chequeo por
+flags no lo vio (ley: el candado se prueba, no se pone). El probe no puede tocar contenido (cero
+bytes; demostrado con huella intacta sobre skill abierta). uchg_arbol NO se toco (paridad de
+gemelos intacta); el censo diario sigue pasivo — el mordisco vive solo en este chequeo profundo.
+Probado en ambas direcciones: copywriting (abierta) no muerde, shopify (blindada) muerde. -->
 <!-- skill GB1.5.2 · 2026-08-25 (centro de mando, cierre R6): la 'prosa de las DOS listas' del sello GB1.5.1 vivía SOLO en el sello — ahora EXCEPCIONES_PARCIALES está nombrada en la sección operativa Excepciones por diseño, con su ejemplo, la regla de los dos gemelos y el límite del dir raíz. Afirmación verificada por grep antes de sellar (receta R6). -->
 <!-- skill GB1.5.1 · 2026-08-25 (centro de mando, remediación R5): re-blindaje del propio chequeo.py (había quedado 644 sin uchg tras la edición de las 23:23 — la skill del blindaje era la única sin blindar del arsenal, cazada por sus DOS instrumentos); prosa actualizada a las DOS listas de excepción; uchg_arbol juzga también DIRECTORIOS (con archivos uchg y carpeta abierta se podía inyectar un archivo sin resistencia — latente, con caso al banco); guardia de paridad ahora falla CERRADO y cubre también la tabla de excepciones. -->
 <!-- skill GB1.5 · 2026-08-25 (centro de mando, remediación R3/R4 del verificador de cierre): chequeo.py CAMBIÓ DE SEMÁNTICA — esto supersede al claim 'INTACTO' del sello GB1.4 y al 'sin cambios de comportamiento', que eran ciertos a su hora y quedaron viejos el mismo día: (1) blindaje por N de M nodos del árbol con la función uchg_arbol de cuerpo BYTE-IDÉNTICO al del censo (stat por archivo, SIGUE symlinks, falla CERRADO); (2) filtro golden* sin guion (golden360 entró al juicio); (3) denominador impreso ('de N juzgadas'); (4) EXCEPCIONES_PARCIALES para escribibles por diseño (fuentes_baseline.json de investigación — regla de los dos lugares); (5) shebang restaurado a la línea 1. -->
@@ -30,7 +44,7 @@ description: >-
 <!-- skill GB1.1 · 2026-07-27 · filtro del PDF Claude Security y de blender-mcp, protocolo de triage con ventanas duras, 5 errores que hacen inútil una auditoría, sección MCPs de terceros -->
 <!-- skill GB1.0 · 2026-07-23 · auditoría local de ~/.claude sin salida de red · 6 áreas (secretos, permisos, hooks, MCP, blindaje, caché) -->
 
-**Versión:** `GB1.5.2` · Fábrica: chat centro de mando. Blindaje propio: `chflags uchg` (estándar de la casa).
+**Versión:** `GB1.6.1` · Fábrica: chat centro de mando. Blindaje propio: `chflags uchg` (estándar de la casa).
 
 Hay una capa que ninguna herramienta de seguridad de código mira: **la configuración
 con la que corren los agentes**. Ahí viven los tokens de Shopify, Meta, Stripe y

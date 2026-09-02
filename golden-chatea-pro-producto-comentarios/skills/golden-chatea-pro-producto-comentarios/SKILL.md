@@ -1,10 +1,11 @@
 ---
 name: golden-chatea-pro-producto-comentarios
-description: Configura UN producto dentro del asistente de COMENTARIOS de Chatea Pro — entrega el objeto de 5 llaves exactas (img, name, desc, rela, estado) listo para pegar, con la desc bajo el tope de 500 y el rela cargado de disparadores para que el bot reconozca de qué producto habla cada comentario de Facebook o Instagram. Parametrizado por los 7 países que acepta la plataforma. Úsalo SIEMPRE que el usuario quiera cargar, agregar, editar, revisar o arreglar un producto del asistente de comentarios, o diga cosas como "sube este producto a comentarios", "arma la ficha de producto para comentarios", "el bot responde con el producto equivocado", "no reconoce los comentarios de este anuncio", "actualiza el rela", "cambié los copys de Meta", "sale comentario no automatizado", "agrega este producto a Comentarios Productos", "ordena los productos del asistente de comentarios". Dispara también cuando peguen un JSON de productos de comentarios pidiendo revisión. La configuración GENERAL de ese asistente (prompts, negocio, país) la hace golden-chatea-pro-config-comentarios; el paquete de venta del producto en WhatsApp lo hace golden-chatea-pro-prompt-ventas.
+description: Configura UN producto dentro del asistente de COMENTARIOS de Chatea Pro — entrega el objeto de 5 llaves exactas (img, name, desc, rela, estado) listo para pegar, con la desc bajo el tope de 500 y el rela cargado de disparadores para que el bot reconozca de qué producto habla cada comentario de Facebook o Instagram. Parametrizado por los 10 países que acepta la plataforma. Úsalo SIEMPRE que el usuario quiera cargar, agregar, editar, revisar o arreglar un producto del asistente de comentarios, o diga cosas como "sube este producto a comentarios", "arma la ficha de producto para comentarios", "el bot responde con el producto equivocado", "no reconoce los comentarios de este anuncio", "actualiza el rela", "cambié los copys de Meta", "sale comentario no automatizado", "agrega este producto a Comentarios Productos", "ordena los productos del asistente de comentarios". Dispara también cuando peguen un JSON de productos de comentarios pidiendo revisión. La configuración GENERAL de ese asistente (prompts, negocio, país) la hace golden-chatea-pro-config-comentarios; el paquete de venta del producto en WhatsApp lo hace golden-chatea-pro-prompt-ventas.
 ---
 
 # Producto del asistente de COMENTARIOS · Chatea Pro
 
+<!-- corrección CdM 2026-08-29 · CAMBIO DE ESTÁNDAR países: la plataforma acepta 10, no 7 (doble medición contra el bundle vivo index-BrZVg7KW.js, sha256 2c947877…; deroga 'solo 7' y 'Guatemala fuera de plataforma'; detalle en la gaceta). Menciones del conteo viejo actualizadas a 10; el resto intacto. -->
 <!-- skill v1.3.3 · 2026-08-23 (Estándar 9, golden-skill-auditor): Estándar 9 (Centro de Mando):
      cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 <!-- skill v1.3.2 · 2026-08-21 (auditoría golden-skill-auditor, 960 ORO → 1000): 🟡 escritura-api.md
@@ -206,7 +207,7 @@ por encima de ~6 activos, cada uno de más es un candidato más al que el bot pu
 - `references/desc-plantilla.md` — el esqueleto de los 500, el **catálogo de reglas de marca por
   categoría** (cosmético, aparato eléctrico, suplemento, ropa, deportivo) y el método de recorte.
 - `references/rela-metodo.md` — las 5 capas, el banco de erratas y la regla anti-colisión.
-- `references/paises.md` — moneda, formato y vocabulario de los 7 países.
+- `references/paises.md` — moneda, formato y vocabulario de los 10 países.
 
 ### 4 · Compuerta: el validador en verde, o no se entrega
 
@@ -314,7 +315,7 @@ propósito. Un dato real incrustado en un archivo de la skill es un error: quít
   regla anti-colisión y qué hacer con los emojis. Léelo antes de escribir cualquier `rela`.
 - `references/desc-plantilla.md` — los 500 caracteres: esqueleto, **catálogo de reglas de marca
   por categoría**, método de recorte y qué material va en el prompt de ventas y no aquí.
-- `references/paises.md` — los **7 países**: moneda y formato, vocabulario, y el detalle
+- `references/paises.md` — los **10 países**: moneda y formato, vocabulario, y el detalle
   Colombia/México para quien trabaje esos dos.
 - `references/escritura-api.md` — **solo si vas a escribir por API**: endpoints, paginación,
   respaldo, relectura, y los tres campos de comentarios que se confunden.

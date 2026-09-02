@@ -156,13 +156,6 @@
       "category": "operations"
     },
     {
-      "name": "golden-logistica-diaria",
-      "source": "./golden-logistica-diaria",
-      "description": "La corrida diaria de logistica: que pedido despachar y por cual transportadora, que frenar, que llamada hacer por novedad, y que chat de WhatsApp se quedo sin procesar.",
-      "version": "1.0.0",
-      "category": "operations"
-    },
-    {
       "name": "golden-matriz-viral",
       "source": "./golden-matriz-viral",
       "description": "Saca la fórmula del contenido que ya funcionó y genera guiones nuevos.",
@@ -266,6 +259,12 @@
       "description": "Revisa las conversaciones del día y te dice dónde se murió cada venta y qué no supo responder el bot.",
       "version": "1.7.0",
       "category": "marketing"
+    },
+    {
+      "name": "golden-presenta",
+      "source": "./golden-presenta",
+      "description": "Presentaciones cinematograficas en UN archivo HTML: fondo vivo, camara que viaja por el lienzo, modo presentador y salida a PDF. Sin suscripcion ni dependencias externas.",
+      "version": "2.0.0"
     }
   ]
 }

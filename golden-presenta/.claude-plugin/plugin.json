@@ -1,0 +1,19 @@
+{
+  "name": "golden-presenta",
+  "version": "2.0.0",
+  "description": "Presentaciones cinematograficas en UN archivo HTML: fondo vivo, camara que viaja por el lienzo, modo presentador y salida a PDF. Sin suscripcion ni dependencias externas.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "chatea-pro",
+    "whatsapp",
+    "ventas",
+    "cod",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-chatea-pro-full-configuracion/"
+  ]
+}

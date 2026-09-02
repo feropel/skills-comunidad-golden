@@ -29,5 +29,8 @@
     "--s6": "#d4699a"
   },
   "nota": "Marca personal de FER en el Cartel. Violeta, no dorado: el Cartel NO se emite bajo Golden Group (memoria: la marca multinicho no se expone).",
-  "paleta_validada": "Los 6 checks del validador de la skill dataviz pasan con ESTE orden. El validador mide pares ADYACENTES: reordenar puede romperlo (medido: rosa junto a teal falla en protanopía con ΔE 4.5). Si cambias un color, re-corre el script; no lo elijas a ojo."
+  "paleta_validada": "Los 6 checks del validador de la skill dataviz pasan con ESTE orden. El validador mide pares ADYACENTES: reordenar puede romperlo (medido: rosa junto a teal falla en protanopía con ΔE 4.5). Si cambias un color, re-corre el script; no lo elijas a ojo.",
+  "source_of_truth": null,
+  "provisional": true,
+  "advertencia": "VALORES NO CONFIRMADOS. El violeta, la voz y el autor los eligio esta fabrica para DEMOSTRAR el mecanismo, no porque sean la identidad real del Cartel del Chat. Esa marca pertenece a otro chat y sus valores deben pedirse a su dueno via Centro de Mando. Lo unico anclado en memoria es que FER se expone ahi como 'Fer', SIN marca Golden Group (project_cartel_del_chat_comunidad). No usar en material real hasta confirmar."
 }

@@ -258,17 +258,18 @@ tbody tr:nth-child(even) td { background: var(--surface-soft); }
 }
 .toc-list {
   list-style: none; margin: 0; padding: 0;
-  columns: 2; column-gap: 13mm;
+  columns: 1;
   border-top: 1px solid var(--gold-line);
   padding-top: 10px;
 }
 .toc-list li {
   break-inside: avoid; page-break-inside: avoid;
-  display: flex; align-items: baseline; gap: 7px;
-  padding: 2.6px 0;
+  display: flex; align-items: baseline; gap: 10px;
+  padding: 5px 0; border-bottom: 1px solid var(--line);
 }
+.toc-list li:last-child { border-bottom: none; }
 .toc-list .toc-h2 {
-  font-size: 9.8pt; font-weight: 700; color: var(--ink);
+  font-size: 11pt; font-weight: 700; color: var(--ink);
   margin-top: 8px; break-after: avoid; line-height: 1.4;
 }
 .toc-list .toc-h2:first-child { margin-top: 0; }

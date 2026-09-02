@@ -305,18 +305,27 @@ def build_index(body_md, pages_map=None):
     items = outline(body_md)
     if not items:
         return ""
+    # SOLO PRIMER NIVEL. Listar cada subsección es lo que producía el muro que
+    # FER rechazó: en un documento de 12 secciones con 10 subsecciones cada una
+    # salían 132 líneas. Un mapa de 12 entradas se lee de un vistazo; uno de 132
+    # se salta. La subsección se encuentra pasando la página, no en una lista.
     rows = []
     for idx, it in enumerate(items):
+        if it["lvl"] != 2:
+            continue
         n = it["cards"]
-        if it["lvl"] == 2:                     # una sección suma las tarjetas de sus subsecciones
-            j = idx + 1
-            while j < len(items) and items[j]["lvl"] == 3:
-                n += items[j]["cards"]
-                j += 1
-        rows.append((it["lvl"], it["text"], n))
+        j = idx + 1
+        while j < len(items) and items[j]["lvl"] == 3:
+            n += items[j]["cards"]
+            j += 1
+        # Se ARRASTRA el índice original: `pages_map` está indexado sobre el
+        # esquema COMPLETO (H2+H3), y al filtrar a primer nivel la posición en
+        # esta lista deja de coincidir. Sin esto, cada sección muestra la página
+        # de otra — medido: 1 de 8 correctos.
+        rows.append((idx, it["lvl"], it["text"], n))
     total = sum(it["cards"] for it in items)
     lis = []
-    for idx_, (lvl, text, n) in enumerate(rows):
+    for idx_, lvl, text, n in rows:
         badge = ('<span class="toc-count">' + str(n) + '</span>') if n else ""
         # Número de página REAL (segunda pasada). Sin él, un índice de 130
         # líneas no es un mapa: el lector ve los títulos y no puede ir a
@@ -334,10 +343,11 @@ def build_index(body_md, pages_map=None):
     # en la hoja de la portada.
     # Sin nivel de 4 columnas: por debajo de cierto tamaño el índice deja de
     # ser legible y un mapa ilegible no orienta a nadie (v5.15).
-    dense = " dense" if len(rows) > 70 else ""
+    # Con solo primer nivel, un mapa denso ya casi no ocurre.
+    dense = " dense" if len(rows) > 28 else ""
     return ('<section class="toc' + dense + '">'
-            '<p class="kicker">Índice del documento</p>'
-            '<h1 class="toc-title">CONTENIDO</h1>'
+            '<p class="kicker">Mapa</p>'
+            '<h1 class="toc-title">EN ESTE DOCUMENTO</h1>'
             '<p class="toc-hint">' + hint + "</p>"
             '<ul class="toc-list">' + "".join(lis) + "</ul>"
             "</section>")
@@ -391,6 +401,17 @@ def cargar_tema(nombre):
         return None, ""
     with open(ruta, encoding="utf-8") as fh:
         tema = json.load(fh)
+    # UNA IDENTIDAD SIN ANCLA ES UNA IDENTIDAD INVENTADA. Comunidad Golden sale
+    # de un archivo real del disco; cualquier marca nueva pertenece al chat que
+    # la lleva, y sus valores se piden a su dueño, no se deducen del logo. Un
+    # tema sin `source_of_truth` se carga pero GRITA, para que nadie confunda un
+    # marcador de posición con la marca de verdad.
+    if not tema.get("source_of_truth"):
+        sys.stderr.write(
+            "\n⚠️  IDENTIDAD PROVISIONAL: el tema '%s' no declara `source_of_truth`.\n"
+            "   Sus colores y su voz NO están confirmados por el chat dueño de esa marca.\n"
+            "   Sirve para probar el mecanismo; NO para material real.\n\n"
+            % tema.get("id", nombre))
     # La paleta del tema se inyecta como variables CSS: TODO el documento y los
     # componentes visuales leen roles, no hex, así que la identidad cambia sin
     # tocar una sola regla de estilo.
@@ -667,8 +688,17 @@ def main():
     ap.add_argument("--footer", default="Comunidad Golden",
                     help="texto del pie de pagina (por defecto: Comunidad Golden)")
     ap.add_argument("--tema", help="identidad con nombre: comunidad-golden, cartel-del-chat…")
+    # NORMA FER REVISADA (2026-09-02). La v5.4 mandaba que TODO PDF abriera con
+    # página de CONTENIDO. FER la revierte con sus palabras: "la gente no lee los
+    # índices, eso no es un libro... no me gusta cuando pones un índice y está tan
+    # lleno". Tenía razón sobre la causa: el índice listaba CADA subsección, así
+    # que un documento mediano producía un muro de 132 líneas. Eso no es un mapa.
+    # Ahora: por DEFECTO no va. Con --mapa se pone uno CORTO (solo secciones de
+    # primer nivel, con su página), que es lo que sirve en un documento largo.
+    ap.add_argument("--mapa", action="store_true",
+                    help="añade un mapa corto de secciones con su página (por defecto NO va)")
     ap.add_argument("--no-index", action="store_true",
-                    help="omite la página de CONTENIDO (por defecto SÍ va · norma FER v5.4)")
+                    help="obsoleto: el índice ya no va por defecto; se conserva por compatibilidad")
     args = ap.parse_args()
 
     with open(args.input, encoding="utf-8") as f:
@@ -696,7 +726,7 @@ def main():
         if getattr(args, k):
             meta[k] = getattr(args, k)
 
-    html_str, cards = build_html(meta, body, with_index=not args.no_index,
+    html_str, cards = build_html(meta, body, with_index=args.mapa,
                                  logo_path=args.logo, theme_css=args.css,
                                  tema_css=tema_css)
 
@@ -735,7 +765,7 @@ def main():
     # localización falla, el PDF de la primera pasada queda tal cual: un índice
     # sin números es peor que uno con números, pero mucho mejor que uno con
     # números inventados.
-    if not args.no_index:
+    if args.mapa:
         items_ = outline(body)
         # PUNTO FIJO. Añadir los números puede empujar el índice a una hoja más,
         # y entonces TODO el cuerpo se corre y los números quedan desfasados por

@@ -343,8 +343,10 @@ def main():
     with open(largo, "w", encoding="utf-8") as f:
         f.write("\n".join(ln))
     largo_pdf = os.path.join(tmp, "largo.pdf")
+    # El mapa ahora es OPT-IN (norma FER revisada 2026-09-02: "la gente no lee
+    # los índices"), así que la prueba lo pide explícitamente con --mapa.
     r5 = run([sys.executable, os.path.join(SCRIPTS, "build_pdf.py"), largo, largo_pdf,
-              "--no-verify"])
+              "--mapa", "--no-verify"])
     fallos = []
     if r5.returncode != 0 or not os.path.exists(largo_pdf):
         fallos.append("no construyó: " + r5.stderr.strip()[:120])
@@ -367,7 +369,7 @@ def main():
             #     un test que asume el layout miente en los dos sentidos.
             _fin_idx = 0
             for _i, _txt in enumerate(_pags):
-                if "CONTENIDO" in _txt[:400] or "ÍNDICE DEL DOCUMENTO" in _txt[:400]:
+                if "EN ESTE DOCUMENTO" in _txt[:400] or "Mapa" in _txt[:200]:
                     _fin_idx = _i
             _idx = " ".join(_pags[:_fin_idx + 1])
             _ok = _tot = 0
@@ -455,6 +457,8 @@ def main():
         except ImportError as e:
             fv = None
             _detv = "no verificable: falta pdfplumber (%s)" % e
+        except Exception as e:
+            fv = ["la prueba reventó: %s: %s" % (type(e).__name__, e)]
     if fv is None:
         results.append(("Componentes visuales: KPI, barras, escala, pasos y QR", None, _detv))
     else:
@@ -473,9 +477,19 @@ def main():
         try:
             import pdfplumber as _pc
             def _tonos(ruta):
+                # non_stroking_color puede traer STRINGS (colores con nombre en
+                # el PDF de Chrome) — round() revienta con ellos. Ya me mordió
+                # antes por el lado de pdfminer; aquí se filtra a números.
+                out = set()
                 with _pc.open(ruta) as _d:
-                    return {tuple(round(x, 2) for x in (c.get("non_stroking_color") or ()))
-                            for _p in _d.pages for c in (_p.rects or [])}
+                    for _p in _d.pages:
+                        for c in (_p.rects or []):
+                            col = c.get("non_stroking_color") or ()
+                            nums = tuple(round(x, 2) for x in col
+                                         if isinstance(x, (int, float)))
+                            if nums:
+                                out.add(nums)
+                return out
             if _tonos(vis_pdf) == _tonos(car_pdf):
                 fc.append("los dos temas pintan EXACTAMENTE lo mismo: la identidad no cambió")
             with _pc.open(car_pdf) as _d:
@@ -485,6 +499,12 @@ def main():
         except ImportError as e:
             fc = None
             _detc = "no verificable: falta pdfplumber (%s)" % e
+        except Exception as e:
+            # Una prueba que revienta se reporta como FALLO DE ESA PRUEBA, nunca
+            # matando la corrida: si no, un error mío borra las otras 21 y el
+            # informe sale vacío (medido: un round() sobre un color con nombre
+            # tumbó las 22 y la salida fue PASS 0 · FAIL 0).
+            fc = ["la prueba reventó: %s: %s" % (type(e).__name__, e)]
     if fc is None:
         results.append(("Identidad por tema: el mismo .md sale con otra marca", None, _detc))
     else:

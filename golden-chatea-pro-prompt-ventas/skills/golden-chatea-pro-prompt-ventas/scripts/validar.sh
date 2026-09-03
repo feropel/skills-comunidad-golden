@@ -26,7 +26,7 @@ import json, sys
 path, limit, mode = sys.argv[1], int(sys.argv[2]), sys.argv[3]
 minimo = len(sys.argv) > 4 and sys.argv[4] == "1"
 vara   = len(sys.argv) > 5 and sys.argv[5] == "1"
-LO, HI = (4000, 6000) if minimo else (9000, 11000)
+LO, HI = (4000, 6000) if minimo else (9000, 11800)   # 11.800 medido: con la doctrina completa (nivel de conciencia + 5 pasos + situaciones + escalada + tramo logístico) el prompt no cabe en 11.000; el techo del campo sigue siendo 12.000
 data = open(path, "rb").read()
 bom = data.startswith(b"\xef\xbb\xbf")
 try:

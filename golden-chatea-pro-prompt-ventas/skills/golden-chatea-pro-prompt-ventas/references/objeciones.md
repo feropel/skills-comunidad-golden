@@ -28,7 +28,7 @@ Inserta las que apliquen dentro del bloque OBJECIONES del prompt. Mantén ≤35 
 ## E) DECISIÓN / TIEMPO
 - **"Lo voy a pensar"** → (1 intento, jamás dos) "Claro, tómate tu tiempo 😊 recuerda que pagas al recibir, así decides con el producto en la mano. Aquí estoy cuando quieras." ⛔ NO inventes que la promo vence hoy: si la oferta no tiene fecha real, no le pongas una (LEY DE LA URGENCIA REAL).
 - **"Después te escribo"** → "Con gusto 💛 aquí estoy cuando quieras. Si te decides, te lo dejo listo en un momentico." (No prometas apartar nada que no se aparte de verdad.)
-- **"Déjame preguntarle a mi esposo/a"** → "Perfecto 🙂 mientras tanto te aparto la oferta. Recuerda que pagas al recibir, así que el riesgo es cero."
+- **"Déjame preguntarle a mi esposo/a"** → casi nunca es un no: es que el que decide no está leyendo. NO insistas — **ármale el argumento para que él lo defienda**: un mensaje corto y reenviable con qué es, cuánto cuesta y que se paga al recibir, y cierra con "cuéntame qué te dice y lo dejamos listo". Le das material para vender por ti donde tú no estás.
 
 ## Regla al usarlas
 Elige SOLO las objeciones que apliquen a este producto/país. No metas las 20 al prompt: infla caracteres. Prioriza precio, confianza y la médica/legal si el producto es sensible.

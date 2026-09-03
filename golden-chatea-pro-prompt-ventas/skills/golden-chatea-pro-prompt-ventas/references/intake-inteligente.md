@@ -73,6 +73,14 @@ Cuando scrapees competidores o reseñas, extrae:
 - **Hooks/ángulos que ya venden** en los anuncios activos de la competencia (Meta Ad Library) → úsalos para el saludo, la pregunta de entrada y el espejo del dolor. NO copies su estructura de prompt (blindaje); toma solo el ángulo/insight.
 - **Rango de precio del mercado** → para sugerir combos y detectar si el precio del cliente está fuera de mercado (avísale).
 
+## ⚠️ SERVICIOS E INTANGIBLES — LO QUE ESTA SKILL NO CUBRE (declarado, no disimulado)
+Toda la skill está construida sobre venta de BIEN FÍSICO con contra entrega: envío, dirección, tiempos de despacho, "pagas al recibir" y la razón de preferencia entera se apoyan en el COD. **Si el producto es un servicio, una asesoría, un curso o algo digital, hay tramos que no aplican y hay que decirlo en vez de forzarlos:**
+- **NO aplican:** captura de dirección/barrio/referencia · tiempos de entrega por ciudad · "pagas al recibir" · regla de envío · oficina de transportadora · regla de talla.
+- **SÍ aplican y son lo que sostiene la venta:** nivel de conciencia · causa del chat · conexión aspiracional · razón de preferencia · oferta con valor apilado · objeciones · cierre con resumen · postventa.
+- **Lo que hay que sustituir:** el riesgo cero del COD por la garantía que sí exista (primera sesión sin costo, devolución, prueba gratuita) · la dirección por el dato que necesite la entrega (correo, agenda, enlace) · el precio por unidad por el precio por alcance o duración.
+- **Y lo que NO se puede inventar:** si el negocio no tiene ninguna forma de quitar riesgo, se construye sin ella y se dice — no se promete una garantía que no existe solo porque el molde la pedía.
+⛔ El intake exige precio de al menos una unidad o combo; en servicios, ese campo es el precio del alcance mínimo. Si el vendedor no lo tiene definido, ESE es el problema a resolver antes del prompt, y hay que decírselo.
+
 ## Adaptación por NICHO (la skill funciona en todos)
 Ajusta tono, claims y objeciones al nicho, sin cambiar la estructura:
 - **Salud/belleza/cosmético:** claims de APARIENCIA, nunca de cura; disclaimer "no es medicamento"; remite a médico (ver `cumplimiento.md`).

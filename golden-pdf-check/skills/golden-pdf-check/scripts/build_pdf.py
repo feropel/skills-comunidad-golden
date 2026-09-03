@@ -81,6 +81,15 @@ def inline(s):
 # Un manual de pasos necesita PANTALLAS. La figura es atómica igual que la
 # tarjeta de prompt: la imagen y su pie viajan juntos y nunca se parten entre
 # páginas. La imagen se incrusta en base64 para que el PDF sea autocontenido.
+# Rótulo del mapa. UNA sola fuente: lo escribe el que dibuja el mapa y lo busca
+# el que localiza los encabezados en la segunda pasada. Estuvo duplicado a mano
+# hasta v6.0 y al renombrar el mapa ("ÍNDICE DEL DOCUMENTO" -> "EN ESTE
+# DOCUMENTO") el detector dejó de reconocer su propia página en silencio: la
+# búsqueda arrancaba en la hoja del mapa y la primera entrada salía con el
+# número de esa hoja. Medido: 1 de 8 entradas mal. Si se vuelve a renombrar,
+# se cambia aquí y las dos puntas siguen casando.
+MAPA_TITULO = "EN ESTE DOCUMENTO"
+
 FIG_COUNTER = {"n": 0}
 IMAGE_BASE = [os.getcwd()]
 IMAGE_MIME = {".svg": "image/svg+xml", ".png": "image/png", ".jpg": "image/jpeg",
@@ -347,7 +356,7 @@ def build_index(body_md, pages_map=None):
     dense = " dense" if len(rows) > 28 else ""
     return ('<section class="toc' + dense + '">'
             '<p class="kicker">Mapa</p>'
-            '<h1 class="toc-title">EN ESTE DOCUMENTO</h1>'
+            '<h1 class="toc-title">' + MAPA_TITULO + "</h1>"
             '<p class="toc-hint">' + hint + "</p>"
             '<ul class="toc-list">' + "".join(lis) + "</ul>"
             "</section>")
@@ -655,10 +664,14 @@ def locate_headings(pdf_path, items):
         # los encuentra todos ahí y el índice sale con puros "1" (bug medido en
         # la primera versión de esta pasada). Se arranca DESPUÉS de la última
         # página del propio índice, identificada por su firma.
-        FIRMA = _norm("ÍNDICE DEL DOCUMENTO CONTENIDO")[:20]
+        FIRMA = _norm(MAPA_TITULO)
+        # Solo la RACHA INICIAL: el mapa va siempre al principio. Recorrer todo
+        # el PDF haría que un documento cuyo CUERPO mencione esas palabras
+        # empujara el cursor hasta esa página y perdiera todo lo anterior.
         for pno, txt in enumerate(paginas):
-            if FIRMA and FIRMA in txt:
-                cursor = pno + 1
+            if not (FIRMA and FIRMA in txt):
+                break
+            cursor = pno + 1
         if cursor >= len(paginas):        # documento que es solo índice
             cursor = 0
         for i, it in enumerate(items):

@@ -26,7 +26,7 @@
       "name": "golden-chatea-pro-prompt-ventas",
       "source": "./golden-chatea-pro-prompt-ventas",
       "description": "Crea el paquete de venta por producto para Chatea Pro: saludo, multimedia, pregunta de entrada, prompt de venta, recordatorios y remarketing.",
-      "version": "3.39.0",
+      "version": "3.43.1",
       "category": "marketing"
     },
     {
@@ -173,7 +173,7 @@
       "name": "golden-pdf-check",
       "source": "./golden-pdf-check",
       "description": "El estándar de PDF de la comunidad: marca, márgenes y bloques que no se parten.",
-      "version": "5.18.0",
+      "version": "6.0.0",
       "category": "education"
     },
     {

@@ -53,7 +53,7 @@ Por eso el prompt siempre debe incluir las URLs conversacionales adentro. La mul
 
 ## Tiempos (fijos)
 
-- Recordatorio 1: 1 hora — sin plantilla (solo el mensaje).
+- Recordatorio 1: 2 horas — sin plantilla (solo el mensaje).
 - Recordatorio 2: 2 horas — sin plantilla.
 - Remarketing 1: 3 horas — plantilla de Meta.
 - Remarketing 2: 6 horas — plantilla de Meta.

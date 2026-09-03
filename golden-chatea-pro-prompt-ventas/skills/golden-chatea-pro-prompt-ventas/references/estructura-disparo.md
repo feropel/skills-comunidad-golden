@@ -5,6 +5,14 @@ Orden de montaje en Chatea PRO:
 palabra clave → SALUDO → MULTIMEDIA → PREGUNTA DE ENTRADA → PROMPT
 ```
 
+## 0. EL PERFIL VENDE ANTES DE QUE ESCRIBAS (prerequisito del paquete)
+El cliente ve el perfil ANTES de leer una sola palabra tuya: es el primer activo de confianza y no cuesta nada. **La fábrica no lo configura —vive en el negocio, no en el prompt— pero SÍ lo verifica antes de entregar**, porque un paquete perfecto sobre un perfil vacío rinde menos.
+- **Foto:** una imagen del negocio **donde aparezcas TÚ** (junto al logo, la marca o el producto). Humaniza y genera confianza. Con sonrisa y un color de fondo distintivo que te haga reconocible en la lista de chats.
+- **Descripción (máx. 160 caracteres):** detallada pero corta — qué consultas o pedidos se resuelven por esa línea, con llamado a la acción. Más largo aburre y no se lee.
+- **Datos de contacto y enlaces:** correo, web y redes principales. Suman confiabilidad verificable.
+⚠️ **Coherencia con el paquete:** si el recordatorio disruptivo envía una foto de la asesora, esa cara DEBE ser la misma del perfil (ver regla en Recordatorios). Un perfil con logo y un mensaje con selfie de otra persona rompen la credibilidad que el propio perfil construyó.
+📌 Al entregar el paquete, revisa el perfil y dilo si está flojo. Es la corrección más barata que existe: cinco minutos, cero costo, y actúa sobre TODAS las conversaciones, no sobre una.
+
 ## 1. Saludo inicial (tope nativo del campo: 1.000 caracteres)
 Cálido, con el nombre del asistente, crea expectativa para que el cliente espere la multimedia.
 
@@ -17,7 +25,7 @@ Soy [NOMBRE], tu asesora personal 😊
 Dame un momentico mientras te comparto algo que te va a encantar 👇
 ```
 
-## 2. Multimedia (3 piezas recomendadas, en orden)
+## 2. Multimedia (UNA pieza: el hero sin precio — ver regla anti-catálogo en `recursos-visuales.md`)
 1. Imagen de producto + propuesta de valor (con envío gratis / contraentrega visible)
 2. Video corto (15-30s) mostrando producto y uso — el que más convierte
 3. Imagen de prueba social (reseñas / testimonios / "+N clientes")
@@ -114,7 +122,8 @@ Si te sirve, te lo dejo listo hoy y pagas cuando lo recibas.
 ```
 Botón: "Quiero verlo". Nunca "Comprar ahora": pide un paso más pequeño que la compra.
 
-**REMARKETING 2 (6h) — LA PUERTA QUE SE CIERRA BIEN**
+**REMARKETING 2 (8h) — LA PUERTA QUE SE CIERRA BIEN**
+⚠️ Ajustado de 6h a 8h para evitar la COLISIÓN con el Recordatorio 2, que desde v3.36 también cae a las 6h: dos mensajes al mismo minuto se leen como spam y queman lo que ambos intentan rescatar.
 Último contacto. No insistas: **cierra con elegancia y deja la puerta abierta.** Paradójicamente es el que más recupera, porque quita la presión.
 ```
 Hola {{1}} 😊 No quiero seguir escribiéndote si no era el momento.

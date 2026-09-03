@@ -1,7 +1,7 @@
 # Vara MÍNIMA VIABLE (el flujo núcleo, sin extras)
 
 > ⚠️ **Esto NO es el objetivo de entrega: es el ESQUELETO para entender la estructura.** Un prompt real apunta a 9.000-11.000 caracteres (ver `ejemplo-completo.md`). Esta vara existe para dos casos: (a) enseñar el núcleo sin ruido a quien recién empieza, y (b) arrancar cuando el vendedor tiene MUY pocos insumos (sin testimonios, sin antes/después, sin bonos). Si entregas algo de este tamaño como prompt final, le estás dando al cliente la mitad de su venta.
-> Rango de esta vara: **4.000-6.000 caracteres** (esta mide 4.413). Se valida con `bash scripts/validar.sh --minimo <archivo>`, que juzga contra ESTE rango y no contra el de la completa. Si tienes insumos para más, no uses esta: usa la completa.
+> Rango de esta vara: **4.000-6.000 caracteres** (esta mide 5023). Se valida con `bash scripts/validar.sh --minimo <archivo>`, que juzga contra ESTE rango y no contra el de la completa. Si tienes insumos para más, no uses esta: usa la completa.
 
 ## Qué SÍ lleva el mínimo viable (nada de esto es opcional)
 Nivel de conciencia · formato nativo de WhatsApp (`*negrita*`, `~tachado~`) · identidad y tono asesor · regla de precio inmediata · causa del chat · memoria del pedido · captura en un mensaje · compuerta del resumen · confirmación personalizada por ciudad · objeciones básicas · cero urgencia inventada.

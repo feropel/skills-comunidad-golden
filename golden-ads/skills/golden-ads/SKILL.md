@@ -1,25 +1,102 @@
 ---
 name: golden-ads
 description: >-
-  Golden Group — CENTRO DE COMANDO DE PAUTA (Meta + TikTok + Google Ads).
-  Analiza cuentas en vivo por MCP o desde un Excel exportado, dice QUÉ PAUSAR y QUÉ ESCALAR con
-  unit economics reales, y monta campañas completas de cero: estructura, segmentación, presupuesto,
-  creativos y copys 5+5+5. Crea y publica en Meta por MCP, siempre EN PAUSA hasta tu OK.
+  Golden Group — CENTRO DE COMANDO DE PAUTA (Meta + TikTok + Google). Monta campañas de cero
+  (estructura, segmentación, presupuesto, creativos y copys 5+5+5) y analiza cuentas en vivo o por
+  Excel: dice qué PAUSAR y qué ESCALAR con la utilidad real en pesos. Publica en Meta siempre EN
+  PAUSA hasta tu OK.
 
-  Úsala cuando el usuario diga: "cómo va mi campaña", "ya la activé, qué miro", "cuándo escalo",
-  "qué pauso", "revisa mis resultados", "monta las campañas de este producto", "por qué no
-  funcionan los anuncios", "se disparó el costo por compra", "estoy perdiendo plata pautando",
-  "dame las columnas / métricas de la cuenta", "configúrame el preset", "arma el retargeting",
-  o cuando suba un informe de Ads Manager. También para lanzar un producto nuevo sin métricas.
+  Úsala cuando digan: "crea una campaña de [objetivo] de [producto] con presupuesto de [valor]",
+  "monta la campaña de este producto", "súbeme este video como anuncio", "analiza el video y hazme
+  los copys", "la cuenta está vacía, súbele el creativo", "cómo va mi campaña", "ya la activé, qué
+  miro", "cuándo escalo", "qué pauso", "por qué no funcionan los anuncios", "se disparó el costo por
+  compra", "estoy perdiendo plata pautando", "dame las columnas de la cuenta", "arma el
+  retargeting", "cómo conecto mi cuenta de Meta", o si suben un informe de Ads Manager. También para
+  lanzar un producto nuevo sin métricas.
 
-  Si lo que hay sobre la mesa es un Excel o CSV ya exportado, la especialista es
-  golden-meta-ads-analysis: esa dispara con el archivo, esta con la pregunta. El estudio de
-  mercado y el lanzamiento completo son golden-investigacion-mercado y golden360.
+  Excel o CSV ya exportado → golden-meta-ads-analysis. Lanzamiento completo → golden360.
 ---
 
 # Golden Group — Centro de Comando de Pauta (Golden Ads)
 
-<!-- GAE_VERSION: G5.6 — 2026-08-31 (CdM) · CORRECCION ANDROMEDA verificada contra la fuente primaria de Meta (blog de ingenieria, 2-dic-2024, leido en vivo): se RETIRA el "Similarity >60% = supresion" (NO esta en Meta, venia de terceros/claude-ads) y se consagra lo estructural: Andromeda es RECUPERACION, decide quien COMPITE no quien gana; el creativo determina elegibilidad via embedding en indice jerarquico. Cifras reales de Meta anadidas con su condicion. "El primer frame es targeting" NO se consagra (no esta en la fuente). Detalle en changelog G5.6. — El bloque de abajo es el historico G5.4:
+<!-- GAE_VERSION: G6.3 — 2026-09-03 — CONSUMIR el teardown de golden360 en vez de repetirlo (aviso
+del CdM, verificado por mi en la skill hermana antes de hornear: golden360 R2.0 tiene FASE 5B real,
+con golden-video-teardown entre producir los creativos y escribir los copys). Cuando el encargo llega
+por la ruta 360, el video YA viene desarmado — beat sheet segundo a segundo, angulo, hook y copy
+quemado en pantalla. Rehacerlo cuesta tiempo y creditos y arriesga CONTRADECIR el analisis que guio
+la produccion. Nota en 25-cuenta-sin-creativos Paso 2 (buscar el teardown en el expediente ANTES de
+analizar; si esta, rellenar la ficha con el y saltar al Paso 3) y en la fila de golden-video-teardown
+del bloque de requisitos. Tambien anotada la ruta real del binario golden-transcribe
+(~/.golden/bin/), que el validador del CdM confundia con una skill. — El bloque de abajo es el
+historico G6.2:
+GAE_VERSION: G6.2 — 2026-09-03 — REQUISITOS DECLARADOS (fila del CdM bajo la ley de FER: todo
+lo que la skill necesite del usuario o del entorno se declara ANTES, cerca del principio, y se pide
+AL CORRER si falta). MEDIDO: la skill citaba hermanas en decenas de archivos y declaraba CERO
+requisitos (grep = 0) — golden-copywriting en 13 archivos, watch en 7, golden-investigacion-mercado
+y golden-ugc-avatar en 6 cada una. Quien la instalara suelta lo descubria a mitad de un encargo.
+NUEVO bloque "QUE NECESITA ESTA SKILL" tras el rol: entorno (MCP de Meta, datos del negocio) y las
+6 hermanas, cada una con QUE APORTA y QUE PASA SI NO ESTA. Matiz que aporto el CdM y se consagra:
+una dependencia entre skills NO es una API key — no se le pide al usuario que la pegue, se le dice
+cual hermana falta y con que se degrada; y si falta golden-copywriting se escriben los 15 copys
+igual (125/40/25 + compliance) pero SIN framework y SE DECLARA, nunca fingir que se aplico uno que
+no se pudo leer. Al repartir, golden-copywriting va con golden-ads. — El bloque de abajo es el
+historico G6.1:
+GAE_VERSION: G6.1 — 2026-09-03 — DESCRIPTION DENTRO DE LA SPEC. Hallazgo de arsenal medido hoy
+en este chat y confirmado por el CdM con medicion independiente: 34 skills instaladas pasan del tope
+de 1024 caracteres que fija la especificacion de Agent Skills (agentskills.io/specification, leida en
+vivo), y 32 de esas son de la casa. golden-ads estaba en 1.444. Recortada a <=1024 con el criterio
+del CdM: los DISPARADORES primero (los del final son los que se pierden) y lo explicativo BAJA AL
+CUERPO, que no tiene tope duro — la instruccion de "si te pasan un video, subelo, analizalo viendolo
+Y escuchandolo, y escribe los copys de ESE video" ahora vive en el bloque de montar campana, no en el
+disparador. DISTINCION HONESTA que aporto el CdM y se adopta: 1024 es el tope de VALIDACION de la
+spec; el ~1536 que esta skill midio el 2026-08-07 es TRUNCADO EN RUNTIME — mecanismos distintos, las
+dos mediciones son ciertas. Que un ZIP sea rechazado al distribuir es PLAUSIBLE Y NO MEDIDO: no se
+vende como certeza. El "tope de 200 en claude.ai" que circulo NO se adopta: sin fuente verificada es
+rumor, no limite. CAUSA RAIZ del fallo de deteccion (ya en manos del CdM): golden-skill-auditor MIDE
+la description en inventario.sh:295 pero NUNCA la compara — "1024" aparece cero veces en sus scripts
+y cero en rubrica.md/estandares-golden.md; el arreglo de clase sera adoptar el validador oficial
+`skills-ref validate`, no codificar el numero a mano. Familia reference_familia_trampas_de_conteo:
+el arreglo es el INSTRUMENTO, no la buena intencion. — El bloque de abajo es el historico G6.0:
+GAE_VERSION: G6.0 — 2026-09-03 — OBJETIVOS DE CAMPANA (reclamo directo de FER: "objetivo son
+trafico, interaccion, venta; tu ya debes saber todo esto, no deberia estar diciendo esto"). El hueco
+era real: la skill nombraba OUTCOME_* de pasada en 05-publicar-mcp y el intake del 26 reducia el
+objetivo a DOS opciones (venta web / WhatsApp), dejando fuera TRAFICO. NUEVO
+references/28-objetivos-de-campana.md: tabla de decision con los 3 de Golden — que dice el usuario ->
+enum ODAX -> optimization_goal -> promoted_object/destino -> por que metrica se mide; el criterio de
+cual elegir; la advertencia de que INTERACCION optimiza a que escriban, no a que compren (y que
+Chatea PRO debe devolver la conversion a Meta); LANDING_PAGE_VIEWS antes que LINK_CLICKS; y que
+cambiar el objetivo obliga a REHACER la campana, no a editarla. Enums verificados contra la
+Marketing API de Meta (ad-campaign-group) hoy. — El bloque de abajo es el historico G5.9:
+GAE_VERSION: G5.9 — 2026-09-03 — CONEXION MCP + candado de presupuesto (aviso del chat EL
+CARTEL DEL CHAT, verificado por mi contra la fuente autoritativa de Meta antes de hornear). NUEVO
+references/27-conectar-mcp-meta.md: URL oficial https://mcp.facebook.com/ads, las DOS vias (con y
+sin app propia), el comando exacto de Claude Code, los 7 permisos textuales, y el paso de
+verificacion. HALLAZGO PROPIO que el aviso no traia y es lo que mas plata protege: Meta permite
+fijar REGLAS POR CUENTA en Business Suite > Integrations > Ads MCP server que el servidor hace
+cumplir, incluido un TECHO MAXIMO DE PRESUPUESTO ("Budgets set above this amount" = Blocked) — con
+eso puesto, el incidente de los $5.000.000 habria sido RECHAZADO por Meta. CORRECCIONES al aviso: la
+description medida son 1.766 chars, no 350 (factor 5); los clientes oficiales son ChatGPT/Claude/
+Claude Code/Perplexity, NO Cursor ni Codex; y NO se encontro en las paginas oficiales ni la
+advertencia de prompt injection ni los alcances "Read/Manage" — rotulado como no verificado en vez
+de atribuirselo a Meta. ADEMAS: description recortada de 1.766 a ~1.500 chars, porque la propia
+skill documento en 2026-08-07 un tope de ~1.536 y habia vuelto a pasarse (las frases del final NO
+disparaban). — El bloque de abajo es el historico G5.8:
+GAE_VERSION: G5.8 — 2026-09-03 — INTAKE (encargo directo de FER tras 3 fallas de campo:
+presupuesto puesto 100x, campana entregada sin los 15 copys, creativo que no se subio). NUEVO
+references/26-intake-montar-campana.md: portero del pedido "crea una campana de [objetivo] de
+[producto] con presupuesto de [valor]" — los 3 campos se PREGUNTAN si faltan (juntos, una sola vez),
+compuerta del presupuesto (escribir el renglon del calculo ANTES de mandarlo + releer del servidor),
+y el ORDEN que enlaza investigacion previa -> creativo (25) -> 15 copys coherentes -> montaje (05)
+-> UTM (24) -> verificacion (13). Enganchado arriba del SKILL.md y en el mapa. HALLAZGO: el hueco
+real era el INTAKE (grep 0 matches); lo del creativo/copys YA estaba cubierto por 25 y lo del
+presupuesto por reglas-de-oro §5 (ambos del 2026-09-03, posteriores al incidente de FER). Se
+DESCARTO un 23-montar-campana-completa.md que se habia empezado: colisionaba de numero con
+23-salud-de-senal, duplicaba 25 y citaba ads_creative_upload_image/_video que estan DEPRECADAS.
+Y se deja escrito el tope MEDIDO que explica "no me sube los 15 copys": ads_create_creative NO
+expone asset_feed_spec -> por API salen 1+1+1, los 15 se cargan en el panel y se REPORTA como
+pendiente. — El bloque de abajo es el historico G5.7:
+GAE_VERSION: G5.7 — 2026-09-02 (encargo directo de FER: "colocamos un UTM para que pueda enviar esa informacion de donde vino la venta, debe estar en la skill de MetaAds"). HUECO MEDIDO: grep -i "utm" sobre toda la skill daba 0 reglas (2 menciones de pasada). NUEVO references/24-utm-atribucion.md + REGLA 18 (reglas-de-oro.md y resumen del SKILL.md) + citas operativas en 05-publicar-mcp (paso 4 y "Nunca"), 13-auto-check (Publicacion), 17-entrega (nivel anuncio) y el checklist de cierre. Esquema tomado de la FUENTE REAL de los montajes (LECOTERRA MONTAJE-CP1-2026-07-25 y -OPEN7-2026-08-14), no del contrato viejo del CdM: el id va en utm_id y utm_content lleva el NOMBRE — confundirlos fue el incidente "adOPEN" del 26-ago. VERIFICADO HOY contra los esquemas vivos del MCP: ads_create_ad y ads_create_creative NO exponen url_tags, o sea que por MCP el anuncio nace sin UTM. SIN VERIFICAR y asi rotulado: ads_update_entity con url_tags, y la captura positiva por el camino LANDING. Detalle en changelog G5.7. — El bloque de abajo es el historico G5.6:
+GAE_VERSION: G5.6 — 2026-08-31 (CdM) · CORRECCION ANDROMEDA verificada contra la fuente primaria de Meta (blog de ingenieria, 2-dic-2024, leido en vivo): se RETIRA el "Similarity >60% = supresion" (NO esta en Meta, venia de terceros/claude-ads) y se consagra lo estructural: Andromeda es RECUPERACION, decide quien COMPITE no quien gana; el creativo determina elegibilidad via embedding en indice jerarquico. Cifras reales de Meta anadidas con su condicion. "El primer frame es targeting" NO se consagra (no esta en la fuente). Detalle en changelog G5.6. — El bloque de abajo es el historico G5.4:
 HERRAMIENTAS autorizado por FER en directo) — NUEVO references/23-salud-de-senal-y-andromeda.md:
 7 controles de CALIDAD DE SEÑAL que faltaban (0 menciones previas medidas por grep): CAPI activo,
 deduplicación >=90% por event_id, EMQ >=8.0 con palanca COD (mandar por CAPI el teléfono/ciudad
@@ -53,6 +130,33 @@ rápido y barato. Trabajas con datos; cuando no hay, lo dices y diseñas para *g
 
 ---
 
+## 📋 QUÉ NECESITA ESTA SKILL (léelo antes de arrancar)
+
+**Una dependencia entre skills NO es una llave que el usuario pega**: es una hermana que hace una
+parte del trabajo. Si falta, **esta skill hace esa parte igual, peor, y lo DECLARA** — nunca finge
+que aplicó algo que no pudo leer, ni falla a mitad de un encargo.
+
+### Del ENTORNO (lo único que sí cambia la ruta)
+| Necesita | Para qué | Si NO está |
+|---|---|---|
+| **MCP de Meta** (`ads_*`) | leer la cuenta en vivo, crear y publicar | Se dice y se cae a **B) informe exportado** o **C) testeo sin datos** (`01`). Para conectarlo: `27-conectar-mcp-meta.md`. **Nunca se inventa que la cuenta respondió.** |
+| Datos del negocio: **precio, costo, envío, % de entrega, modelo de pago** | breakeven y veredicto de rentabilidad | Se marca `[PENDIENTE]` y se entrega **ranking relativo**, no veredicto absoluto (REGLAS 2 y 9) |
+
+### Skills HERMANAS (ninguna bloquea; todas con salida declarada)
+| Hermana | Qué aporta | Si NO está instalada |
+|---|---|---|
+| **`golden-copywriting`** ⭐ *(la más usada — citada en 13 archivos de esta skill)* | motor de frameworks (AIDA/PAS/4U/BAB) y límites medidos de Meta para los **15 copys** | Escribo los 15 igual, respetando **125/40/25** y compliance, pero **sin framework** — y **lo digo**: "copys escritos sin el motor de frameworks". Jamás afirmar que se aplicó uno que no se pudo leer |
+| `golden-investigacion-mercado` | ángulos, persona, objeciones, oferta | Saco los ángulos del **creativo + Ad Library** y lo declaro (`26` Paso 3) |
+| `golden-video-teardown` · `watch` | análisis del video segundo a segundo | Transcribo con `golden-transcribe` (local, `~/.golden/bin/`) o pido al usuario que describa el video. **Nunca escribo copy de un video que no escuché** (`25`). ⚡ **Si el encargo viene de `golden360`, su Fase 5B ya hizo el teardown: se LEE, no se repite** |
+| `golden-ugc-avatar` · `golden-imagen-arena` | generar el creativo si no lo tienen | Entrego **prompts + libreto segundo a segundo** y dejo el slot `[PENDIENTE GENERAR]` (`15`) |
+| `golden-dropi-analisis` | % de entrega real y comprador real | Pido la tasa de entrega al usuario; si no la sabe, uso 65% **marcado como supuesto** (`12`) |
+| `golden-meta-ads-analysis` | análisis profundo de un Excel exportado | Analizo el Excel aquí mismo con `02` + `12`, sin delegar |
+
+> **Al repartir esta skill, `golden-copywriting` va con ella.** Es la única cuya ausencia se nota en
+> cada encargo, porque los 15 copys aparecen en casi todos.
+
+---
+
 ## ⚠️ REGLAS DE ORO (innegociables — `references/reglas-de-oro.md`)
 > Extracto de las que más se citan. **La numeración es la CANÓNICA de `reglas-de-oro.md` (17 reglas)**
 > — cuando el cuerpo dice "REGLA 9" o "REGLA 12", ese número es el de ese archivo, no el de esta lista.
@@ -74,7 +178,10 @@ rápido y barato. Trabajas con datos; cuando no hay, lo dices y diseñas para *g
 3. **Confirmar antes de gastar.** Lo creado por MCP nace **EN PAUSA**. NUNCA activar
    (`ads_activate_entity`) ni subir presupuesto sin **OK explícito**. Activar = dinero real.
 4. **Compliance** Meta/TikTok/Google en todo creativo/copy (sin atributos personales, sin claims prohibidos).
-5. **País/moneda** correctos (presupuestos en la moneda de la cuenta; segmentación/entrega por país).
+5. 🔴 **País/moneda.** Presupuesto en la **unidad mínima** de la moneda de la cuenta: **COP/CLP/PYG
+   van ×1** (`50000` = $50.000), **USD/EUR/MXN van ×100**. El parámetro dice "cents" y **miente en
+   las monedas sin decimales**. Obligatorio **releer el `daily_budget` del servidor** tras crear o
+   actualizar y comparar el texto renderizado con lo pedido (`reglas-de-oro` §5, `13`).
 6. **Accionable**: cada hallazgo → una acción concreta (qué tocar, a qué valor, por qué).
 8. **Entregables en `PROYECTOS/<PRODUCTO>/ADS/`** (MAYÚSCULA), nada suelto.
 16 y 17. **El dato decide QUÉ; la empatía decide CÓMO.** Cero supuestos y cero parálisis: de cada análisis
@@ -86,11 +193,20 @@ rápido y barato. Trabajas con datos; cuando no hay, lo dices y diseñas para *g
    Y **antes de leer cualquier rendimiento**, la SALUD DE LA SEÑAL: CAPI, deduplicación, EMQ,
    Learning Limited, presupuesto por conjunto y Andromeda → `references/23-salud-de-senal-y-andromeda.md`.
    Si la señal está rota, los números del informe no son de fiar y eso va primero.
+18. **🔴 NINGÚN anuncio a LANDING se entrega ni se activa SIN UTM.** Sin UTM la venta llega y nadie
+   sabe qué anuncio la produjo. Esquema oficial (macros, nivel anuncio, va tal cual) y **el id vive
+   en `utm_id`, NO en `utm_content`** → `references/24-utm-atribucion.md`. El MCP **no** pone UTM al
+   crear (verificado): montado por MCP, el anuncio nace ciego y hay que pegarlo en la UI antes de
+   activar. CTWA es la excepción: ahí el ad id llega solo en el primer mensaje.
 
 ---
 
 ## PASO 0 · Detectar la FUENTE DE DATOS → `references/01-fuentes-datos.md`
 - **A) Meta EN VIVO (MCP)** — la mejor. `ads_get_ad_accounts` (carga las tools con ToolSearch: `ads`).
+  **Si NO hay conexión** → `references/27-conectar-mcp-meta.md`: la URL oficial de Meta
+  (`https://mcp.facebook.com/ads`), el comando de Claude Code, los permisos, y el 🔒 **candado de
+  presupuesto** de Business Suite que rechaza montos por encima de un techo (la red de seguridad
+  contra el error de los 100×).
   Da insights, benchmarks, anomalías, opportunity score, activity log Y creación/publicación.
   **Sigue la receta exacta y la chuleta de campos válidos en `references/11-mcp-meta-recipe.md`**
   (evita el fallo #1: inventar nombres de campo; los válidos son `actions:omni_purchase`,
@@ -110,6 +226,26 @@ Transversal a las 3: **retargeting/full-funnel** (`06`), **benchmarks/KPIs** (`0
 > tener la cuenta", el preset oficial es **GOLDEN PRO** → `references/19-golden-pro-preset.md` (40 columnas
 > en 5 bloques + fórmulas custom + 🚦 semáforo de metas + receta del doc imprimible). `18-columnas-ads-manager.md`
 > queda para sets por objetivo (landing/video/WhatsApp). El preset se guarda en Ads Manager a mano (el MCP no fija la vista).
+
+---
+
+## 🚀 "CREA UNA CAMPAÑA DE [objetivo] DE [producto] CON PRESUPUESTO DE [valor]"
+→ **`references/26-intake-montar-campana.md`** (portero e índice del pedido más común). Los 3 no
+negociables, nacidos de fallas MEDIDAS el 2026-09-03:
+1. **INTAKE**: objetivo · producto · presupuesto. **Si falta uno, se PREGUNTA** — los tres juntos,
+   una sola vez. Lo demás (ABO/CBO, edades, público, naming) se decide por convención y se informa.
+   **Los objetivos son TRÁFICO · INTERACCIÓN · VENTA** y su traducción a la API ya está resuelta en
+   `references/28-objetivos-de-campana.md` — se traduce, no se pregunta dos veces.
+2. 🔴 **PRESUPUESTO**: escribe el renglón del cálculo ANTES de mandarlo (testigo
+   `min_daily_budget_cents`: COP/CLP/PYG **×1**, USD/EUR/MXN **×100**) y **relee del servidor** al
+   crear. *(Incidente: $50.000 pedidos → $5.000.000 puestos.)* Regla completa en `reglas-de-oro.md` §5.
+3. **CREATIVO → COPYS → ANUNCIO** (`25-cuenta-sin-creativos.md`). **Si te pasan un video o una foto
+   para pautar** (o la cuenta está vacía): sube el medio a la cuenta, **ANALIZA el video — viéndolo Y
+   escuchándolo** — y escribe los copys que le corresponden a ESE video, coherentes con lo que dice.
+   **Nunca copy genérico.** En detalle: mide si la cuenta ya tiene medios,
+   **súbelo** con `ads_creative_upload_media`, **analiza el video viéndolo Y ESCUCHÁNDOLO**, escribe
+   los **15 copys coherentes con ESE creativo**, monta y **verifica con `ads_get_ad_preview`**.
+   La estructura sale de la investigación previa y se adapta al creativo (`26` Paso 3).
 
 ---
 
@@ -138,6 +274,7 @@ creativos, corregir evento/atribución, **activar retargeting** `06`).
 ### MODO B · SIN métricas → `references/04-build-sin-metricas.md`
 Estructura de testeo (1 campaña, N conjuntos = N ángulos, público amplio, 2–3 creativos, ABO) +
 **criterios de matar/escalar definidos ANTES** de lanzar. Insumos: investigación + `ads_library_search`.
+- **Si la cuenta no tiene creativos, o el usuario pasa un video/foto por el chat** → `references/25-cuenta-sin-creativos.md`: subir el medio, **analizar el video antes de escribir el copy**, y pasar la prueba de coherencia.
 - **Creativos + copys los produce ESTE skill** (`references/15-creativos-produccion.md`): pide media al
   cliente → analízala y escribe copys desde ahí; si no tiene, **genérala** (Higgsfield/`golden-ugc-avatar`)
   o entrega **prompts perfectos** + slots. Copy = 5 hooks/5 títulos/5 descripciones por creativo.
@@ -163,8 +300,13 @@ Estructura de testeo (1 campaña, N conjuntos = N ángulos, público amplio, 2�
 - [ ] **Unit economics y breakeven** definidos (no asumidos) + **ROAS pagado** estimado (COD).
 - [ ] **Pixel + CAPI / Events API** activos y evento de Compra probado (sin señal no hay optimización).
 - [ ] Objetivo y evento de conversión correctos (Compra, no clics). Atribución revisada.
+- [ ] **UTM en todos los anuncios a landing** (`24`, REGLA 18), id en `utm_id`, cobertura reportada.
 - [ ] Segmentación por país/moneda correcta. Presupuesto ≥ mínimo de la cuenta.
-- [ ] Creativos compliant + 5 hooks/5 títulos/5 descripciones por creativo (`golden-copywriting`).
+- [ ] 🔴 **Presupuesto releído del servidor** y comparado con lo pedido (COP/CLP/PYG ×1, no ×100).
+- [ ] 🔴 **15 copys POR CREATIVO** (5 textos principales + 5 títulos + 5 descripciones), **coherentes
+      con ese creativo** y cada uno en su bloque copiable (REGLA 15). Menos de 15 = entrega incompleta.
+- [ ] 🔴 **Creativo SUBIDO** (`ads_creative_upload_image`/`_video`) y referenciado por el anuncio —
+      verificado releyendo, no asumido. Creativos compliant (`golden-copywriting`).
 - [ ] Retargeting contemplado (`06`). Criterios de matar/escalar escritos (`07`).
 - [ ] Todo **en PAUSA**; resumen mostrado; activación solo con OK del usuario.
 - [ ] Entregables guardados en `PROYECTOS/<PRODUCTO>/ADS/`.
@@ -175,7 +317,7 @@ Estructura de testeo (1 campaña, N conjuntos = N ángulos, público amplio, 2�
 ---
 
 ## Sello de versión
-**Versión:** `G5.6` · **Última modificación:** 2026-08-31 · **Validada en vivo** contra cuentas Meta
+**Versión:** `G5.7` · **Última modificación:** 2026-09-02 · **Validada en vivo** contra cuentas Meta
 reales (COP, COD) — GOLDEN PRO construido y replicado en vivo. El sello vive SOLO aquí y en el
 comentario `GAE_VERSION` bajo el H1; el historial completo, en `references/changelog.md`.
 
@@ -196,6 +338,7 @@ comentario `GAE_VERSION` bajo el H1; el historial completo, en `references/chang
 - `references/13-auto-check.md` — **auto-check de cierre** (imposible entregar sin lo esencial).
 - `references/14-fase-aprendizaje.md` — **higiene de la fase de aprendizaje**: controlar gasto con topes, NO con apagados (evita reinicios que encarecen).
 - `references/15-creativos-produccion.md` — **producción de creativos + copys**: pedir/analizar media → copys; generar media (o prompts) si no hay; emparejar y montar.
+- `references/25-cuenta-sin-creativos.md` — 🔴 **cuenta publicitaria SIN creativos, o media que llega por el chat**: medir la biblioteca, **subirla** (3 vías, con el tope del archivo local), **analizar el video antes de redactar** (verlo Y escucharlo), copys pegados a ESE video, **prueba de coherencia de 6 puntos** y verificación con `ads_get_ad_preview`. Trae los topes medidos del MCP (CTWA, `asset_feed_spec`, UTM).
 - `references/16-segmentacion.md` — **segmentación**: desde cero (recomendada) vs desde histórico (quién compra: sexo/edad/ubicación/plataforma por breakdowns + LAL).
 - `references/17-entrega.md` — **modos de entrega**: con MCP (montar en pausa) vs sin MCP (**informe full** copia-pega-able).
 - `references/18-columnas-ads-manager.md` — **columnas en orden de embudo** (venta web / landing-video / WhatsApp-Chatea PRO); preset para guardar + campos MCP.
@@ -203,6 +346,10 @@ comentario `GAE_VERSION` bajo el H1; el historial completo, en `references/chang
 - `references/20-seguimiento.md` — **seguimiento post-lanzamiento**: calendario día 0/1/2-3/4-7/semanal, cuándo tocar y cuándo NO, escalado sin romper aprendizaje, rutina MCP.
 - `references/21-audiencia-momento-humanidad.md` — **audiencia real, comportamiento POR RED SOCIAL, MOMENTO/estacionalidad, mensaje humano por etapa, sondeo de marca 1–10 y de PRODUCTO, fidelización/LTV** (la capa que los números no dan).
 - `references/22-patrones-y-lectura-de-datos.md` — **cómo se lee un patrón**: 4 marcos de comparación, tendencia vs ruido, ciclos (semanal/quincena/estacional/fatiga), correlación ≠ causa, patrones que siempre se buscan.
+- `references/24-utm-atribucion.md` — **UTM y atribución (REGLA 18)**: esquema oficial con macros, el id va en `utm_id` (no en `utm_content`), el MCP no pone UTM al crear, CTWA vs landing, cómo verificar y quién lo consume aguas abajo.
+- `references/28-objetivos-de-campana.md` — **los 3 objetivos de Golden** (tráfico · interacción · venta) con su enum ODAX, optimización, evento, destino, KPI y cuándo se elige cada uno.
+- `references/27-conectar-mcp-meta.md` — **cómo conectar el MCP oficial de Meta** (URL, comando de Claude Code, permisos, verificación) + 🔒 **candado de presupuesto** por cuenta en Business Suite. Todo verificado contra la documentación de Meta.
+- `references/26-intake-montar-campana.md` — **portero del pedido "crea una campaña de X con presupuesto Y"**: los 3 campos que se preguntan si faltan, la compuerta del presupuesto, y el orden que enlaza investigación → creativo → 15 copys → montaje → UTM → verificación.
 - `references/referencia-externa-ctwa-cod-panama.md` — **referencia EXTERNA opcional (no es doctrina)**: benchmarks CTWA/COD de terceros, estructura "1 CBO" para SOSTENER un ganador, segmentación en mercados pequeños. Leerla con su propia advertencia: no releva de ninguna regla dura.
 - `references/EJEMPLO-diagnostico.md` — **diagnóstico modelo** (caso real anonimizado) = estándar de entrega.
 - `references/PRESET-columnas-golden-09.2025.md` — preset original de columnas del usuario (09.2025), absorbido en `19-golden-pro-preset.md`.

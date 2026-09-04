@@ -1,27 +1,25 @@
 ---
 name: golden-agenda-citas
 description: >-
-  Golden Group — Agendamiento automático de CITAS para negocios de servicios
-  (consultorios odontológicos, estética, clínicas, salones, asesorías, spas,
-  entrenadores). Toma una solicitud de cita, consulta la disponibilidad real
-  en Google Calendar, propone horarios libres, agenda el evento, lo confirma
-  y prepara el recordatorio. Pensado para ofrecerse como SERVICIO a empresas
-  y para gestionar la agenda propia (asesorías Golden, VIP, mentorías).
-  Úsala SIEMPRE que el usuario quiera: agendar una cita, gestionar la agenda
-  de un negocio, montar un sistema de reservas, "agéndame con", "qué horarios
-  hay libres", "reserva para el paciente/cliente", confirmar, mover o
-  cancelar citas, avisar de un choque de horario, o configurar el
-  agendamiento de un consultorio/negocio. Se apoya en el MCP de Google
-  Calendar (list_calendars, list_events, suggest_time, create_event,
-  update_event, delete_event, get_event) — si esas tools no responden, la
-  skill lo declara en vez de inventar disponibilidad.
-  NO usar para: automatizar el cruce entre varias apps (Shopify/Dropi/Sheets)
-  o webhooks — eso es golden-automatizacion; montar el bot de WhatsApp que
-  recibe la solicitud del paciente antes de que llegue aquí — eso es la
-  familia golden-chatea-pro-*; cobrar el setup/mensualidad del servicio —
-  eso es golden-cobros / golden-finanzas.
+  Golden Group — Agendamiento automático de CITAS para negocios de servicios (consultorios
+  odontológicos, estética, clínicas, salones, asesorías, spas, entrenadores). Toma una
+  solicitud de cita, consulta la disponibilidad real en Google Calendar, propone horarios
+  libres, agenda el evento, lo confirma y prepara el recordatorio. Pensado para ofrecerse
+  como SERVICIO a empresas y para gestionar la agenda propia (asesorías Golden, VIP,
+  mentorías). Úsala SIEMPRE que el usuario quiera: agendar una cita, gestionar la agenda de
+  un negocio, montar un sistema de reservas, "agéndame con", "qué horarios hay libres",
+  "reserva para el paciente/cliente", confirmar, mover o cancelar citas, avisar de un choque
+  de horario, o configurar el agendamiento de un consultorio/negocio. Se apoya en el MCP de
+  Google Calendar (list_calendars, list_events, suggest_time, create_event, update_event,
+  delete_event, get_event) — si esas tools no responden, la skill lo declara en vez de
+  inventar disponibilidad.
 ---
-
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 987 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # Golden Group — Agenda de Citas
 
 <!-- skill v1.2 · 2026-08-23 · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
@@ -128,3 +126,7 @@ su celular es 300-000-0000."
 ## Vender esto como servicio
 
 Modelo: cobrar setup + mensualidad por gestionar la agenda del consultorio (recepcionista IA) — la propuesta comercial y el precio los arma **golden-finanzas**, y el cobro recurrente **golden-cobros**. Combínalo con un bot de WhatsApp para que el paciente agende solo: el flujo conversacional lo monta la familia **golden-chatea-pro-***, y si hace falta cruzar esto con otras apps (Sheets, CRM, notificaciones) eso es **golden-automatizacion**. Ofrece al usuario armar ese embudo completo cuando lo pida — esta skill solo pone el calendario a funcionar, no reemplaza a esas skills hermanas.
+
+## Fronteras y desambiguacion
+
+NO usar para: automatizar el cruce entre varias apps (Shopify/Dropi/Sheets) o webhooks — eso es golden-automatizacion; montar el bot de WhatsApp que recibe la solicitud del paciente antes de que llegue aquí — eso es la familia golden-chatea-pro-*; cobrar el setup/mensualidad del servicio — eso es golden-cobros / golden-finanzas.

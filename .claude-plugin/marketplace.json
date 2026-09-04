@@ -61,7 +61,7 @@
       "name": "golden-ads",
       "source": "./golden-ads",
       "description": "Centro de comando de pauta en Meta, TikTok y Google, con o sin métricas.",
-      "version": "5.6.0",
+      "version": "5.7.0",
       "category": "marketing"
     },
     {
@@ -173,7 +173,7 @@
       "name": "golden-pdf-check",
       "source": "./golden-pdf-check",
       "description": "El estándar de PDF de la comunidad: marca, márgenes y bloques que no se parten.",
-      "version": "6.0.0",
+      "version": "6.1.0",
       "category": "education"
     },
     {
@@ -187,7 +187,7 @@
       "name": "golden-shopify",
       "source": "./golden-shopify",
       "description": "Construye páginas de producto Shopify de alta conversión para contra entrega.",
-      "version": "4.17.0",
+      "version": "4.19.0",
       "category": "ecommerce"
     },
     {
@@ -229,7 +229,7 @@
       "name": "golden360",
       "source": "./golden360",
       "description": "La ruta completa: de una foto a vender. Investiga, monta la página, la pauta y el bot, con compuertas de calidad en cada paso.",
-      "version": "1.9.0",
+      "version": "2.0.0",
       "category": "research"
     },
     {

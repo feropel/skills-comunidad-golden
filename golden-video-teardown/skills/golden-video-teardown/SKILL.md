@@ -1,8 +1,24 @@
 ---
 name: golden-video-teardown
-description: Golden Group — TEARDOWN exhaustivo de videos publicitarios (ads, reels, TikTok, UGC, VSL). Desarma un video de cero a cien, segundo por segundo: transcribe el texto en pantalla y la locución, mapea el beat sheet completo (gancho, educación, demo, oferta, CTA), diagnostica el ángulo/enfoque, el hook, el copy y la oferta, marca fortalezas, debilidades y riesgos de baneo, y entrega una FÓRMULA replicable + brief para producir videos nuevos. Úsala SIEMPRE que el usuario quiera analizar, desglosar, "destripar" o entender un video de anuncio a fondo, saber qué dice/cómo está hecho, por qué funciona o no, qué copy usar, o extraer la fórmula para replicarlo — o diga cosas como "analiza este video", "desglosa este ad", "qué dice este video segundo a segundo", "hazme el teardown", "por qué funciona este creativo", "sácame la fórmula de este video", "analiza mis videos para replicarlos". Funciona para cualquier producto, nicho y país. Frontera: el RENDIMIENTO en números (CPA/ROAS/qué pausar) lo da golden-meta-ads-analysis; la PRODUCCIÓN del video nuevo la hacen golden-ugc-avatar (video) y golden-ads + golden-copywriting (hooks/copys). Acepta uno o varios archivos locales (.mov/.mp4/.webm) por ruta, y URLs de YouTube/TikTok/Instagram/Facebook para descargar antes de analizar (ver Paso 0).
+description: >-
+  Golden Group — TEARDOWN exhaustivo de videos publicitarios (ads, reels, TikTok, UGC, VSL).
+  Desarma un video de cero a cien, segundo por segundo: transcribe el texto en pantalla y la
+  locución, mapea el beat sheet completo (gancho, educación, demo, oferta, CTA), diagnostica
+  el ángulo/enfoque, el hook, el copy y la oferta, marca fortalezas, debilidades y riesgos
+  de baneo, y entrega una FÓRMULA replicable + brief para producir videos nuevos. Úsala
+  SIEMPRE que el usuario quiera analizar, desglosar, "destripar" o entender un video de
+  anuncio a fondo, saber qué dice/cómo está hecho, por qué funciona o no, qué copy usar, o
+  extraer la fórmula para replicarlo — o diga cosas como "analiza este video", "desglosa
+  este ad", "qué dice este video segundo a segundo", "hazme el teardown", "por qué funciona
+  este creativo", "sácame la fórmula de este video", "analiza mis videos para replicarlos".
+  Funciona para cualquier producto, nicho y país.
 ---
-
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (1) FRONTMATTER YAML INVALIDO, arreglado: la description estaba escrita como escalar PLANO en una linea y su texto contenia 'dos puntos + espacio', que YAML lee como una clave nueva. Un parser estricto NO podia leer esta skill. Pasa a bloque '>-', que es inmune. No se cambio una sola palabra: cambio la FORMA de escribirla · (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 937 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # Golden Group — Teardown de videos publicitarios
 
 <!-- skill v1.5 · 2026-08-23 (centro de mando) · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
@@ -168,3 +184,7 @@ Guarda el teardown completo como documento markdown en la carpeta del producto/p
 ## Recursos
 - `scripts/extract_frames.sh` — extrae hook strip + filmstrip denso de un video.
 - `references/plantilla-teardown.md` — plantilla estándar del teardown por video + síntesis.
+
+## Fronteras y desambiguacion
+
+Frontera: el RENDIMIENTO en números (CPA/ROAS/qué pausar) lo da golden-meta-ads-analysis; la PRODUCCIÓN del video nuevo la hacen golden-ugc-avatar (video) y golden-ads + golden-copywriting (hooks/copys). Acepta uno o varios archivos locales (.mov/.mp4/.webm) por ruta, y URLs de YouTube/TikTok/Instagram/Facebook para descargar antes de analizar (ver Paso 0).

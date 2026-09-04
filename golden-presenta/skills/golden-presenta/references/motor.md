@@ -202,6 +202,77 @@ El check nuevo de "restos de sustitución" marcaba `_CANVAS` y `_VISIBLE`, que s
 **Clase del fallo:** el auditor lee código como si fuera prosa. Hermano del fallo del
 comentario HTML de GP1.0.
 
+### 10 · El deep-link no reaccionaba al cambiar el hash sin recargar
+
+En carga nueva `deck.html#3` **siempre funcionó**. Lo que no: cambiar el hash con el deck
+ya abierto. Medido el 2026-09-03: de `#6` a `#8` el deck se quedaba en la lámina 6 con el
+contador en 06. Pasa cuando alguien te pasa un enlace a una lámina concreta y ya tienes el
+deck abierto, o cuando se escribe el hash a mano en la barra.
+**Arreglo:** un listener de `hashchange`.
+**Clase del fallo:** leer un estado de la URL solo al arrancar, cuando ese estado puede
+cambiar durante la vida de la página. Es hermano del fallo 5 (el modo, que se decidía una
+vez y no se recuperaba al cambiar el tamaño de ventana).
+
+**Y una trampa de medición que casi me lo esconde:** `python3 -m http.server` no manda
+cabeceras de no-caché, así que tras arreglarlo el navegador seguía sirviendo el archivo
+viejo y parecía que el arreglo no funcionaba. Se comprueba con
+`document.documentElement.outerHTML.indexOf('hashchange')` antes de concluir nada, y se
+fuerza con `?v=2` en la URL. **Si un arreglo "no funciona" al primer intento, comprobar
+primero que el navegador está ejecutando el archivo nuevo.**
+
+### 11 · Una variable de bucle pisó el documento entero
+
+El check nuevo de "clases CSS huérfanas" no cazaba nada. La causa no estaba en el check:
+el bucle que mide densidad de texto usaba `cuerpo` como variable de iteración, y **pisaba
+la variable `cuerpo` que guarda el documento completo**. Todo check colocado DESPUÉS de ese
+bucle recibía solo la última lámina. Medido: 300 caracteres y 3 clases, en vez de 1,2 MB
+y 43 clases.
+**Arreglo:** la variable del bucle pasa a llamarse `cuerpo_lamina`.
+**Clase del fallo:** variable de bucle que sombrea una de ámbito mayor. En Python el bucle
+no crea ámbito propio, así que la pisa de verdad. Y el síntoma es silencioso: el check corre,
+no da error, y devuelve verde sobre un dato equivocado.
+**Cómo se cazó:** imprimiendo `len()` y `repr()` de la variable dentro del flujo real, en
+vez de razonar sobre el código. Aislado el fragmento funcionaba; dentro de la función, no.
+
+### 12 · Dos regalos del chat del Cartel, hechos motor
+
+Los dos salieron de fallos suyos que **pasaron 30 de 30 estando rotos**:
+
+- **CSS que no llega a entrar.** Inyectó estilos con un `replace` cuyo ancla ya no existía:
+  el HTML tenía las clases, el CSS ni una regla, y en pantalla salió texto a 16px sin estilo.
+  Ahora hay un check que marca toda clase usada sin ninguna regla que la nombre. Es
+  baratísimo y caza una familia entera de fallos silenciosos.
+- **Numeración a mano que se descuadra.** Sus pasos salieron 00, 01, 03, 04, 05, 06, 08 de
+  mover láminas de sitio. **Ahora numera el motor**: si un eyebrow empieza por `(NN)`, se
+  reescribe según la posición real. Si el motor lo ofrece, nadie tiene que acordarse.
+
+Y un aviso suyo confirmado midiendo: el logo de portada se pintaba en una caja de ratio 3,33
+cuando el logo es 1,17, porque **la lámina es un contenedor flex en columna y lo comprimía**.
+`object-fit` salvaba la imagen de deformarse, pero dejaba un hueco enorme al lado. Arreglado
+con `flex-shrink:0`.
+
+### 13 · Cómo verificar el FONDO, y por qué dos chats midieron lo contrario
+
+Quedó una discrepancia entre chats: uno afirmó que el Browser pane reporta
+`document.hidden: true` siempre, y que por eso el motor pausa y el canvas sale negro.
+Otro midió que el canvas SÍ animaba. **Las dos mediciones eran correctas, en contextos
+distintos**, y esto lo zanja:
+
+| Herramienta | `document.hidden` | Canvas | Sirve para verificar el fondo |
+|---|---|---|---|
+| Browser pane (`mcp__Claude_Browser__*`) | **true** | queda en 300x150, sin dimensionar | **No** |
+| Playwright (`mcp__playwright__*`) | **false** | dimensionado y animando | **Sí** |
+
+Medido el 2026-09-03 en el mismo deck: pane `hidden:true` con canvas 300x150; Playwright
+`hidden:false` con canvas 1800x1107.
+
+**No es un fallo del motor: es el motor haciendo lo correcto.** Se pausa con la pestaña
+oculta para no quemar batería. Lo que falla es medir el fondo desde una herramienta que
+la mantiene oculta.
+
+**Regla:** el fondo vivo se verifica con Playwright, con viewport explícito. El pane sirve
+para leer el DOM y el texto, no para juzgar la atmósfera.
+
 Moraleja que vale para cualquier skill: **si tu script dice que todo está bien a la primera,
 sospecha del script.** Este dijo 26 de 26 mientras el deck tenía cinco defectos de render, y
 más tarde 29 de 29 con un titular roto en pantalla.

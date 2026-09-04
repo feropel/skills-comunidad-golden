@@ -5,7 +5,7 @@ Empieza SIEMPRE aquí. El motor mueve la cámara; esta referencia decide qué se
 ## Índice
 1. La regla del esquema
 2. Frameworks por tipo de encargo
-3. Los 8 tipos de lámina y cuándo usar cada uno
+3. Los 11 tipos de lámina: 8 de texto y 3 visuales
 4. Densidad: cuánto texto cabe de verdad
 5. Errores de estructura que se repiten
 
@@ -70,7 +70,7 @@ tarjetas(los 3 aprendizajes) · proceso(qué se hace el mes que viene) · cierre
 ```
 Un reporte que no termina pidiendo una decisión es un informe, no una presentación.
 
-## 3 · Los 8 tipos de lámina
+## 3 · Los 11 tipos de lámina
 
 | Tipo | Clase CSS | Para qué sirve | Cuándo NO usarlo |
 |---|---|---|---|
@@ -82,6 +82,30 @@ Un reporte que no termina pidiendo una decisión es un informe, no una presentac
 | Proceso | `t-proceso` | 3 a 5 pasos en secuencia | Si los pasos no son secuenciales, son tarjetas |
 | Cita | `t-cita` | Prueba social verificable | **Jamás una cita inventada.** Sin fuente real, se borra la lámina |
 | Cierre | `t-cierre` | Un solo paso siguiente | Si ofreces dos opciones, no ofreciste ninguna |
+
+### Los 3 tipos VISUALES
+
+Añadidos el 2026-09-03 tras un fallo medido: un deck de 18 láminas salió con **cero `<img>`
+y cero `<svg>`**, y el veredicto fue "puro texto, muy plana". La causa raíz no era el autor:
+**los 8 tipos de arriba son todos de texto**, así que se construyó exactamente lo que había.
+Un deck de marca sin una sola imagen se lee como un documento proyectado.
+
+| Tipo | Clase CSS | Para qué sirve | Cuándo NO usarlo |
+|---|---|---|---|
+| Visual | `t-visual` | Imagen o diagrama al lado del texto. **El caballo de batalla** | Si la imagen no aporta, es relleno |
+| Galería | `t-galeria` | Rejilla de logos, capturas o resultados (`.g2` `.g3` `.g4`) | Con menos de 4 piezas: usa `t-visual` |
+| Pantalla | `t-pantalla` | Una captura grande con marco de ventana | Si hay que señalar 5 cosas en ella: pártela |
+
+`t-visual` acepta `img-izq` para invertir el lado: `class="slide t-visual img-izq"`.
+Alternar el lado entre láminas evita el ritmo de plantilla.
+
+**Regla de proporción:** en un deck de marca, **al menos 1 de cada 4 láminas lleva algo que
+no sea texto.** Logo, captura, diagrama o gráfico. Si el deck entero es tipografía, o es una
+charla de keynote muy deliberada, o está plano.
+
+**Todo recurso va incrustado como data URI**, nunca como ruta:
+`scripts/incrustar_recurso.py imagen /ruta/logo.png`. El deck es un archivo y tiene que
+abrir sin red.
 
 ### Criterios que no se negocian
 

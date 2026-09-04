@@ -1,23 +1,25 @@
 ---
 name: golden-chatea-operacion
-description: |
-  Golden Group — OPERACIÓN DIARIA DE UN ESPACIO DE CHATEA PRO. Barre las conversaciones de ayer
-  (o la ventana que se pida), reconstruye cada hilo con `include_bot=1` y clasifica: quién habló
-  de último, en qué paso del embudo murió, si el bot respondió tarde o incoherente, qué preguntó
-  el cliente que el prompt no cubre, y por cuál anuncio llegó. Entrega COBERTURA medida (N de N
-  del día), con "la empresa se fue de último" primero.
-  Úsala SIEMPRE que el usuario quiera saber qué pasó ayer con el bot: "cómo le fue al bot hoy",
-  "qué chats se quedaron sin contestar", "quién habló de último", "qué preguntas no supo
-  responder el bot", "el bot está diciendo cosas raras", "audita las conversaciones de ayer",
-  "revisa el desempeño del asistente", "por cuál anuncio están llegando", "el bot mencionó pago
-  anticipado cuando no debía", o pida la corrida diaria centrada en LO QUE DIJO EL BOT.
-  Aplica a cualquier workspace y a los 10 países. Solo lee: no escribe en Chatea.
-  FRONTERAS: el PEDIDO (qué se despacha, qué se frena, direcciones, duplicados) =
-  golden-logistica-diaria, y lo que aparezca de eso se le pasa en una línea; la INSTALACIÓN
-  (campos, disparadores, topes, interruptores) = golden-chatea-auditoria. Esta mira el DÍA: si
-  FUNCIONÓ de verdad, con la evidencia de lo que el bot escribió.
+description: >-
+  Golden Group — OPERACIÓN DIARIA DE UN ESPACIO DE CHATEA PRO. Barre las conversaciones de
+  ayer (o la ventana que se pida), reconstruye cada hilo con `include_bot=1` y clasifica:
+  quién habló de último, en qué paso del embudo murió, si el bot respondió tarde o
+  incoherente, qué preguntó el cliente que el prompt no cubre, y por cuál anuncio llegó.
+  Entrega COBERTURA medida (N de N del día), con "la empresa se fue de último" primero.
+  Úsala SIEMPRE que el usuario quiera saber qué pasó ayer con el bot: "cómo le fue al bot
+  hoy", "qué chats se quedaron sin contestar", "quién habló de último", "qué preguntas no
+  supo responder el bot", "el bot está diciendo cosas raras", "audita las conversaciones de
+  ayer", "revisa el desempeño del asistente", "por cuál anuncio están llegando", "el bot
+  mencionó pago anticipado cuando no debía", o pida la corrida diaria centrada en LO QUE
+  DIJO EL BOT. Aplica a cualquier workspace y a los 10 países. Solo lee: no escribe en
+  Chatea.
 ---
-
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 963 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare · (4) Esta skill estaba SIN BLINDAR: se le puso 'uchg' y se comprobo que el candado muerde. Para editarla: chflags -R nouchg <ruta>, y al cerrar chflags -R uchg.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # golden-chatea-operacion · qué pasó ayer con el bot
 
 <!-- corrección CdM 2026-08-29 · CAMBIO DE ESTÁNDAR países: la plataforma acepta 10, no 7 (doble medición contra el bundle vivo index-BrZVg7KW.js, sha256 2c947877…; deroga 'solo 7' y 'Guatemala fuera de plataforma'; detalle en la gaceta). Menciones del conteo viejo actualizadas a 10; el resto intacto. -->
@@ -425,3 +427,8 @@ contra otro mensaje del mismo hilo. `R6` es la versión que funciona sin esa int
 Cuando esta skill y `golden-chatea-auditoria` estén sanas y probadas, se monta
 `golden-chatea-360`, que corre las dos y entrega la cadena causa-efecto (una falla de
 instalación explicando una pérdida del día). Ese orquestador se construye **después**, no antes.
+
+## Fronteras y desambiguacion
+
+FRONTERAS: el PEDIDO (qué se despacha, qué se frena, direcciones, duplicados) = golden-logistica-diaria, y lo que aparezca de eso se le pasa en una línea; la INSTALACIÓN (campos, disparadores, topes, interruptores) = golden-chatea-auditoria. Esta mira el DÍA: si FUNCIONÓ de verdad, con la evidencia de lo que el bot escribió.
+x

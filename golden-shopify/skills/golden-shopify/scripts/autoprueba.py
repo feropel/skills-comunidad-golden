@@ -27,7 +27,7 @@ USO   python3 autoprueba.py            (usa ../assets/product.base.json)
       python3 autoprueba.py <base.json>
 SALIDA 0 = todas pasan · 1 = alguna falla
 """
-import json, os, re, shutil, sys, tempfile
+import json, os, re, shutil, subprocess, sys, tempfile
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, AQUI)
@@ -236,6 +236,31 @@ def pruebas_de_sellos():
     return casos
 
 
+def prueba_spec_oficial():
+    """La skill se valida A SI MISMA contra la spec de publicacion.
+
+    HUECO QUE CIERRA (medido 2026-09-02): esta skill validaba a fondo el product.json que
+    PRODUCE, pero no se validaba a si misma como artefacto publicable — y se publica al
+    marketplace de la comunidad. La `description` llevaba `product.<tema>.json` y la spec
+    prohibe los angulares; lo caza el validador OFICIAL que trae skill-creator, que ninguna
+    de nuestras herramientas corria. Un validador propio muy pulido no sustituye al de la
+    plataforma que publica.
+
+    BLOQUEA si el validador existe y falla (el fallo es NUESTRO, esta en nuestro SKILL.md).
+    AVISA si no se encuentra: vive fuera de nuestro arbol, lo mantiene otro, y no podemos
+    romper la corrida por algo que no controlamos (refinacion 2 de la ley).
+    """
+    cand = [os.path.expanduser("~/.claude/skills/skill-creator/scripts/quick_validate.py")]
+    v = next((c for c in cand if os.path.exists(c)), None)
+    skill = os.path.normpath(os.path.join(AQUI, ".."))
+    if not v:
+        return [("spec oficial: validador no encontrado (AVISO, vive fuera del arbol)", True,
+                 "no bloquea: no lo mantenemos nosotros")]
+    r = subprocess.run([sys.executable, v, skill], capture_output=True, text=True)
+    salida = (r.stdout + r.stderr).strip()
+    return [(f"spec oficial de publicacion ({os.path.basename(v)})", r.returncode == 0, salida)]
+
+
 def main():
     ruta = sys.argv[1] if len(sys.argv) > 1 else base_por_defecto()
     if not os.path.exists(ruta):
@@ -293,6 +318,16 @@ def main():
                 ok += 1
         finally:
             os.unlink(tmp)
+
+    # LA SKILL CONTRA LA SPEC OFICIAL DE PUBLICACION
+    print()
+    for nombre, paso, detalle in prueba_spec_oficial():
+        if paso:
+            print(f"✅ {nombre}")
+            ok += 1
+        else:
+            print(f"❌ {nombre}\n     {detalle}")
+            fail += 1
 
     # PRUEBAS DE sellos.py (el otro validador de la skill)
     print()

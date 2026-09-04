@@ -1,24 +1,23 @@
 ---
 name: golden-video-editor
 description: >-
-  Golden Group — EDITOR DE VIDEO AUTOMÁTICO. Toma una grabación cruda (celular,
-  cámara, pantalla) y la deja como anuncio o reel terminado: transcribe, corta
-  silencios/muletillas/tomas repetidas, pone subtítulos sincronizados palabra por
-  palabra, mete visuales (imágenes IA, animaciones, mockups, texto grande),
-  efectos de sonido y música, y renderiza el video final. Motor: HyperFrames
-  (gratis, local). Transcripción: Whisper LOCAL sin API key.
-  Úsala SIEMPRE que el usuario quiera: editar un video, "córtame este video",
-  "quítale los silencios", "ponle subtítulos", "edítame este reel", "hazme el
-  anuncio con este video", "límpiame esta grabación", "replica este estilo de
-  edición", o cuando arrastre un archivo de video pidiendo que lo deje listo para
-  publicar. Dispara aunque no diga "editar": basta con una grabación cruda que
-  haya que dejar publicable.
-  NO usar para: analizar un anuncio ajeno y sacarle la fórmula (eso es
-  golden-video-teardown), generar un avatar/UGC hablando desde cero
-  (golden-ugc-avatar), escribir el guion (golden-copywriting / golden-matriz-viral),
-  ni para imágenes de producto sueltas (golden-imagen-arena).
+  Golden Group — EDITOR DE VIDEO AUTOMÁTICO. Toma una grabación cruda (celular, cámara,
+  pantalla) y la deja como anuncio o reel terminado: transcribe, corta
+  silencios/muletillas/tomas repetidas, pone subtítulos sincronizados palabra por palabra,
+  mete visuales (imágenes IA, animaciones, mockups, texto grande), efectos de sonido y
+  música, y renderiza el video final. Motor: HyperFrames (gratis, local). Transcripción:
+  Whisper LOCAL sin API key. Úsala SIEMPRE que el usuario quiera: editar un video, "córtame
+  este video", "quítale los silencios", "ponle subtítulos", "edítame este reel", "hazme el
+  anuncio con este video", "límpiame esta grabación", "replica este estilo de edición", o
+  cuando arrastre un archivo de video pidiendo que lo deje listo para publicar. Dispara
+  aunque no diga "editar": basta con una grabación cruda que haya que dejar publicable.
 ---
-
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 854 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # Golden Video Editor — de grabación cruda a anuncio publicable
 <!-- skill GVE1.9 · 2026-08-31 (CdM) · compuerta de la congelacion de Higgsfield (estandar de FER 30-ago repartido por el CdM): tecnica 2 remite el movimiento a HyperFrames (0 creditos), video de Higgsfield CONGELADO, costo-antes para imagenes. Reversible al levantar la congelacion. -->
 <!-- skill GVE1.8 · 2026-08-31 (CdM, fila del FILTRO) · SEGUNDA COSECHA de la MISMA fuente externa:
@@ -304,3 +303,7 @@ identidad Golden, nunca con la marca ajena (regla de referencias).
   conserva: transcript **sucio con timestamps** como base del corte, variar la técnica de
   visual en cada mención, replicar estilo desde capturas, y empaquetar el estilo final en
   una skill hija.
+
+## Fronteras y desambiguacion
+
+NO usar para: analizar un anuncio ajeno y sacarle la fórmula (eso es golden-video-teardown), generar un avatar/UGC hablando desde cero (golden-ugc-avatar), escribir el guion (golden-copywriting / golden-matriz-viral), ni para imágenes de producto sueltas (golden-imagen-arena).

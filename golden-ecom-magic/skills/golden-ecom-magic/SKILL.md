@@ -1,23 +1,24 @@
 ---
 name: golden-ecom-magic
-description: >
+description: >-
   Golden Group — Fábrica de IMÁGENES de alta conversión con Ecom Magic AI, 100% AUTOMÁTICA
-  por su MCP oficial (sin navegador): genera creativos/infografías con la FOTO REAL del
-  producto + texto de venta compuesto (no redibuja el producto), en el formato que se
-  necesite (carrusel 1080×1080, secciones 1080×1350, stories, 16:9), los descarga y
-  optimiza a WebP <150 KB y los entrega para que otra skill los implemente (golden-shopify
-  para la página, golden-ads para pauta). La foto entra por URL pública (ej. CDN de
-  Shopify), así que el usuario no sube ni arrastra nada. Yo elijo las plantillas, escribo
-  el texto que va DENTRO de cada imagen, superviso pieza por pieza y aprovecho todo el
-  motor (editar, redimensionar, traducir, mockups, reembolso si sale mala). Úsala SIEMPRE
-  que el usuario quiera: generar imágenes/infografías de producto, "haz las imágenes del
+  por su MCP oficial y sin navegador: genera creativos e infografías con la FOTO REAL del
+  producto más texto de venta compuesto (no redibuja el producto), en el formato que se
+  necesite (carrusel 1080x1080, secciones 1080x1350, stories, 16:9), los descarga, los
+  optimiza a WebP menor a 150 KB y los entrega para que otra skill los implemente. La foto
+  entra por URL pública, así que el usuario no sube ni arrastra nada. Elige plantillas,
+  escribe el texto que va DENTRO de cada imagen y supervisa pieza por pieza. Úsala SIEMPRE
+  que el usuario quiera: generar imágenes o infografías de producto, "haz las imágenes del
   producto", "genérame el carrusel", "las infografías de la página", "las imágenes de
   secciones", "creativos para la ficha", o producir el paquete visual de un producto para
-  Shopify. Dispara aunque no digan "Ecom Magic": basta con "imágenes/infografías de
-  producto de alta conversión para la ficha o el carrusel". NO usar para avatares/UGC ni
-  video (eso es golden-ugc-avatar), ni para armar la página en sí (eso es golden-shopify).
+  Shopify.
 ---
-
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 881 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # golden-ecom-magic — Fábrica de imágenes con Ecom Magic AI
 
 <!-- skill v2.3 · 2026-08-23 (cierre del ciclo con el Centro de Mando): la "ley de migración de vía" que nació de la v2.2 quedó canonizada en la gaceta y su barrido pescó la MISMA afirmación-veneno viva fuera de esta skill (golden-imagen-arena/references/motores.md decía "Ecom Magic no tiene API ni MCP"). Aprendizaje horneado aquí: el barrido de negaciones se hace también en las HERMANAS que citan a la skill migrada, no solo adentro -->
@@ -310,3 +311,10 @@ Grep sugerido: `grep -rniE "no tiene (api|mcp)|no hay atajo" ~/.claude/skills`.
 - `references/ui-navegacion.md` — **Fallback.** Mapa de pantallas y trampas de la UI web, para
   cuando el MCP no esté disponible.
 - `scripts/optimizar-webp.py` — Descarga (URL o archivo) → WebP < 150 KB en el tamaño pedido.
+
+## Fronteras y desambiguacion
+
+Descripcion completa anterior (se conserva para no perder ningun matiz de frontera):
+
+> Golden Group — Fábrica de IMÁGENES de alta conversión con Ecom Magic AI, 100% AUTOMÁTICA por su MCP oficial (sin navegador): genera creativos/infografías con la FOTO REAL del producto + texto de venta compuesto (no redibuja el producto), en el formato que se necesite (carrusel 1080×1080, secciones 1080×1350, stories, 16:9), los descarga y optimiza a WebP <150 KB y los entrega para que otra skill los implemente (golden-shopify para la página, golden-ads para pauta). La foto entra por URL pública (ej. CDN de Shopify), así que el usuario no sube ni arrastra nada. Yo elijo las plantillas, escribo el texto que va DENTRO de cada imagen, superviso pieza por pieza y aprovecho todo el motor (editar, redimensionar, traducir, mockups, reembolso si sale mala). Úsala SIEMPRE que el usuario quiera: generar imágenes/infografías de producto, "haz las imágenes del producto", "genérame el carrusel", "las infografías de la página", "las imágenes de secciones", "creativos para la ficha", o producir el paquete visual de un producto para Shopify. Dispara aunque no digan "Ecom Magic": basta con "imágenes/infografías de producto de alta conversión para la ficha o el carrusel". NO usar para avatares/UGC ni video (eso es golden-ugc-avatar), ni para armar la página en sí (eso es golden-shopify).
+

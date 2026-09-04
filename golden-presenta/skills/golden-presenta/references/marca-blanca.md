@@ -26,7 +26,59 @@ comunidad y a la marca personal de FER sin reescribir una línea del motor.
 }
 ```
 
-Ocho valores. Nada más se toca para cambiar de marca.
+## LA LISTA COMPLETA · se sustituyen TODOS, no los obvios
+
+Este es el fallo medido el 2026-09-03: un deck del Cartel del Chat salió con el acento
+correcto pero **chasis gris ajeno**, porque solo se cambiaron 4 tokens y quedaron de fábrica
+`--surface`, `--muted`, `--line` y `--curtain` (que seguía amarillo Golden). Y la tipografía
+se quedó en Georgia serif, que es lo contrario de lo que pedía la marca.
+
+**Checklist. Si uno se queda de fábrica, el deck lleva marca ajena.**
+
+| Token | Qué pinta | Se olvida a menudo |
+|---|---|---|
+| `--bg` | Fondo del lienzo, detrás de todo | |
+| `--surface` | **Fondo de cada lámina** | 🔴 sí, y es media pantalla |
+| `--ink` | Texto principal | |
+| `--muted` | **Texto secundario, etiquetas, pies** | 🔴 sí |
+| `--accent` | Cifras, viñetas, CTA, tiñe la atmósfera | |
+| `--accent-2` | Acento secundario, tiñe la atmósfera | 🔴 sí |
+| `--line` | **Bordes, retícula, separadores** | 🔴 sí |
+| `--curtain` | Barra del preloader | 🔴 sí, se queda amarillo Golden |
+| `--font-display` | **Titulares** | 🔴 sí, se queda en Georgia |
+| `--font-body` | Cuerpo de texto | |
+| `--font-mono` | Microtipografía, contadores, etiquetas | |
+| `--vidrio` | Opacidad de la lámina sobre el fondo (72% por defecto) | |
+| `--logo-alto` / `--logo-alto-portada` | Tamaño del logo | |
+
+Comprobación de un vistazo, antes de dar por buena la marca:
+
+```bash
+grep -E "^\s+--(bg|surface|ink|muted|accent|accent-2|line|curtain|font-display):" deck.html
+```
+
+Si alguno sigue con el valor de la tabla de abajo (`#10131A`, `#8B93A7`, `#232833`,
+`#FFC637`, `Georgia`), **no se cambió**.
+
+## El logo, que no es opcional en un deck de marca
+
+Un deck de cliente sin su logo se lee como plantilla. Va en dos sitios:
+
+1. **Portada**, encima del título: `<img class="marca-logo" src="DATA_URI" alt="Marca">`
+2. **HUD**, sustituyendo al nombre escrito: descomentar el `<img class="marca-logo">` del
+   HUD y añadir la clase `con-logo` al `<div id="hud">`
+
+El logo va **incrustado como data URI**, nunca como ruta a un archivo: el deck es UN archivo
+y tiene que abrir desde WhatsApp o un USB.
+
+```bash
+python3 ~/.claude/skills/golden-presenta/scripts/incrustar_recurso.py imagen /ruta/logo.png
+```
+
+Si el logo es SVG, mejor pegarlo **inline** dentro de `<figure class="marco limpio">`: pesa
+menos y puede heredar el color del deck con `fill="currentColor"`.
+
+Ocho valores de color. Nada más se toca para cambiar de marca, pero **se tocan los ocho**.
 
 **Verificación obligatoria:** el script calcula el contraste WCAG real entre `--ink` y
 `--surface` (mínimo 4.5) y entre `--muted` y `--surface`. Una paleta bonita que no llega a
@@ -117,6 +169,40 @@ justo el día de la presentación.
 --font-body:    system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
 --font-mono:    ui-monospace, "SF Mono", "JetBrains Mono", Menlo, monospace;
 ```
+
+### Tipografía de marca sin salir a la red
+
+**Antes de pensar en Google Fonts, mirar lo que ya está en el Mac.** `canvas-design` trae
+una carpeta de fuentes con licencia OFL (libre para incrustar y distribuir):
+
+```bash
+python3 ~/.claude/skills/golden-presenta/scripts/incrustar_recurso.py catalogo
+```
+
+Las que importan para presentaciones:
+
+| Fuente | Peso | Para qué |
+|---|---|---|
+| **Big Shoulders Bold** | 92 KB | Condensada display. **La más cercana a Anton.** Eventos, carteles |
+| Boldonse | 75 KB | Display pesada, con carácter. Un titular que grite |
+| Erica One | 24 KB | Display gorda. Carteles |
+| Outfit Bold | 54 KB | Grotesca geométrica limpia. Corporativa moderna |
+| Gloock | 93 KB | Serif display de contraste alto. Editorial cara |
+| Young Serif | 103 KB | Serif con peso. Marca de producto |
+
+Se incrusta en base64 y queda dentro del archivo:
+
+```bash
+python3 .../incrustar_recurso.py fuente ".../BigShoulders-Bold.ttf" \
+    --nombre "Big Shoulders" --peso 700
+```
+
+El bloque `@font-face` que devuelve se pega arriba del `<style>`, y en `:root`:
+`--font-display: "Big Shoulders", "Arial Narrow", sans-serif;`
+
+**Pila de respaldo del sistema**, si no se quiere incrustar y se acepta el riesgo: para
+condensada, `"DIN Condensed", "Impact", "Haettenschweiler", "Arial Narrow", sans-serif`.
+Funciona en macOS; en el portátil de la sala puede no estar. **Incrustar es lo seguro.**
 
 Si el cliente exige su tipografía corporativa, hay dos caminos y se elige explícitamente:
 

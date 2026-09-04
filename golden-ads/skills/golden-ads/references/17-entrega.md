@@ -23,6 +23,8 @@ pega** en su Ads Manager, sin decidir nada. Debe traer TODO, campo por campo:
    puja, ubicaciones, programación. **Copia-pega-able**: valores literales, no "elige tú".
 4. **NIVEL ANUNCIO**: formato, identidad (página/IG), destino/URL o WhatsApp, y por cada creativo:
    la pieza (o su prompt/libreto `15`) + **5 hooks + 5 títulos + 5 descripciones** + CTA.
+   **+ el bloque UTM literal para pegar en "Parámetros de URL"** (`24`, REGLA 18) — campo
+   obligatorio del informe, no un extra; sin él el cliente queda ciego para saber qué anuncio vendió.
 5. **Qué activar/desactivar** (Advantage+ placements/creativo, CAPI, etc.).
 6. **Retargeting** (`06`), **criterios de matar/escalar** (`07`) y **higiene de aprendizaje** (`14`:
    controlar gasto con topes, NO apagados).

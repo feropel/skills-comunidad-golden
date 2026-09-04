@@ -1,13 +1,255 @@
 # Changelog — GOLDEN ADS
 
+## G6.3 — 2026-09-03 — El teardown de `golden360` se CONSUME, no se repite
+**Aviso del Centro de Mando, verificado en la hermana antes de hornear:** `golden360` **R2.0**
+(2026-09-03) tiene una **Fase 5B** real — `golden-video-teardown` entra en la ruta **entre producir
+los creativos (Fase 5) y escribir los copys (6-7)**. Comprobado en su `SKILL.md:216` y su tabla de
+hijas; no se aceptó de palabra.
+
+**Qué cambia para esta skill:** cuando el encargo llega por la ruta 360, el video **ya viene
+desarmado** (beat sheet segundo a segundo, ángulo, hook y copy quemado en pantalla). Repetir el
+análisis cuesta tiempo y créditos y, peor, **arriesga contradecir el análisis que guió la
+producción del creativo**.
+
+- **`25-cuenta-sin-creativos.md` Paso 2**: nota al inicio — buscar el teardown en el expediente del
+  producto **ANTES** de analizar nada; si está, la ficha del creativo se rellena con él y se pasa
+  directo al Paso 3 (escribir los copys).
+- **Bloque de requisitos del `SKILL.md`**: la fila de `golden-video-teardown` lo dice, y se anota la
+  ruta real del binario **`golden-transcribe` (`~/.golden/bin/`)**.
+
+> La regla de fondo no cambia, se refuerza: **el copy nace del video que se escuchó.** Lo nuevo es
+> que a veces ya lo escuchó una hermana, y entonces se le cree a ella en vez de volver a empezar.
+
+**De paso**, los 3 avisos que este chat devolvió al validador del CdM quedaron arreglados en origen
+(resolver contra `~/.golden/bin/`, descontar nombres de archivo y anclas de índice) y **horneados en
+su autoprueba, que pasó de 23 a 26 casos** — un arreglo sin su caso de prueba vuelve en tres
+versiones. golden-ads: **1 de 1, cero avisos**. Sello → **G6.3**.
+
+## G6.2 — 2026-09-03 — Requisitos DECLARADOS (la skill deja de asumir a sus hermanas)
+**Fila del Centro de Mando**, bajo la ley que dictó FER: *todo lo que la skill necesite del usuario
+o del entorno se declara ANTES, cerca del principio del SKILL.md, y se pide AL CORRER si falta*.
+
+**El hueco, medido:** la skill citaba hermanas en decenas de archivos y **declaraba CERO requisitos**
+(`grep -i "requisito|dependencia" SKILL.md` = 0). Conteo real de citas:
+`golden-copywriting` **13 archivos** · `watch` 7 · `golden-investigacion-mercado` 6 ·
+`golden-ugc-avatar` 6 · `golden-video-teardown` 5 · `golden-dropi-analisis` 4 ·
+`golden-meta-ads-analysis` 3. Quien instalara golden-ads suelta se quedaba con una skill que pide
+otra que no tiene, **y lo descubría a mitad de un encargo**.
+
+**Nuevo bloque "QUÉ NECESITA ESTA SKILL"**, justo después del rol y antes de las reglas de oro:
+- **Del entorno:** MCP de Meta (si falta → informe o testeo, y `27` para conectarlo; nunca inventar
+  que la cuenta respondió) y los datos del negocio para el breakeven (si faltan → `[PENDIENTE]` y
+  ranking relativo, no veredicto absoluto).
+- **Las 6 hermanas**, cada una con **qué aporta** y **qué pasa si no está**. Ninguna bloquea.
+
+**Matiz que aportó el CdM y se consagra:** una dependencia entre skills **NO es una API key**. No se
+le pide al usuario que la pegue: se le dice **cuál hermana falta y con qué se degrada el trabajo**.
+Caso concreto de `golden-copywriting`: sin ella se escriben **los 15 copys igual** (respetando
+125/40/25 y compliance) pero **sin framework**, y **se declara** — *"copys escritos sin el motor de
+frameworks"*. **Prohibido fingir que se aplicó un framework que no se pudo leer.**
+
+**Para el reparto:** `golden-copywriting` **va junto con** `golden-ads`. Es la única cuya ausencia se
+nota en casi todos los encargos, porque los 15 copys aparecen en casi todos. Sello → **G6.2**.
+
+## G6.1 — 2026-09-03 — La `description` vuelve DENTRO de la especificación (1.444 → 1.000)
+**Hallazgo de arsenal**, medido en este chat y **confirmado por el Centro de Mando con medición
+independiente**: de las ~188 skills instaladas, **34 pasan del tope de 1.024 caracteres** que fija la
+especificación de Agent Skills — y **32 de esas son de la casa**. Que las diez peores del arsenal
+entero sean todas nuestras es el dato que más dice. `golden-ads` estaba en **1.444**.
+
+**Límites verificados en vivo** (agentskills.io/specification, no de memoria): `description` **1–1024
+obligatorio** · `name` 1–64, minúsculas, sin guion inicial/final ni dobles, **debe coincidir con la
+carpeta** · `compatibility` 1–500 · **el cuerpo NO tiene tope duro** ("under 500 lines" y los 5.000
+tokens son recomendaciones).
+
+**Qué se hizo:** description recortada a **1.000** con el criterio del CdM — **los DISPARADORES
+primero**, porque los del final son los que se pierden, y **lo explicativo BAJA AL CUERPO**, que no
+tiene tope. La instrucción de *"si te pasan un video, súbelo, analízalo viéndolo Y escuchándolo, y
+escribe los copys de ESE video, nunca genérico"* pasó del disparador al bloque de montar campaña.
+Se conservaron los 15 disparadores en las palabras reales de FER.
+
+**Distinción honesta que aportó el CdM y se adopta** (para no vender certezas):
+- **1.024 = tope de VALIDACIÓN** de la spec.
+- **~1.536 = TRUNCADO EN RUNTIME**, medido por esta misma skill el 2026-08-07.
+- Son **mecanismos distintos**: las dos mediciones son ciertas a la vez.
+- Que un ZIP sea **rechazado al distribuir** es **plausible y NO medido**.
+- El **"tope de 200 en claude.ai"** que circuló **no se adopta**: sin fuente verificada es rumor, no
+  límite (el CdM lo buscó en memoria y no está registrado en ningún lado).
+
+**CAUSA RAÍZ del fallo de detección** (ya en manos del CdM, que es el dueño): `golden-skill-auditor`
+**MIDE** la description (`inventario.sh:293-295`) pero **NUNCA la compara** — `1024` aparece **cero
+veces** en sus scripts y cero en `rubrica.md` / `estandares-golden.md`. Por eso skills selladas ORO
+pasaron fuera de norma sin que saltara nada. Es `reference_familia_trampas_de_conteo` en su forma más
+pura: **el arreglo es el INSTRUMENTO, no la buena intención** — el mismo patrón que el presupuesto
+×100 de hoy (se medía, no se comparaba). El arreglo de clase que tomará el CdM es **adoptar el
+validador oficial `skills-ref validate`**, no codificar el número a mano: así los topes futuros
+llegan gratis en vez de envejecer con nuestra interpretación. Sello → **G6.1**.
+
+## G6.0 — 2026-09-03 — Los 3 objetivos de campaña, resueltos de una vez
+**Reclamo directo de FER:** *"objetivo son: tráfico, interacción, venta. Tú ya debes saber todo esto,
+no debería estar diciendo esto"*. Tenía razón: es dato de plataforma, no algo que se le pregunte.
+
+**El hueco, medido:** la skill nombraba `OUTCOME_SALES`/`OUTCOME_ENGAGEMENT`/`OUTCOME_TRAFFIC` de
+pasada en `05-publicar-mcp.md`, sin tabla ni criterio — y el intake de `26` reducía el objetivo a
+**dos** opciones ("venta web o conversaciones de WhatsApp"), **dejando TRÁFICO fuera**.
+
+**`28-objetivos-de-campana.md` (NUEVO)** — tabla de decisión: lo que dice el usuario → `objective` →
+`optimization_goal` → `promoted_object`/destino → la métrica con que se mide. Más:
+- **VENTA** es el default cuando el pixel tiene señal de Compra (requisito duro).
+- **INTERACCIÓN** optimiza a **que escriban, no a que compren**: el costo por conversación puede
+  verse hermoso y el negocio perder si el bot no cierra → Chatea PRO debe **devolver la conversión a
+  Meta** o Meta aprende de chats, no de ventas.
+- **TRÁFICO** es el más barato y el que menos vende: para probar creativo o calentar pixel. Si
+  alguien pide tráfico esperando ventas, **hay que decírselo**.
+- `LANDING_PAGE_VIEWS` antes que `LINK_CLICKS` (el clic dice que tocaron; la LPV, que cargó).
+- **Cambiar el objetivo obliga a REHACER la campaña**, no a editarla (editar reinicia el aprendizaje).
+- Los otros 3 enums (`LEADS`, `AWARENESS`, `APP_PROMOTION`) quedan declarados como existentes y fuera
+  del default de Golden.
+
+Enums verificados hoy contra la Marketing API de Meta (`ad-campaign-group`). `26` corregido para
+ofrecer los **tres**. Sello → **G6.0**.
+
+## G5.9 — 2026-09-03 — Conectar el MCP de Meta + 🔒 candado de presupuesto
+**Origen:** aviso del chat "🎯 EL CARTEL DEL CHAT" (FER reparte la skill en el bootcamp).
+**Verificado por esta fábrica contra la fuente autoritativa ANTES de hornear** — nada se aceptó de
+palabra: `developers.facebook.com/documentation/ads-commerce/ads-ai-connectors/ads-mcp-server/*`
+(actualizado 14-jul-2026) y `facebook.com/business/help/1456422242197840`, leídas en vivo hoy.
+
+**`27-conectar-mcp-meta.md` (NUEVO)** — la skill asumía "el MCP está conectado" y nunca decía cómo:
+- URL oficial **`https://mcp.facebook.com/ads`** (confirmada en las dos páginas).
+- **Vía A sin app propia** (Meta ads AI connectors, la del alumno) y **Vía B con app propia** con el
+  **comando exacto de Claude Code**: `claude mcp add --transport http --client-id <META_APP_ID> meta-ads https://mcp.facebook.com/ads`.
+- Los **7 permisos textuales** (`ads_mcp_management`, `ads_read`, `ads_management`,
+  `catalog_management`, `business_management`, `pages_show_list`, `instagram_basic`).
+- El paso de **verificación** que nadie hace: preguntarle al agente qué herramientas tiene.
+
+**🔒 HALLAZGO PROPIO (no venía en el aviso) y es lo que más plata protege:** Meta permite fijar
+**reglas por cuenta en Business Suite → Settings → Integrations → Ads MCP server**, y **el servidor
+MCP las hace cumplir**: bloquear "Create campaigns", bloquear "Edit or set budget", y sobre todo
+**"Budgets set above this amount" = un TECHO MÁXIMO**. Con un techo puesto, el incidente del mismo
+día ($50.000 pedidos → $5.000.000 puestos) **habría sido rechazado por Meta**. Se recomienda dejar
+techo en toda cuenta operativa. Es el cinturón que acompaña al airbag de `reglas-de-oro.md` §5.
+
+**Meta confirma dos doctrinas de la casa:** *"All ads are paused by default until you set them
+live"* y *"any actions taken on your behalf require your authorization"*. Y desmiente el miedo al
+baneo: usar el MCP no pone la cuenta en riesgo; los baneos vienen de violar políticas de anuncios.
+
+**Correcciones al aviso recibido (se documentan para no propagar el error):**
+- La `description` **medida** son **1.766 caracteres**, no 350 — error de factor 5.
+- Clientes soportados **oficialmente por Meta**: ChatGPT, Claude, Claude Code y Perplexity.
+  **Cursor y Codex NO aparecen** en la lista oficial.
+- **No se encontró** en las páginas oficiales ni la advertencia de *prompt injection* ni los alcances
+  llamados "Read"/"Manage". Quedan **rotulados como no verificados** en el archivo, en vez de
+  atribuírselos a Meta. Lo que sí existe es el control por ACCIÓN descrito arriba.
+
+**Description recortada de 1.766 → 1.442 caracteres.** La propia skill documentó el 2026-08-07 un
+tope de ~1.536 y que pasarse **trunca las frases finales** (que dejan de disparar); había vuelto a
+pasarse al ir sumando triggers. Se conservaron todos los disparadores clave y se sumó
+"cómo conecto mi cuenta de Meta". **No se adoptó** la versión de 172 caracteres propuesta para el
+ZIP: degradaría el disparo en Claude Code, que es donde se usa a diario. Sello → **G5.9**.
+
+## G5.8 — 2026-09-03 — INTAKE del pedido "crea una campaña de X con presupuesto Y"
+Encargo directo de FER tras **3 fallas de campo el mismo día**: presupuesto puesto 100 veces más
+alto, campaña entregada sin los 15 copys, y creativo que nunca se subió al anuncio.
+
+**Diagnóstico honesto antes de tocar nada** (grep sobre la skill):
+- El **presupuesto** ya estaba arreglado (`reglas-de-oro.md` §5 + `13-auto-check`, mismo 2026-09-03).
+- El **creativo + 15 copys** ya estaban cubiertos por `25-cuenta-sin-creativos.md` (mismo día).
+- **El hueco REAL era el INTAKE**: cero menciones en toda la skill. Cada chat improvisaba qué pedir.
+
+**Cambios:**
+- **`26-intake-montar-campana.md` (NUEVO)**: los 3 campos obligatorios (objetivo · producto ·
+  presupuesto) que **se preguntan juntos, una sola vez, si faltan**; qué NO se pregunta (autonomía:
+  ABO/CBO, edades, público, naming) y qué se deduce solo (cuenta, moneda, pixel, página); la
+  compuerta del presupuesto resumida con su testigo; el enlace con la **investigación previa** (los
+  ángulos = los conjuntos, adaptados al creativo); y el ORDEN completo hacia `25` → `05` → `24` → `13`.
+- **SKILL.md**: bloque visible arriba (antes de "RUTA SEGÚN DATOS") + entrada en el mapa.
+- **Escrito el tope MEDIDO que explica "no me sube los 15 copys"**: `ads_create_creative` no expone
+  `asset_feed_spec` → por API salen **1+1+1**; los 15 se entregan igual y se cargan en el panel,
+  y **se reporta como pendiente**, nunca se callan ni se recortan.
+
+**Descartado en el camino (se documenta para que no se repita):** se empezó un
+`23-montar-campana-completa.md` que (a) **colisionaba de número** con `23-salud-de-senal-y-andromeda.md`,
+(b) duplicaba `25`, y (c) citaba `ads_creative_upload_image`/`_video`, **deprecadas**. Se borró antes
+de sellar. Lección: en una skill que editan varios chats, **listar `references/` antes de crear un
+archivo numerado** y leer el vecino antes de escribir doctrina nueva. Sello → **G5.8**.
+
 > Fuente única de versión/fecha de la skill (ver reconciliación en G4.7). `SKILL.md` solo refleja el
 > número vigente en su sello; el detalle completo de cada cambio vive aquí.
 
 ## Índice
+- [G6.3 — 2026-09-03 · Consumir el teardown de golden360](#g63--2026-09-03--el-teardown-de-golden360-se-consume-no-se-repite)
+- [G6.2 — 2026-09-03 · Requisitos declarados (dependencias entre skills)](#g62--2026-09-03--requisitos-declarados-la-skill-deja-de-asumir-a-sus-hermanas)
+- [G6.1 — 2026-09-03 · description dentro de la spec (1.444 → 1.000)](#g61--2026-09-03--la-description-vuelve-dentro-de-la-especificación-1444--1000)
+- [G6.0 — 2026-09-03 · Los 3 objetivos de campaña](#g60--2026-09-03--los-3-objetivos-de-campaña-resueltos-de-una-vez)
+- [G5.9 — 2026-09-03 · Conectar el MCP de Meta + candado de presupuesto](#g59--2026-09-03--conectar-el-mcp-de-meta--candado-de-presupuesto)
+- [G5.8 — 2026-09-03 · INTAKE del pedido de campaña](#g58--2026-09-03--intake-del-pedido-crea-una-campaña-de-x-con-presupuesto-y)
+- [G5.7 — 2026-09-02 · UTM y atribución bajan al archivo (REGLA 18 + references/24)](#g57--2026-09-02--utm-y-atribución-bajan-al-archivo-regla-18--references24)
 - [G5.6 — 2026-08-31 · Corrección Andromeda verificada contra fuente primaria](#g56--2026-08-31--corrección-andromeda-verificada-contra-la-fuente-primaria-de-meta)
 - [G5.5 — 2026-08-27 · Corrección medida EMQ (sellada en SKILL.md)](#g55)
 - [G5.4 — 2026-08-26 · references/23 salud de señal + Andromeda (sellada en SKILL.md)](#g54)
 - [G5.3 — 2026-08-24 · Barrido total del arsenal (CdM)](#g53--2026-08-24--barrido-total-del-arsenal-ordenado-por-fer-vía-centro-de-mando)
+
+## G5.7 — 2026-09-02 · UTM y atribución bajan al archivo (REGLA 18 + references/24)
+
+**Encargo directo de FER**, textual: *"Nosotros estamos haciendo unas campañas y colocamos un UTM
+para que pueda enviar esa información de dónde vino la venta. Debe estar en la skill de MetaAds"*.
+Ratificación retroactiva por la vía de `reference_skill_sin_fabrica_dueno_centro_mando`: encargo
+directo de FER + sección AUTO-MEJORA presente + ritual completo con escritura de prueba rechazada.
+Fábrica de esta skill = CENTRO DE MANDO (`REGISTRO-FABRICAS.md`, "por ley").
+
+### El hueco, medido antes de escribir
+`grep -rn -i "utm\|url_tags"` sobre toda la skill: **0 reglas**. Solo dos menciones de pasada —
+`changelog.md` G5.3 y `referencia-externa-ctwa-cod-panama.md`— y ambas dicen lo mismo: que la ley
+del UTM *"vive en la memoria Golden, no en este SKILL.md"*. O sea que la propia skill llevaba desde
+el 24-ago documentando su propio hueco sin taparlo. Regla hermana que lo obliga: **"la regla de
+entorno baja al archivo"** (canonizada 2026-08-23) — una norma que solo vive en memoria debe estar
+escrita DENTRO de la skill que la ejecuta.
+
+Consecuencia práctica del hueco: `05-publicar-mcp.md` montaba campaña→conjunto→creativo→anuncio sin
+nombrar el UTM una sola vez. **Todo anuncio montado con esta skill nacía ciego** y nadie lo notaba
+al entregar, porque tampoco estaba en el auto-check ni en el checklist de cierre.
+
+### Qué se hizo
+- **NUEVO `references/24-utm-atribucion.md`** — esquema oficial con macros, tabla de qué lleva cada
+  parámetro y para quién, las dos rutas (CTWA vs landing), cómo se pone, cómo se verifica y quién lo
+  consume aguas abajo (snippet del tema, `resolver_atribucion.py`, `lib/atribucion.ts`).
+- **REGLA 18** en `reglas-de-oro.md` (canónica, 17 → 18) y en el resumen de reglas del `SKILL.md`.
+- Citas operativas donde de verdad se dispara: `05-publicar-mcp.md` (paso 4 + "Nunca"),
+  `13-auto-check.md` (Publicación), `17-entrega.md` (nivel anuncio del informe full), checklist de
+  cierre y mapa de archivos del `SKILL.md`.
+
+### La fuente del esquema: los montajes reales, NO el contrato viejo
+Se consagra lo que **está puesto hoy en las campañas** (`PROYECTOS/LECOTERRA/campanas/
+MONTAJE-CP1-2026-07-25.md` y `MONTAJE-CP1-OPEN7-2026-08-14.md`, declarados verificados en vivo):
+
+    utm_source={{site_source_name}}&utm_medium=paid_social&utm_campaign={{campaign.name}}&utm_content={{ad.name}}&utm_term={{adset.name}}&utm_id={{ad.id}}
+
+**El id va en `utm_id`; `utm_content` lleva el NOMBRE del anuncio, a propósito** ("dice qué video
+vendió"). Un contrato anterior del CdM (2026-08-14) decía `utm_content={{ad.id}}` y **no es lo que
+se montó**; la divergencia es exactamente el incidente `adOPEN` del 26-ago (orden 86907080, $259.801
+acreditados a un anuncio inexistente). El archivo lo deja explícito para que nadie "corrija" el
+montaje hacia el contrato muerto, y ata el cambio del esquema al cambio del lector.
+
+### Verificado hoy contra la fuente autoritativa
+Relectura de los **esquemas vivos del MCP de Meta**: ni `ads_create_ad` ni `ads_create_creative`
+exponen `url_tags`. Confirma la medición del 14-ago y hace que la advertencia sea presente, no
+histórica: **por MCP el anuncio nace sin UTM y hay que pegarlo en la UI antes de activar.**
+
+### Rotulado SIN VERIFICAR (no se promete)
+- `ads_update_entity` con `entity_type:"ad"` y `fields:{"url_tags":"..."}` como vía por MCP:
+  `url_tags` sí es campo real del objeto Ad en la Marketing API, pero el MCP rechaza campos que no
+  reconoce y **esto nunca se ha probado**. Escrito como candidato a probar en UN anuncio y releer.
+- **La captura positiva por el camino LANDING sigue sin verificarse.** Lo único comprobado contra la
+  API de Meta es el camino nativo CTWA (ad `120249805036590118`).
+- Que el snippet corregido esté pegado en el `theme.liquid` VIVO: no se pudo comprobar, la conexión
+  de Shopify está caída (switch-shop revocado).
+
+### Hallazgo fuera de dominio (va a la bandeja, no se toca aquí)
+`13-auto-check.md` todavía pide verificar *"Similarity >60% = supresión"* de Andromeda — **G5.6 lo
+retractó** por no estar en la fuente primaria de Meta, pero solo lo corrigió en `23` y en el sello;
+el auto-check quedó sin sincronizar. Es la misma clase de desfase que el ledger ya castigó tres
+veces. No se corrige en esta corrida: no es el dominio de este encargo.
 
 ## G5.6 — 2026-08-31 · Corrección Andromeda verificada contra la fuente primaria de Meta
 **Origen:** hallazgo del chat FILTRO, que fue a la fuente primaria; el CdM (dueño por ley de golden-ads) la leyó
@@ -44,6 +286,61 @@ entera el 2026-08-31.
 - [G3.9 → G3.0 — 2026-06-25 · construcción del preset y validación en vivo](#g39--2026-06-25--golden-pro-preset-único-construido-en-vivo-hookhold-rate-creadas)
 - [G2.0 — 2026-06-25 · rename + Meta/TikTok/Google + full-funnel](#g20--2026-06-25--rename-a-golden-ads--metatiktokgoogle-completos--full-funnel)
 - [G1.0 — 2026-06-25 · versión inicial](#g10--2026-06-25--versión-inicial-centro-de-comando-de-pauta)
+
+## G5.8 — 2026-09-03 — Cuenta sin creativos: subir el medio, analizar el video, copy coherente
+
+**Orden de FER:** *"si la cuenta publicitaria no tiene creativos, podamos montarlo, una vez te lo
+dé el chat, analices el video y crees los copys que corresponden al video y que sea coherente"*.
+
+**Hueco que lo motivó:** montando `LECOTERRA - VENTA - OPEN 1` en GOLDEN CP6 COL se reutilizaron
+videos viejos y **no se subió nada nuevo**; FER lo notó. `15-creativos-produccion.md` ya tenía el
+árbol TIENE/NO TIENE media, pero **no decía cómo meter el medio en la cuenta**, ni con qué
+herramienta analizar el video, ni cómo comprobar que el copy le corresponde.
+
+**NUEVO `references/25-cuenta-sin-creativos.md`:**
+- **Paso 0** — medir la biblioteca (`ads_get_ad_videos` / `ads_get_ad_images`; resultados
+  parciales: campo ausente ≠ vacío). "Cuenta vacía" casi nunca es cierto — CP6 no lo estaba.
+- **Paso 1** — las **3 vías** para meter el medio con `ads_creative_upload_media` (las herramientas
+  `upload_image`/`upload_video` están DEPRECADAS): URL pública (Claude solo), archivo del Mac
+  (**el usuario elige en un selector** — tope real), y referenciar un `video_id` de otra cuenta
+  (Meta lo copia sin resubir).
+- **Paso 2** — 🔴 **analizar antes de redactar**: mirar fotogramas NO basta, en un reel hablado los
+  subtítulos quemados salen una palabra por cuadro. `golden-video-teardown` / `watch` +
+  `golden-transcribe`. Ficha obligatoria de 7 campos antes de escribir.
+- **Paso 3** — 5+5+5 pegados a esa pieza, con el estándar 125/40/25.
+- **Paso 4** — **prueba de coherencia de 6 puntos** (mismo producto, mismo interlocutor, aporta en
+  vez de subtitular, datos que coinciden, reglas de marca del producto, compliance Meta).
+- **Paso 5** — `ads_get_ad_preview` y **entregar el `preview_url`**; avisar que
+  `IN_PROCESS`/`PENDING_REVIEW` es normal (si no, el usuario cree que no se montó nada).
+- **Topes del MCP medidos**: CTWA no se puede crear por API (con `link` lo rechaza, sin `link`
+  descarta el CTA en silencio); `description` exige CTA con enlace; `asset_feed_spec` no expuesto
+  → 1+1+1; UTM solo en el panel.
+
+**Enganchado** desde el `description` (nuevos disparadores: "te paso el video", "monta este video
+como anuncio", "la cuenta está vacía"), el índice de referencias, el flujo de build, un aviso al
+inicio de `15-creativos-produccion.md` y un control nuevo en el auto-check.
+
+## G5.7 — 2026-09-03 — 🔴 La trampa de los "centavos": COP va ×1, no ×100
+
+**Incidente medido, no teórico.** Montando `LECOTERRA - VENTA - OPEN 1` en GOLDEN CP6 COL, FER
+pidió $50.000 COP/día y se mandó `daily_budget: 5000000` → el conjunto quedó en **$5.000.000
+COP/día, 100 veces**. No se gastó (estaba PAUSED). Orden de FER: *"este error no puede pasar
+nunca más, revisa la skill y corrige para siempre"*.
+
+**Causa raíz en ESTA skill:** `reglas-de-oro` §5 decía *"la API usa centavos del currency de la
+cuenta"*. Es **falso para las monedas de cero decimales** — COP, CLP y PYG, tres países donde
+Golden opera. El parámetro se llama `..._cents` y el nombre miente.
+
+**Corregido en tres sitios:**
+- `reglas-de-oro.md` §5 — reescrita: tabla de multiplicador por moneda, el testigo
+  (`min_daily_budget_cents`: USD `100` → ×100; COP `3076` → ×1) y el procedimiento obligatorio.
+- `13-auto-check.md` — control duro en Publicación: **releer el `daily_budget` del servidor** y
+  comparar el texto renderizado con lo pedido. Sin esa relectura no se reporta el montaje.
+- `SKILL.md` — regla 5 y checklist de entrega.
+
+**La clase, no el caso:** un presupuesto que no se leyó de vuelta del servidor no está verificado.
+El arreglo es el instrumento (la relectura), no la intención de multiplicar bien.
+Memoria: `reference_presupuesto_meta_cop_x1_no_centavos`.
 
 ## G5.3 — 2026-08-24 — Barrido total del arsenal ordenado por FER, vía Centro de Mando
 Auditoría fresca `golden-skill-auditor` (lote AUDITA+ARREGLA del CdM). Hallazgos con evidencia, reparados:
@@ -158,7 +455,7 @@ decía **G4.6 con fecha 2026-07-25** para el mismo tramo de trabajo — versión
 Desde esta edición ambos dicen **G4.7** y este ledger (`references/changelog.md`) queda como fuente única
 de verdad de versión/fecha; `SKILL.md` solo refleja el número vigente. Sello → **G4.7**.
 
-## G4.5 — 2026-08-07 — Cosecha del chat "un estudio de producto" (Chile), vía Centro de Mando
+## G4.5 — 2026-08-07 — Cosecha del chat "ESTUDIO 360 DENTAL CAVITY HEALING" (Chile), vía Centro de Mando
 > Nota de reconciliación (ver G4.7 arriba): este tramo de trabajo quedó registrado con doble numeración
 > en su momento (ledger decía G4.5, sello impreso decía G4.6/2026-07-25). El contenido abajo es real y
 > vive hoy en `12-unit-economics.md`; el número de versión que manda es el de este ledger.

@@ -1,24 +1,18 @@
 ---
 name: golden360
-description: >
-  Golden Group — GOLDEN 360, el ORQUESTADOR que lleva un producto de CERO (incluso de una sola
-  FOTO, sin nombre ni URL) hasta VENDIENDO, uniendo todas las skills Golden en 3 bloques —
-  DECIDIR, CONSTRUIR, ENCENDER — sobre el expediente único PRODUCTO.json, con 4 compuertas duras
-  que lo frenan si el producto no viabiliza, si un claim no tiene respaldo, si los precios no
-  salen del sistema vivo, o si no pasa QA.
-
-  SIEMPRE usa esta skill cuando el usuario quiera el LANZAMIENTO COMPLETO, o lo llame por su nombre:
-  "Golden360", "golden 360", "corre la 360", "ruta 360", "la ruta", "lanza este
-  producto", "de la foto a vender", "monta todo el producto", "producto completo de cero", "hazme
-  todo el sistema de este producto", "quiero vender esto", "arranquemos este producto", "de cero a
-  ventas", "sácalo a la calle", "déjalo listo para vender", o pegue una FOTO de un producto pidiendo
-  llevarlo a la venta. También cuando pida RETOMAR un lanzamiento a medias ("sigamos con el producto
-  X", "en qué quedamos con este producto"): lee el PRODUCTO.json y continúa en su fase actual.
-
-  NO para una pieza suelta — deriva: estudio de mercado → golden-investigacion-mercado; página →
-  golden-shopify; pauta → golden-ads; imágenes → golden-imagen-arena; video UGC →
-  golden-ugc-avatar; bot → familia golden-chatea-pro. Es el DIRECTOR DE ORQUESTA, no un
-  instrumento.
+description: >-
+  Golden Group — GOLDEN 360, el ORQUESTADOR que lleva un producto de CERO (incluso de una
+  sola FOTO, sin nombre ni URL) hasta VENDIENDO, uniendo todas las skills Golden en 3
+  bloques (DECIDIR, CONSTRUIR, ENCENDER) sobre el expediente único PRODUCTO.json, con 4
+  compuertas duras que lo frenan si el producto no viabiliza, si un claim no tiene respaldo,
+  si los precios no salen del sistema vivo, o si no pasa QA. Úsala SIEMPRE que el usuario
+  quiera el LANZAMIENTO COMPLETO, o la llame por su nombre: "Golden360", "golden 360",
+  "corre la 360", "ruta 360", "lanza este producto", "de la foto a vender", "monta todo el
+  producto", "producto completo de cero", "hazme todo el sistema de este producto", "quiero
+  vender esto", "de cero a ventas", "sácalo a la calle", "déjalo listo para vender", o pegue
+  una FOTO pidiendo llevarla a la venta. También cuando pida RETOMAR un lanzamiento a medias
+  ("sigamos con el producto X", "en qué quedamos con este producto"): lee el PRODUCTO.json y
+  sigue en su fase actual.
 ---
 <!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leían el cerebro de marca — esta entra a la familia que SÍ lo lee. Bloque idéntico en las 6 del CdM + fila a la fábrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
 
@@ -44,6 +38,7 @@ la conversación se pierde en el próximo chat: por eso queda por escrito en el 
 `PRODUCTO.json`. Es un ESTÁNDAR TRANSVERSAL — lo escriben otras skills — y por la convivencia de esta
 skill no se toca sin su aviso previo. Mientras tanto manda la regla del README.
 
+<!-- GR360_VERSION: R2.0 — 2026-09-03 — FASE 5B · TEARDOWN. Encargo directo de FER: `golden-video-teardown` entra en la ruta entre producir los creativos (Fase 5) y escribir los copys (Fases 6-7). Antes el copy se escribia sin que nadie hubiera desarmado el video que lo acompana. Tocadas las CUATRO caras, que es lo que R1.9 enseno que hacia falta: la fase en el cuerpo, la fila en la tabla REQUISITOS, la entrada en HIJAS de candado.py y este sello con su changelog. Ejecutado por el CENTRO DE MANDO con autorizacion expresa de FER, por estar la fabrica (chat exclusivo golden360) cerrada. Fabrica: chat exclusivo golden360. -->
 <!-- GR360_VERSION: R1.9 — 2026-08-24 — AUDITORÍA FRESCA (golden-skill-auditor v1.16; base 918, veredicto 903 PLATA por la reserva del estreno). Arreglos con evidencia: (1) `golden-brand-brain`, dependencia OBLIGATORIA del Paso 0 desde el 23-ago, no estaba ni en REQUISITOS ni en HIJAS de candado.py — el chequeo decía "ecosistema completo" sobre un hueco; ya está en ambas. (2) "Pasa la ruta del cerebro" era orden sin destino: ahora se declara dónde vive (es de la MARCA, no del producto) y se anota en la cabecera del README del paquete, con su fila en la plantilla de la Fase 9; el campo `marca.cerebro_ruta` del esquema queda ELEVADO al Centro de Mando por ser estándar transversal. (3) El sello R1.8 decía "15/15 hijas" y son 13 (los auxiliares se contaban dos veces) — corregido. (4) R1.8 y la adenda del cerebro no tenían entrada de changelog, reincidencia de la clase que R1.6b ya había registrado: escritas. (5) Sellos reagrupados en un solo bloque (R1.2/R1.1/R1.0 habían quedado partidos por una sección viva). Menores: claude-seo-ai → claude-seo-ai:audit, tildes de la adenda. Reportado al Centro de Mando. Fábrica: chat exclusivo golden360. -->
 <!-- GR360_VERSION: R1.8 — 2026-08-21 — Auditoría golden-skill-auditor (959→1000 ORO). Arreglos: (1)
      concordancia de género en la línea disparadora del description ("este skill" → "esta skill",
@@ -126,6 +121,7 @@ imposible de romper por diseño. Esquema:
 | 3 | `claude-seo-ai:audit` (opcional — es un PLUGIN, no una skill en `~/.claude/skills`) | auditoría SEO/AIO |
 | 4 | `golden-shopify` **o** `golden-web` · `golden-agenda-citas` | página COD / sitio / agenda |
 | 5 | `golden-imagen-arena` · `golden-ugc-avatar` | imágenes/GIF / video UGC |
+| 5B | `golden-video-teardown` | desarmar cada video ANTES de escribir su copy |
 | 6–7 | `golden-ads` · `golden-copywriting` | orgánico impulsable + pauta + copys 5/5/5 |
 | 8 | `golden-chatea-pro-prompt-ventas` · `golden-chatea-pro-config-comentarios` | bot del producto (2 piezas) |
 | 9 | `golden-pdf-check` | PDF Golden del paquete |
@@ -216,6 +212,22 @@ descripción + galería + pósters de video) y mirarlas una a una contra `claims
 render del proveedor vs producto físico. Todo claim debe estar en INCI/etiqueta; imagen heredada con
 otra etiqueta → se despublica. Barrido COMPLETO con regex (des-escapar `\/` en el .json o el barrido
 da cero).
+
+## FASE 5B · TEARDOWN DE LOS CREATIVOS (antes de escribir un solo copy)
+Con los videos ya producidos, **cada uno se desarma antes de que nadie escriba el texto que lo va a
+acompañar**. Motor: `golden-video-teardown`, que devuelve el beat sheet segundo a segundo (gancho,
+educación, demo, oferta, CTA), el ángulo real, el copy que ya lleva quemado en pantalla y la fórmula
+replicable. Eso es lo que alimenta las Fases 6 y 7: **el copy nace del video que se ESCUCHÓ, no de la
+idea que se tenía del video.**
+**Por qué es una parada y no un opcional:** escribir el copy sin ver el video es narrar un partido por
+radio sin verlo. El primary text que contradice lo que el video promete es la fuga más cara y más
+invisible de una campaña, porque el anuncio se ve bien y no convierte.
+**Entrada:** los videos de la Fase 5 (archivos locales o URL). **Salida:** una ficha por creativo que
+entra al contexto de `golden-copywriting` y de `golden-ads`.
+**Candado:** ningún copy de las Fases 6-7 se escribe para un video que no tenga su teardown hecho. Si
+un creativo es solo imagen, se declara y se salta: el teardown es de VIDEO.
+**Frontera:** el RENDIMIENTO en números (CPA, ROAS, qué pausar) NO es de aquí — eso es
+`golden-meta-ads-analysis` en la Fase 10.
 
 # BLOQUE 3 · ENCENDER
 
@@ -327,3 +339,10 @@ viejos que otros archivos ya nombran.
 El paquete basta, solo, para lanzar: página montable, pauta lista campo por campo, bot copia-pega,
 todo coherente con el expediente, compuertas pasadas con evidencia. Si falta algo no mencionado,
 se agrega (exhaustividad). Cada dato con fuente; cada generación pagada, con datos reales.
+
+## Fronteras y desambiguacion
+
+Descripcion completa anterior (se conserva para no perder ningun matiz de frontera):
+
+> Golden Group — GOLDEN 360, el ORQUESTADOR que lleva un producto de CERO (incluso de una sola FOTO, sin nombre ni URL) hasta VENDIENDO, uniendo todas las skills Golden en 3 bloques — DECIDIR, CONSTRUIR, ENCENDER — sobre el expediente único PRODUCTO.json, con 4 compuertas duras que lo frenan si el producto no viabiliza, si un claim no tiene respaldo, si los precios no salen del sistema vivo, o si no pasa QA. SIEMPRE usa esta skill cuando el usuario quiera el LANZAMIENTO COMPLETO, o lo llame por su nombre: "Golden360", "golden 360", "corre la 360", "ruta 360", "la ruta", "lanza este producto", "de la foto a vender", "monta todo el producto", "producto completo de cero", "hazme todo el sistema de este producto", "quiero vender esto", "arranquemos este producto", "de cero a ventas", "sácalo a la calle", "déjalo listo para vender", o pegue una FOTO de un producto pidiendo llevarlo a la venta. También cuando pida RETOMAR un lanzamiento a medias ("sigamos con el producto X", "en qué quedamos con este producto"): lee el PRODUCTO.json y continúa en su fase actual. NO para una pieza suelta — deriva: estudio de mercado → golden-investigacion-mercado; página → golden-shopify; pauta → golden-ads; imágenes → golden-imagen-arena; video UGC → golden-ugc-avatar; bot → familia golden-chatea-pro. Es el DIRECTOR DE ORQUESTA, no un instrumento.
+

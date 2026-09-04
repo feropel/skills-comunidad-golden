@@ -1,21 +1,24 @@
 ---
 name: golden-matriz-viral
-description: >
-  Golden Group — MATRIZ DE CONTENIDO VIRAL. Desmenuza el contenido que YA funcionó (tuyo o de
-  2-3 creadores de referencia) y extrae la fórmula: hooks, estructuras, temas, emociones y CTAs
-  que conectan — en una MATRIZ accionable. Con esa matriz genera guiones nuevos on-brand
-  (reels/TikTok/shorts) y los pre-califica con una rúbrica de viralidad antes de grabar.
-  Úsala SIEMPRE que el usuario quiera: analizar sus videos virales, "por qué pegó este video",
-  sacar la fórmula/patrón viral de un creador, armar la matriz de contenido, generar guiones
-  para reels/TikTok con base en lo que funciona, planear contenido orgánico del mes, armar el
-  calendario editorial de reels/TikTok (cuánto publicar, mezcla tráfico/valor/conexión/venta),
-  o predecir si un guion tiene potencial. Dispara con "matriz viral", "fórmula viral", "analiza
-  estos videos", "guiones virales", "contenido para redes basado en datos", "calendario de
-  contenido", "cuánto debo publicar". NO es para pauta pagada (golden-ads) ni para escribir el
-  copy de un anuncio suelto (golden-copywriting): esto es la CAPA DE INTELIGENCIA del contenido
-  orgánico.
+description: >-
+  Golden Group — MATRIZ DE CONTENIDO VIRAL. Desmenuza el contenido que YA funcionó (tuyo o
+  de 2-3 creadores de referencia) y extrae la fórmula: hooks, estructuras, temas, emociones
+  y CTAs que conectan — en una MATRIZ accionable. Con esa matriz genera guiones nuevos
+  on-brand (reels/TikTok/shorts) y los pre-califica con una rúbrica de viralidad antes de
+  grabar. Úsala SIEMPRE que el usuario quiera: analizar sus videos virales, "por qué pegó
+  este video", sacar la fórmula/patrón viral de un creador, armar la matriz de contenido,
+  generar guiones para reels/TikTok con base en lo que funciona, planear contenido orgánico
+  del mes, armar el calendario editorial de reels/TikTok (cuánto publicar, mezcla
+  tráfico/valor/conexión/venta), o predecir si un guion tiene potencial. Dispara con "matriz
+  viral", "fórmula viral", "analiza estos videos", "guiones virales", "contenido para redes
+  basado en datos", "calendario de contenido", "cuánto debo publicar".
 ---
-
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 947 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # Golden Matriz Viral — la fórmula de tu contenido
 <!-- skill GMV1.8.1 · 2026-08-24 (centro de mando, remediación del verificador de cierre): línea de RUTA del cerebro en el Paso 0 (las lectoras ordenaban LÉELO PRIMERO sin decir dónde — un chat limpio no podía ejecutar la orden) + bump que las ediciones del 23-24 dejaron sin subir. -->
 
@@ -324,3 +327,7 @@ propio, **arréglalo sin esperar que lo pidan** e informa; 4) pasa `golden-skill
 periódicamente. Nunca borres conocimiento: reorganiza y añade.
 
 - **2026-08-02** — LOOP DEL ARSENAL (semana 1, skills de negocio): se hornea la sección **AUTO-MEJORA** (mandato global de FER, autorización permanente). Sin esta sección la skill no se auto-calificaba al cerrar corrida. Contenido operativo intacto. Backup: `_backups/2026-08-02-loop-arsenal-s1/`.
+
+## Fronteras y desambiguacion
+
+NO es para pauta pagada (golden-ads) ni para escribir el copy de un anuncio suelto (golden-copywriting): esto es la CAPA DE INTELIGENCIA del contenido orgánico.

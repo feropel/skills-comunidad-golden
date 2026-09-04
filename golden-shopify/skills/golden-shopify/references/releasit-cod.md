@@ -20,7 +20,7 @@ Form** (sus "Quantity offers" / upsells del formulario), NO como un componente d
 - Por eso "bundle" salió del roadmap de componentes: ya está resuelto por la app.
 
 ## Fallback del CTA a `/cart/add` — REGLA PERMANENTE en toda página (G4.2)
-Aprendido en tienda real (chat otro producto, 2026-08-07): si Releasit no está en la página
+Aprendido en tienda real (chat Insulinum, 2026-08-07): si Releasit no está en la página
 (app desinstalada, bloqueada por el navegador, o que aún no inyectó), el botón custom no
 tenía a quién disparar y **no hacía nada** — un CTA muerto justo en la puerta de venta.
 Desde G4.2, **TODO CTA de compra lleva fallback al formulario nativo `/cart/add`**, en

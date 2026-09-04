@@ -1,5 +1,24 @@
 # Changelog — GOLDEN 360
 
+## R2.0 — 2026-09-03 — FASE 5B · Teardown de los creativos (encargo de FER)
+
+- **El copy se escribia sin haber desarmado el video.** La ruta iba Fase 5 (creativos) → Fase 6
+  (organico) → Fase 7 (pauta), y en ninguna parada alguien miraba el video segundo a segundo antes
+  de escribir el texto que lo iba a acompanar. Textual de FER: *"ya tengo los videos, entonces voy a
+  analizar cada video y analizar cada imagen, y con la skill de copywriting voy a crearle sus copys
+  a cada anuncio"*.
+- **Nace la FASE 5B**, entre la Compuerta 2 y el Bloque 3: cada video pasa por `golden-video-teardown`
+  y su ficha (beat sheet, angulo, copy quemado, formula) entra al contexto de `golden-copywriting` y
+  `golden-ads`. El argumento en una frase: **escribir el copy sin ver el video es narrar un partido
+  por radio sin verlo.**
+- **Se tocaron las CUATRO caras**, que es la leccion que dejo R1.9 cuando una dependencia obligatoria
+  "no existia para el sistema" por estar solo en la prosa: la fase en el cuerpo, la fila en la tabla
+  REQUISITOS, la entrada en `HIJAS` de `candado.py` y este changelog con su sello.
+- **Frontera declarada:** el rendimiento en numeros (CPA, ROAS, que pausar) sigue siendo de
+  `golden-meta-ads-analysis` en la Fase 10; 5B es lectura del creativo, no de la cuenta.
+- Ejecutado por el **Centro de Mando** con autorizacion expresa de FER, por estar cerrada la fabrica
+  (chat exclusivo golden360). Origen del hallazgo: chat EL CARTEL DEL CHAT, preparando la charla.
+
 ## R1.9 — 2026-08-24 — Auditoría fresca (918 base · 903 con reserva → PLATA, reparada)
 - **La dependencia obligatoria del Paso 0 no existía para el sistema.** El bloque "Cerebro de marca"
   que el Centro de Mando instaló el 23-ago exige `golden-brand-brain` ANTES de generar nada, pero esa

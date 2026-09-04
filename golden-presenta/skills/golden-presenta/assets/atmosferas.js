@@ -59,8 +59,12 @@
     var c = document.createElement('canvas');
     c.id = 'atmosfera';
     c.setAttribute('aria-hidden', 'true');
+    // La opacidad sale del token --atmosfera-fuerza, para poder calmar el fondo
+    // sin cambiar de atmosfera ni tocar el shader.
+    var fuerza = getComputedStyle(document.documentElement)
+                   .getPropertyValue('--atmosfera-fuerza').trim() || '1';
     c.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:0;' +
-                      'pointer-events:none;display:block';
+                      'pointer-events:none;display:block;opacity:' + fuerza;
     document.body.insertBefore(c, document.body.firstChild);
     return c;
   }
@@ -264,6 +268,70 @@
     ].join(''));
   };
 
+  /* 3b · CANDELA — nube de brasa naranja a la izquierda, frio cian a la derecha,
+     campo de estrellas detras. Evento del Cartel, marca personal con fuego,
+     lanzamiento. Origen: el fondo del video de los 7 mentores de El Cartel del
+     Chat (sitio/cartel-6.mp4), colores MUESTREADOS del frame a t=2s:
+       candela pico #ff6926 · medio #854225 · base #4f2817
+       cian #247684 · base cian #073238 · negro calido #280b05
+     Esos hex viven aqui solo como documentacion: el shader NO los lleva quemados,
+     usa u_a / u_b / u_bg como todas las demas, asi que cada deck se sigue viendo
+     distinto segun sus tokens. Construida por el chat "Estructura y componentes
+     de un skill" y verificada leyendo pixeles de vuelta (5 de 5 en su banco de
+     pruebas, contra 2 de 5 del caso de control). Adoptada como NOVENA atmosfera,
+     sin tocar `nebulosa`, para no cambiar los decks que ya la usan. */
+  ATM.candela = function () {
+    return montarShader([
+
+  /* --- coordenadas: st centrado, uv 0..1 --- */
+  'vec2 q=st*1.15;',
+  'q+=(u_m-.5)*.18;',                       // el puntero mueve la nube, suave
+
+  /* --- domain warping: da los filamentos de humo, no manchas --- */
+  'float w1=fbm(q*1.30+vec2(u_t*.028,u_t*.017));',
+  'float w2=fbm(q*1.90+vec2(-u_t*.021,u_t*.033)+w1*1.15);',
+  'vec2 qw=q+vec2(w1,w2)*.55;',
+  'float n=fbm(qw*2.10+vec2(u_t*.019,-u_t*.024));',
+  'float d=fbm(qw*4.30-vec2(u_t*.037,u_t*.015));',
+
+  /* --- densidad de nube --- */
+  'float nube=smoothstep(-.18,.62,n*.85+d*.35);',
+
+  /* --- ASIMETRIA: candela pesa a la izquierda, frio a la derecha --- */
+  'float izq=smoothstep(.72,.02,uv.x);',
+  'float der=smoothstep(.18,.92,uv.x);',
+
+  /* --- nucleo de brasa: lo mas caliente, solo donde la nube es densa y a la izquierda --- */
+  'float brasa=pow(smoothstep(.42,1.,nube),2.6)*izq;',
+  'float vena=pow(smoothstep(.60,1.,n+d*.5),3.4)*izq;',   // filamentos encendidos
+
+  /* --- composicion sobre negro calido --- */
+  'vec3 col=u_bg;',
+  'col=mix(col,u_a*.58,nube*izq*1.00);',                    // halo naranja
+  'col=mix(col,u_a,brasa*.85);',                           // cuerpo de candela
+  'col+=u_a*vena*.55;',                                    // venas encendidas
+  'col=mix(col,u_b*1.05,pow(smoothstep(.12,.92,nube),1.25)*der*1.00);',  // frio a la derecha
+  'col+=u_b*pow(smoothstep(.48,1.,d),2.2)*der*.85;',
+  'col+=u_b*pow(der,2.2)*(.30+.55*nube)*.55;',   // halo frio de borde
+
+  /* --- CAMPO DE ESTRELLAS: rejilla con hash, parpadeo lento --- */
+  'vec2 sg=gl_FragCoord.xy/max(u_res.y,1.)*118.;',
+  'vec2 si=floor(sg);',
+  'float sh=fract(sin(dot(si,vec2(41.13,289.7)))*43758.5453);',
+  'float est=step(.9955,sh);',                             // ~0.45% de celdas son estrella
+  'vec2 sf=fract(sg)-.5;',
+  'float sd=1.-smoothstep(.0,.34,length(sf));',
+  'float tw=.72+.28*sin(u_t*1.6+sh*63.0);',                // titileo
+  'float cielo=1.-smoothstep(.10,.72,nube);',              // la nube tapa las estrellas
+  'col+=vec3(.88,.93,1.)*est*sd*tw*cielo*1.35;',
+
+  /* --- vineta y grano (mata el banding del degradado) --- */
+  'col*=1.-.24*pow(length(st)*.74,2.1);',
+  'col+=(fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453)-.5)*.022;',
+  'gl_FragColor=vec4(col,1.);'
+    ].join(''));
+  };
+
   /* 4 · ENJAMBRE — nodos y enlaces. Comunidad, red, alumnos, networking. */
   ATM.enjambre = function () {
     return montar2D(function (ctx, w, h, t, pt, A, B, st) {
@@ -398,7 +466,8 @@
      ====================================================================== */
 
   var Atmosfera = {
-    lista: ['nebulosa', 'aurora', 'pulso', 'enjambre', 'reticula', 'duna', 'viaje', 'ninguna'],
+    lista: ['nebulosa', 'candela', 'aurora', 'pulso', 'enjambre',
+            'reticula', 'duna', 'viaje', 'ninguna'],
 
     usar: function (nombre) {
       this.apagar();
@@ -407,7 +476,8 @@
       var r = f();
       // Si WebGL no esta disponible, las de shader caen a una 2D equivalente.
       if (!r && nombre !== 'ninguna') {
-        var respaldo = { nebulosa: 'duna', aurora: 'reticula', pulso: 'enjambre' }[nombre];
+        var respaldo = { nebulosa: 'duna', candela: 'duna',
+                         aurora: 'reticula', pulso: 'enjambre' }[nombre];
         if (respaldo) {
           console.warn('[atmosfera] sin WebGL, se usa', respaldo);
           r = ATM[respaldo]();

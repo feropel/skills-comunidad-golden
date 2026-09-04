@@ -111,3 +111,35 @@ Regla de puntaje (ÚNICA, escrita idéntica en SKILL.md Fase 2 y en references/r
 
 - **ORO** 950–1000 · **PLATA** 850–949 · **BRONCE** 700–849 · **EN OBRA** <700.
 - Un 🔴 crítico (secretos, datos privados, referencia rota en el camino principal, contradicción que cambia el resultado) impide veredicto ORO aunque el número alcance.
+
+## COMPUERTA DURA · ESPECIFICACION Y REGLAS DE LA CASA (añadida 2026-09-03, mandato de FER)
+
+**Antes de dar cualquier nota, se corre `scripts/validar_arsenal.py` sobre la skill. Si sale con
+codigo 1, la skill NO PUEDE pasar de 700/1000, por perfecta que sea en las 7 dimensiones.**
+
+Por que existe esta compuerta: hasta el 2026-09-02 `inventario.sh` MEDIA la longitud de la
+description y **nunca la comparaba contra el tope**. Resultado medido: **33 skills de la casa
+fuera de la especificacion**, incluidas varias selladas ORO por esta misma rubrica, y **5 con el
+frontmatter YAML roto** que ningun validador de la casa vio. El fallo no fue de nadie: fue del
+instrumento, que imprimia un numero sin vara. Quien lee "1442 caracteres" no tiene con que
+compararlo.
+
+Lo que la compuerta comprueba (topes reales de agentskills.io/specification, leidos en vivo):
+- `name` 1-64, minusculas, digitos y guiones simples, **y coincidiendo con la carpeta** (si no
+  coinciden, la skill NO CARGA y ninguna otra dimension importa).
+- `description` **1-1024 DURO**. Se carga al arranque para TODAS las skills, asi que pasarse
+  encarece cada sesion y arriesga el truncado de los disparadores del final, que son los mas
+  nuevos.
+- `compatibility` 1-500 si se usa · sin campos ajenos al frontmatter · YAML valido.
+- Reglas duras de FER sobre la description: sin signos de apertura, sin acentos rotos, sin rayas
+  separadoras, lenguaje de EMPRESA fuera de las citas del cliente.
+
+Cuerpo de mas de 500 lineas es **aviso, no falla**: encarece la activacion, no la rompe. No resta
+puntos por si solo; se anota en el informe.
+
+**Al recortar una description que se pasa: los disparadores primero.** Los del final son los mas
+nuevos y los primeros en perderse. Lo explicativo y las fronteras bajan al CUERPO, que no tiene
+tope duro. Nada se borra: se muda.
+
+El validador tiene su propia autoprueba (`scripts/autoprueba_arsenal.py`, 17 casos en las dos
+direcciones). **Si la autoprueba no pasa, el validador no se usa para juzgar a nadie.**

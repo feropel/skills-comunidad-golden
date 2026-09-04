@@ -2,21 +2,24 @@
 name: golden-archivos
 description: >-
   Golden Group — ORGANIZADOR DE BIBLIOTECAS DE ARCHIVOS. Toma control de carpetas caóticas
-  (productos, creativos, marca, informes) y las deja coherentes: clasifica por tipo, pone nombres
-  auto-descriptivos con el producto adentro, separa el material WEB listo para subir de los
-  originales HD/master, aplica la regla anti-mezcla (ninguna carpeta con archivos sueltos al lado
-  de subcarpetas), reubica lo que está en el producto equivocado y elimina duplicados reales —
-  todo con log reversible y verificación VISUAL antes de borrar. Úsala SIEMPRE que el usuario
-  quiera organizar, ordenar, limpiar, clasificar o auditar archivos y carpetas — "organiza mi
-  escritorio", "acomódame estas carpetas", "esto está hecho un desastre", "tengo archivos
-  duplicados", "no sé qué es este archivo", "revisa que todo esté en su sitio", "clasifica estas
-  fotos/videos", "separa lo que subo a Shopify de los originales", "hay imágenes repetidas",
-  "esto no va en esa carpeta" — o cuando arrastre una carpeta suelta pidiendo que la ubique.
-  Dispara aunque no diga "organizar": basta con desorden de archivos, duplicados, nombres
-  crípticos (IMG_4924, UUID, "Video 1") o material de producto mezclado. NO para código/repos,
-  datos de ventas (golden-dropi-analisis) ni generar imágenes (golden-imagen-arena).
+  (productos, creativos, marca, informes) y las deja coherentes: clasifica por tipo, pone
+  nombres auto-descriptivos con el producto adentro, separa el material WEB listo para subir
+  de los originales HD, aplica la regla anti-mezcla (ninguna carpeta con archivos sueltos al
+  lado de subcarpetas), reubica lo que está en el producto equivocado y elimina duplicados
+  reales, todo con log reversible y verificación VISUAL antes de borrar. Úsala SIEMPRE que
+  el usuario quiera organizar, ordenar, limpiar, clasificar o auditar archivos y carpetas:
+  "organiza mi escritorio", "acomódame estas carpetas", "esto está hecho un desastre",
+  "tengo archivos duplicados", "no sé qué es este archivo", "revisa que todo esté en su
+  sitio", "clasifica estas fotos o videos", "separa lo que subo a Shopify de los
+  originales", "hay imágenes repetidas", "esto no va en esa carpeta", o cuando arrastre una
+  carpeta suelta pidiendo que la ubique.
 ---
-
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 1004 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # Golden Archivos — orden de bibliotecas de archivos
 
 <!-- skill v1.6 · auditoría golden-skill-auditor 2026-08-23 (947→): TRES hallazgos, todos de la MISMA CLASE — trabajo que se calla sin error. (1) nombrar.sh ALLOW seguía sin `mkv` pese a que el changelog de v1.5 declaraba las listas "alineadas": clasificar.sh lo manda a VIDEOS y nunca recibía prefijo; verificado ahora por diff programático de ambas listas (huecos restantes: 0) — la lección es que "alineadas" se demuestra con un diff, no se afirma. (2) hoja-contactos.sh solo intentaba 8 formatos (jpg jpeg png webp gif heic mp4 mov): tiff/bmp/heif/webm/m4v/avi/mkv/svg/psd no se intentaban siquiera, así que no salían en el mosaico NI en la línea "no se pudo leer" — medido en sandbox: 4 archivos → "1 pieza". Eso contradecía la regla propia de la skill ("un mosaico que calla piezas invalida la verificación") en la herramienta de la fase 6, que es el corazón del método. Ahora la lista MEDIA_EXTS cubre todo lo que clasificar.sh trata como media, y el cierre imprime SIEMPRE "N de M piezas renderizadas" más un aviso si M>N y otro con los archivos no-media: el censo hace imposible la omisión silenciosa. (3) Sección "Conexión con el ecosistema" (estándar 9): los cambios y hallazgos relevantes se reportan a 🧠 GOLDEN - CENTRO DE MANDO — un criterio descubierto organizando (ej. dos marcas que son el mismo producto físico) le sirve a la tienda, la pauta y el bot, y si se queda en el chat se pierde. Blindaje: chflags -R uchg re-aplicado al cierre. -->
@@ -222,3 +225,10 @@ Los cambios relevantes de esta skill — y los hallazgos que deje una corrida gr
 ## Referencias
 
 - `references/estructura.md` — léela ANTES de crear o reorganizar cualquier carpeta de producto (fases 2 a 5): trae la anatomía estándar, la regla de nombrado, WEB vs MASTER y las reglas de identidad entre productos
+
+## Fronteras y desambiguacion
+
+Descripcion completa anterior (se conserva para no perder ningun matiz de frontera):
+
+> Golden Group — ORGANIZADOR DE BIBLIOTECAS DE ARCHIVOS. Toma control de carpetas caóticas (productos, creativos, marca, informes) y las deja coherentes: clasifica por tipo, pone nombres auto-descriptivos con el producto adentro, separa el material WEB listo para subir de los originales HD/master, aplica la regla anti-mezcla (ninguna carpeta con archivos sueltos al lado de subcarpetas), reubica lo que está en el producto equivocado y elimina duplicados reales — todo con log reversible y verificación VISUAL antes de borrar. Úsala SIEMPRE que el usuario quiera organizar, ordenar, limpiar, clasificar o auditar archivos y carpetas — "organiza mi escritorio", "acomódame estas carpetas", "esto está hecho un desastre", "tengo archivos duplicados", "no sé qué es este archivo", "revisa que todo esté en su sitio", "clasifica estas fotos/videos", "separa lo que subo a Shopify de los originales", "hay imágenes repetidas", "esto no va en esa carpeta" — o cuando arrastre una carpeta suelta pidiendo que la ubique. Dispara aunque no diga "organizar": basta con desorden de archivos, duplicados, nombres crípticos (IMG_4924, UUID, "Video 1") o material de producto mezclado. NO para código/repos, datos de ventas (golden-dropi-analisis) ni generar imágenes (golden-imagen-arena).
+

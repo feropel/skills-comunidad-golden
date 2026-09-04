@@ -5,13 +5,13 @@ orgánico, WhatsApp). Meta y TikTok RECHAZAN anuncios que violen esto; TikTok es
 Regla base transversal: **enfoque positivo del beneficio**, nunca diagnóstico ni promesa de cura, sin
 atributos personales ("sufres de…?"), sin antes/después corporal engañoso.
 
-**El NOMBRE del producto también es un ítem de compliance** (caso "Dental el producto del estudio", Chile
+**El NOMBRE del producto también es un ítem de compliance** (caso "Dental Cavity Healing", Chile
 2026-08-07: el nombre promete curación y era el mayor pasivo legal del negocio; ninguna revisión lo
 detectaba porque el mapa miraba el copy, no el nombre). Si el nombre promete cura o resultado
 médico → proponer renombre. Ver `00-identificacion-forense.md`.
 
 ## Salud bucal (gotas dentales, remineralizantes, blanqueadores)
-Redacción probada en campo (estudio Dental el producto del estudio · Chile · 2026-08-07):
+Redacción probada en campo (estudio Dental Cavity Healing · Chile · 2026-08-07):
 - ❌ "sana caries", "elimina la caries", "repara el diente", "reemplaza al dentista",
   antes/después de dentadura, porcentajes de efectividad, odontólogo firmando o avalando.
 - ✅ "ayuda a cuidar el esmalte", "apoya la remineralización", demostración del gotario,

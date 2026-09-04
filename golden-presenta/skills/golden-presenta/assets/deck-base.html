@@ -60,6 +60,13 @@
 
   /* --- Geometria de lamina --- */
   --vidrio:  72%;       /* opacidad de la lamina sobre la atmosfera */
+  /* Fuerza del fondo. 1 = a tope, 0.45 = presente pero calmado, 0.25 = insinuado.
+     Cuando el fondo "esta muy alborotado" se baja ESTO antes de cambiar de
+     atmosfera: casi siempre el problema es la intensidad, no el motivo. */
+  --atmosfera-fuerza: 1;
+  --logo-alto: 34px;    /* altura del logo en el HUD */
+  --logo-alto-portada: 96px;
+  --logo-ancho-portada: 320px;   /* el tope que impide que un logo apaisado se coma la lamina */
   --slide-w: 1280px;
   --slide-h: 720px;
   --pad:     84px;
@@ -277,6 +284,99 @@ em{font-style:italic;color:var(--accent)}
   letter-spacing:var(--tracking-micro); color:var(--muted); text-transform:uppercase;
 }
 
+/* ==========================================================
+   TIPOS VISUALES
+   Sin estos, un deck solo puede ser texto: esa fue la causa
+   medida de "puro texto, muy plana" el 2026-09-03.
+   ========================================================== */
+
+/* --- Marca: el logo, en portada y en el HUD --- */
+/* El logo se limita por ALTO y por ANCHO. Con solo la altura, un logo apaisado
+   (10:1 es normal en logotipos con texto) se estira hasta ocupar la lamina entera
+   y encima se pixela si el original es pequeno. Medido el 2026-09-03 con el logo
+   del Cartel: 92px de alto lo llevaban a 920px de ancho desde un PNG de 300px. */
+.marca-logo{
+  display:block; width:auto; height:auto;
+  max-height:var(--logo-alto-portada); max-width:var(--logo-ancho-portada);
+  object-fit:contain; margin-bottom:30px;
+  /* flex-shrink:0 — la lamina es un contenedor flex en columna y comprimia el
+     logo en vertical. Medido el 2026-09-03 con el logo del Cartel (900x767,
+     ratio 1.17): la CAJA salia 264x79, ratio 3.33. object-fit salvaba la imagen
+     de deformarse, pero dejaba un hueco enorme a los lados y el margen inferior
+     descolocado. Aviso del chat del Cartel, confirmado midiendo. */
+  flex-shrink:0; align-self:flex-start;
+}
+#hud .marca-logo{max-height:var(--logo-alto); max-width:150px; margin:0}
+#hud.con-logo .marca{display:none}   /* el logo sustituye al nombre escrito */
+
+/* t-visual — imagen o diagrama junto al texto. El caballo de batalla. */
+.t-visual .par{
+  display:grid; grid-template-columns:1fr 1fr; gap:56px; align-items:center; flex:1;
+}
+.t-visual.img-izq .par{direction:rtl}
+.t-visual.img-izq .par > *{direction:ltr}
+.t-visual .par h2{
+  font-family:var(--font-display); font-size:clamp(28px,3.2vw,44px);
+  line-height:1.1; letter-spacing:-.02em; margin-bottom:20px;
+}
+.t-visual .par p{font-size:18px; line-height:1.6; color:var(--muted)}
+.t-visual .par li{
+  font-size:17px; line-height:1.5; color:var(--ink);
+  padding:10px 0 10px 26px; position:relative; border-top:1px solid var(--line);
+}
+.t-visual .par li:first-child{border-top:0}
+.t-visual .par li::before{
+  content:""; position:absolute; left:0; top:18px;
+  width:8px; height:8px; border-radius:2px; background:var(--accent);
+}
+.marco{
+  margin:0; border-radius:14px; overflow:hidden;
+  border:1px solid var(--line); background:rgba(255,255,255,.03);
+  display:flex; align-items:center; justify-content:center;
+  max-height:520px;
+}
+.marco img, .marco svg{display:block; width:100%; height:auto; object-fit:contain}
+.marco.limpio{border:0; background:none}
+.marco figcaption{
+  padding:12px 16px; font:500 11px/1.4 var(--font-mono);
+  letter-spacing:var(--tracking-micro); color:var(--muted); text-transform:uppercase;
+}
+
+/* t-galeria — rejilla de imagenes o logos (clientes, capturas, resultados) */
+.t-galeria h2{
+  font-family:var(--font-display); font-size:clamp(28px,3.2vw,44px);
+  line-height:1.1; margin-bottom:34px;
+}
+.t-galeria .rejilla{display:grid; gap:16px}
+.t-galeria .rejilla.g2{grid-template-columns:repeat(2,1fr)}
+.t-galeria .rejilla.g3{grid-template-columns:repeat(3,1fr)}
+.t-galeria .rejilla.g4{grid-template-columns:repeat(4,1fr)}
+.t-galeria .rejilla figure{
+  margin:0; border:1px solid var(--line); border-radius:12px; overflow:hidden;
+  background:rgba(255,255,255,.03); aspect-ratio:4/3;
+  display:flex; align-items:center; justify-content:center; padding:14px;
+}
+.t-galeria .rejilla img, .t-galeria .rejilla svg{max-width:100%; max-height:100%; width:auto}
+
+/* t-pantalla — una captura a lo grande, con marco de ventana */
+.t-pantalla{padding:56px}
+.t-pantalla h2{
+  font-family:var(--font-display); font-size:clamp(24px,2.6vw,34px); margin-bottom:22px;
+}
+.ventana{
+  border-radius:12px; overflow:hidden; border:1px solid var(--line);
+  box-shadow:0 40px 90px -40px rgba(0,0,0,.9); flex:1; display:flex; flex-direction:column;
+}
+.ventana .barra{
+  display:flex; align-items:center; gap:7px; padding:10px 14px;
+  background:rgba(255,255,255,.05); border-bottom:1px solid var(--line);
+}
+.ventana .barra i{width:10px; height:10px; border-radius:50%; background:var(--line); display:block}
+.ventana .barra span{
+  margin-left:10px; font:500 11px/1 var(--font-mono); color:var(--muted);
+}
+.ventana img{display:block; width:100%; height:auto}
+
 /* t-cierre — el CTA se lee, no se anima */
 .t-cierre{align-items:flex-start; text-align:left}
 .t-cierre h2{
@@ -373,6 +473,12 @@ body.presentador #presentador{transform:none}
   .slide [data-reveal]{opacity:1 !important; transform:none !important; filter:none !important}
   .slide::after{display:none}
   .grid.c2,.grid.c3{grid-template-columns:1fr}
+  .t-visual .par{grid-template-columns:1fr; gap:26px; direction:ltr !important}
+  .t-galeria .rejilla.g2,.t-galeria .rejilla.g3,.t-galeria .rejilla.g4{grid-template-columns:repeat(2,1fr)}
+  .marco{max-height:none}
+  .marca-logo{height:56px}
+  #hud .marca-logo{height:26px}
+  .t-pantalla{padding:32px 24px}
   .t-proceso .pasos{grid-auto-flow:row; gap:22px}
   .t-proceso .paso::before{display:none}
   #presentador{display:none}
@@ -533,7 +639,35 @@ body.presentador #presentador{transform:none}
       <div class="autor" data-reveal>GP_AUTOR_CITA</div>
     </section>
 
-    <!-- 08 · CIERRE -->
+    <!-- 08 · VISUAL · imagen o diagrama junto al texto.
+         Cambiar a class="t-visual img-izq" para poner la imagen a la izquierda.
+         La imagen va SIEMPRE como data URI: scripts/incrustar_recurso.py -->
+    <section class="slide t-visual" data-x="-1560" data-y="0" data-scale="1" data-rot="0"
+             data-notas="La imagen se mira sola. El texto de al lado se lee en voz alta, no se proyecta entero.">
+      <div class="eyebrow" data-reveal>(08) Cómo se ve</div>
+      <div class="par" data-reveal>
+        <div>
+          <h2>GP_VISUAL_TITULO</h2>
+          <p>GP_VISUAL_TEXTO</p>
+        </div>
+        <figure class="marco">
+          <img src="GP_VISUAL_IMG" alt="GP_VISUAL_ALT">
+        </figure>
+      </div>
+    </section>
+
+    <!-- 09 · PANTALLA · una captura grande con marco de ventana -->
+    <section class="slide t-pantalla" data-x="-1560" data-y="900" data-scale="1" data-rot="0"
+             data-notas="Una sola captura. Si hay que señalar algo, se señala con el cursor en vivo.">
+      <div class="eyebrow" data-reveal>(09) En vivo</div>
+      <h2 data-reveal>GP_PANTALLA_TITULO</h2>
+      <div class="ventana" data-reveal>
+        <div class="barra"><i></i><i></i><i></i><span>GP_PANTALLA_URL</span></div>
+        <img src="GP_PANTALLA_IMG" alt="GP_PANTALLA_ALT">
+      </div>
+    </section>
+
+    <!-- 10 · CIERRE -->
     <section class="slide t-cierre" data-x="0" data-y="900" data-scale="1" data-rot="0"
              data-notas="Un solo paso siguiente. Si hay dos opciones, no hay ninguna.">
       <div class="eyebrow" data-reveal>(07) El paso siguiente</div>
@@ -547,6 +681,10 @@ body.presentador #presentador{transform:none}
 
 <!-- ===== HUD ===== -->
 <div id="hud">
+  <!-- Logo en el HUD: descomentar y poner el data URI. Al hacerlo, anadir la
+       clase "con-logo" al div de arriba para que el nombre escrito no se duplique.
+       El data URI se genera con: scripts/incrustar_recurso.py imagen <ruta> -->
+  <!-- <img class="marca-logo" src="GP_LOGO_URI" alt="GP_MARCA"> -->
   <span class="marca">GP_MARCA</span>
   <span id="titulo-lamina"></span>
   <span class="sep"></span>
@@ -633,8 +771,12 @@ body.presentador #presentador{transform:none}
     var c = document.createElement('canvas');
     c.id = 'atmosfera';
     c.setAttribute('aria-hidden', 'true');
+    // La opacidad sale del token --atmosfera-fuerza, para poder calmar el fondo
+    // sin cambiar de atmosfera ni tocar el shader.
+    var fuerza = getComputedStyle(document.documentElement)
+                   .getPropertyValue('--atmosfera-fuerza').trim() || '1';
     c.style.cssText = 'position:fixed;inset:0;width:100%;height:100%;z-index:0;' +
-                      'pointer-events:none;display:block';
+                      'pointer-events:none;display:block;opacity:' + fuerza;
     document.body.insertBefore(c, document.body.firstChild);
     return c;
   }
@@ -838,6 +980,70 @@ body.presentador #presentador{transform:none}
     ].join(''));
   };
 
+  /* 3b · CANDELA — nube de brasa naranja a la izquierda, frio cian a la derecha,
+     campo de estrellas detras. Evento del Cartel, marca personal con fuego,
+     lanzamiento. Origen: el fondo del video de los 7 mentores de El Cartel del
+     Chat (sitio/cartel-6.mp4), colores MUESTREADOS del frame a t=2s:
+       candela pico #ff6926 · medio #854225 · base #4f2817
+       cian #247684 · base cian #073238 · negro calido #280b05
+     Esos hex viven aqui solo como documentacion: el shader NO los lleva quemados,
+     usa u_a / u_b / u_bg como todas las demas, asi que cada deck se sigue viendo
+     distinto segun sus tokens. Construida por el chat "Estructura y componentes
+     de un skill" y verificada leyendo pixeles de vuelta (5 de 5 en su banco de
+     pruebas, contra 2 de 5 del caso de control). Adoptada como NOVENA atmosfera,
+     sin tocar `nebulosa`, para no cambiar los decks que ya la usan. */
+  ATM.candela = function () {
+    return montarShader([
+
+  /* --- coordenadas: st centrado, uv 0..1 --- */
+  'vec2 q=st*1.15;',
+  'q+=(u_m-.5)*.18;',                       // el puntero mueve la nube, suave
+
+  /* --- domain warping: da los filamentos de humo, no manchas --- */
+  'float w1=fbm(q*1.30+vec2(u_t*.028,u_t*.017));',
+  'float w2=fbm(q*1.90+vec2(-u_t*.021,u_t*.033)+w1*1.15);',
+  'vec2 qw=q+vec2(w1,w2)*.55;',
+  'float n=fbm(qw*2.10+vec2(u_t*.019,-u_t*.024));',
+  'float d=fbm(qw*4.30-vec2(u_t*.037,u_t*.015));',
+
+  /* --- densidad de nube --- */
+  'float nube=smoothstep(-.18,.62,n*.85+d*.35);',
+
+  /* --- ASIMETRIA: candela pesa a la izquierda, frio a la derecha --- */
+  'float izq=smoothstep(.72,.02,uv.x);',
+  'float der=smoothstep(.18,.92,uv.x);',
+
+  /* --- nucleo de brasa: lo mas caliente, solo donde la nube es densa y a la izquierda --- */
+  'float brasa=pow(smoothstep(.42,1.,nube),2.6)*izq;',
+  'float vena=pow(smoothstep(.60,1.,n+d*.5),3.4)*izq;',   // filamentos encendidos
+
+  /* --- composicion sobre negro calido --- */
+  'vec3 col=u_bg;',
+  'col=mix(col,u_a*.58,nube*izq*1.00);',                    // halo naranja
+  'col=mix(col,u_a,brasa*.85);',                           // cuerpo de candela
+  'col+=u_a*vena*.55;',                                    // venas encendidas
+  'col=mix(col,u_b*1.05,pow(smoothstep(.12,.92,nube),1.25)*der*1.00);',  // frio a la derecha
+  'col+=u_b*pow(smoothstep(.48,1.,d),2.2)*der*.85;',
+  'col+=u_b*pow(der,2.2)*(.30+.55*nube)*.55;',   // halo frio de borde
+
+  /* --- CAMPO DE ESTRELLAS: rejilla con hash, parpadeo lento --- */
+  'vec2 sg=gl_FragCoord.xy/max(u_res.y,1.)*118.;',
+  'vec2 si=floor(sg);',
+  'float sh=fract(sin(dot(si,vec2(41.13,289.7)))*43758.5453);',
+  'float est=step(.9955,sh);',                             // ~0.45% de celdas son estrella
+  'vec2 sf=fract(sg)-.5;',
+  'float sd=1.-smoothstep(.0,.34,length(sf));',
+  'float tw=.72+.28*sin(u_t*1.6+sh*63.0);',                // titileo
+  'float cielo=1.-smoothstep(.10,.72,nube);',              // la nube tapa las estrellas
+  'col+=vec3(.88,.93,1.)*est*sd*tw*cielo*1.35;',
+
+  /* --- vineta y grano (mata el banding del degradado) --- */
+  'col*=1.-.24*pow(length(st)*.74,2.1);',
+  'col+=(fract(sin(dot(gl_FragCoord.xy,vec2(12.9898,78.233)))*43758.5453)-.5)*.022;',
+  'gl_FragColor=vec4(col,1.);'
+    ].join(''));
+  };
+
   /* 4 · ENJAMBRE — nodos y enlaces. Comunidad, red, alumnos, networking. */
   ATM.enjambre = function () {
     return montar2D(function (ctx, w, h, t, pt, A, B, st) {
@@ -972,7 +1178,8 @@ body.presentador #presentador{transform:none}
      ====================================================================== */
 
   var Atmosfera = {
-    lista: ['nebulosa', 'aurora', 'pulso', 'enjambre', 'reticula', 'duna', 'viaje', 'ninguna'],
+    lista: ['nebulosa', 'candela', 'aurora', 'pulso', 'enjambre',
+            'reticula', 'duna', 'viaje', 'ninguna'],
 
     usar: function (nombre) {
       this.apagar();
@@ -981,7 +1188,8 @@ body.presentador #presentador{transform:none}
       var r = f();
       // Si WebGL no esta disponible, las de shader caen a una 2D equivalente.
       if (!r && nombre !== 'ninguna') {
-        var respaldo = { nebulosa: 'duna', aurora: 'reticula', pulso: 'enjambre' }[nombre];
+        var respaldo = { nebulosa: 'duna', candela: 'duna',
+                         aurora: 'reticula', pulso: 'enjambre' }[nombre];
         if (respaldo) {
           console.warn('[atmosfera] sin WebGL, se usa', respaldo);
           r = ATM[respaldo]();
@@ -1077,6 +1285,25 @@ body.presentador #presentador{transform:none}
     });
   }
   disponerLienzo();
+
+  /* --- Numeracion automatica de las etiquetas de seccion ---
+     Si el eyebrow empieza por "(NN)", el motor reescribe ese numero segun la
+     posicion REAL de la lamina. Reportado por el chat del Cartel el 2026-09-03:
+     numerando a mano, sus pasos salieron 00, 01, 03, 04, 05, 06, 08 — con huecos,
+     de mover laminas de sitio. Si el motor lo ofrece, nadie tiene que acordarse.
+     La portada no cuenta: la numeracion empieza en la segunda lamina. */
+  function numerarSecciones(){
+    var n = 0;
+    slides.forEach(function(s){
+      var e = s.querySelector('.eyebrow');
+      if(!e) return;
+      var t = e.textContent;
+      if(!/^\s*\(\d+\)/.test(t)) return;   // solo las que ya se numeran
+      n++;
+      e.textContent = t.replace(/^\s*\(\d+\)/, '(' + (n < 10 ? '0' + n : n) + ')');
+    });
+  }
+  numerarSecciones();
 
   /* --- Camara: centra la lamina i en el viewport --- */
   function encuadrar(i){
@@ -1252,6 +1479,19 @@ body.presentador #presentador{transform:none}
     clearTimeout(rt);
     rt = setTimeout(reajustar, 120);
   }
+  /* --- Deep-link en caliente ---
+     En carga nueva el hash ya funcionaba. Lo que no: CAMBIAR el hash sin recargar.
+     Medido el 2026-09-03: con el deck abierto en #6, ir a #8 dejaba la lamina 6
+     activa y el contador en 06. Pasa cuando alguien te pasa un enlace a una lamina
+     y ya tienes el deck abierto, o cuando se escribe el hash en la barra. */
+  window.addEventListener('hashchange', function(){
+    var n = parseInt((location.hash || '').replace('#', ''), 10);
+    if (!isNaN(n) && n >= 1 && n <= total && (n - 1) !== idx) {
+      usuarioInteractuo = true;
+      ir(n - 1, false);
+    }
+  });
+
   window.addEventListener('resize', reajustarConFreno);
   window.addEventListener('orientationchange', reajustarConFreno);
   if(window.ResizeObserver){

@@ -10,6 +10,20 @@ buena intencion — y las buenas intenciones no cazan bugs. El mecanismo es este
   no basta con arreglar esa pagina: se agrega el check a `scripts/autocheck.py` y su caso a
   `scripts/autoprueba.py`. Asi el fallo no puede volver en silencio. Lo que no se automatiza,
   se vuelve a pagar.
+- **La skill tambien se valida A SI MISMA, no solo a lo que produce.** Medido: esta skill revisaba
+  a fondo el `product.json` que genera y **no se revisaba a si misma como artefacto publicable**,
+  aunque se publica al marketplace. La `description` llevaba angulares que la spec prohibe, y lo
+  cazo el validador OFICIAL de `skill-creator` — que ninguna de nuestras herramientas corria.
+  **Un validador propio muy pulido no sustituye al de la plataforma que publica.** Ahora la
+  autoprueba lo ejecuta: BLOQUEA si falla (el fallo es nuestro) y AVISA si no lo encuentra (vive
+  fuera de nuestro arbol y lo mantiene otro).
+- 🔴 **Un reemplazo que no casa NO falla: no hace nada.** Medido aqui: en G4.10 el encabezado nuevo
+  de `auto-check.md` no entro porque el patron decia "Auto-verificacion" y el archivo dice
+  "Auto-verificación" **con tilde** — la ley del grep con tilde dentro del propio horneado. El
+  comando termino sin error, el changelog dio el cambio por hecho, y la documentacion quedo diciendo
+  "correr este script" **sin decir como**, durante ocho versiones. Regla: tras editar, **verificar
+  que el texto nuevo ESTA** (grep del resultado), no que el comando salio sin error. Un cambio que
+  no se aplico es indistinguible de uno aplicado si nadie mira.
 - **El validador se ejecuta, no se lee.** `python3 scripts/autocheck.py <product.json>`.
   Un check que vive solo en prosa depende de que alguien se acuerde; uno que corre, no.
 - **El validador tambien se prueba.** `scripts/autoprueba.py` sabotea la plantilla base con los

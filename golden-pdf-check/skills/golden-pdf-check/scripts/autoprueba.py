@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 GOLDEN PDF · autoprueba.py
-Prueba de regresión de la skill: **22 comprobaciones** sobre PDFs construidos
+Prueba de regresión de la skill: **23 comprobaciones** sobre PDFs construidos
 de verdad (nada simulado). Hay una prueba por cada versión que cambió el
 comportamiento, para que una regresión no pase en verde:
 
@@ -18,9 +18,13 @@ comportamiento, para que una regresión no pase en verde:
   18. DIRECCIÓN POSITIVA: el auditor NO marca un PDF Golden limpio (probar en
   las dos direcciones — un detector agresivo daña tanto como uno ciego) ·
   19. COMPONENTES VISUALES (v6.0) · 20. IDENTIDAD por tema ·
-  21. Estado del REGISTRO DE FÁBRICAS, la cara que vive fuera del árbol
+  21. NEUTRALIDAD POR DEFECTO (v6.1): un documento construido SIN --tema no
+  lleva NINGUNA marca de Golden — ni pie, ni autor, ni kicker, ni logo.
+  Existe porque hasta v6.0 la marca era el valor por defecto y quien usara
+  la skill firmaba sus documentos con la marca de FER sin enterarse ·
+  22. Estado del REGISTRO DE FÁBRICAS, la cara que vive fuera del árbol
   (informativo: entre sellar y que el CdM regenere hay desfase legítimo) ·
-  22. COHERENCIA DEL SELLO: las comprobaciones declaradas aquí arriba son
+  23. COHERENCIA DEL SELLO: las comprobaciones declaradas aquí arriba son
   exactamente las que la corrida imprime.
 
 La cifra de arriba es la que imprime una corrida SANA, y es la que va en el
@@ -228,10 +232,15 @@ def main():
         except ImportError:
             txt, imgs = "", -1
         # Un SVG se incrusta como VECTOR (no suma XObject de imagen: mejor, queda
-        # nítido y ligero); el PNG sí suma. Con el logo de la portada, >= 2.
+        # nítido y ligero); el PNG sí suma, y ese PNG es lo que esta prueba mide.
+        # El umbral era >=2 porque contaba TAMBIÉN el logo de la portada, que
+        # hasta v6.0 se colaba por defecto sin que nadie lo pidiera. Al quitar
+        # ese logo (v6.1) la prueba se puso roja y dejó ver que su umbral medía
+        # dos cosas distintas: la figura del documento y una marca del motor.
+        # Ahora mide solo lo suyo.
         up = txt.upper()   # la insignia se imprime en versalitas por CSS
         results.append(("Figuras: imagen incrustada y pies numerados en orden",
-                        imgs >= 2 and "FIGURA 1" in up and "FIGURA 2" in up,
+                        imgs >= 1 and "FIGURA 1" in up and "FIGURA 2" in up,
                         "imagenes=%d" % imgs if imgs >= 0
                         else "sin pdfplumber: no se pudo verificar"))
 
@@ -511,6 +520,55 @@ def main():
         results.append(("Identidad por tema: el mismo .md sale con otra marca",
                         not fc, "; ".join(fc) if fc else
                         "Comunidad Golden vs Cartel: colores y pie distintos"))
+
+    # v6.1 · NEUTRALIDAD POR DEFECTO. Guardián de CLASE, no del caso: no
+    # comprueba que un tema concreto funcione (eso es la prueba 20), sino que
+    # SIN tema no se cuele NINGUNA marca de la casa. El defecto que la motiva no
+    # se veía en ninguna corrida verde: la skill hacía exactamente lo que decía
+    # su código, y lo que decía era "si no te identificas, te pongo la marca de
+    # FER". Lo reportó el chat del Cartel preparando material propio.
+    _neu = []
+    _detn = ""
+    try:
+        neu_md = os.path.join(tmp, "neutro.md")
+        with open(neu_md, "w", encoding="utf-8") as fh:
+            fh.write("---\ntitle: Documento de un tercero\n---\n\n"
+                     "## Seccion\n\nTexto cualquiera.\n")
+        neu_pdf = os.path.join(tmp, "neutro.pdf")
+        # A propósito SIN --tema, SIN --footer, SIN --logo: el caso del tercero
+        # que corre la skill tal cual la recibe.
+        run([sys.executable, os.path.join(SCRIPTS, "build_pdf.py"),
+             neu_md, neu_pdf, "--no-verify"])
+        import pdfplumber as _pn
+        with _pn.open(neu_pdf) as _d:
+            _tn = "\n".join((_p.extract_text() or "") for _p in _d.pages)
+            _imgs = sum(len(_p.images) for _p in _d.pages)
+        # COMPARAR EN MAYÚSCULAS, no en la caja del código: el kicker y el pie
+        # se imprimen en VERSALITAS por CSS, así que en el PDF el texto extraído
+        # es "COMUNIDAD GOLDEN" y buscar "Comunidad Golden" no encuentra nada.
+        # Medido: la primera versión de esta prueba pasaba en verde con el
+        # defecto REPUESTO a propósito — un guardián ciego que parecía trabajar.
+        _tnU = _tn.upper()
+        for marca in ("COMUNIDAD GOLDEN", "GOLDEN GROUP"):
+            if marca in _tnU:
+                _neu.append("estampa '%s' sin que nadie la pidiera" % marca.title())
+        # El logo es marca igual que el texto: un pie vacío con el emblema de
+        # Golden sigue siendo atribución falsa. El documento no trae figuras,
+        # así que CUALQUIER imagen incrustada aquí es el logo.
+        if _imgs:
+            _neu.append("incrusta %d imagen(es): el logo se cuela igual" % _imgs)
+    except ImportError as e:
+        _neu = None
+        _detn = "no verificable: falta pdfplumber (%s)" % e
+    except Exception as e:
+        _neu = ["la prueba reventó: %s: %s" % (type(e).__name__, e)]
+    if _neu is None:
+        results.append(("Neutralidad por defecto: sin --tema no hay marca Golden",
+                        None, _detn))
+    else:
+        results.append(("Neutralidad por defecto: sin --tema no hay marca Golden",
+                        not _neu, "; ".join(_neu) if _neu else
+                        "sin pie, sin autor, sin kicker y sin logo"))
 
     # LA CUARTA CARA, la que vive FUERA del árbol: la fila del REGISTRO-FABRICAS,
     # que leen los otros chats y que ningún bump ni blindaje alcanza. Se reporta

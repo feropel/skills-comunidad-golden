@@ -1,23 +1,24 @@
 ---
 name: golden-imagen-arena
-description: >
+description: >-
   Golden Group — ARENA DE IMÁGENES por API. Genera la MISMA pieza de ecommerce en VARIOS
-  motores de IA a la vez (Nano Banana Pro, Nano Banana 2, OpenAI Hazel, GPT Image 2,
-  Seedream 5 Pro, FLUX.2, Recraft, DTC Ads con brand kit) a través del MCP de Higgsfield,
-  con la FOTO REAL del producto como referencia, las descarga, las optimiza a WebP < 150 KB
-  y las CALIFICA con una rúbrica de conversión para decir cuál ganó y por qué. Sin
-  navegador, sin arrastrar archivos: la foto entra por URL (CDN de Shopify) o por subida
-  directa desde el Mac. Úsala SIEMPRE que el usuario quiera: comparar modelos de imagen,
-  "cuál IA hace mejor esta imagen", "genérame esta imagen en varios modelos", "hazlo
-  automático por API", "prueba nano banana", "cuál motor uso para este producto", generar
-  creativos/infografías de producto sin navegador, o producir el paquete visual de una
-  ficha Shopify de forma desatendida. Dispara aunque no nombren un modelo: basta con
-  "imágenes de producto automáticas / por API / comparando IAs". Si golden-ecom-magic está
-  instalada, esa es la productora por defecto con un solo motor y plantillas; esta manda
-  cuando hay que COMPARAR motores o producir por API sin navegador. NO usar para avatares
-  UGC o video (eso es golden-ugc-avatar), ni para montar la página (golden-shopify).
+  motores de IA a la vez (Nano Banana Pro y 2, OpenAI Hazel, GPT Image 2, Seedream 5 Pro,
+  FLUX.2, Recraft, DTC Ads con brand kit) por el MCP de Higgsfield, con la FOTO REAL del
+  producto como referencia, las descarga, las optimiza a WebP menor a 150 KB y las CALIFICA
+  con una rúbrica de conversión para decir cuál ganó y por qué. Sin navegador y sin
+  arrastrar archivos: la foto entra por URL (CDN de Shopify) o por subida directa desde el
+  Mac. Úsala SIEMPRE que el usuario quiera: comparar modelos de imagen, "cuál IA hace mejor
+  esta imagen", "genérame esta imagen en varios modelos", "hazlo automático por API",
+  "prueba nano banana", "cuál motor uso para este producto", generar creativos o infografías
+  de producto sin navegador, o producir el paquete visual de una ficha Shopify de forma
+  desatendida. Dispara aunque no nombren un modelo.
 ---
-
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 923 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # golden-imagen-arena — Varias IAs compiten, una gana
 
 <!-- skill v1.12 · 2026-08-30 (chat FILTRO, autoridad de FER) · NUEVO references/formato-por-destino.md. Origen: el documento "Un post en todas partes" (Maurys Alvarez) que FER trajo el 30-ago; se toma su TABLA DE FORMATO POR RED y se descarta su herramienta (Metricool de pago, Make/n8n), que no esta contratada. HUECO MEDIDO con sinapsis: la frase "formato por red social" daba 0 de 93 skills, y sobre esta skill 9:16 cero menciones, 16:9 cero, 2:3 cero. El prompt maestro solo ofrecia {1080x1080 | 1080x1350}: faltaban TRES de los cinco formatos, incluido el vertical de reel y story. VERIFICADO CONTRA EL SCHEMA VIVO del MCP de Higgsfield: outpaint_image (imagen) cubre los cinco ratios, pero reframe (video) NO soporta 4:5 ni 2:3, y 4:5 es justo el feed de Instagram; para llevar video a 4:5 el camino es recorte con ffmpeg en golden-video-editor. EJECUTADO get_cost (no lanza job): reframe cuesta 72 creditos a 15s/720p, 139,5 a 15s/1080p y 277,5 a 30s/1080p, mientras el saldo de la cuenta ese dia era 223,5 en plan plus, o sea que UN reframe de 30s a 1080p NO ALCANZA. Se añadieron TRES disparadores en el cuerpo (preflight, paso 4 y archivos de referencia) para que no nazca dormido. NO VERIFICADO: el costo de outpaint_image, que exige un image_id real ya subido y no acepta estimacion en seco; y las zonas seguras de cada red, que no se contrastaron con la documentacion oficial y por eso no llevan numero. No se tocaron las 5 leyes, ni la rubrica, ni el disparador de la skill. -->
@@ -27,7 +28,7 @@ description: >
 <!-- skill v1.8 · 2026-08-22 (turno del CENTRO DE MANDO al chat FILTRO) · NUEVO references/vocabulario-foto.md: tabla español→token exacto para lente/focal, esquemas de luz con tamaño-ángulo-ratio, materiales y ángulo de cámara. ORIGEN: evaluación del método que vendía la guía "Higgsfield director de arte"; el método ya existía en golden-cinematica (ley de tokens exactos) pero su vocabulario es 100% web/3D. HUECO MEDIDO con grep sobre esta skill: 0 menciones de focal (35/50/85mm), 0 de softbox/difusor, las 2 de "lente" eran metafóricas. El bloque [1 ESCENA] decía "luz suave de estudio" (adjetivo): la arena medía interpretaciones, no motores. NO se tocaron las 5 leyes, ni compliance, ni componer.py, ni el disparador. -->
 <!-- skill v1.7 · 2026-08-21 (auditoría golden-skill-auditor): ley 2 ahora cubre el style_id de ms_image dentro del intake único del preflight (antes goteaba a mitad de la arena); paso 6 suma checklist explícito de "definición de terminado" antes de entregar a golden-shopify/golden-ads -->
 <!-- skill v1.6 · 2026-08-10 (loop del arsenal, semana 2 · producción): el corte de ANTES/DESPUÉS POR VERTICAL en references/prompt-maestro.md. La norma del 2026-08-07 prohibía el antes/después solo en dental; Meta 2026 lo prohíbe además en antiedad/arrugas/reafirmante y en pérdida de peso, y lo permite en cosmética general con 18+. Añadidos los dos transversales al bloque [5 PROHIBIDO]: segunda persona que señala la condición del espectador y titular de plazo con resultado (Meta juzga el significado implícito). Roster de motores verificado contra el MCP en vivo el 2026-08-10: al día. Parche espejo en golden-ecom-magic y golden-ugc-avatar -->
-<!-- skill v1.5 · 2026-08-07 (centro de mando, cosecha del chat un estudio de producto) · reglas de arte para SALUD (dental y afines) horneadas en references/prompt-maestro.md: PROHIBIDO bocas con lesiones visibles, antes/después de dentadura, delantal blanco/estetoscopio/sillón dental (aval médico aparente), porcentajes de resultados en pantalla y preguntas que señalen una condición del espectador; PERMITIDO y probado macro del gotario, textura, corte de esmalte ilustrado y lifestyle de baño. Van al bloque [5 PROHIBIDO] del prompt maestro cuando el vertical es salud -->
+<!-- skill v1.5 · 2026-08-07 (centro de mando, cosecha del chat ESTUDIO 360 DENTAL CAVITY HEALING Chile) · reglas de arte para SALUD (dental y afines) horneadas en references/prompt-maestro.md: PROHIBIDO bocas con lesiones visibles, antes/después de dentadura, delantal blanco/estetoscopio/sillón dental (aval médico aparente), porcentajes de resultados en pantalla y preguntas que señalen una condición del espectador; PERMITIDO y probado macro del gotario, textura, corte de esmalte ilustrado y lifestyle de baño. Van al bloque [5 PROHIBIDO] del prompt maestro cuando el vertical es salud -->
 <!-- skill v1.4 · 2026-08-02 · filtro de un carrusel de 20 repos open source (saul.vicentem). De los 20, UNO sirve de verdad y se PROBO con un packshot real: rembg (MIT) queda horneado como scripts/quitar-fondo.py — recorte de fondo LOCAL, 0,63 s por imagen y CERO creditos, frente a remove_background del MCP que cobra por imagen. Medido: tapa blanca sobre fondo blanco resuelta sin halos (52% transparente, 1,7% de borde con antialiasing). Corre offline tras bajar el modelo una vez. El MCP se reserva para pelo/humo/cristal, donde el modelo grande sigue ganando. El script usa histogram() y no getdata(), que Pillow elimina en 2027 -->
 <!-- skill v1.3 · filtro de 9 reels 2026-07-27: benchmark de costo REAL por generación en motores.md (tarifario público verificado) + punto de equilibrio contra la suscripción, para decidir con número si el plan se justifica; y veredicto documentado sobre Open-Generative-AI (descartado: el repo "alternativa open source" es un embudo hacia la API de pago del propio autor) -->
 <!-- skill v1.2 · fix auditoría 2026-07-25: rutas de scripts absolutas (el cwd se resetea entre llamadas Bash), componer.py recorta a 0 las coordenadas de borde (evita crash de alpha_composite) y guarda PNG sin el quality muerto -->
@@ -304,3 +305,10 @@ Si falta cualquier casilla, la arena no está lista para pasar a `golden-shopify
 - `scripts/optimizar-webp.py` — convierte a WebP < 150 KB en cualquier proporción.
 - `scripts/componer.py` — pega los PNG reales del producto sobre la placa generada por IA,
   con sombra y posicionamiento relativo. Es la pieza clave del método definitivo (paso 1.5).
+
+## Fronteras y desambiguacion
+
+Descripcion completa anterior (se conserva para no perder ningun matiz de frontera):
+
+> Golden Group — ARENA DE IMÁGENES por API. Genera la MISMA pieza de ecommerce en VARIOS motores de IA a la vez (Nano Banana Pro, Nano Banana 2, OpenAI Hazel, GPT Image 2, Seedream 5 Pro, FLUX.2, Recraft, DTC Ads con brand kit) a través del MCP de Higgsfield, con la FOTO REAL del producto como referencia, las descarga, las optimiza a WebP < 150 KB y las CALIFICA con una rúbrica de conversión para decir cuál ganó y por qué. Sin navegador, sin arrastrar archivos: la foto entra por URL (CDN de Shopify) o por subida directa desde el Mac. Úsala SIEMPRE que el usuario quiera: comparar modelos de imagen, "cuál IA hace mejor esta imagen", "genérame esta imagen en varios modelos", "hazlo automático por API", "prueba nano banana", "cuál motor uso para este producto", generar creativos/infografías de producto sin navegador, o producir el paquete visual de una ficha Shopify de forma desatendida. Dispara aunque no nombren un modelo: basta con "imágenes de producto automáticas / por API / comparando IAs". Si golden-ecom-magic está instalada, esa es la productora por defecto con un solo motor y plantillas; esta manda cuando hay que COMPARAR motores o producir por API sin navegador. NO usar para avatares UGC o video (eso es golden-ugc-avatar), ni para montar la página (golden-shopify).
+

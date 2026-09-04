@@ -1,23 +1,25 @@
 ---
 name: golden-dropi-analisis
-description: >
-  Golden Group — analiza los informes de Dropi (COD/contra entrega) y genera 2 maestros
-  Excel listos para decidir: MAESTRO_LOGISTICA (% de entrega global y por producto,
+description: >-
+  Golden Group — analiza los informes de Dropi (COD, contra entrega) y genera 2 maestros
+  Excel listos para decidir: MAESTRO_LOGISTICA (porcentaje de entrega global y por producto,
   transportadora, departamento y ciudad; mejor transportadora por ciudad; novedades;
-  evolución en el tiempo) y MAESTRO_CONTACTOS (todos los clientes sin duplicados, con %
-  de efectividad, segmento VIP/riesgo, etiquetas de WhatsApp, leads del bot y lista de
-  posibles para mensaje masivo). Úsala SIEMPRE que el usuario quiera analizar sus ventas
-  o entregas de Dropi, procesar los reportes/exports de Dropi, saber qué transportadora
-  le entrega mejor, bajar devoluciones, sacar su base de clientes o segmentar para
-  remarketing; o diga "analiza mis Dropi", "informe de entregas", "reporte de Dropi",
+  evolución en el tiempo) y MAESTRO_CONTACTOS (todos los clientes sin duplicados, con
+  porcentaje de efectividad, segmento VIP o riesgo, etiquetas de WhatsApp, leads del bot y
+  lista de posibles para mensaje masivo). Úsala SIEMPRE que el usuario quiera analizar sus
+  ventas o entregas de Dropi, procesar los reportes o exports de Dropi, saber qué
+  transportadora le entrega mejor, bajar devoluciones, sacar su base de clientes o segmentar
+  para remarketing; o diga "analiza mis Dropi", "informe de entregas", "reporte de Dropi",
   "mejor transportadora", "cuánto entrego", "mi base de clientes de Dropi", "clientes VIP",
-  "por qué me devuelven", "consolida mis órdenes", o suba archivos ordenes_*.xlsx /
-  ordenes_productos_*.xlsx. Dispara aunque no diga "Dropi": basta con exports de órdenes
-  COD por pedido (63 columnas) o por producto (53 columnas), o varias cuentas de Dropi que
-  haya que unir. NO es para pauta (usa golden-ads) ni para rescatar novedades una por una
-  (usa golden-logistica): esta skill es el ANÁLISIS agregado y la base de datos.
+  "por qué me devuelven", "consolida mis órdenes", o suba archivos ordenes_*.xlsx u
+  ordenes_productos_*.xlsx.
 ---
-
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 980 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # golden-dropi-analisis
 
 <!-- skill v1.6.1 · 2026-08-24 · barrido total del arsenal (CdM): fechada la entrada v1.6 del changelog (era la única sin fecha; formato uniforme para el próximo editor). Sin cambios de contenido ni de motor. Motor re-verificado hoy EJECUTÁNDOLO contra fixtures sintéticos con casos malos sembrados: dedup cazó 1 duplicado por-pedido y 1 por-producto y avisó, nombre PRUEBA excluido, TRANSITO A DEVOLUCION contado como devolución (regla FER v1.4 intacta), camino sin-reportlab degradó con aviso y generó los 2 Excel, y las cifras del RESUMEN EJECUTIVO (50% entrega, P&L $60.000−$18.000−$40.000=$2.000 RENTABLE) coincidieron con el cálculo a mano. -->
@@ -183,3 +185,10 @@ completos. No hay estado que mantener; el motor siempre lee todo desde cero.
 - Puntuación en español sin signos de apertura (`¿`/`¡`): usa solo el de cierre.
 - Esta skill es el ANÁLISIS agregado + base de datos. Para montar pauta con estos datos, pasa a
   golden-ads; para redactar los mensajes de rescate uno a uno, a golden-logistica.
+
+## Fronteras y desambiguacion
+
+Descripcion completa anterior (se conserva para no perder ningun matiz de frontera):
+
+> Golden Group — analiza los informes de Dropi (COD/contra entrega) y genera 2 maestros Excel listos para decidir: MAESTRO_LOGISTICA (% de entrega global y por producto, transportadora, departamento y ciudad; mejor transportadora por ciudad; novedades; evolución en el tiempo) y MAESTRO_CONTACTOS (todos los clientes sin duplicados, con % de efectividad, segmento VIP/riesgo, etiquetas de WhatsApp, leads del bot y lista de posibles para mensaje masivo). Úsala SIEMPRE que el usuario quiera analizar sus ventas o entregas de Dropi, procesar los reportes/exports de Dropi, saber qué transportadora le entrega mejor, bajar devoluciones, sacar su base de clientes o segmentar para remarketing; o diga "analiza mis Dropi", "informe de entregas", "reporte de Dropi", "mejor transportadora", "cuánto entrego", "mi base de clientes de Dropi", "clientes VIP", "por qué me devuelven", "consolida mis órdenes", o suba archivos ordenes_*.xlsx / ordenes_productos_*.xlsx. Dispara aunque no diga "Dropi": basta con exports de órdenes COD por pedido (63 columnas) o por producto (53 columnas), o varias cuentas de Dropi que haya que unir. NO es para pauta (usa golden-ads) ni para rescatar novedades una por una (usa golden-logistica): esta skill es el ANÁLISIS agregado y la base de datos.
+

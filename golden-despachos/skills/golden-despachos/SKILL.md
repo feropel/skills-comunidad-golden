@@ -1,23 +1,24 @@
 ---
 name: golden-despachos
-description: >
-  Golden Group — CALIFICACIÓN DE PEDIDOS ANTES DE DESPACHAR (Dropi · COD y prepago). Toma la cola
-  de pedidos en PENDIENTE CONFIRMACION y PENDIENTE, y antes de que se genere la guía dictamina uno
-  por uno: si está DUPLICADO, si la DIRECCIÓN permite entregar, qué dice la HUELLA del cliente en
-  Dropi (incluida su historia con cada transportadora), si la bodega VETÓ esa transportadora, y
-  cuál transportadora conviene por balance de precio y efectividad real. Entrega semáforo por
-  pedido, la transportadora recomendada con la plata que gana o pierde, y el mensaje exacto para
-  pedirle al cliente lo que falta. NO ejecuta: recomienda y el usuario aprueba.
-  Úsala SIEMPRE que el usuario quiera: "revisa los pendientes", "califica estos pedidos", "qué
-  cambio antes de despachar", "cuál transportadora le pongo", "este cliente sirve", "analiza las
-  direcciones", "hay pedidos duplicados", "me rechazaron un pedido", "por dónde mando este envío",
-  o suba un export de órdenes de Dropi. Dispara aunque no diga "calificar": basta con pedidos
-  pendientes, elección de transportadora, riesgo de devolución o direcciones malas.
-  Fronteras: novedades ya trabadas → golden-logistica (lo reactivo); esta es la PREVENTIVA, decidir
-  antes de que salga el paquete. Dirección que el bot recoge en WhatsApp →
-  golden-chatea-pro-validacion-direcciones; aquí se auditan pedidos YA creados en Dropi.
+description: >-
+  Golden Group — CALIFICACIÓN DE PEDIDOS ANTES DE DESPACHAR (Dropi, COD y prepago). Toma la
+  cola en PENDIENTE CONFIRMACION y PENDIENTE y, antes de que se genere la guía, dictamina
+  uno por uno: si está DUPLICADO, si la DIRECCIÓN permite entregar, qué dice la HUELLA del
+  cliente en Dropi (incluida su historia con cada transportadora), si la bodega VETÓ esa
+  transportadora, y cuál conviene por balance de precio y efectividad real. Entrega semáforo
+  por pedido, la transportadora recomendada con la plata que gana o pierde, y el mensaje
+  exacto para pedirle al cliente lo que falta. NO ejecuta: recomienda y el usuario aprueba.
+  Úsala SIEMPRE que el usuario quiera: "revisa los pendientes", "califica estos pedidos",
+  "qué cambio antes de despachar", "cuál transportadora le pongo", "este cliente sirve",
+  "analiza las direcciones", "hay pedidos duplicados", "me rechazaron un pedido", "por dónde
+  mando este envío", o suba un export de órdenes de Dropi.
 ---
-
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 944 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # Golden Despachos — calificar antes de que se genere la guía
 
 <!-- skill GD1.4 · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
@@ -215,3 +216,10 @@ cerrar. Auditoría periódica con `golden-skill-auditor`.
 
 El historial de versiones vive en `references/changelog.md` (una sola fuente: aquí solo el
 comentario de versión bajo el título, para no desincronizar dos changelogs).
+
+## Fronteras y desambiguacion
+
+Descripcion completa anterior (se conserva para no perder ningun matiz de frontera):
+
+> Golden Group — CALIFICACIÓN DE PEDIDOS ANTES DE DESPACHAR (Dropi · COD y prepago). Toma la cola de pedidos en PENDIENTE CONFIRMACION y PENDIENTE, y antes de que se genere la guía dictamina uno por uno: si está DUPLICADO, si la DIRECCIÓN permite entregar, qué dice la HUELLA del cliente en Dropi (incluida su historia con cada transportadora), si la bodega VETÓ esa transportadora, y cuál transportadora conviene por balance de precio y efectividad real. Entrega semáforo por pedido, la transportadora recomendada con la plata que gana o pierde, y el mensaje exacto para pedirle al cliente lo que falta. NO ejecuta: recomienda y el usuario aprueba. Úsala SIEMPRE que el usuario quiera: "revisa los pendientes", "califica estos pedidos", "qué cambio antes de despachar", "cuál transportadora le pongo", "este cliente sirve", "analiza las direcciones", "hay pedidos duplicados", "me rechazaron un pedido", "por dónde mando este envío", o suba un export de órdenes de Dropi. Dispara aunque no diga "calificar": basta con pedidos pendientes, elección de transportadora, riesgo de devolución o direcciones malas. Fronteras: novedades ya trabadas → golden-logistica (lo reactivo); esta es la PREVENTIVA, decidir antes de que salga el paquete. Dirección que el bot recoge en WhatsApp → golden-chatea-pro-validacion-direcciones; aquí se auditan pedidos YA creados en Dropi.
+

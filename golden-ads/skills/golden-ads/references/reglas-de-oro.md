@@ -21,12 +21,53 @@
 4. **Compliance.** Cada copy/creativo cumple políticas Meta/TikTok: sin atributos personales
    ("sufres de…?"), sin claims médicos/garantías de resultado, sin antes/después engañoso.
 
-5. **País y moneda.** Presupuestos y pujas en la **moneda de la cuenta** (la API usa centavos del
-   currency de la cuenta — lee `min_daily_budget_cents` de `ads_get_ad_accounts`). Segmentación y
-   tiempos de entrega por país.
+5. 🔴 **País y moneda — LA TRAMPA DE LOS "CENTAVOS" (incidente medido 2026-09-03).**
+   Presupuestos y pujas van en la **unidad mínima de la moneda de la cuenta**, y esa unidad
+   **NO siempre son centavos**. El parámetro se llama `..._cents` y la documentación del MCP dice
+   "in cents": **ese nombre miente para las monedas sin decimales**.
+
+   | Moneda de la cuenta | Multiplicador | $50.000 se manda como |
+   |---|---|---|
+   | **COP, CLP, PYG** (y JPY, KRW, VND, ISK, HUF, CRC, TWD) — **sin decimales** | **×1** | `50000` |
+   | **USD, EUR, MXN, PEN, BRL** — con decimales | **×100** | `5000000` (= $50.000,00) |
+
+   Colombia, Chile y Paraguay son tres de los países donde opera Golden: **la mayoría de las
+   cuentas COP van ×1**. Multiplicar por 100 en una cuenta COP pone **100 veces el presupuesto**.
+
+   **Caso real:** el 2026-09-03, montando `LECOTERRA - VENTA WP - OPEN 1` en GOLDEN CP6 COL, se
+   pidieron $50.000 COP/día y se mandó `5000000` → el conjunto quedó en **$5.000.000 COP/día**.
+   No se gastó porque estaba en PAUSED; con la campaña activa habrían sido 5 millones en un día.
+
+   **PROCEDIMIENTO OBLIGATORIO, no opcional:**
+   1. Antes de mandar, mira `min_daily_budget_cents` en `ads_get_ad_accounts`. Es el testigo:
+      en cuentas **USD sale `100`** (= $1,00 → ×100); en cuentas **COP sale `3076`**
+      (≈ $3.076 COP → ×1). Si el mínimo "en centavos" da una cifra absurda al dividir por 100,
+      la moneda es de cero decimales.
+   2. **Después de crear o actualizar, RELEE el conjunto del servidor** (`ads_get_ad_entities`,
+      campo `daily_budget`) y compara el **texto renderizado** (`"$ 50.000 COP"`) contra lo que
+      pidió el usuario. La API devuelve el monto ya formateado: es prueba, no suposición.
+   3. Si no coinciden, corrige con `ads_update_entity` y **vuelve a releer**. Nunca reportes un
+      presupuesto que no hayas leído de vuelta del servidor.
+
+   Segmentación y tiempos de entrega, por país.
 
 6. **Accionable, no descriptivo.** Cada hallazgo → una acción: qué entidad tocar, a qué valor,
    y por qué (con el número que lo respalda). Prohibido el reporte que solo describe.
+
+5-bis. 🔴 **INVENTARIO COMPLETO antes de construir, y la receta se LEE.** (Fallos medidos el
+   2026-09-03 en GOLDEN CP6.)
+   - **Cuatro listas, no una:** campañas (`ads_get_ad_entities`), **creativos
+     (`ads_get_creatives`)**, videos (`ads_get_ad_videos`) e imágenes (`ads_get_ad_images`).
+     **"La cuenta está vacía" solo se puede decir con las cuatro leídas.** CP6 tenía 0 campañas y
+     **12+ creativos de Le'côterra del 14-ago** que no se miraron: se rehízo trabajo ya hecho y se
+     ignoró una oferta viva. Es la fase 1 del protocolo de FER — el inventario es el denominador.
+   - **Antes de crear por MCP se lee `05-publicar-mcp.md`.** Improvisar la receta desde la memoria
+     hace redescubrir a golpes lo que la skill ya trae escrito (el `url_tags` que el MCP no acepta,
+     el `advantage_audience=0`, el orden CBO/ABO).
+   - **Lo que se recomienda tiene que ser construible.** Verificar la capacidad de la herramienta
+     ANTES de proponer un embudo, no a mitad del montaje.
+   - **Los creativos son INMUTABLES.** Medir 125/40/25 antes de crearlos; después solo se arregla
+     rehaciendo creativo Y anuncio.
 
 7. **No solapar audiencias.** Vigila `ads_insights_auction_ranking_benchmarks` (overlap de subasta):
    conjuntos que compiten entre sí desperdician presupuesto → consolidar.
@@ -93,3 +134,13 @@
     disparador de vida y qué **temporada** entra (anticipa 3–4 semanas para que el algoritmo aprenda
     antes del pico) y recomienda del catálogo el producto adecuado a ese momento. Alcance grande en mal
     momento es presupuesto quemado. (`21` §4)
+
+18. **🔴 NINGÚN anuncio a LANDING se entrega ni se activa SIN UTM.** Sin UTM la venta llega y nadie
+    puede decir qué anuncio la produjo: se escala lo que no vende y se mata lo que sí. El esquema
+    oficial va con macros a nivel ANUNCIO y **el id del anuncio vive en `utm_id`, NUNCA en
+    `utm_content`** (ahí va el NOMBRE; confundirlos ya costó una venta acreditada a un anuncio
+    inexistente, 26-ago-2026). El **MCP no expone `url_tags` al crear** — verificado: montado por
+    MCP el anuncio nace ciego y el UTM se pega en la UI **antes de activar**. Excepción: **CTWA**
+    (anuncio directo a WhatsApp) no lo necesita, Meta entrega el ad id dentro del primer mensaje.
+    Se reporta COBERTURA (cuántos anuncios de cuántos lo llevan), nunca "quedó puesto".
+    Esquema, verificación y consumidores en `references/24-utm-atribucion.md`.

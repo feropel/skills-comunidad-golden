@@ -1,24 +1,24 @@
 ---
 name: golden-blindaje
 description: >-
-  Golden Group — AUDITORÍA DE SEGURIDAD DEL PROPIO ENTORNO DE AGENTES. Revisa
-  ~/.claude completo: credenciales escritas a mano en skills y agentes, reglas
-  de permiso demasiado abiertas, hooks inyectables o con salida de red, MCP con
-  tokens en texto plano, blindaje de las skills golden y caché de sesión que
-  guardó secretos devueltos por una API. Corre 100% LOCAL, sin salida de red y
-  sin subir nada a ningún servidor.
-  Úsala SIEMPRE que el usuario quiera: auditar la seguridad de su Claude o de
-  sus agentes, "revisa mi configuración", "tengo tokens expuestos", "es seguro
-  mi setup", "auditá mis MCP", "revisá mis permisos", "qué tan expuesto estoy",
-  "limpia la caché de sesiones", o antes de compartir/sincronizar skills al
-  marketplace o de darle acceso a alguien más al equipo. Dispara también de
-  forma preventiva tras conectar un MCP nuevo, instalar una herramienta de
-  terceros o agregar un hook.
-  NO usar para: auditar el código de una app o web (eso es cyber-neo), calificar
-  la calidad de una skill (golden-skill-auditor), ni para revisar la seguridad
-  de una tienda Shopify o un portal (eso va por su chat correspondiente).
+  Golden Group — AUDITORÍA DE SEGURIDAD DEL PROPIO ENTORNO DE AGENTES. Revisa ~/.claude
+  completo: credenciales escritas a mano en skills y agentes, reglas de permiso demasiado
+  abiertas, hooks inyectables o con salida de red, MCP con tokens en texto plano, blindaje
+  de las skills golden y caché de sesión que guardó secretos devueltos por una API. Corre
+  100% LOCAL, sin salida de red y sin subir nada a ningún servidor. Úsala SIEMPRE que el
+  usuario quiera: auditar la seguridad de su Claude o de sus agentes, "revisa mi
+  configuración", "tengo tokens expuestos", "es seguro mi setup", "auditá mis MCP", "revisá
+  mis permisos", "qué tan expuesto estoy", "limpia la caché de sesiones", o antes de
+  compartir/sincronizar skills al marketplace o de darle acceso a alguien más al equipo.
+  Dispara también de forma preventiva tras conectar un MCP nuevo, instalar una herramienta
+  de terceros o agregar un hook.
 ---
-
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 896 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # Golden Blindaje — auditoría del entorno de agentes
 <!-- skill GB1.6.1 · 2026-08-30 (CdM, verificacion externa del FILTRO sobre GB1.6) · documentado el
 MATIZ SEMANTICO en el docstring de candado_muerde (muerde = "no se puede escribir", no "tiene uchg";
@@ -279,3 +279,7 @@ a una carpeta con datos del negocio.
   se conserva el método y se implementa local. En la primera corrida real sobre el
   entorno Golden encontró un JWT cacheado en un resultado de consulta y 82 archivos de
   caché con más de 15 días, con 0 hallazgos ALTOS tras filtrar los falsos positivos.
+
+## Fronteras y desambiguacion
+
+NO usar para: auditar el código de una app o web (eso es cyber-neo), calificar la calidad de una skill (golden-skill-auditor), ni para revisar la seguridad de una tienda Shopify o un portal (eso va por su chat correspondiente).

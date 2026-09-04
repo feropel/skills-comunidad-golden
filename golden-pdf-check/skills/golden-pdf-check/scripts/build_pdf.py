@@ -1,9 +1,16 @@
 #!/usr/bin/env python3
 """
 GOLDEN PDF · build_pdf.py
-Convierte contenido Markdown-Golden en un PDF con la identidad de
-Comunidad Golden, márgenes correctos, paginación y — lo esencial —
-tarjetas de prompt ATÓMICAS que nunca se parten entre páginas.
+Convierte contenido Markdown-Golden en un PDF con márgenes correctos,
+paginación y — lo esencial — tarjetas de prompt ATÓMICAS que nunca se
+parten entre páginas.
+
+LA IDENTIDAD SE PIDE, NO SE HEREDA (v6.1). Sin `--tema`, el documento sale
+NEUTRO: sin logo, sin kicker, sin autor y sin pie. La marca de Comunidad
+Golden vive en su tema y se pide con `--tema comunidad-golden`. Hasta v6.0
+esa marca era el valor por defecto, así que cualquiera que usara la skill
+firmaba SUS documentos con la marca de FER: un documento sin sello es
+neutro, uno con el sello de otro es una atribución falsa.
 
 Además, tras construir, corre una COMPUERTA VERBATIM: re-extrae el texto
 del PDF y confirma que el contenido de cada prompt aparece idéntico
@@ -15,12 +22,13 @@ Uso:
         --save-html archivo.html                      guarda el HTML intermedio
         --no-verify                                   omite la compuerta verbatim
         --strict                                      falla (exit 3) si el verbatim no cuadra
-        --no-index                                    omite la página de CONTENIDO (por defecto SÍ va)
+        --tema comunidad-golden                       identidad con nombre (sin esto sale neutro)
+        --mapa                                        añade la hoja "EN ESTE DOCUMENTO"
 
-Norma FER (v5.4): todo PDF Golden abre con una página de **CONTENIDO** que lista, línea por
-línea, TODO lo que trae el documento (secciones y subsecciones, en orden de ejecución) y marca
-cuántos textos copiables tiene cada una. Se genera SOLA desde los encabezados: nadie la escribe
-a mano y nunca queda desactualizada.
+El MAPA es opt-in (v6.0). La norma v5.4 mandaba abrir todo PDF con una página de CONTENIDO
+que listara cada sección y subsección; FER la revocó midiendo al lector: "la gente no lee los
+índices, eso no es un libro". Cuando se pide con --mapa sale solo el primer nivel, a una
+columna. Se genera SOLA desde los encabezados: nadie la escribe a mano.
 
 Formato de entrada: ver references/content-format.md.
 Todo lo que va en ``` ``` ``` (o ~~~ ~~~) o en ::: prompt ::: es una tarjeta
@@ -363,9 +371,10 @@ def build_index(body_md, pages_map=None):
 
 
 def build_cover(meta, logo_path=None):
-    # Logo alterno (v5.6): documentos que NO se emiten bajo la marca Comunidad
-    # Golden — p.ej. el MBA, cuyo emisor formal es la empresa — pasan su propio
-    # sello con --logo. Sin el flag, el emblema Golden de siempre.
+    # Logo: se pasa con --logo o lo trae el tema. SIN NINGUNO NO HAY LOGO (v6.1).
+    # Hasta v6.0 aquí caía el emblema Golden por defecto, así que un tercero que
+    # usara la skill firmaba SUS documentos con la marca de FER. Un documento sin
+    # sello es neutro; un documento con el sello de otro es atribución falsa.
     if logo_path and os.path.exists(logo_path):
         ext = os.path.splitext(logo_path)[1].lower()
         with open(logo_path, "rb") as fh:
@@ -373,21 +382,27 @@ def build_cover(meta, logo_path=None):
                     % (IMAGE_MIME.get(ext, "image/png"),
                        base64.b64encode(fh.read()).decode()))
     else:
-        logo = load_asset("logo-golden.svg")
-    kicker = esc(meta.get("kicker", "Comunidad Golden"))
+        logo = ""
+    # Identidad NEUTRA por defecto, misma razón (v6.1). La marca de Golden vive
+    # en su tema y se pide: --tema comunidad-golden.
+    kicker = esc(meta.get("kicker", ""))
     title = esc(meta.get("title", "Documento"))
     subtitle = meta.get("subtitle", "")
-    author = esc(meta.get("author", "Golden Group"))
+    author = esc(meta.get("author", ""))
     date = esc(meta.get("date", ""))
     sub_html = '<p class="subtitle">' + esc(subtitle) + "</p>" if subtitle else ""
-    meta_line = "<strong>" + author + "</strong>" + (" · " + date if date else "")
+    # Sin identidad, los huecos se OMITEN, no se dejan vacíos: un
+    # <div class="logo"></div> vacío reserva su alto igual y deja un boquete en
+    # la portada, y un autor vacío con fecha imprimía un "·" suelto (v6.1).
+    logo_html = '<div class="logo">' + logo + "</div>" if logo else ""
+    kick_html = '<p class="kicker">' + kicker + "</p>" if kicker else ""
+    meta_line = " · ".join(x for x in ("<strong>" + author + "</strong>" if author
+                                       else "", date) if x)
+    meta_html = '<div class="cover-meta">' + meta_line + "</div>" if meta_line else ""
     return (
-        '<section class="cover">'
-        '<div class="logo">' + logo + "</div>"
-        '<p class="kicker">' + kicker + "</p>"
+        '<section class="cover">' + logo_html + kick_html +
         '<div class="cover-rule"></div>'
-        "<h1>" + title + "</h1>" + sub_html +
-        '<div class="cover-meta">' + meta_line + "</div>"
+        "<h1>" + title + "</h1>" + sub_html + meta_html +
         "</section>"
     )
 
@@ -511,7 +526,7 @@ def footer_template(label="Comunidad Golden", color="#8a6d1f"):
     )
 
 
-def render_with_playwright(html_str, out_path, footer_label="Comunidad Golden",
+def render_with_playwright(html_str, out_path, footer_label="",
                            footer_color="#8a6d1f"):
     from playwright.sync_api import sync_playwright
     with sync_playwright() as p:
@@ -578,7 +593,7 @@ def render_with_chrome(html_str, out_path):
     return "chrome-cli (sin numeración en pie; instala Playwright para numeración)", []
 
 
-def render_pdf(html_str, out_path, footer_label="Comunidad Golden",
+def render_pdf(html_str, out_path, footer_label="",
                footer_color="#8a6d1f"):
     try:
         import playwright  # noqa
@@ -698,8 +713,9 @@ def main():
     ap.add_argument("--strict", action="store_true")
     ap.add_argument("--logo", help="ruta a un logo alterno para la portada (png/jpg/svg)")
     ap.add_argument("--css", help="hoja de estilo de tema que se anexa a la de marca")
-    ap.add_argument("--footer", default="Comunidad Golden",
-                    help="texto del pie de pagina (por defecto: Comunidad Golden)")
+    ap.add_argument("--footer", default="",
+                    help="texto del pie de pagina (por defecto VACIO: la marca la "
+                         "pone --tema, nunca el motor)")
     ap.add_argument("--tema", help="identidad con nombre: comunidad-golden, cartel-del-chat…")
     # NORMA FER REVISADA (2026-09-02). La v5.4 mandaba que TODO PDF abriera con
     # página de CONTENIDO. FER la revierte con sus palabras: "la gente no lee los
@@ -731,13 +747,23 @@ def main():
         # explícitamente, y los flags de línea de comandos mandan sobre los dos.
         meta.setdefault("kicker", tema.get("kicker", ""))
         meta.setdefault("author", tema.get("autor", ""))
-        if not args.footer or args.footer == "Comunidad Golden":
+        if not args.footer:
             args.footer = tema.get("pie", args.footer)
         if not args.logo and tema.get("logo"):
             args.logo = os.path.join(ASSETS, tema["logo"])
     for k in ("title", "subtitle", "kicker", "author"):
         if getattr(args, k):
             meta[k] = getattr(args, k)
+
+    # v6.1 · SIN IDENTIDAD SE AVISA, no se rellena. El silencio aquí es lo que
+    # hacía que un tercero se llevara la marca de Golden puesta sin enterarse:
+    # el motor decidía por él. Ahora el motor no decide, informa.
+    if not (args.tema or meta.get("kicker") or meta.get("author")
+            or args.footer or args.logo):
+        sys.stderr.write(
+            "\nℹ️  DOCUMENTO NEUTRO: sale sin logo, sin autor y sin pie.\n"
+            "   La identidad se pide: --tema comunidad-golden (o el tema que sea),\n"
+            "   o se declara en el front matter (kicker / author).\n\n")
 
     html_str, cards = build_html(meta, body, with_index=args.mapa,
                                  logo_path=args.logo, theme_css=args.css,

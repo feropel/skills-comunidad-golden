@@ -2,24 +2,57 @@
 name: golden-skill-auditor
 description: >-
   Golden Group — AUDITOR MAESTRO de skills. Entra a cualquier skill instalada en
-  ~/.claude/skills, la lee COMPLETA de inicio a fin (SKILL.md + references +
-  scripts + assets, sin omitir un solo archivo), la califica sobre 1000 puntos
-  con una rúbrica fija de 7 dimensiones, reporta qué está bien, qué está mal y
-  qué le falta, y la ARREGLA hasta dejarla mil de mil: reestructura, optimiza
-  el disparo (description), pule instrucciones, repara referencias rotas,
-  valida scripts y verifica los estándares Golden (prefijo, autonomía, cero
-  datos privados, blindaje). Úsala SIEMPRE que el usuario quiera: auditar,
-  evaluar, calificar, revisar, optimizar, mejorar, perfeccionar o "dejar mil de
-  mil" una skill; sepa qué le falta a una skill; diga "audita esta skill",
-  "revisa la skill X", "qué le falta a mi skill", "optimiza la skill",
-  "califícame esta skill", "está bien estructurada mi skill", "mejora todos
-  los procesos de la skill". Dispara aunque no diga "auditar": basta con que
-  pida diagnóstico o mejora de una skill existente. Línea divisoria con
-  skill-creator: diagnosticar, calificar y reparar una skill EXISTENTE = esta
-  skill; crear una skill desde cero o correr evals con subagentes =
-  skill-creator. Tampoco es para auditar PDFs (golden-pdf-check) ni seguridad
-  de código de apps (cyber-neo).
+  ~/.claude/skills, la lee COMPLETA de inicio a fin (SKILL.md + references + scripts +
+  assets, sin omitir un solo archivo), la califica sobre 1000 puntos con una rúbrica fija de
+  7 dimensiones, reporta qué está bien, qué está mal y qué le falta, y la ARREGLA hasta
+  dejarla mil de mil: reestructura, optimiza el disparo (description), pule instrucciones,
+  repara referencias rotas, valida scripts y verifica los estándares Golden (prefijo,
+  autonomía, cero datos privados, blindaje). Úsala SIEMPRE que el usuario quiera: auditar,
+  evaluar, calificar, revisar, optimizar, mejorar, perfeccionar o "dejar mil de mil" una
+  skill; sepa qué le falta a una skill; diga "audita esta skill", "revisa la skill X", "qué
+  le falta a mi skill", "optimiza la skill", "califícame esta skill", "está bien
+  estructurada mi skill", "mejora todos los procesos de la skill". Dispara aunque no diga
+  "auditar": basta con que pida diagnóstico o mejora de una skill existente.
 ---
+
+## 🔴 MANDATO DE FER · 2026-09-03 · ESTO NO PUEDE VOLVER A PASAR NUNCA
+
+**Palabras de FER:** *"Tenemos un auditor de skills. Ese auditor tenía que haberse dado cuenta y no se dio cuenta. Dale la instrucción para que esto no vuelva a pasar nunca jamás: que mire y evalúe siempre TODAS las skills. Tiene que auditar cada una de las skills, que esté bien redactado, que esté bien conectado, que no se pase de los topes, todo, todo, todo. Que las estructuras tengan absolutamente todo. Y que esa skill también se autoevalúe."*
+
+**Qué pasó y por qué es culpa del instrumento, no de nadie.** El 2026-09-02 se midió que **33 skills de la casa estaban fuera de la especificación** y **5 tenían el frontmatter con YAML inválido**, y esta skill no lo vio en ninguna auditoría. La causa exacta: `scripts/inventario.sh` **medía** la longitud de la description (línea 293) y la **imprimía** (línea 295), pero **nunca la comparaba contra un tope** — `1024` aparecía cero veces en sus scripts, y cero menciones de tope en la rúbrica. Quien lee "1442 caracteres" no tiene con qué compararlo. Skills selladas ORO por esta misma rúbrica estaban fuera de norma.
+
+**La lección permanente: medir no es comparar. Un número sin vara al lado no es un chequeo, es decoración.**
+
+### LO QUE ESTA SKILL ESTÁ OBLIGADA A HACER, SIEMPRE
+
+**1. PRIMERO EL VALIDADOR, ANTES DE CUALQUIER NOTA.**
+```
+python3 scripts/validar_arsenal.py <ruta-de-la-skill>      # una skill
+python3 scripts/validar_arsenal.py --casa                  # las 39 de la casa
+python3 scripts/validar_arsenal.py                         # el arsenal entero
+```
+Salida `0` limpio · `1` hay fallos · `2` no se pudo leer. **Si sale 1, la skill no pasa de 700/1000**, por perfecta que sea en las 7 dimensiones. La compuerta está escrita en `references/rubrica.md`.
+
+**2. AUTOEVALUARSE PRIMERO, ANTES DE JUZGAR A NADIE.** Al dispararse, esta skill se audita a sí misma antes que a cualquier otra:
+```
+python3 scripts/autoprueba_arsenal.py     # 23 casos, en las dos direcciones
+python3 scripts/validar_arsenal.py ~/.claude/skills/golden-skill-auditor
+```
+**Si la autoprueba no pasa, el validador NO SE USA para juzgar a nadie**, y se dice en el informe. Un auditor que no se puede auditar a sí mismo no tiene autoridad para calificar a otro. Y si esta skill se cae en su propia validación, eso va **primero** en el informe, antes que el hallazgo de la skill que se venía a revisar.
+
+**3. TODO, TODO, TODO — las cuatro caras que hay que mirar en cada skill:**
+- **Que no se pase de los topes.** `name` 1-64 minúsculas con guiones simples y **coincidiendo con la carpeta** (si no coincide, la skill NO CARGA) · `description` **1-1024 DURO** · `compatibility` 1-500 · YAML válido y sin campos ajenos al frontmatter. Cuerpo de más de 500 líneas es **aviso, no falla**.
+- **Que esté bien redactado.** Reglas duras de FER sobre la description: sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA fuera de las citas del cliente.
+- **Que esté bien conectado.** Rutas internas que existen, scripts declarados que están, y nombres de skills o agentes que resuelven a algo real. La conexión se juzga con tres reglas medidas, sin las cuales el chequeo es ruido: lo que vive en un **comentario HTML es historia** y no se juzga · una ruta **calificada con la skill dueña** (antes o después) es correcta aunque el archivo no esté aquí · un nombre `golden-*` puede ser **agente, memoria, prefijo de familia o token de marca**, no solo una skill.
+- **Que la estructura tenga todo.** SKILL.md con frontmatter válido, y si declara scripts, references o assets, que estén.
+
+**4. SIEMPRE TODAS, NUNCA UNA MUESTRA.** Cuando el encargo sea revisar el arsenal, se corre sobre **las 39 de la casa** y se reporta **N de N**. Revisar "las importantes" está prohibido: o todas, o se declara cuáles no y por qué.
+
+**5. COBERTURA, NUNCA VEREDICTO.** El informe dice universo, cuántas se revisaron, qué falla, qué quedó en aviso y qué no se pudo verificar. **Frases prohibidas: "quedó perfecto", "todo bien", "está listo", "debería funcionar".**
+
+**6. EL VALIDADOR OFICIAL MANDA SOBRE EL PROPIO.** Si `agentskills` (paquete `skills-ref`) está en el PATH, se usa y su veredicto pesa sobre la spec; si no está, se usa el chequeo propio y **se declara cuál se usó**. El oficial cazó una skill que el parser propio del Centro de Mando no vio.
+
+**7. SI ENCUENTRAS UN FALLO, BUSCA LA CLASE, NO EL CASO.** Y al arreglar una description que se pasa: **los disparadores primero** (los del final son los más nuevos y los primeros en perderse), lo explicativo y las fronteras **bajan al cuerpo**, que no tiene tope duro. **Nada se borra: se muda.**
 
 # Golden Skill Auditor — auditoría y reparación de skills mil de mil
 
@@ -233,3 +266,7 @@ prueba, no antes.
 - Optimizar el description con evals automáticos de disparo → ofrecer el loop de **skill-creator** como paso extra opcional al final; el arreglo manual del description sí es de esta skill.
 - Auditar seguridad de código de una app → **cyber-neo**. Auditar un PDF → **golden-pdf-check**.
 - Skills de terceros (no golden-): se auditan igual, pero la dimensión 6 (Estándares Golden) evalúa solo lo universal (datos privados, autonomía) y reparte los puntos de marca en las demás verificaciones de esa dimensión; además NO se reescriben para redistribuir (licencia de terceros) — solo se reparan localmente.
+
+## Fronteras y desambiguacion
+
+Línea divisoria con skill-creator: diagnosticar, calificar y reparar una skill EXISTENTE = esta skill; crear una skill desde cero o correr evals con subagentes = skill-creator. Tampoco es para auditar PDFs (golden-pdf-check) ni seguridad de código de apps (cyber-neo).

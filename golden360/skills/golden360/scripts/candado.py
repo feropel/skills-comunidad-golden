@@ -28,6 +28,7 @@ HIJAS = {
     "golden-agenda-citas": "agenda de citas (Fase 4, servicios)",
     "golden-imagen-arena": "imágenes/GIF de producto por API (Fase 5)",
     "golden-ugc-avatar": "video/avatar UGC (Fase 5)",
+    "golden-video-teardown": "desarmar cada video antes de escribir su copy (Fase 5B)",
     "golden-ads": "pauta Meta+TikTok+Google (Fase 7) + seguimiento (Fase 10)",
     "golden-copywriting": "copys 5/5/5 y textos de orgánico (Fases 6-7)",
     "golden-chatea-pro-prompt-ventas": "venta WhatsApp del producto (Fase 8)",

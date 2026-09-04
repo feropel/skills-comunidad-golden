@@ -1,20 +1,24 @@
 ---
 name: golden-logistica
-description: >
+description: >-
   Golden Group — RESCATE DE NOVEDADES y control de devoluciones para COD (Dropi y
   transportadoras LatAm). Toma la lista de novedades del día (export, pantallazo o texto
   pegado de Dropi), clasifica cada guía por tipo de novedad, y entrega el PLAN DE RESCATE:
-  mensaje de WhatsApp exacto para cada cliente, respuesta/solución para la transportadora,
+  mensaje de WhatsApp exacto para cada cliente, respuesta o solución para la transportadora,
   prioridad de ataque y checklist del día. También mide la operación (tasa de novedad, tasa
   de rescate, costo de devoluciones) con semáforo. Úsala SIEMPRE que el usuario quiera:
-  gestionar/revisar/salvar novedades, "rescata estas guías", "mis pedidos están en novedad",
-  bajar las devoluciones, responder novedades de Dropi, mensajes para clientes que no
-  contestan o rechazan, o medir devoluciones/efectividad de entrega. Dispara con "novedad",
-  "novedades", "devoluciones", "guías varadas", "en reparto fallido", "rescate COD".
-  NO es la validación PREVENTIVA de direcciones (eso es golden-chatea-pro-config-logistico y
-  su hijo validacion-direcciones); esta skill es el lado REACTIVO: salvar lo que ya se trabó.
+  gestionar, revisar o salvar novedades, "rescata estas guías", "mis pedidos están en
+  novedad", bajar las devoluciones, responder novedades de Dropi, mensajes para clientes que
+  no contestan o rechazan, o medir devoluciones y efectividad de entrega. Dispara con
+  "novedad", "novedades", "devoluciones", "guías varadas", "en reparto fallido", "rescate
+  COD".
 ---
-
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 875 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # Golden Logística — rescate de novedades y control de devoluciones (COD)
 
 **Versión:** `GL1.4` · Fábrica: este chat. Blindada con `chflags uchg` (desbloquear con
@@ -174,3 +178,10 @@ Entrega solo lo que sobrevive, y di qué descartaste.
 - **GL1.0** (2026-07-11) — Creación: rescate diario (clasificar → priorizar → mensajes +
   solución → checklist), métricas con semáforo, prevención por derivación. Umbrales de
   referencia COD Colombia marcados como ajustables.
+
+## Fronteras y desambiguacion
+
+Descripcion completa anterior (se conserva para no perder ningun matiz de frontera):
+
+> Golden Group — RESCATE DE NOVEDADES y control de devoluciones para COD (Dropi y transportadoras LatAm). Toma la lista de novedades del día (export, pantallazo o texto pegado de Dropi), clasifica cada guía por tipo de novedad, y entrega el PLAN DE RESCATE: mensaje de WhatsApp exacto para cada cliente, respuesta/solución para la transportadora, prioridad de ataque y checklist del día. También mide la operación (tasa de novedad, tasa de rescate, costo de devoluciones) con semáforo. Úsala SIEMPRE que el usuario quiera: gestionar/revisar/salvar novedades, "rescata estas guías", "mis pedidos están en novedad", bajar las devoluciones, responder novedades de Dropi, mensajes para clientes que no contestan o rechazan, o medir devoluciones/efectividad de entrega. Dispara con "novedad", "novedades", "devoluciones", "guías varadas", "en reparto fallido", "rescate COD". NO es la validación PREVENTIVA de direcciones (eso es golden-chatea-pro-config-logistico y su hijo validacion-direcciones); esta skill es el lado REACTIVO: salvar lo que ya se trabó.
+

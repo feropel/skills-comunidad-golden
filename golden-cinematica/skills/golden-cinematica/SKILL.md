@@ -1,23 +1,24 @@
 ---
 name: golden-cinematica
 description: >-
-  Golden Group — WEB CINEMATOGRÁFICA 3D nivel awwwards. Construye páginas con
-  escenas 3D reales (partículas que ondulan, objetos cromados, nubes que siguen
-  el cursor, cabezas de puntos, orbes de vidrio), preloader con contador y cortina
-  de revelado, fondo de video pre-renderizado y movimiento lento de cine. Motor:
-  Three.js por importmap en HTML de un archivo, o React Three Fiber si el proyecto
-  es Next. Método: TOKENS NUMÉRICOS EXACTOS (milisegundos, grados, radios, hex),
-  jamás adjetivos.
-  Úsala SIEMPRE que el usuario pida: una página "espectacular", "como las de
-  awwwards", "con 3D", "futurista", "robótica", "cinematográfica", "que se vea
-  cara", "con partículas", "con un objeto que gire", "que se mueva sola", "tipo
-  Apple", "que la gente pregunte qué agencia la hizo"; o cuando muestre de
-  referencia un sitio con escena 3D, fondo animado o preloader. Dispara también
-  para el HERO de una web que ya existe si el encargo es "súbele el nivel visual".
-  NO usar para: página de producto Shopify COD (golden-shopify), sitio funcional
-  sencillo o corporativo estándar (golden-web), ni imágenes sueltas de producto
-  (golden-imagen-arena).
+  Golden Group — WEB CINEMATOGRÁFICA 3D nivel awwwards. Construye páginas con escenas 3D
+  reales (partículas que ondulan, objetos cromados, nubes que siguen el cursor, cabezas de
+  puntos, orbes de vidrio), preloader con contador y cortina de revelado, fondo de video
+  pre-renderizado y movimiento lento de cine. Motor: Three.js por importmap en HTML de un
+  archivo, o React Three Fiber si el proyecto es Next. Método: TOKENS NUMÉRICOS EXACTOS
+  (milisegundos, grados, radios, hex), jamás adjetivos. Úsala SIEMPRE que el usuario pida:
+  una página "espectacular", "como las de awwwards", "con 3D", "futurista", "robótica",
+  "cinematográfica", "que se vea cara", "con partículas", "con un objeto que gire", "que se
+  mueva sola", "tipo Apple", "que la gente pregunte qué agencia la hizo"; o cuando muestre
+  de referencia un sitio con escena 3D, fondo animado o preloader. Dispara también para el
+  HERO de una web que ya existe si el encargo es "súbele el nivel visual".
 ---
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 952 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 <!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leian el cerebro de marca — esta entra a la familia que SI lo lee. Bloque identico en las 6 del CdM + fila a la fabrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
 
 # Golden Cinemática — el salto de "página" a "experiencia"
@@ -196,3 +197,7 @@ completa abajo.
   frame de 6 sitios de referencia. Aporta lo que faltaba: la disciplina de tokens
   numéricos, la ruta HTML por importmap (el entregable real de Golden), las recetas con
   código y el vocabulario para encargar.
+
+## Fronteras y desambiguacion
+
+NO usar para: página de producto Shopify COD (golden-shopify), sitio funcional sencillo o corporativo estándar (golden-web), ni imágenes sueltas de producto (golden-imagen-arena).

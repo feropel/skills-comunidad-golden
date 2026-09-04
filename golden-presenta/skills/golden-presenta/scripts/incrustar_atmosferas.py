@@ -50,7 +50,11 @@ def main():
     if INICIO in html and FIN in html:
         patron = re.compile(re.escape(INICIO) + '.*?' + re.escape(FIN), re.S)
         html_nuevo = patron.sub(lambda m: bloque, html)
-        accion = 'actualizado'
+        # Decir "actualizado" cuando el archivo queda identico byte a byte es una
+        # confirmacion falsa: manda a buscar el fallo donde no esta. Reportado por
+        # el chat del Cartel el 2026-09-03 mientras diagnosticaba un fondo que no
+        # se veia (y cuya causa era otra).
+        accion = 'actualizado' if html_nuevo != html else 'ya estaba al dia, sin cambios'
     else:
         # Primera vez: se ancla justo antes del script del motor, para que
         # window.Atmosfera exista cuando el motor arranque.
@@ -60,6 +64,11 @@ def main():
             return 1
         html_nuevo = html.replace(ancla, bloque + '\n\n' + ancla, 1)
         accion = 'insertado'
+
+    if html_nuevo == html:
+        print('Bloque de atmosferas %s en %s (%d KB de JS). No se reescribio el archivo.'
+              % (accion, os.path.basename(destino), len(js) / 1024))
+        return 0
 
     io.open(destino, 'w', encoding='utf-8').write(html_nuevo)
     print('Bloque de atmosferas %s en %s (%d KB de JS)'

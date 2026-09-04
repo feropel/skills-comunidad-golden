@@ -1,25 +1,28 @@
 ---
 name: golden-shopify
 description: >-
-  Construye, adapta y recolorea páginas de producto Shopify de alta conversión
-  para venta CONTRA ENTREGA (COD con Releasit COD Form) y/o pago anticipado.
-  Plantilla base = PRODUCTO DEMO (el build más completo, sobre Shrine Pro), adaptable a
-  Dawn ("plantilla down", el tema que se enseña/regala), Sense y cualquier tema
-  (la mayoría de bloques son custom-liquid y portables).
-  Trabaja con DOS PERFILES sobre un mismo motor: "marca propia" y
-  "catálogo/dropshipping".
-  Úsala SIEMPRE que el usuario quiera: crear o mejorar una landing/página de
-  producto, armar un product.json o product.<tema>.json, adaptar una página de
-  un cliente a otro tema, cambiar la marca/colores de una plantilla, agregar
-  countdown, sticky bar, garantía, barra logística, reseñas, FAQ, manifiesto,
-  combos/bundles, pirámide/"cómo actúa", precio dinámico, botón Releasit, o
-  resolver dudas de carrito/Releasit/COD. También cuando venda un producto de
-  Dropi o de catálogo público y necesite diferenciarse por oferta y por página. Dispara aunque no digan "plantilla down": basta con
-  "página de producto", "landing de producto Shopify", "tema Dawn/Shrine/Sense",
-  "contra entrega", "Releasit", "COD", o que peguen un product.json con bloques
-  custom_liquid. NO usar para análisis de anuncios ni temas no-Shopify.
+  Construye, adapta y recolorea páginas de producto Shopify de alta conversión para venta
+  CONTRA ENTREGA (COD con Releasit COD Form) y para pago anticipado. Plantilla base =
+  PRODUCTO DEMO (el build más completo, sobre Shrine Pro), adaptable a Dawn ("plantilla
+  down", el tema que se enseña o se regala), Sense y cualquier tema, porque la mayoría de
+  bloques son custom-liquid y portables. Trabaja con DOS PERFILES sobre un mismo motor:
+  "marca propia" y "catálogo o dropshipping". Úsala SIEMPRE que el usuario quiera: crear o
+  mejorar una landing o página de producto, armar un product.json o product.tema.json,
+  adaptar la página de un cliente a otro tema, cambiar la marca o los colores de una
+  plantilla, agregar countdown, sticky bar, garantía, barra logística, reseñas, FAQ,
+  manifiesto, combos, pirámide o "cómo actúa", precio dinámico, botón Releasit, o resolver
+  dudas de carrito, Releasit o COD. También cuando venda un producto de Dropi o de catálogo
+  público y necesite diferenciarse por oferta y por página.
 ---
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 1010 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # GOLDEN SHOPIFY (`golden-shopify`)
+<!-- skill G4.19 · 2026-09-03: la doc no decia COMO correr los validadores. En G4.10 el encabezado nuevo nunca entro porque el patron buscaba 'Auto-verificacion' y el archivo dice 'Auto-verificación' CON TILDE: el reemplazo no fallo, simplemente no hizo nada, y el changelog lo dio por hecho. Ocho versiones con la doc rota. Regla nueva en 0-H: tras editar se verifica que el texto nuevo ESTA, no que el comando salio sin error. -->
+<!-- skill G4.18 · 2026-09-03 (fila del CdM): la description llevaba `product.<tema>.json` y la spec de publicacion PROHIBE los angulares — no era longitud (1010 de 1024). El arreglo son dos caracteres; la causa de fondo no: esta skill validaba a fondo el product.json que PRODUCE y no se validaba A SI MISMA como artefacto publicable, aunque se publica al marketplace. La autoprueba ahora corre el validador OFICIAL de skill-creator sobre esta skill. -->
 <!-- skill G4.17b · 2026-09-02: el check 27 recien horneado dio falso positivo y destapo una CLASE — la funcion de "texto visible" solo quitaba {% comment %} y dejaba pasar {%- comment -%} (con guiones) y los comentarios JS /* */, asi que los separadores que orientan a quien EDITA el codigo se leian como rayas publicadas. La usaban CUATRO checks: DEMO visible, apertura, rayas y lenguaje de tienda. Un arreglo, cuatro checks. -->
 <!-- skill G4.17 · 2026-09-02: coherencia antes de repartir. Iba a salir una fila preguntando a cada fabrica si comprueba las SEIS reglas duras de la casa, y esta skill solo comprobaba DOS. Checks 27 (rayas separadoras), 28 (lenguaje de tienda) y 29 (credenciales en el entregable), los tres FALLA, cada uno con su caso bueno: una raya em en prosa es correcta, «tiendas fisicas» sin posesivo no es el vicio, y una clase CSS larga no es un token. 6 de 6 reglas duras comprobadas. 29 checks, 29/29 pruebas. -->
 <!-- skill G4.16 · 2026-09-02 (FER amplia la ley a cada skill, agente y proceso): el validador NO comprobaba NINGUNA regla dura de FER — cero menciones de los signos de apertura y de los acentos en el codigo Y en la doc, mientras la nota del proyecto daba por hecho que el auto-check los cubria. Checks 25 (apertura ¿¡ en texto visible) y 26 (acentos rotos/mojibake), ambos FALLA nunca aviso, con casos en las dos direcciones: un ¿ dentro de un comentario no se publica y las tildes correctas NO son mojibake. 23/23. -->
@@ -59,7 +62,7 @@ marcado distinto, se pisaban si un product.json cargaba ambos) → sec-beneficio
 `.gfs-bnf`; sec-cine/sec-escalera/sec-escenas/sec-manifiesto/sec-ya-lo-intentaste reinventaban su
 propio IntersectionObserver sin la red de seguridad ~1.2s de efx-reveal-seguro.liquid (si el observer
 fallaba, el contenido quedaba invisible para siempre) → se les agregó el mismo patrón de red de
-seguridad por tiempo; detalle completo en references/changelog.md · G4.3 · 2026-08-07 (centro de mando, cosecha del chat un estudio de producto): componente estándar "LO QUE ESTE PRODUCTO NO HACE" para verticales de SALUD, descrito junto a sec-disclaimer/sec-es-para-ti como obligatorio-recomendado — declara el límite del producto con honestidad (ej. "no repara una caries ya formada; sí cuida el esmalte") y convierte la objeción "es estafa" en razón de compra en categorías donde los competidores usan avales inventados y estadísticas sin estudio; el mismo mensaje se replica en pauta y en la respuesta pública de comentarios · G4.2 · 2026-08-07 (fuente: chat otro producto/otro producto): TOPE 50 KB por setting custom_liquid (punto 9 del RESUMEN DURO + check obligatorio en auto-check.md) + límites duros y RECETA PROBADA Horizon/Pitch (horizon-bloques.md) + fallback permanente del CTA a /cart/add si Releasit falta (REGLA #2 + releasit-cod.md) + nota [DEUDA] product.base.json en 17 vs 24 secciones; G4.1 · fix 2026-07-27: resumen del PROTOCOLO TEMA VIVO subido al tope (un chat recibió la skill truncada y trabajó sin él — lo crítico va ARRIBA); G4.0 · PERFILES (marca propia | catálogo-dropshipping) + embudo canónico de 24 secciones + bloque alternado imagen-texto + revelado seguro (el CTA nunca se oculta) + video lazy + srcset + schema SEO-AIO en sección propia; historial completo en references/changelog.md -->
+seguridad por tiempo; detalle completo en references/changelog.md · G4.3 · 2026-08-07 (centro de mando, cosecha del chat ESTUDIO 360 DENTAL CAVITY HEALING Chile): componente estándar "LO QUE ESTE PRODUCTO NO HACE" para verticales de SALUD, descrito junto a sec-disclaimer/sec-es-para-ti como obligatorio-recomendado — declara el límite del producto con honestidad (ej. "no repara una caries ya formada; sí cuida el esmalte") y convierte la objeción "es estafa" en razón de compra en categorías donde los competidores usan avales inventados y estadísticas sin estudio; el mismo mensaje se replica en pauta y en la respuesta pública de comentarios · G4.2 · 2026-08-07 (fuente: chat Insulinum/Nuut): TOPE 50 KB por setting custom_liquid (punto 9 del RESUMEN DURO + check obligatorio en auto-check.md) + límites duros y RECETA PROBADA Horizon/Pitch (horizon-bloques.md) + fallback permanente del CTA a /cart/add si Releasit falta (REGLA #2 + releasit-cod.md) + nota [DEUDA] product.base.json en 17 vs 24 secciones; G4.1 · fix 2026-07-27: resumen del PROTOCOLO TEMA VIVO subido al tope (un chat recibió la skill truncada y trabajó sin él — lo crítico va ARRIBA); G4.0 · PERFILES (marca propia | catálogo-dropshipping) + embudo canónico de 24 secciones + bloque alternado imagen-texto + revelado seguro (el CTA nunca se oculta) + video lazy + srcset + schema SEO-AIO en sección propia; historial completo en references/changelog.md -->
 
 > 🔒 **SKILL CANÓNICA — SOLO-LECTURA.** Estos archivos están protegidos (read-only) a propósito.
 > Se pueden LEER y usar libremente, pero **NO se editan desde fuera de la "fábrica"** (el chat del
@@ -90,7 +93,7 @@ se generó sin voz de marca cargada.
 6. **CSS prohibido**: jamás `html,body{overflow-x:clip}` — mata el scroll vertical; el desborde se arregla en el elemento culpable.
 7. **Releasit**: el Sticky Bar NUNCA se desactiva en el panel (se oculta por CSS) y el botón se prueba PULSÁNDOLO (abrir el modal).
 8. **Media de la ficha vive en el TEMA y en la DESCRIPCIÓN del producto** (descriptionHtml) — un barrido/parche de media mira ambos. **Video de contenido: `poster` OBLIGATORIO** (sin poster + sin autoplay = recuadro en blanco que simula sección vacía) y el autoplay se comprueba con play() o teléfono real, nunca desde el panel del navegador. GIF pesado (>1 MB) → convertir a MP4 `<video autoplay muted loop playsinline>` (caso real: 23,5 MB → 3,3 MB).
-9. **TOPE DURO: cada setting `custom_liquid` admite máximo 50 KB** — aplica a TODOS los temas, no solo a Horizon/Pitch. Al pasarse, el guardado revienta con *"Setting 'custom_liquid' is invalid. ['Liquid file size cannot exceed 50 kilobytes.']"* (descubierto con `FileSaveError` en tienda real, chat otro producto 2026-08-07). Medir CADA valor en **bytes UTF-8, no caracteres**, antes de entregar (verificación obligatoria en `references/auto-check.md`); si una pieza se acerca al tope, partirla en secciones más pequeñas (una sección por pieza, REGLA #5).
+9. **TOPE DURO: cada setting `custom_liquid` admite máximo 50 KB** — aplica a TODOS los temas, no solo a Horizon/Pitch. Al pasarse, el guardado revienta con *"Setting 'custom_liquid' is invalid. ['Liquid file size cannot exceed 50 kilobytes.']"* (descubierto con `FileSaveError` en tienda real, chat Insulinum 2026-08-07). Medir CADA valor en **bytes UTF-8, no caracteres**, antes de entregar (verificación obligatoria en `references/auto-check.md`); si una pieza se acerca al tope, partirla en secciones más pequeñas (una sección por pieza, REGLA #5).
 
 Sistema para generar páginas de producto Shopify de alta conversión COD. Nació
 del proyecto interno "plantilla down" (tema **Dawn**) y se probó en dos productos
@@ -513,3 +516,10 @@ y NUNCA reintroducir nombres reales** (usar descriptores de categoría; la skill
 - **TICKER_CONFIG** para parametrizar textos de los tickers.
 - **Tema "Golden"** (custom, en desarrollo) — documentar sus selectores cuando exista.
 - ✅ ~~Tokenizar colores~~ HECHO en v1.14 (recolorear = cambiar variables del config center).
+
+## Fronteras y desambiguacion
+
+Descripcion completa anterior (se conserva para no perder ningun matiz de frontera):
+
+> Construye, adapta y recolorea páginas de producto Shopify de alta conversión para venta CONTRA ENTREGA (COD con Releasit COD Form) y/o pago anticipado. Plantilla base = PRODUCTO DEMO (el build más completo, sobre Shrine Pro), adaptable a Dawn ("plantilla down", el tema que se enseña/regala), Sense y cualquier tema (la mayoría de bloques son custom-liquid y portables). Trabaja con DOS PERFILES sobre un mismo motor: "marca propia" y "catálogo/dropshipping". Úsala SIEMPRE que el usuario quiera: crear o mejorar una landing/página de producto, armar un product.json o product.<tema>.json, adaptar una página de un cliente a otro tema, cambiar la marca/colores de una plantilla, agregar countdown, sticky bar, garantía, barra logística, reseñas, FAQ, manifiesto, combos/bundles, pirámide/"cómo actúa", precio dinámico, botón Releasit, o resolver dudas de carrito/Releasit/COD. También cuando venda un producto de Dropi o de catálogo público y necesite diferenciarse por oferta y por página. Dispara aunque no digan "plantilla down": basta con "página de producto", "landing de producto Shopify", "tema Dawn/Shrine/Sense", "contra entrega", "Releasit", "COD", o que peguen un product.json con bloques custom_liquid. NO usar para análisis de anuncios ni temas no-Shopify.
+

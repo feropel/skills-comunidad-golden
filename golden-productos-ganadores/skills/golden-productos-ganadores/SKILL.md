@@ -1,22 +1,25 @@
 ---
 name: golden-productos-ganadores
 description: >-
-  Golden Group — Búsqueda y validación de PRODUCTOS GANADORES para dropshipping
-  COD / marca propia en LatAm. Cruza la Meta Ad Library (anuncios activos de la
-  competencia) con los contadores de ventas reales de AliExpress y Amazon, reseñas
-  y tendencias de búsqueda para encontrar y puntuar productos con demanda real, y
-  entrega una FICHA DE PRODUCTO GANADOR lista para investigar a fondo y montar la página.
-  Úsala SIEMPRE que el usuario quiera: buscar productos ganadores, validar un
-  producto, saber si un producto vende, encontrar productos en tendencia,
-  "qué vendo", "dame productos winner", analizar la demanda de un producto,
-  espiar qué está pautando la competencia, o decidir qué producto lanzar. También cuando mande
-  VARIOS productos de una (modo LOTE: valida cada uno y entrega un ranking comparativo), pregunte
-  "está saturado este producto", "cuánta competencia hay", "quién lo está vendiendo ya", o quiera
-  el índice de anuncios de la competencia con links para espiar creativos.
-  NO usar para analizar pauta propia (eso es golden-meta-ads-analysis) ni para
-  construir la página (eso es golden-shopify).
+  Golden Group — Búsqueda y validación de PRODUCTOS GANADORES para dropshipping COD / marca
+  propia en LatAm. Cruza la Meta Ad Library (anuncios activos de la competencia) con los
+  contadores de ventas reales de AliExpress y Amazon, reseñas y tendencias de búsqueda para
+  encontrar y puntuar productos con demanda real, y entrega una FICHA DE PRODUCTO GANADOR
+  lista para investigar a fondo y montar la página. Úsala SIEMPRE que el usuario quiera:
+  buscar productos ganadores, validar un producto, saber si un producto vende, encontrar
+  productos en tendencia, "qué vendo", "dame productos winner", analizar la demanda de un
+  producto, espiar qué está pautando la competencia, o decidir qué producto lanzar. También
+  cuando mande VARIOS productos de una (modo LOTE: valida cada uno y entrega un ranking
+  comparativo), pregunte "está saturado este producto", "cuánta competencia hay", "quién lo
+  está vendiendo ya", o quiera el índice de anuncios de la competencia con links para espiar
+  creativos.
 ---
-
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 984 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # Golden Group — Productos Ganadores
 
 <!-- skill GPG1.10 · 2026-08-24 · Barrido total del arsenal (auditoría fresca golden-skill-auditor,
@@ -304,3 +307,7 @@ propio, **arréglalo sin esperar que lo pidan** e informa; 4) pasa `golden-skill
 periódicamente. Nunca borres conocimiento: reorganiza y añade.
 
 - **2026-08-02** — LOOP DEL ARSENAL (semana 1, skills de negocio): se hornea la sección **AUTO-MEJORA** (mandato global de FER, autorización permanente). Sin esta sección la skill no se auto-calificaba al cerrar corrida. Contenido operativo intacto. Backup: `_backups/2026-08-02-loop-arsenal-s1/`.
+
+## Fronteras y desambiguacion
+
+NO usar para analizar pauta propia (eso es golden-meta-ads-analysis) ni para construir la página (eso es golden-shopify).

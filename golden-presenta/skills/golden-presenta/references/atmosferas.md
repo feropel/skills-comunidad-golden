@@ -15,7 +15,7 @@ Se elige atmósfera, paleta y tipografía por el asunto del que se habla, no por
 5. Por qué WebGL puro y no Three.js
 6. Rendimiento y degradación
 
-## 1 · Las 8 atmósferas
+## 1 · Las 9 atmósferas
 
 Todas se tiñen solas con los tokens de marca del deck (`--accent`, `--accent-2`, `--bg`).
 Cambiar la paleta cambia el fondo: no hay un solo color escrito en el motor.
@@ -29,7 +29,13 @@ Cambiar la paleta cambia el fondo: no hay un solo color escrito en el motor.
 | `reticula` | Canvas 2D | Malla de puntos que se hunde bajo el cursor | Técnico, preciso, de panel |
 | `duna` | Canvas 2D | Campo en perspectiva que ondula, crestas encendidas | Producto, materia, oficio |
 | `viaje` | Canvas 2D | Estrellas con dolly hacia el espectador | Lanzamiento, visión, futuro |
+| `candela` | WebGL | Nube de brasa naranja a la izquierda, frío cian a la derecha, estrellas detrás | Fuego, escenario, comunidad con marca |
 | `ninguna` | — | Sin fondo | Sobrio, institucional, serio |
+
+**`candela` viene de un sitio concreto:** el fondo del video de los 7 mentores de El Cartel
+del Chat, con los colores muestreados del frame real, no inventados — candela `#ff6926`,
+cian `#247684`, negro cálido `#0b0503`. Como todas, se tiñe con los tokens del deck: esos
+hex son su punto de partida, no una prisión.
 
 Se activa con un atributo, y nada más:
 ```html
@@ -43,7 +49,7 @@ Esta tabla es el corazón de la skill. **Se consulta siempre antes de maquetar.*
 
 | Si el deck habla de… | Atmósfera | Carácter de paleta | Display | Receta de apoyo |
 |---|---|---|---|---|
-| **El Cartel del Chat**, evento en vivo, bootcamp | `pulso` | Rojo y ámbar sobre negro cálido | Condensada pesada | `balenciaga-post-2017` |
+| **El Cartel del Chat**, evento en vivo, bootcamp | `candela` | Rojo y ámbar sobre negro cálido | Condensada pesada | `balenciaga-post-2017` |
 | **Comunidad Golden, MBA**, formación | `aurora` | Verde y dorado sobre verde muy oscuro | Serif humanista | `stripe-press` |
 | **Propuesta comercial**, agencia, servicios | `nebulosa` | La del cliente sobre fondo profundo | Serif transitional | `pentagram` |
 | **Marca personal de Fer**, charla, keynote | `nebulosa` o `ninguna` | Neutro, acento gris claro | Serif editorial | `monocle-magazine` |

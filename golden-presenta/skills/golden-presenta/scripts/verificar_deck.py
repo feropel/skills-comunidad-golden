@@ -159,6 +159,8 @@ def auditar(ruta):
     # y no habia check detras. Ahora si lo hay, y busca la CLASE: palabras que
     # en espanol SIEMPRE llevan tilde y aparecen escritas sin ella.
     SIEMPRE_CON_TILDE = [
+    'operacion', 'ubicacion', 'sesion', 'union', 'mision', 'presion', 'ocasion', 'oracion', 'estacion', 'duracion', 'relacion', 'solucion', 'situacion', 'condicion', 'division', 'revision', 'emision', 'fusion', 'tension', 'pension', 'organizacion', 'participacion', 'optimizacion', 'automatizacion', 'integracion', 'validacion', 'medicion', 'edicion', 'creacion', 'ejecucion', 'distribucion', 'instalacion', 'migracion', 'notificacion', 'planificacion', 'clasificacion', 
+   
         'presentacion', 'informacion', 'configuracion', 'aplicacion', 'seccion',
         'opcion', 'version', 'atencion', 'decision', 'direccion', 'produccion',
         'comunicacion', 'introduccion', 'conclusion', 'inversion', 'gestion',
@@ -188,10 +190,24 @@ def auditar(ruta):
             a or b for a, b in re.findall(r"'([^'\n]{3,})'|\"([^\"\n]{3,})\"", js))
     texto_plano = re.sub(r'<[^>]+>', ' ', cuerpo) + ' ' + atributos + ' ' + cadenas_js
 
+    # AMBIGUAS: cada una es tambien una forma VERBAL que va SIN tilde.
+    # "el sistema publica gratis" es correcto; "la pagina publica" (adjetivo) no.
+    # La palabra suelta no permite decidir, asi que estas NO bloquean: avisan.
+    # Origen: 2026-09-03, un deck CORRECTO quedo bloqueado por 'publica' y hubo
+    # que reescribir la frase para poder entregar. Un detector agresivo hace
+    # tanto daño como uno ciego, y cuesta mas descubrirlo.
+    AMBIGUAS_VERBO = {'publica', 'publico', 'practica', 'numero', 'articulo', 'ultimo'}
+
+    def _aparece(w):
+        return re.search(r'(?<![\w\-_áéíóúñ])' + w + r'(?![\w\-_áéíóúñ])', texto_plano, re.I)
+
     sin_tilde = sorted(set(
         w for w in SIEMPRE_CON_TILDE
-        if re.search(r'(?<![\w\-_áéíóúñ])' + w + r'(?![\w\-_áéíóúñ])', texto_plano, re.I)
-    ))
+        if w not in AMBIGUAS_VERBO and _aparece(w)))
+    dudosas = sorted(set(
+        w for w in SIEMPRE_CON_TILDE
+        if w in AMBIGUAS_VERBO and _aparece(w)))
+
     a.check('Acentos puestos en el texto que se ve',
             not sin_tilde,
             'Palabras escritas SIN su tilde en el contenido: %s. '
@@ -199,13 +215,40 @@ def auditar(ruta):
             'y lo lee en voz alta un lector de pantalla.'
             % ', '.join(sin_tilde[:15]))
 
+    a.check('Palabras que pueden ir con o sin tilde',
+            not dudosas,
+            'Aparecen sin tilde: %s. Cada una es tambien un VERBO y entonces va '
+            'sin tilde ("el sistema publica gratis" es correcto). Si en tu frase '
+            'es sustantivo o adjetivo, ponsela ("la pagina publica" -> publica). '
+            'No bloquea la entrega: lo decide quien escribe.'
+            % ', '.join(dudosas[:15]),
+            grave=False)
+
     # ------------------------------------------------------------------
     # 3 · Reglas de escritura Golden
     # ------------------------------------------------------------------
-    aperturas = re.findall(r'[¿¡]', visible)
-    a.check('Sin signos de apertura ¿ ¡', not aperturas,
-            'Hay %d signos de apertura. El estandar Golden escribe sin ellos, y eso '
-            'no es decision del autor.' % len(aperturas))
+    # ESTANDAR CORREGIDO (FER, 2026-09-03): "las presentaciones si deben llevar la
+    # manera ortografica correcta. Solamente cuando escribimos, que no parezcamos
+    # un bot". O sea: la regla de escribir sin ¿ ¡ es para NUESTRA prosa en el chat
+    # y los informes, NO para el texto que se publica y proyecta. En un deck los
+    # signos de apertura son LO CORRECTO.
+    #
+    # El check estaba INVERTIDO y bloqueaba la entrega de decks bien escritos.
+    # Ahora comprueba lo contrario: que no falte el signo de apertura.
+    frases = re.split(r'[\n\r]+', re.sub(r'<[^>]+>', '\n', cuerpo))
+    sin_apertura = []
+    for f in frases:
+        f = f.strip()
+        if not f or len(f) > 300:
+            continue
+        # Cierra con ? o ! pero en toda la frase no hay signo de apertura
+        if re.search(r'[?!]\s*$', f) and not re.search(r'[¿¡]', f):
+            sin_apertura.append(f[:60])
+    a.check('Interrogaciones y exclamaciones bien abiertas',
+            not sin_apertura,
+            'Frases que cierran con ? o ! y les falta el signo de apertura: %s. '
+            'En una presentacion se escribe con ortografia correcta: "¿Que pasa?", '
+            'no "Que pasa?".' % ' · '.join('"%s"' % x for x in sin_apertura[:5]))
 
     # ------------------------------------------------------------------
     # 4 · Estructura del motor
@@ -299,8 +342,14 @@ def auditar(ruta):
 
         # Densidad de texto: una lamina no es un documento
         cargadas = []
-        for i, cuerpo in enumerate(laminas, start=1):
-            texto = re.sub(r'<[^>]+>', ' ', cuerpo)
+        # OJO: esta variable NO puede llamarse `cuerpo`. Lo hacia, y al ser el
+        # bucle del nivel de la funcion, pisaba la variable `cuerpo` que guarda
+        # el documento entero. Todo check posterior al bucle recibia solo la
+        # ULTIMA lamina. Medido el 2026-09-03: el check de clases huerfanas veia
+        # 300 caracteres y 3 clases en vez del documento de 1,2 MB, y por eso no
+        # cazaba nada. Clase del fallo: variable de bucle que sombrea una global.
+        for i, cuerpo_lamina in enumerate(laminas, start=1):
+            texto = re.sub(r'<[^>]+>', ' ', cuerpo_lamina)
             texto = re.sub(r'\s+', ' ', texto).strip()
             if len(texto) > 550:
                 cargadas.append((i, len(texto)))
@@ -312,7 +361,7 @@ def auditar(ruta):
     # ------------------------------------------------------------------
     # 6b · Atmosfera: la que se declara tiene que existir en el motor
     # ------------------------------------------------------------------
-    ATMOSFERAS = ['nebulosa', 'aurora', 'pulso', 'enjambre',
+    ATMOSFERAS = ['nebulosa', 'candela', 'aurora', 'pulso', 'enjambre',
                   'reticula', 'duna', 'viaje', 'ninguna']
     matm = re.search(r'<body[^>]*data-atmosfera=["\']([^"\']*)', visible, re.I)
     if matm:
@@ -330,6 +379,33 @@ def auditar(ruta):
         a.sin_verificar('Atmosfera del deck',
                         'El body no declara data-atmosfera. El deck saldra sin fondo vivo, '
                         'que es valido solo si se eligio "ninguna" a proposito.')
+
+    # ------------------------------------------------------------------
+    # 6c · Clases usadas en el HTML que NO tienen ninguna regla CSS
+    # ------------------------------------------------------------------
+    # Reportado por el chat del Cartel el 2026-09-03: inyecto el CSS de sus
+    # laminas con un `replace` cuyo ancla ya no existia. Fallo EN SILENCIO: el
+    # HTML tenia las clases, el CSS no tenia ni una regla, y el verificador dio
+    # 30 de 30. FER lo vio en pantalla: texto a 16px con la fuente del sistema
+    # en una lamina vacia. Comprobarlo es baratisimo y lo habria cazado.
+    css_todo = ' '.join(re.findall(r'<style[^>]*>(.*?)</style>', visible, re.S | re.I))
+    clases_html = set()
+    for attr in re.findall(r'class=["\']([^"\']+)["\']', cuerpo, re.I):
+        for c in attr.split():
+            if c and not c.startswith('GP_'):
+                clases_html.add(c)
+    # Clases que el motor aplica desde JS y por tanto no siempre estan en el HTML
+    VIVEN_EN_JS = {'is-active', 'go', 'vista-general', 'presentador', 'con-logo'}
+    huerfanas = sorted(
+        c for c in clases_html
+        if c not in VIVEN_EN_JS
+        and not re.search(r'\.' + re.escape(c) + r'(?![\w-])', css_todo)
+    )
+    a.check('Toda clase usada tiene alguna regla CSS', not huerfanas,
+            'Clases en el HTML sin ni una regla que las nombre: %s. Sintoma de CSS '
+            'que no llego a entrar (un replace con el ancla equivocada falla en '
+            'silencio). En pantalla se ve como texto sin estilo en una lamina vacia.'
+            % ', '.join(huerfanas[:10]))
 
     # ------------------------------------------------------------------
     # 7 · Contraste real de la paleta declarada (WCAG AA = 4.5)

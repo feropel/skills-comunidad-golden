@@ -3,6 +3,40 @@
 Registro de versiones de la skill. Cada vez que se absorbe una mejora de una página
 real, se sube una versión aquí (ver el ritual de auto-mejora en SKILL.md).
 
+## G4.19 — 2026-09-03 — La doc no decia como correr los validadores (ocho versiones rota)
+Salio de comprobar si mi documentacion ensenaba la trampa de la tuberia. No la ensenaba, pero al
+mirar aparecio algo peor: **`auto-check.md` no traia NINGUN comando**. Decia "correr este script"
+y a continuacion "(el codigo vive en scripts/autocheck.py)", sin decir como.
+- **Causa medida:** en G4.10 el encabezado nuevo se inserto con un patron que decia
+  "Auto-verificacion" mientras el archivo dice **"Auto-verificación" con tilde**. La ley del grep
+  con tilde, esta vez dentro de mi propio horneado. El otro reemplazo del mismo comando (el bloque
+  ```python) si caso, porque no llevaba tildes — asi que medio cambio entro y medio no.
+- **Lo grave no es el fallo, es que no dio la cara:** un `re.sub` que no casa **no falla, no hace
+  nada**. El comando termino con exito, el changelog de G4.10 dio por hecho que la doc explicaba el
+  uso, y asi paso por **ocho versiones** — mientras esta misma skill se auditaba a fondo cada hora.
+- **Regla nueva en 0-H:** tras editar, **verificar que el texto nuevo ESTA**, no que el comando
+  salio sin error. Un cambio que no se aplico es indistinguible de uno aplicado si nadie mira.
+- Encabezado ya puesto, con los cuatro comandos, el aviso de la tuberia y la regla de los dos casos.
+
+## G4.18 — 2026-09-03 — Angulares en la description, y el validador que nadie corria
+Fila del Centro de Mando, verificada aqui ejecutando antes de aceptarla: la `description` contenia
+`product.<tema>.json` y **la spec de publicacion prohibe los angulares**. No era longitud: 1010
+caracteres de 1024. El arreglo son dos caracteres → `product.tema.json`, y el disparador no pierde
+nada.
+- 🔴 **La causa de fondo vale mas que el arreglo:** esta skill revisaba con 29 checks el
+  `product.json` que PRODUCE, y **no se revisaba a si misma como artefacto publicable** — aunque se
+  publica al marketplace de la comunidad. El fallo lo caza el validador **oficial** que trae
+  `skill-creator` (`scripts/quick_validate.py`), la fuente autoritativa de publicacion, y **ninguna
+  de nuestras herramientas lo corria**. Un validador propio muy pulido no sustituye al de la
+  plataforma que publica: valida lo que TU decidiste mirar, no lo que la plataforma exige.
+- **La autoprueba ahora lo ejecuta sobre esta skill**, con la distincion de la refinacion 2:
+  **BLOQUEA** si el validador existe y falla (el fallo esta en nuestro SKILL.md) y **AVISA** si no
+  se encuentra (vive fuera de nuestro arbol y lo mantiene otro).
+- **Nota de medicion propia:** al comprobar la fila lei el codigo de salida a traves de un `head` y
+  me dio 0 — el mismo error que el CdM habia confesado horas antes con un `tail`. Repetido bien:
+  salida **1**. Y con **control conocido** (`golden-pdf-check` → 0, "Skill is valid!"), que es la
+  refinacion 4 de la ley funcionando el mismo dia que se escribio.
+
 ## G4.17b — 2026-09-02 — Un falso positivo destapo una clase: la funcion de "texto visible"
 El check 27 (rayas) dio falso positivo en su primera corrida y el caso bueno lo cazo. La causa no
 era el check: era **la funcion que decide que texto se PUBLICA**, que solo quitaba `{% comment %}`
@@ -1177,8 +1211,8 @@ faltaba eran las **secciones de persuasión narrativa** y la **estrategia de cop
 ## G4.1b — 2026-07-29 — Media: tema+descripción, poster obligatorio, GIF→MP4 (lección chat TOPPIK, parche 23,5→3,3 MB)
 ## G4.1c — 2026-07-29 — REGLA #3 con matiz PAUTA: display propio se queda; porcentajes-estudio, testimonios en imagen y atribución a terceros jamás (gaceta 4f p.3).
 
-## G4.2 — 2026-08-07 — Límites duros de Shopify + receta Horizon/Pitch + fallback del CTA (fuente: chat otro producto/otro producto)
-Paquete de hallazgos horneado por el Centro de Mando desde la entrada del chat otro producto en la bandeja
+## G4.2 — 2026-08-07 — Límites duros de Shopify + receta Horizon/Pitch + fallback del CTA (fuente: chat INSULINUM/Nuut)
+Paquete de hallazgos horneado por el Centro de Mando desde la entrada del chat Insulinum en la bandeja
 (3 `FileSaveError` consecutivos en tienda real descubrieron límites que no están en la documentación oficial).
 - **TOPE 50 KB por setting `custom_liquid` (aplica a TODOS los temas):** el guardado del template revienta
   con *"Setting 'custom_liquid' is invalid. ['Liquid file size cannot exceed 50 kilobytes.']"*. Entró como
@@ -1199,7 +1233,7 @@ Paquete de hallazgos horneado por el Centro de Mando desde la entrada del chat o
   el orden de 17 secciones vs las 24 del embudo canónico G4.0 — pendiente de sesión dedicada. Hasta
   regenerarlo, el ORDEN canónico es la tabla del SKILL.md, no el base.
 
-## G4.3 — 2026-08-07 — Componente "LO QUE ESTE PRODUCTO NO HACE" (cosecha del chat un estudio de producto, Chile)
+## G4.3 — 2026-08-07 — Componente "LO QUE ESTE PRODUCTO NO HACE" (cosecha del chat ESTUDIO 360 DENTAL CAVITY HEALING, Chile)
 Repartido por el Centro de Mando desde la bandeja (orden de FER: "sin omitir detalle"). Invención del
 estudio dental y probablemente lo más valioso que salió de él:
 - **Componente estándar para verticales de SALUD**, descrito en el SKILL.md junto a `sec-disclaimer` /

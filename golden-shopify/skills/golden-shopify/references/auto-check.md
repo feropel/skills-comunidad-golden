@@ -1,7 +1,24 @@
 # Auto-verificación de cierre (correr ANTES de entregar)
 
 Objetivo: que los errores que ya pasaron (rating 0.0, color viejo, sin sello, JSON roto)
-sean IMPOSIBLES de entregar. Correr este script sobre el `product.json` generado.
+sean IMPOSIBLES de entregar.
+
+> **El validador es un SCRIPT, no este documento.** Aqui se explica QUE mira cada check y por
+> que; el codigo tiene UNA sola fuente, `scripts/autocheck.py`, para que no se desincronicen.
+
+```bash
+python3 scripts/autocheck.py ruta/al/product.json          # entrega final (estricto)
+python3 scripts/autocheck.py assets/product.base.json --base   # plantilla base de la skill
+python3 scripts/autoprueba.py                              # prueba los validadores (regresion)
+python3 scripts/sellos.py                                  # las caras de la version coinciden
+```
+
+`autocheck.py` sale con **0 si esta limpio y 1 si hay hallazgos**, asi que se puede encadenar.
+⚠️ **Nunca leas ese codigo a traves de una tuberia**: `... | tail; echo $?` devuelve el estado de
+`tail` y da 0 SIEMPRE. Se corre a un archivo (`cmd > /tmp/x 2>&1; RC=$?`) o se mide en Python.
+`autoprueba.py` sabotea la plantilla base real con cada bug que esta skill ya pago y exige que el
+validador lo cace, **y ademas comprueba que deja pasar lo legitimo**: si agregas un check, agregale
+sus dos casos. Tambien corre el validador OFICIAL de publicacion sobre esta skill.
 
 ⚠️ **G4.2 — verificación OBLIGATORIA en cada entrega:** el check 21 mide cada valor
 `custom_liquid` del template en **bytes UTF-8** (no caracteres) y FALLA si alguno llega a

@@ -4,6 +4,12 @@
 como motor de frameworks (AIDA/PAS/4U/BAB) y la generación de medios (Higgsfield/Nano Banana/Seedance
 vía `golden-ugc-avatar` + MCP). El copy SIEMPRE nace del **creativo + la investigación**, no al aire.
 
+🔴 **Si la CUENTA PUBLICITARIA no tiene creativos** (o el usuario acaba de pasar un video/foto por
+el chat), el procedimiento completo — medir la biblioteca, meter el medio en la cuenta por sus
+**3 vías**, **analizar el video antes de redactar**, la **prueba de coherencia de 6 puntos** y la
+verificación con `ads_get_ad_preview` — está en **`25-cuenta-sin-creativos.md`**. Ese archivo
+manda sobre este en ese escenario.
+
 ## PASO 1 — Intake de creativos (SIEMPRE preguntar primero)
 > "Tienes **videos y/o imágenes** del producto? Súbelos. Si no tienes, los generamos nosotros."
 

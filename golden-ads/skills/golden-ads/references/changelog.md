@@ -455,7 +455,7 @@ decía **G4.6 con fecha 2026-07-25** para el mismo tramo de trabajo — versión
 Desde esta edición ambos dicen **G4.7** y este ledger (`references/changelog.md`) queda como fuente única
 de verdad de versión/fecha; `SKILL.md` solo refleja el número vigente. Sello → **G4.7**.
 
-## G4.5 — 2026-08-07 — Cosecha del chat "ESTUDIO 360 DENTAL CAVITY HEALING" (Chile), vía Centro de Mando
+## G4.5 — 2026-08-07 — Cosecha del chat "ESTUDIO 360 DENTAL un producto de cliente" (Chile), vía Centro de Mando
 > Nota de reconciliación (ver G4.7 arriba): este tramo de trabajo quedó registrado con doble numeración
 > en su momento (ledger decía G4.5, sello impreso decía G4.6/2026-07-25). El contenido abajo es real y
 > vive hoy en `12-unit-economics.md`; el número de versión que manda es el de este ledger.

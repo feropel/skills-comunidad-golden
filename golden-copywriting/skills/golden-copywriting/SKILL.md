@@ -320,7 +320,7 @@ lo señala.
   variante del MECANISMO leída en mercado. **(4)** §6 NUEVA — **el copy no es la variable
   dominante**: tres creativos con el mismo cuerpo byte por byte dan CPA de 14.794 a 119.346; §7
   NUEVA con qué del mercado es medible y qué no (emoji y MAYÚSCULAS eran ruido, corrige a la
-  corrida 2). Los dos fallos de higiene de Dolce (negrita Unicode falsa, Markdown sin renderizar)
+  corrida 2). Los dos fallos de higiene de un cliente (negrita Unicode falsa, Markdown sin renderizar)
   siguen sin corregir y el de Markdown se replicó de 1 a 3 creativos; reportado otra vez a la
   bandeja del CdM, fuera de mi dominio ejecutarlo. Cobertura: 74 cuentas inventariadas / 42
   barridas (excl. BACK UP, +6 sin medio de pago que antes no se miraban) / 17 con gasto / 5 a
@@ -339,11 +339,11 @@ lo señala.
   inventariadas, 36 revisadas (excluida BACK UP), 17 con gasto en 30 días (sube de 14); mercado:
   3 términos, 150 anuncios, 46 páginas, 60 títulos únicos, 4 cuerpos completos. Hallazgo mayor:
   **la regla de los 125 caracteres deja de ser ley dura** — 0 de 5 mayores vendedores medidos
-  (Le'côterra, Tag Recede, Dolce por primera vez cruzada) meten el argumento en la ventana
+  (Le'côterra, Tag Recede, un cliente por primera vez cruzada) meten el argumento en la ventana
   visible, y ya no es solo un vertical con restricción de claims. Actualizado
   `estandar-meta-medido.md` §3 con el número y la fuente. También: la skill se encontró
   **desblindada** al empezar esta corrida (sin forcejeo detectado); dos fallos de higiene
-  hallados en copy PROPIO de Dolce (negrita Unicode falsa, asteriscos Markdown sin renderizar)
+  hallados en copy PROPIO de un cliente (negrita Unicode falsa, asteriscos Markdown sin renderizar)
   reportados a la bandeja del CdM por estar fuera de mi dominio ejecutarlos. El reparto
   2 cortos + 3 largos sigue sin poder verificarse (van 2 corridas: la API no expone
   `asset_feed_spec`). Nueva entrada en `tendencias-vivas.md`. Respaldo previo:

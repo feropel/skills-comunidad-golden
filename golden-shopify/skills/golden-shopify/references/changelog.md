@@ -3,6 +3,28 @@
 Registro de versiones de la skill. Cada vez que se absorbe una mejora de una página
 real, se sube una versión aquí (ver el ritual de auto-mejora en SKILL.md).
 
+## G4.20 — 2026-09-04 — El tema se declara ANTES de generar (y el candado deja de asumir Dawn)
+FER compartio las skills al grupo VIP y varios **no usan Dawn**. Esta skill construye sobre el tema
+de OTRA persona, asi que asumir familia es el fallo de instalacion mas caro: si encaja a medias
+parece que funciona.
+- **Que ya teniamos** (medido antes de tocar): `references/temas.md` ya decia *"preguntar SIEMPRE
+  cual es"*, ya separaba las **2 familias** (clasica Dawn/Shrine/Sense, donde el `product.json` pega,
+  y nueva Horizon/Pitch, donde NO pega y va por Custom Liquid) y ya tenia fallback generico, mas
+  `horizon-bloques.md`. El conocimiento estaba.
+- **Que faltaba, y es de ORDEN:** eso vivia en un archivo de referencia, **no en la compuerta de
+  arranque**. El Paso 0 obligatorio solo exigia el cerebro de marca. Y el protocolo de tema vivo dice
+  "verificar QUE tema es MAIN" **por API** — que un VIP con la skill en su propio Claude puede no
+  tener. Sin API y sin compuerta, se cae en asumir Dawn.
+- **Paso 0-A (compuerta):** el tema queda DECLARADO antes de escribir una linea. Y la primera via no
+  es preguntar: es **MEDIRLO desde la URL publica**. `Shopify.theme.schema_name` da la **familia
+  real** aunque el dueno haya renombrado el tema — `name` es solo el rotulo. Verificado en tienda
+  real: rotulo "GOLDEN 3D · Dawn (atrib WhatsApp)" vs `schema_name` **"Dawn"** 15.5.0.
+- 🔴 **El candado asumia la familia Dawn.** Sus 13 selectores son todos Dawn/Shrine; en Debut,
+  Impulse, Prestige, Booster o Ella **no ocultaba nada**, y falla **en SILENCIO**: la pagina se ve
+  perfecta y el cliente igual puede irse al home. Anadidos los selectores de esas familias **y una
+  verificacion medida obligatoria** (`getComputedStyle(header).display === 'none'`), porque ninguna
+  lista cubre todos los temas: lo que no se puede garantizar por lista, se mide en la tienda.
+
 ## G4.19 — 2026-09-03 — La doc no decia como correr los validadores (ocho versiones rota)
 Salio de comprobar si mi documentacion ensenaba la trampa de la tuberia. No la ensenaba, pero al
 mirar aparecio algo peor: **`auto-check.md` no traia NINGUN comando**. Decia "correr este script"

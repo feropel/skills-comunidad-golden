@@ -3,7 +3,12 @@
 La regla de oro: **los bloques `custom-liquid` funcionan en cualquier tema sin
 cambios.** Solo se adapta lo nativo. Esta tabla es lo único que cambia entre temas.
 
-**Temas soportados (preguntar SIEMPRE cuál es). 2 familias:**
+**El tema se MIDE antes de preguntarlo.** Con la URL de la tienda basta — sin API ni permisos:
+`Shopify.theme.schema_name` da la **familia real** aunque el dueno lo haya renombrado (`name` es
+solo el rotulo: "Mi tienda v2" no dice nada; `schema_name` dice "Dawn"). Medido 2026-09-04 en una
+tienda real. Preguntar es la TERCERA via, no la primera (ver Paso 0-A del SKILL.md).
+
+**Temas soportados (medir o preguntar SIEMPRE cuál es). 2 familias:**
 - **Familia clásica (product.json pega):** **Dawn** (base) · **Shrine / Shrine Pro** · **Sense**.
 - **Familia NUEVA (product.json NO pega → bloques Custom Liquid):** **Horizon** · **Pitch**.
 - **Otro:** fallback genérico; si parece OS 2.0 clásico trátalo como Dawn/Sense, si parece

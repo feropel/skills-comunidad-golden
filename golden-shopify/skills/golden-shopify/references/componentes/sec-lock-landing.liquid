@@ -16,6 +16,18 @@
   Este bloque usa display:none: el DOM sigue existiendo, el tema inicializa su JS,
   y solo se oculta VISUALMENTE la navegación. Nada se rompe.
 
+  VERIFICAR EN LA TIENDA REAL (obligatorio, no opcional)
+  ─────────────────────────────────────────────────────
+  Ninguna lista de selectores cubre todos los temas del mundo, y este bloque falla en
+  SILENCIO: si no acierta, la pagina se ve perfecta y el cliente igual puede irse al home.
+  Por eso, tras aplicar, se MIDE en la tienda (consola del navegador):
+
+    const h = document.querySelector('header'), f = document.querySelector('footer');
+    ({ header_oculto: !h || getComputedStyle(h).display === 'none',
+       footer_oculto: !f || getComputedStyle(f).display === 'none' })
+
+  Si alguno sale `false`, se anade el selector real de ESE tema a la lista de arriba.
+
   CÓMO PERMITIR NAVEGACIÓN OTRA VEZ
   ─────────────────────────────────
   Pon LOCK = false (o apaga el bloque desde el editor). El usuario decide.
@@ -24,7 +36,12 @@
 {% if LOCK %}
 <style id="gfs-lock-landing">
 /* Header, announcement y footer del tema: ocultos (sin salidas al home). Cubre Shrine + Dawn/Sense. */
-#shopify-section-header,.shopify-section-group-header-group,.section-header,.header-wrapper,header.header,sticky-header,.announcement-bar,.announcement-bar-section,#shopify-section-announcement-bar,#shopify-section-footer,.shopify-section-group-footer-group,.section-footer,.footer{display:none !important;}
+#shopify-section-header,.shopify-section-group-header-group,.section-header,.header-wrapper,header.header,sticky-header,.announcement-bar,.announcement-bar-section,#shopify-section-announcement-bar,#shopify-section-footer,.shopify-section-group-footer-group,.section-footer,.footer,
+/* familias FUERA de Dawn/Shrine (Debut, Impulse, Prestige, Booster, Ella y derivados): sin estas
+   el candado no ocultaba NADA y fallaba en silencio — la pagina se veia bien y el cliente igual
+   podia irse al home. */
+.site-header,#SiteHeader,#shopify-section-sections--header,.main-header,.header__wrapper,
+.site-footer,#SiteFooter,.main-footer{display:none !important;}
 /* Cualquier enlace suelto al home/tienda queda inerte. */
 a[href="/"],a[href="/#"],a[href$="/collections/all"]{pointer-events:none !important;cursor:default !important;}
 </style>

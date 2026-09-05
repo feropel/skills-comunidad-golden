@@ -21,6 +21,7 @@ description: >-
      COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
      SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # GOLDEN SHOPIFY (`golden-shopify`)
+<!-- skill G4.20 · 2026-09-04 (la skill se comparte y corre sobre el tema de OTRA persona): el tema ya estaba cubierto en references/temas.md ('preguntar SIEMPRE', 2 familias) pero NO era compuerta de arranque — el Paso 0 solo exigia el cerebro de marca — y el protocolo asumia acceso por API, que un VIP en su propio Claude puede no tener. Nuevo Paso 0-A: el tema se DECLARA antes de generar, y se MIDE desde la URL publica (Shopify.theme.schema_name da la familia real aunque el tema este renombrado) antes que preguntarlo. Ademas el candado asumia la familia Dawn: sus 13 selectores no cubrian Debut/Impulse/Prestige/Booster/Ella y fallaba EN SILENCIO. -->
 <!-- skill G4.19 · 2026-09-03: la doc no decia COMO correr los validadores. En G4.10 el encabezado nuevo nunca entro porque el patron buscaba 'Auto-verificacion' y el archivo dice 'Auto-verificación' CON TILDE: el reemplazo no fallo, simplemente no hizo nada, y el changelog lo dio por hecho. Ocho versiones con la doc rota. Regla nueva en 0-H: tras editar se verifica que el texto nuevo ESTA, no que el comando salio sin error. -->
 <!-- skill G4.18 · 2026-09-03 (fila del CdM): la description llevaba `product.<tema>.json` y la spec de publicacion PROHIBE los angulares — no era longitud (1010 de 1024). El arreglo son dos caracteres; la causa de fondo no: esta skill validaba a fondo el product.json que PRODUCE y no se validaba A SI MISMA como artefacto publicable, aunque se publica al marketplace. La autoprueba ahora corre el validador OFICIAL de skill-creator sobre esta skill. -->
 <!-- skill G4.17b · 2026-09-02: el check 27 recien horneado dio falso positivo y destapo una CLASE — la funcion de "texto visible" solo quitaba {% comment %} y dejaba pasar {%- comment -%} (con guiones) y los comentarios JS /* */, asi que los separadores que orientan a quien EDITA el codigo se leian como rayas publicadas. La usaban CUATRO checks: DEMO visible, apertura, rayas y lenguaje de tienda. Un arreglo, cuatro checks. -->
@@ -72,6 +73,29 @@ seguridad por tiempo; detalle completo en references/changelog.md · G4.3 · 202
 > (REGISTRO-FABRICAS.md). Solo la fábrica numera esta skill (ley del número de versión).
 
 <!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leian el cerebro de marca — esta entra a la familia que SI lo lee. Bloque identico en las 6 del CdM + fila a la fabrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
+## Paso 0-A · QUE TEMA ES (compuerta: no se genera nada sin esto)
+Esta skill construye **sobre el tema de OTRA persona**. Si se asume Dawn y la tienda corre otra
+familia, lo que se entrega no encaja — y en el peor caso encaja a medias, que es peor porque parece
+bien. **Antes de escribir una sola linea, el tema queda DECLARADO.** Tres vias, en este orden:
+
+1. **MEDIRLO desde la tienda publica** (no hace falta API ni permisos: basta la URL). En el HTML de
+   cualquier tienda Shopify vive `Shopify.theme`, y lo que manda es **`schema_name`**, no `name`:
+   `name` es el rotulo que le puso el dueno ("Mi tienda v2") y no dice nada; **`schema_name` dice la
+   FAMILIA real** aunque lo hayan renombrado.
+   ```js
+   // pegar en la consola de la tienda, o leerlo del HTML publico
+   ({familia: Shopify.theme.schema_name, version: Shopify.theme.schema_version, rotulo: Shopify.theme.name})
+   ```
+2. **Por API**, si hay MCP/credencial: `{themes{nodes{name role id}}}` — y ademas el tema MAIN cambia
+   entre sesiones sin avisar, asi que se relee cada vez (`references/tema-vivo.md`).
+3. **Preguntarle al usuario**, si no hay ni URL ni API: *"Que tema usa la tienda? Si no lo sabes,
+   mandame la URL y lo miro yo."*
+
+**Nunca se asume Dawn.** Si las tres vias fallan, se dice en la entrega que el build se hizo a ciegas
+sobre familia clasica y que hay que verificarlo antes de publicar. El reparto por familia y las
+diferencias de cada una estan en `references/temas.md` (clasica: Dawn/Shrine/Sense, el product.json
+pega · nueva: Horizon/Pitch, NO pega y va por bloques Custom Liquid).
+
 ## Paso 0 · Cerebro de marca (obligatorio antes de generar)
 El cerebro vive en `PROYECTOS/BRAND-BRAINS/<MARCA>/` — la resolución exacta de la ruta la declara
 `golden-brand-brain`: ante duda de ruta, invócala en vez de adivinar.

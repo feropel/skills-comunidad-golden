@@ -26,7 +26,8 @@ flojo = imagen floja = crédito perdido.
 ## Los campos, en orden
 
 ### Referencia (obligatorio)
-El estilo/layout que Ecom Magic va a imitar.
+**La MAQUETA que Ecom Magic va a clonar** — no "inspiración". Lo que traiga (producto, claims,
+textos) sale en tu pieza. **Ábrela y mírala (`thumbnail_url`) antes de usarla; nunca por id.**
 - **"Seleccionar Plantilla"** (Galería EcomMagic) — elige un molde acorde al mensaje de la
   pieza. Ej.: grilla de beneficios, pack de precios, testimonio, antes/después, "cómo actúa".
 - **"Subir desde PC"** — para replicar un molde propio del usuario.
@@ -79,7 +80,8 @@ aprovecha las 3 ranuras.
 
 ### Tamaño de salida del anuncio (obligatorio)
 Dropdown. Estándar Golden:
-- **1080×1080 (Instagram Cuadrado)** → piezas de carrusel/multimedia Shopify.
+- **1080×1080 (Instagram Cuadrado)** → se GENERA así; la pieza de galería se ENTREGA a
+  2048×2048 al optimizar (Shopify lo recomienda y el zoom lo exige — ver SKILL.md paso 5).
 - **1080×1350 (Instagram vertical)** → infografías de secciones.
 Ajusta según la pieza que estés generando.
 

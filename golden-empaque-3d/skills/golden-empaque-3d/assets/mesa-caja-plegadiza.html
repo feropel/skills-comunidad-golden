@@ -1,0 +1,1191 @@
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Mesa de Empaque</title>
+<!-- PLANTILLA NEUTRA. Todos los textos, colores y
+     cifras de costo son de EJEMPLO. Reemplázalos por los del producto real:
+     ver references/controles.md, tabla "Qué tocar al adaptar la plantilla". -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500;6..96,700&family=Cinzel:wght@400;600&family=Cormorant+Garamond:wght@300;400;600&family=DM+Serif+Display&family=Italiana&family=Jost:wght@300;400;500;600&family=Josefin+Sans:wght@300;400;600&family=Marcellus&family=Outfit:wght@200;300;400;600&family=Playfair+Display:wght@400;500;700&family=Spectral:wght@300;400;600&family=Syne:wght@400;600;800&family=Tenor+Sans&display=swap">
+
+<style>
+:root{
+  --paper:#F4F2EE; --surface:#FFFFFF; --surface-2:#FAF9F7;
+  --ink:#191714; --ink-2:#5C574F; --ink-3:#8C867C;
+  --line:#E0DCD4; --line-2:#EFECE6;
+  --accent:#2E4A54; --on-accent:#FFFFFF;
+  --shadow:rgba(30,26,20,.16);
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --paper:#141416; --surface:#1C1C1F; --surface-2:#232327;
+    --ink:#EFEDE8; --ink-2:#A8A39A; --ink-3:#77726A;
+    --line:#2C2C31; --line-2:#242429;
+    --accent:#8DB6C4; --on-accent:#10171A;
+    --shadow:rgba(0,0,0,.6);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#141416; --surface:#1C1C1F; --surface-2:#232327;
+  --ink:#EFEDE8; --ink-2:#A8A39A; --ink-3:#77726A;
+  --line:#2C2C31; --line-2:#242429;
+  --accent:#8DB6C4; --on-accent:#10171A;
+  --shadow:rgba(0,0,0,.6);
+}
+
+*{box-sizing:border-box}
+html,body{margin:0}
+body{
+  background:var(--paper); color:var(--ink);
+  font-family:'Archivo',system-ui,-apple-system,sans-serif;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3{margin:0; text-wrap:balance}
+button,input,select,textarea{font:inherit; color:inherit}
+
+/* ============ sticky viewer ============ */
+.viewer{
+  position:sticky; top:env(safe-area-inset-top, 0px); z-index:20;
+  background:var(--paper);
+  padding:10px 16px 12px;
+  border-bottom:1px solid var(--line);
+}
+.viewer-inner{max-width:1180px; margin:0 auto}
+
+.titlerow{display:flex; align-items:baseline; gap:12px; flex-wrap:wrap; margin-bottom:9px}
+.brandmark{font-family:'Bodoni Moda',Georgia,serif; font-size:20px; font-weight:500; letter-spacing:-.01em}
+.brandmark em{font-style:normal; color:var(--accent)}
+.tagline{font-size:11.5px; color:var(--ink-3)}
+.spacer{flex:1 1 auto}
+
+.stage-shell{
+  position:relative; border-radius:13px; overflow:hidden;
+  border:1px solid var(--line);
+  height:clamp(300px, 46vh, 460px);
+  display:grid; place-items:center;
+  touch-action:none; cursor:grab; user-select:none;
+  background:var(--stagebg);
+}
+.stage-shell.dragging{cursor:grabbing}
+.stage{perspective:1500px; perspective-origin:50% 44%; width:100%; height:100%; display:grid; place-items:center}
+
+.floor{
+  position:absolute; left:50%; bottom:12%; width:min(50%,280px); height:24px;
+  transform:translateX(-50%); border-radius:50%;
+  background:radial-gradient(ellipse at center, var(--shadow) 0%, rgba(0,0,0,0) 72%);
+  filter:blur(3px); pointer-events:none; transition:opacity .5s;
+}
+
+.stagewrap{position:relative}
+.viewbar{position:absolute; top:10px; left:10px; right:10px; display:flex; gap:6px; flex-wrap:wrap; z-index:3}
+.viewbar .chip{background:color-mix(in srgb, var(--surface) 84%, transparent); backdrop-filter:blur(8px)}
+.stageinfo{
+  position:absolute; bottom:9px; left:12px; right:12px; display:flex; gap:10px;
+  justify-content:space-between; font-size:10.5px; color:var(--ink-3);
+  pointer-events:none; z-index:3; font-variant-numeric:tabular-nums;
+}
+
+/* ============ box ============ */
+.box{position:relative; transform-style:preserve-3d; width:0; height:0; transition:transform .12s linear}
+.box.animated{transition:transform .7s cubic-bezier(.22,1,.36,1)}
+
+.face{
+  position:absolute; left:50%; top:50%;
+  transform-style:preserve-3d; backface-visibility:hidden;
+  background:var(--boxbody); color:var(--boxink); overflow:hidden;
+  transition:transform .7s cubic-bezier(.22,1,.36,1), background .25s, width .3s, height .3s;
+  box-shadow:inset 0 0 0 .5px rgba(0,0,0,.10);
+}
+.matte{box-shadow:inset 0 0 0 .5px rgba(0,0,0,.10), inset 0 0 40px rgba(0,0,0,.04)}
+.f-front::after,.f-back::after,.f-left::after,.f-right::after,.f-top::after,.f-bottom::after{
+  content:''; position:absolute; inset:0; pointer-events:none;
+}
+.f-left::after{background:linear-gradient(90deg, rgba(0,0,0,.17), rgba(0,0,0,.03))}
+.f-right::after{background:linear-gradient(90deg, rgba(0,0,0,.03), rgba(0,0,0,.17))}
+.f-back::after{background:rgba(0,0,0,.10)}
+.f-top::after{background:linear-gradient(180deg, rgba(255,255,255,.3), rgba(255,255,255,0))}
+.f-bottom::after{background:rgba(0,0,0,.22)}
+
+.band{
+  position:absolute; left:0; right:0; height:var(--bandh);
+  background:var(--band); color:var(--bandink);
+  display:flex; align-items:center; justify-content:center; gap:4px;
+  font-family:var(--textfont); font-size:calc(var(--bandh) * .44);
+  letter-spacing:.05em; padding:0 5px; text-align:center; font-weight:500;
+  overflow:hidden;
+}
+.band.top{top:0}
+.band.bottom{bottom:0; justify-content:space-between; font-size:calc(var(--bandh) * .4)}
+.band.off{display:none}
+
+.panel-front{position:absolute; inset:0}
+.logoblock{position:absolute; left:9px; top:calc(var(--bandh) + 14px); bottom:calc(var(--bandh) + 28px)}
+.logoblock.vertical{writing-mode:vertical-rl; text-orientation:mixed}
+.logoblock.horizontal{writing-mode:horizontal-tb; right:9px; bottom:auto}
+.logo{
+  font-family:var(--logofont); font-size:var(--logosize); line-height:.95;
+  font-weight:var(--logoweight); letter-spacing:var(--logotrack);
+  white-space:nowrap; display:inline-block;
+}
+.variant{
+  font-family:var(--varfont); font-size:var(--varsize); font-weight:400;
+  letter-spacing:.015em; white-space:nowrap; opacity:.92; display:inline-block;
+}
+.emboss{text-shadow:0 .6px 0 rgba(255,255,255,.85), 0 -.4px .5px rgba(0,0,0,.35)}
+.uvgloss{
+  background:linear-gradient(115deg, currentColor 30%, rgba(255,255,255,.6) 46%, currentColor 60%);
+  -webkit-background-clip:text; background-clip:text; -webkit-text-fill-color:transparent;
+}
+.metablock{position:absolute; right:8px; bottom:calc(var(--bandh) + 9px); text-align:right}
+.descriptor{font-family:var(--textfont); font-size:6.6px; line-height:1.35; letter-spacing:.03em; opacity:.82}
+.claimblock{position:absolute; left:8px; bottom:calc(var(--bandh) + 9px)}
+.claim-n{font-family:var(--textfont); font-size:8.4px; font-weight:600; line-height:1.1}
+.claim-s{font-family:var(--textfont); font-size:5.6px; letter-spacing:.09em; text-transform:uppercase; opacity:.6; margin-top:2px}
+.netwt{font-family:var(--textfont); font-size:7px; font-weight:600; line-height:1.25; margin-top:5px}
+.netwt span{display:block; font-size:5.4px; font-weight:400; opacity:.66}
+.monogram{position:absolute; right:9px; top:calc(var(--bandh) + 13px); font-family:var(--logofont); font-size:17px; opacity:.13; font-weight:500}
+
+.backtext{
+  position:absolute; inset:0; padding:calc(var(--bandh) + 9px) 8px;
+  font-family:var(--textfont); font-size:5.6px; line-height:1.45; opacity:.88;
+  display:flex; flex-direction:column; gap:5px;
+}
+.backtext b{font-size:6.2px; letter-spacing:.11em; text-transform:uppercase; opacity:.9; display:block; margin-bottom:1.5px}
+.sidewrap{position:absolute; inset:0; display:grid; place-items:center; padding:var(--bandh) 0}
+.sidelogo{font-family:var(--logofont); font-size:12px; white-space:nowrap; writing-mode:vertical-rl; opacity:.9}
+.topwrap{position:absolute; inset:0; background:var(--band); color:var(--bandink); display:grid; place-items:center; font-family:var(--logofont); font-size:13px}
+.botwrap{position:absolute; inset:0; display:grid; place-items:center; gap:2px; font-family:var(--textfont); font-size:4.6px; letter-spacing:.06em; opacity:.55}
+.barcode{display:flex; gap:.8px; height:11px; align-items:stretch}
+.barcode i{display:block; background:currentColor}
+
+/* ============ controls below ============ */
+.desk{max-width:1180px; margin:0 auto; padding:0 16px; padding-block:18px 48px}
+.grid{display:grid; grid-template-columns:repeat(auto-fit, minmax(268px, 1fr)); gap:14px; align-items:start}
+
+.card{background:var(--surface); border:1px solid var(--line); border-radius:12px}
+.card > h3{font-size:10.5px; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-3); padding:13px 15px 0; font-weight:600}
+.card-body{padding:12px 15px 15px; display:flex; flex-direction:column; gap:12px}
+.card.wide{grid-column:1/-1}
+
+.row{display:flex; flex-direction:column; gap:6px}
+.row > label{font-size:11.5px; color:var(--ink-2); font-weight:500; display:flex; justify-content:space-between; gap:8px}
+.row > label i{font-style:normal; color:var(--ink-3); font-variant-numeric:tabular-nums}
+.pair{display:grid; grid-template-columns:1fr 1fr; gap:10px}
+.trio{display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px}
+
+input[type=text], select, textarea{
+  width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:7px;
+  background:var(--surface-2); font-size:13px; font-family:inherit;
+}
+input[type=number]{width:100%; padding:8px 10px; border:1px solid var(--line); border-radius:7px; background:var(--surface-2); font-size:13px}
+input[type=range]{width:100%; accent-color:var(--accent)}
+input:focus-visible, select:focus-visible, textarea:focus-visible,
+button:focus-visible, .chip:focus-visible, .swatch:focus-visible{outline:2px solid var(--accent); outline-offset:2px}
+
+.chips{display:flex; flex-wrap:wrap; gap:6px}
+.chip{
+  border:1px solid var(--line); background:var(--surface-2); color:var(--ink-2);
+  border-radius:999px; padding:6px 11px; font-size:12px; cursor:pointer;
+  transition:background .16s, color .16s, border-color .16s;
+}
+.chip:hover{border-color:var(--ink-3)}
+.chip[aria-pressed="true"]{background:var(--accent); border-color:var(--accent); color:var(--on-accent)}
+
+.swatches{display:flex; flex-wrap:wrap; gap:7px; align-items:center}
+.swatch{width:27px; height:27px; border-radius:7px; border:1px solid rgba(128,128,128,.35); cursor:pointer; padding:0; position:relative}
+.swatch[aria-pressed="true"]::after{content:''; position:absolute; inset:-4px; border:2px solid var(--accent); border-radius:10px}
+input[type=color]{width:42px; height:27px; padding:0; border:1px solid var(--line); border-radius:7px; background:none; cursor:pointer}
+
+.btn{border:1px solid var(--line); background:var(--surface-2); border-radius:8px; padding:9px 13px; font-size:12.5px; font-weight:500; cursor:pointer; transition:background .16s, border-color .16s}
+.btn:hover{border-color:var(--ink-3)}
+.btn-primary{background:var(--accent); border-color:var(--accent); color:var(--on-accent); font-weight:600}
+.btn-row{display:flex; gap:8px; flex-wrap:wrap}
+.toggle{display:flex; align-items:center; gap:9px; cursor:pointer; font-size:12.5px; color:var(--ink-2)}
+.toggle input{width:16px; height:16px; accent-color:var(--accent); margin:0}
+
+.opinion{white-space:pre-wrap; font-size:13px; line-height:1.62; color:var(--ink-2)}
+.opinion:empty{display:none}
+.op-status{font-size:11.5px; color:var(--ink-3); font-style:italic}
+.costnote{font-size:11.5px; color:var(--ink-3); line-height:1.55; border-top:1px solid var(--line-2); padding-top:10px}
+.costnote b{color:var(--ink-2); font-variant-numeric:tabular-nums}
+
+
+/* ---- piezas del troquel: solo existen en la vista de plano ---- */
+.die{
+  position:absolute; left:50%; top:50%;
+  background:var(--boxbody); color:var(--boxink);
+  display:none; align-items:center; justify-content:center; text-align:center;
+  font-family:var(--textfont); font-size:5.4px; letter-spacing:.09em;
+  text-transform:uppercase; opacity:.9;
+  box-shadow:inset 0 0 0 .5px rgba(0,0,0,.45);
+  transition:transform .7s cubic-bezier(.22,1,.36,1);
+}
+.box.plano .die{display:flex}
+.box.plano .f-top, .box.plano .f-bottom{display:none}
+
+/* la pestana de pegue va rayada, como en un troquel de verdad */
+.die-tab{
+  background:
+    repeating-linear-gradient(45deg,
+      rgba(0,0,0,.14) 0 2px, rgba(0,0,0,0) 2px 5px),
+    var(--boxbody);
+  font-size:4.6px;
+}
+/* solapas de polvo: esquinas achaflanadas */
+.die-dust{clip-path:polygon(7% 0, 93% 0, 100% 100%, 0 100%)}
+/* tapa con lengueta */
+.die-tuck{clip-path:polygon(0 14%, 5% 0, 95% 0, 100% 14%, 100% 100%, 0 100%)}
+/* fondo automatico: las diagonales que lo traban */
+.die-lock-a{clip-path:polygon(0 0, 100% 0, 100% 58%, 55% 100%, 0 100%)}
+.die-lock-b{clip-path:polygon(0 0, 100% 0, 100% 100%, 45% 100%, 0 58%)}
+.die-lock-s{clip-path:polygon(0 0, 100% 0, 74% 100%, 0 100%)}
+
+/* linea de pliegue entre panel y solapa */
+.die::after{
+  content:''; position:absolute; left:0; right:0; top:0;
+  border-top:1px dashed rgba(0,0,0,.38);
+}
+.die-bot::after{top:auto; bottom:0; border-top:0; border-bottom:1px dashed rgba(0,0,0,.38)}
+.die-tab::after{left:auto; right:0; top:0; bottom:0; width:0;
+  border-top:0; border-right:1px dashed rgba(0,0,0,.38)}
+
+.die-note{
+  position:absolute; left:50%; top:50%;
+  display:none; font-family:var(--textfont); font-size:7px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink-3); white-space:nowrap;
+  transition:transform .7s cubic-bezier(.22,1,.36,1);
+}
+.box.plano .die-note{display:block}
+
+/* ---- pelicula termoencogible impresa (ficha del proveedor) ---- */
+.film{
+  position:absolute; inset:-1px; pointer-events:none; z-index:4;
+  display:none; overflow:hidden;
+  background:linear-gradient(112deg,
+    rgba(255,255,255,.34) 0%, rgba(255,255,255,.05) 22%,
+    rgba(255,255,255,.30) 38%, rgba(255,255,255,.04) 58%,
+    rgba(255,255,255,.22) 76%, rgba(255,255,255,.06) 100%);
+}
+.film.on{display:block}
+.film-ink{
+  position:absolute; inset:-14%;
+  display:flex; flex-wrap:wrap; align-content:flex-start; gap:5px 7px;
+  transform:rotate(-8deg); opacity:.42;
+}
+.film-ink span{
+  font-family:var(--logofont); font-size:5.6px; white-space:nowrap;
+  color:rgba(0,0,0,.72);
+}
+.film-cut{
+  position:absolute; top:0; bottom:0; right:22%; width:0;
+  border-left:1px dashed rgba(0,0,0,.42);
+}
+
+/* ============ movil ============ */
+/* Reportado por FER el 23-sep-2026 usandolo en el telefono: la barra de vistas
+   tapaba la pieza y los controles eran imposibles de acertar con el dedo. */
+@media (max-width: 760px){
+
+  /* la barra de vistas SALE del escenario y va encima, en una sola fila arrastrable */
+  .viewbar{
+    position:static; margin-bottom:10px; flex-wrap:nowrap;
+    overflow-x:auto; overscroll-behavior-x:contain; padding-bottom:3px;
+    scrollbar-width:none;
+  }
+  .viewbar::-webkit-scrollbar{display:none}
+  /* :not() es obligatorio. Sin el, esta regla empata en especificidad con
+     .chip[aria-pressed="true"] y, por venir despues, gana: el boton seleccionado
+     pierde su color y queda ilegible. Una colision de CSS no da error. */
+  .viewbar .chip:not([aria-pressed="true"]){flex:0 0 auto; backdrop-filter:none; background:var(--surface-2)}
+  .viewbar .chip[aria-pressed="true"]{flex:0 0 auto; backdrop-filter:none}
+
+  /* area tactil de 44 px en todo lo que se toca */
+  .chip{min-height:44px; padding:0 15px; display:inline-flex; align-items:center; font-size:14px}
+  input[type=text], input[type=number], select, textarea{
+    min-height:48px; padding:11px 13px;
+    font-size:16px;              /* por debajo de 16 px iOS hace zoom al enfocar */
+  }
+  textarea{min-height:130px; line-height:1.5}
+  .swatch{width:42px; height:42px; border-radius:10px}
+  .swatch[aria-pressed="true"]::after{inset:-5px; border-radius:14px}
+  input[type=color]{width:58px; height:42px}
+  input[type=range]{height:44px}
+  .swatches{gap:10px}
+  .toggle{min-height:44px; font-size:14px}
+  .toggle input{width:22px; height:22px}
+  .btn{min-height:46px; font-size:14px; padding:0 16px; display:inline-flex; align-items:center}
+  .btn-row{gap:10px}
+
+  /* que se lea, no solo que se toque */
+  .row > label{font-size:13px}
+  .card > h3{font-size:12px; letter-spacing:.1em; padding:15px 16px 0}
+  .card-body{padding:14px 16px 18px; gap:16px}
+  .grid{gap:12px}
+  .desk{padding-block:16px 44px}
+
+  /* el escenario cede alto, porque la barra ya no vive dentro */
+  .stage-shell{height:clamp(270px, 38vh, 360px)}
+  .tagline{display:none}
+  .brandmark{font-size:18px}
+  .stageinfo{font-size:11px}
+}
+
+@media (max-width: 420px){
+  .trio{grid-template-columns:1fr 1fr}   /* ancho y fondo arriba, alto debajo */
+  .pair{grid-template-columns:1fr}
+}
+
+@media (prefers-reduced-motion: reduce){ *{transition-duration:.01ms !important; animation-duration:.01ms !important} }
+</style>
+
+<!-- ======================= VIEWER (sticky, always on top) ======================= -->
+<div class="viewer">
+ <div class="viewer-inner">
+  <div class="titlerow">
+    <div class="brandmark">Mesa de Empaque <em>DEMO</em></div>
+    <div class="tagline" id="tagline-el">Arrastra para girar · rueda para acercar</div>
+    <div class="spacer"></div>
+    <button class="btn" id="theme-btn" type="button">Tema</button>
+  </div>
+
+  <div class="stagewrap">
+    <div class="viewbar">
+      <button class="chip" data-view="armada" aria-pressed="true" type="button">Armada</button>
+      <button class="chip" data-view="explotada" aria-pressed="false" type="button">Desarmada</button>
+      <button class="chip" data-view="plano" aria-pressed="false" type="button">Plano de troquel</button>
+      <button class="chip" data-spin aria-pressed="true" type="button">Giro automático</button>
+      <button class="chip" id="recenter" type="button">Centrar</button>
+    </div>
+  <div class="stage-shell" id="shell">
+    <div class="floor" id="floor"></div>
+    <div class="stage">
+      <div class="box animated" id="box">
+
+        <div class="face f-front" id="f-front">
+          <div class="film" data-film></div>
+          <div class="band top" data-band></div>
+          <div class="panel-front">
+            <div class="monogram" id="mono">L'</div>
+            <div class="logoblock vertical" id="logoblock">
+              <div class="variant" id="variant">Variante Uno</div>
+              <div class="logo" id="logo">Nombre de Marca</div>
+            </div>
+            <div class="claimblock">
+              <div class="claim-n" id="claim-n">Claim en</div>
+              <div class="claim-s" id="claim-s">dos líneas</div>
+            </div>
+            <div class="metablock">
+              <div class="descriptor" id="descriptor">Descriptor de<br>Categoría</div>
+              <div class="netwt" id="netwt">Net Wt.<span>4 oz / 120 mL</span></div>
+            </div>
+          </div>
+          <div class="band bottom" data-band data-foot></div>
+        </div>
+
+        <div class="face f-back" id="f-back">
+          <div class="film" data-film></div>
+          <div class="band top" data-band></div>
+          <div class="backtext" id="backtext"></div>
+          <div class="band bottom" data-band data-foot></div>
+        </div>
+
+        <div class="face f-left" id="f-left">
+          <div class="film" data-film></div>
+          <div class="band top" data-band></div>
+          <div class="sidewrap"><div class="sidelogo side-logo">Nombre de Marca</div></div>
+          <div class="band bottom" data-band></div>
+        </div>
+
+        <div class="face f-right" id="f-right">
+          <div class="film" data-film></div>
+          <div class="band top" data-band></div>
+          <div class="sidewrap"><div class="sidelogo side-logo">Nombre de Marca</div></div>
+          <div class="band bottom" data-band></div>
+        </div>
+
+        <div class="face f-top" id="f-top"><div class="film" data-film></div><div class="topwrap" id="topwrap">L'</div></div>
+
+        <div class="face f-bottom" id="f-bottom">
+          <div class="film" data-film></div>
+          <div class="botwrap"><div class="barcode" id="barcode"></div><div>LOTE · VENCE</div></div>
+        </div>
+
+        <!-- ===== piezas del troquel real. Solo se ven en la vista de plano ===== -->
+        <div class="die die-tab" id="d-tab">pegue</div>
+
+        <div class="die die-tuck" id="d-t1">tapa</div>
+        <div class="die die-dust" id="d-t2"></div>
+        <div class="die die-dust" id="d-t3"></div>
+        <div class="die die-dust" id="d-t4"></div>
+
+        <div class="die die-bot die-lock-a" id="d-b1"></div>
+        <div class="die die-bot die-lock-s" id="d-b2"></div>
+        <div class="die die-bot die-lock-b" id="d-b3"></div>
+        <div class="die die-bot die-lock-s" id="d-b4"></div>
+
+        <div class="die-note" id="d-note">fondo automático · se sella al levantar</div>
+
+      </div>
+    </div>
+    <div class="stageinfo">
+      <span id="dims">5 × 5 × 13 cm</span>
+      <span id="zoomlabel">100%</span>
+    </div>
+  </div>
+  </div>
+ </div>
+</div>
+
+<!-- ======================= CONTROLS ======================= -->
+<div class="desk">
+ <div class="grid">
+
+  <div class="card">
+    <h3>Referencia</h3>
+    <div class="card-body">
+      <div class="chips" id="refchips">
+        <button class="chip" data-ref="uno" aria-pressed="true" type="button">Variante Uno</button>
+        <button class="chip" data-ref="dos" aria-pressed="false" type="button">Variante Dos</button>
+        <button class="chip" data-ref="tres" aria-pressed="false" type="button">Variante Tres</button>
+      </div>
+      <div class="row">
+        <label for="i-logotext">Nombre de la marca</label>
+        <input type="text" id="i-logotext" value="Nombre de Marca">
+      </div>
+      <div class="row">
+        <label for="i-mono">Monograma</label>
+        <input type="text" id="i-mono" value="L'">
+      </div>
+      <div class="row">
+        <label for="i-side1">Texto del lateral izquierdo</label>
+        <input type="text" id="i-side1" value="Nombre de Marca">
+      </div>
+      <div class="row">
+        <label for="i-side2">Texto del lateral derecho</label>
+        <input type="text" id="i-side2" value="Nombre de Marca">
+      </div>
+      <div class="row">
+        <label for="i-variant">Nombre de la variante</label>
+        <input type="text" id="i-variant" value="Variante Uno">
+      </div>
+      <div class="row">
+        <label for="i-netwt">Contenido</label>
+        <input type="text" id="i-netwt" value="4 oz / 120 mL">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Medidas de la caja</h3>
+    <div class="card-body">
+      <div class="trio">
+        <div class="row"><label for="i-w">Ancho cm</label><input type="number" id="i-w" value="5" min="2" max="20" step="0.5"></div>
+        <div class="row"><label for="i-d">Fondo cm</label><input type="number" id="i-d" value="5" min="2" max="20" step="0.5"></div>
+        <div class="row"><label for="i-h">Alto cm</label><input type="number" id="i-h" value="13" min="3" max="30" step="0.5"></div>
+      </div>
+      <div class="row">
+        <label for="i-zoom">Lupa <i id="zoom-val">100%</i></label>
+        <input type="range" id="i-zoom" min="50" max="600" value="100">
+        <div class="chips" style="margin-top:4px">
+          <button class="chip" type="button" data-zoom="100">100%</button>
+          <button class="chip" type="button" data-zoom="200">200%</button>
+          <button class="chip" type="button" data-zoom="300">300%</button>
+          <button class="chip" type="button" data-zoom="450">450%</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Color</h3>
+    <div class="card-body">
+      <div class="row">
+        <label>Franja</label>
+        <div class="swatches" id="bandsw">
+          <button class="swatch" type="button" data-c="#E8A0AE" style="background:#E8A0AE" aria-pressed="false" title="Rosa"></button>
+          <button class="swatch" type="button" data-c="#C9D46A" style="background:#C9D46A" aria-pressed="false" title="Verde"></button>
+          <button class="swatch" type="button" data-c="#E9C5A8" style="background:#E9C5A8" aria-pressed="true" title="Durazno"></button>
+          <button class="swatch" type="button" data-c="#2E4A54" style="background:#2E4A54" aria-pressed="false" title="Petróleo"></button>
+          <button class="swatch" type="button" data-c="#1A1917" style="background:#1A1917" aria-pressed="false" title="Tinta"></button>
+          <button class="swatch" type="button" data-c="#B9A06A" style="background:#B9A06A" aria-pressed="false" title="Oro viejo"></button>
+          <input type="color" id="i-band" value="#E9C5A8" aria-label="Color libre de la franja">
+        </div>
+      </div>
+      <div class="row">
+        <label>Cuerpo de la caja</label>
+        <div class="swatches" id="bodysw">
+          <button class="swatch" type="button" data-c="#FBFAF8" style="background:#FBFAF8" aria-pressed="true" title="Blanco"></button>
+          <button class="swatch" type="button" data-c="#F0EADF" style="background:#F0EADF" aria-pressed="false" title="Hueso"></button>
+          <button class="swatch" type="button" data-c="#D8C3A5" style="background:#D8C3A5" aria-pressed="false" title="Kraft"></button>
+          <button class="swatch" type="button" data-c="#23211E" style="background:#23211E" aria-pressed="false" title="Negro mate"></button>
+          <input type="color" id="i-body" value="#FBFAF8" aria-label="Color libre del cuerpo">
+        </div>
+      </div>
+      <div class="row">
+        <label class="toggle"><input type="checkbox" id="c-autoink" checked> Tinta automática según el fondo</label>
+        <div class="swatches"><input type="color" id="i-ink" value="#191714" aria-label="Color de la tinta"></div>
+      </div>
+      <div class="row">
+        <label for="i-stage">Fondo del estudio</label>
+        <select id="i-stage">
+          <option value="studio">Estudio claro</option>
+          <option value="dark">Estudio oscuro</option>
+          <option value="warm">Arena</option>
+          <option value="flat">Plano neutro</option>
+        </select>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Franja</h3>
+    <div class="card-body">
+      <div class="row">
+        <label>Dónde va</label>
+        <div class="chips" id="bandmode">
+          <button class="chip" data-bm="both" aria-pressed="true" type="button">Arriba y abajo</button>
+          <button class="chip" data-bm="top" aria-pressed="false" type="button">Solo arriba</button>
+          <button class="chip" data-bm="bottom" aria-pressed="false" type="button">Solo abajo</button>
+          <button class="chip" data-bm="none" aria-pressed="false" type="button">Ninguna</button>
+        </div>
+      </div>
+      <div class="row">
+        <label for="i-bandh">Grosor <i id="bandh-val">14</i></label>
+        <input type="range" id="i-bandh" min="4" max="42" value="14">
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Tipografía</h3>
+    <div class="card-body">
+      <div class="row"><label for="i-logofont">Logotipo</label><select id="i-logofont"></select></div>
+      <div class="row"><label for="i-varfont">Nombre de variante</label><select id="i-varfont"></select></div>
+      <div class="row"><label for="i-textfont">Texto secundario</label><select id="i-textfont"></select></div>
+      <div class="pair">
+        <div class="row"><label for="i-logosize">Tamaño <i id="logosize-val">30</i></label><input type="range" id="i-logosize" min="14" max="52" value="30"></div>
+        <div class="row"><label for="i-varsize">Variante <i id="varsize-val">16</i></label><input type="range" id="i-varsize" min="8" max="30" value="16"></div>
+      </div>
+      <div class="pair">
+        <div class="row"><label for="i-logoweight">Grosor <i id="logoweight-val">500</i></label><input type="range" id="i-logoweight" min="300" max="800" step="100" value="500"></div>
+        <div class="row"><label for="i-logotrack">Interletra <i id="logotrack-val">-1</i></label><input type="range" id="i-logotrack" min="-6" max="16" value="-1"></div>
+      </div>
+      <div class="row">
+        <label>Orientación del logotipo</label>
+        <div class="chips" id="orient">
+          <button class="chip" data-or="vertical" aria-pressed="true" type="button">Vertical</button>
+          <button class="chip" data-or="horizontal" aria-pressed="false" type="button">Horizontal</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Textos</h3>
+    <div class="card-body">
+      <div class="row">
+        <label for="i-desc">Descriptor de categoría</label>
+        <input type="text" id="i-desc" value="Descriptor de Categoría">
+        <div class="chips" style="margin-top:3px">
+          <button class="chip" type="button" data-desc="Alternativa de descriptor A">Alternativa de descriptor A</button>
+          <button class="chip" type="button" data-desc="Alternativa de descriptor B">Alternativa de descriptor B</button>
+          <button class="chip" type="button" data-desc="Alternativa de descriptor C">Alternativa de descriptor C</button>
+        </div>
+      </div>
+      <div class="pair">
+        <div class="row"><label for="i-claim">Claim, línea 1</label><input type="text" id="i-claim" value="Claim en"></div>
+        <div class="row"><label for="i-claim2">Claim, línea 2</label><input type="text" id="i-claim2" value="dos líneas"></div>
+      </div>
+      <div class="chips">
+        <button class="chip" type="button" data-claim="Claim alterno|segunda línea">Claim alterno</button>
+        <button class="chip" type="button" data-claim="Otro claim|su segunda línea">Otro claim</button>
+      </div>
+      <div class="row"><label for="i-tagline">Franja superior</label><input type="text" id="i-tagline" value="Frase de marca, aquí."></div>
+      <div class="row"><label for="i-foot">Franja inferior</label><input type="text" id="i-foot" value="www.tusitio.com · @tumarca"></div>
+      <div class="row"><label for="i-back">Texto de la cara trasera</label><textarea id="i-back" rows="5"></textarea></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Acabados y costo</h3>
+    <div class="card-body">
+      <label class="toggle"><input type="checkbox" id="c-film"> Ver el termoencogible impreso</label>
+      <label class="toggle"><input type="checkbox" id="c-emboss" checked> Repujado en el logotipo</label>
+      <label class="toggle"><input type="checkbox" id="c-uv"> Reserva UV brillante</label>
+      <label class="toggle"><input type="checkbox" id="c-matte" checked> Plastificado mate</label>
+      <div class="row">
+        <label for="i-price">Precio de venta</label>
+        <input type="number" id="i-price" value="80000" min="0" step="1000">
+      </div>
+      <div class="costnote" id="costnote"></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>Versiones</h3>
+    <div class="card-body">
+      <div class="row">
+        <label for="i-slot">Guardar esta versión como</label>
+        <input type="text" id="i-slot" placeholder="por ejemplo: bruma rosa sin claim">
+      </div>
+      <div class="btn-row">
+        <button class="btn" id="save-btn" type="button">Guardar</button>
+        <button class="btn" id="copy-btn" type="button">Copiar la ficha</button>
+        <button class="btn" id="reset-btn" type="button">Volver al original</button>
+      </div>
+      <div class="chips" id="slots"></div>
+      <div class="op-status" id="slot-status"></div>
+    </div>
+  </div>
+
+  <div class="card wide">
+    <h3>Opinión de Claude</h3>
+    <div class="card-body">
+      <div class="op-status" id="op-status">Cambia lo que quieras y pídeme que lo revise.</div>
+      <div class="opinion" id="opinion"></div>
+      <div class="btn-row">
+        <button class="btn btn-primary" id="ask-btn" type="button">Revisar este diseño</button>
+        <button class="btn" id="ask2-btn" type="button">Proponme tres alternativas</button>
+      </div>
+    </div>
+  </div>
+
+ </div>
+</div>
+
+<script>
+(function(){
+  'use strict';
+  var $ = function(id){ return document.getElementById(id); };
+  var root = document.documentElement;
+  function setVar(n,v){ root.style.setProperty(n,v); }
+
+  /* ---------- fonts ---------- */
+  var FONTS = [
+    ["'Bodoni Moda', serif","Bodoni Moda — didone de moda"],
+    ["'Italiana', serif","Italiana — fina y alta"],
+    ["'Playfair Display', serif","Playfair Display — editorial"],
+    ["'Cormorant Garamond', serif","Cormorant Garamond — clásica"],
+    ["'DM Serif Display', serif","DM Serif Display — titular con peso"],
+    ["'Marcellus', serif","Marcellus — romana serena"],
+    ["'Cinzel', serif","Cinzel — capitulares de lujo"],
+    ["'Spectral', serif","Spectral — serif de lectura"],
+    ["'Tenor Sans', sans-serif","Tenor Sans — sans elegante"],
+    ["'Jost', sans-serif","Jost — geométrica Bauhaus"],
+    ["'Outfit', sans-serif","Outfit — sans limpia"],
+    ["'Josefin Sans', sans-serif","Josefin Sans — art déco"],
+    ["'Syne', sans-serif","Syne — contemporánea con carácter"],
+    ["'Archivo', sans-serif","Archivo — grotesca sólida"]
+  ];
+  ['i-logofont','i-varfont','i-textfont'].forEach(function(id){
+    var s = $(id);
+    FONTS.forEach(function(f){
+      var o = document.createElement('option'); o.value = f[0]; o.textContent = f[1]; s.appendChild(o);
+    });
+  });
+
+  var STAGES = {
+    studio:'radial-gradient(120% 90% at 50% 16%, #EFEDE7 0%, #D9D4CA 100%)',
+    dark:  'radial-gradient(120% 90% at 50% 16%, #2B2B30 0%, #101012 100%)',
+    warm:  'radial-gradient(120% 90% at 50% 16%, #F0E4D4 0%, #D6BFA4 100%)',
+    flat:  'linear-gradient(180deg, #E6E3DD 0%, #E6E3DD 100%)'
+  };
+
+  /* ---------- geometry ---------- */
+  var PX = 22, W = 110, D = 110, H = 286;
+  var faces = {front:$('f-front'), back:$('f-back'), left:$('f-left'), right:$('f-right'), top:$('f-top'), bottom:$('f-bottom')};
+
+  function sizeFace(el,w,h){
+    el.style.width=w+'px'; el.style.height=h+'px';
+    el.style.marginLeft=(-w/2)+'px'; el.style.marginTop=(-h/2)+'px';
+  }
+  function rebuild(){
+    var wc = parseFloat($('i-w').value)||5, dc = parseFloat($('i-d').value)||5, hc = parseFloat($('i-h').value)||13;
+    W = wc*PX; D = dc*PX; H = hc*PX;
+    sizeFace(faces.front,W,H); sizeFace(faces.back,W,H);
+    sizeFace(faces.left,D,H);  sizeFace(faces.right,D,H);
+    sizeFace(faces.top,W,D);   sizeFace(faces.bottom,W,D);
+    $('dims').textContent = wc+' × '+dc+' × '+hc+' cm';
+    dieLayout();
+    applyFaces();
+  }
+
+  function faceT(gap){
+    return {
+      front:'translateZ('+(D/2+gap)+'px)',
+      back:'rotateY(180deg) translateZ('+(D/2+gap)+'px)',
+      right:'rotateY(90deg) translateZ('+(W/2+gap)+'px)',
+      left:'rotateY(-90deg) translateZ('+(W/2+gap)+'px)',
+      top:'rotateX(90deg) translateZ('+(H/2+gap)+'px)',
+      bottom:'rotateX(-90deg) translateZ('+(H/2+gap)+'px)'
+    };
+  }
+  function flatT(){
+    return {
+      front:'translate3d(0,0,0)',
+      right:'translate3d('+((W+D)/2)+'px,0,0)',
+      back:'translate3d('+(W+D)+'px,0,0)',
+      left:'translate3d('+(-(W+D)/2)+'px,0,0)',
+      top:'translate3d(0,'+(-(H+D)/2)+'px,0)',
+      bottom:'translate3d(0,'+((H+D)/2)+'px,0)'
+    };
+  }
+
+  /* ---------- troquel real: la caja plegadiza es una TIRA, no una cruz ----------
+     [pegue] [FRENTE] [lateral] [REVES] [lateral], con solapas arriba y el fondo
+     automatico abajo: cuatro solapas en diagonal que se traban solas al levantar
+     la caja. Es el plano que va al impresor. */
+  var TAB = 18;
+  function dieLayout(){
+    var hT = D * 0.92, hB = D * 0.68;
+    var total = TAB + 2*W + 2*D;
+    var x0 = -total/2;
+    var cx = {
+      tab:  x0 + TAB/2,
+      p1:   x0 + TAB + W/2,
+      p2:   x0 + TAB + W + D/2,
+      p3:   x0 + TAB + W + D + W/2,
+      p4:   x0 + TAB + W + D + W + D/2
+    };
+    function poner(id, w, h, x, y){
+      var el = $(id); if(!el) return;
+      el.style.width = w + 'px'; el.style.height = h + 'px';
+      el.style.marginLeft = (-w/2) + 'px'; el.style.marginTop = (-h/2) + 'px';
+      el.style.transform = 'translate3d(' + x + 'px,' + y + 'px,0)';
+    }
+    poner('d-tab', TAB, H, cx.tab, 0);
+    poner('d-t1', W, hT, cx.p1, -(H/2 + hT/2));
+    poner('d-t2', D, hT*0.86, cx.p2, -(H/2 + hT*0.43));
+    poner('d-t3', W, hT*0.94, cx.p3, -(H/2 + hT*0.47));
+    poner('d-t4', D, hT*0.86, cx.p4, -(H/2 + hT*0.43));
+    poner('d-b1', W, hB, cx.p1, (H/2 + hB/2));
+    poner('d-b2', D, hB*0.8, cx.p2, (H/2 + hB*0.4));
+    poner('d-b3', W, hB, cx.p3, (H/2 + hB/2));
+    poner('d-b4', D, hB*0.8, cx.p4, (H/2 + hB*0.4));
+    var n = $('d-note');
+    if(n){ n.style.transform = 'translate3d(-50%,' + (H/2 + hB + 15) + 'px,0)'; }
+    return {total:total, hT:hT, hB:hB};
+  }
+
+  function tiraT(){
+    var total = TAB + 2*W + 2*D, x0 = -total/2;
+    return {
+      front:  'translate3d(' + (x0 + TAB + W/2) + 'px,0,0)',
+      right:  'translate3d(' + (x0 + TAB + W + D/2) + 'px,0,0)',
+      back:   'translate3d(' + (x0 + TAB + W + D + W/2) + 'px,0,0)',
+      left:   'translate3d(' + (x0 + TAB + W + D + W + D/2) + 'px,0,0)',
+      top:    'translate3d(0,0,0)',
+      bottom: 'translate3d(0,0,0)'
+    };
+  }
+
+  var state = {view:'armada', spin:true, rx:-12, ry:-28, zoom:1};
+  var box = $('box'), shell = $('shell'), floor = $('floor');
+
+  function applyFaces(){
+    var t = state.view === 'plano' ? tiraT() : faceT(state.view === 'explotada' ? GAP : 0);
+    if(state.view === 'plano') dieLayout();
+    Object.keys(t).forEach(function(k){ faces[k].style.transform = t[k]; });
+  }
+  var GAP = 46;                       // hueco entre caras en la vista desarmada
+  function fitScale(){
+    var base = state.view === 'plano' ? 1 : (state.view === 'explotada' ? 0.82 : 1);
+    var room = shell.clientHeight || 400;
+    // la altura que de verdad ocupa cada vista, no una estimacion
+    var need = state.view === 'plano'     ? (H + 2*D*0.92 + 54)
+             : state.view === 'explotada' ? (H + 2*GAP + D)
+             :                              (H * 1.35);
+    var fit = Math.min(1, (room - 34) / (need * base));
+    // la tira del troquel es ANCHA: tambien hay que caber de lado, no solo de alto
+    if(state.view === 'plano'){
+      var ancho = TAB + 2*W + 2*D + 30;
+      var room2 = shell.clientWidth || 600;
+      fit = Math.min(fit, (room2 - 30) / (ancho * base));
+    }
+    return base * fit * state.zoom;
+  }
+  function applyBox(){
+    box.classList.toggle('plano', state.view === 'plano');
+    box.style.transform = 'scale('+fitScale().toFixed(3)+') rotateX('+state.rx+'deg) rotateY('+state.ry+'deg)';
+    floor.style.opacity = state.view === 'armada' ? '1' : '.2';
+  }
+
+  /* ---------- drag, wheel, pinch ---------- */
+  var dragging=false, lastX=0, lastY=0;
+  shell.addEventListener('pointerdown', function(e){
+    if (e.target.closest('.viewbar')) return;
+    dragging=true; lastX=e.clientX; lastY=e.clientY;
+    shell.classList.add('dragging'); box.classList.remove('animated');
+    try{ shell.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  shell.addEventListener('pointermove', function(e){
+    if(!dragging) return;
+    state.ry += (e.clientX-lastX)*0.45;
+    state.rx = Math.max(-85, Math.min(85, state.rx - (e.clientY-lastY)*0.35));
+    lastX=e.clientX; lastY=e.clientY;
+    if (state.spin) setSpin(false);
+    applyBox();
+  });
+  function endDrag(e){
+    if(!dragging) return;
+    dragging=false; shell.classList.remove('dragging'); box.classList.add('animated');
+    try{ if(e && e.pointerId!=null) shell.releasePointerCapture(e.pointerId); }catch(err){}
+  }
+  shell.addEventListener('pointerup', endDrag);
+  shell.addEventListener('pointercancel', endDrag);
+  shell.addEventListener('wheel', function(e){
+    e.preventDefault();
+    var z = Math.max(0.5, Math.min(6, state.zoom - e.deltaY*0.0022));
+    setZoom(Math.round(z*100));
+  }, {passive:false});
+
+  function setZoom(pct){
+    pct = Math.max(50, Math.min(600, pct));
+    state.zoom = pct/100;
+    $('i-zoom').value = pct;
+    $('zoom-val').textContent = pct+'%';
+    $('zoomlabel').textContent = pct+'%';
+    applyBox();
+  }
+  function recenter(){ state.rx=-12; state.ry=-28; setZoom(100); box.classList.add('animated'); applyBox(); }
+  $('recenter').addEventListener('click', recenter);
+
+  /* ---------- idle spin ---------- */
+  var raf=null, lastT=0;
+  function step(t){
+    if(!state.spin){ raf=null; return; }
+    if(lastT) { state.ry += (t-lastT)*0.012; applyBox(); }
+    lastT=t; raf=requestAnimationFrame(step);
+  }
+  function setSpin(on){
+    state.spin=on;
+    document.querySelector('[data-spin]').setAttribute('aria-pressed', on?'true':'false');
+    if(on && !raf){ lastT=0; box.classList.remove('animated'); raf=requestAnimationFrame(step); }
+    if(!on && raf){ cancelAnimationFrame(raf); raf=null; box.classList.add('animated'); }
+  }
+
+  /* ---------- colour ---------- */
+  function contrastInk(hex){
+    var c=hex.replace('#',''); if(c.length===3) c=c[0]+c[0]+c[1]+c[1]+c[2]+c[2];
+    function lin(u){ u/=255; return u<=0.03928?u/12.92:Math.pow((u+0.055)/1.055,2.4); }
+    var L=0.2126*lin(parseInt(c.substr(0,2),16))+0.7152*lin(parseInt(c.substr(2,2),16))+0.0722*lin(parseInt(c.substr(4,2),16));
+    return L>0.42?'#1A1917':'#FFFFFF';
+  }
+  function mark(id,hex){
+    var l=$(id).querySelectorAll('.swatch');
+    for(var i=0;i<l.length;i++) l[i].setAttribute('aria-pressed', l[i].dataset.c.toLowerCase()===hex.toLowerCase()?'true':'false');
+  }
+  function setBand(hex){ setVar('--band',hex); setVar('--bandink',contrastInk(hex)); $('i-band').value=hex; mark('bandsw',hex); }
+  function setBody(hex){
+    setVar('--boxbody',hex); $('i-body').value=hex; mark('bodysw',hex);
+    if($('c-autoink').checked){ var ink=contrastInk(hex); setVar('--boxink',ink); $('i-ink').value=ink; }
+  }
+
+  /* ---------- text ---------- */
+  function splitTail(v){ return String(v).replace(/ (?=\S+$)/,'<br>'); }
+  function setFoot(v){
+    var parts=String(v).split('·');
+    document.querySelectorAll('[data-foot]').forEach(function(b){
+      b.innerHTML='';
+      if(parts.length>1) parts.forEach(function(p){ var s=document.createElement('span'); s.textContent=p.trim(); b.appendChild(s); });
+      else b.textContent=v;
+    });
+  }
+  function setTagline(v){ document.querySelector('#f-front .band.top').textContent=v; }
+  function setBack(v){
+    var el=$('backtext'); el.innerHTML='';
+    String(v).split(/\n\s*\n/).forEach(function(blk){
+      var lines=blk.split('\n'), d=document.createElement('div');
+      var b=document.createElement('b'); b.textContent=lines.shift()||'';
+      d.appendChild(b); d.appendChild(document.createTextNode(lines.join(' ')));
+      el.appendChild(d);
+    });
+  }
+  function setBandMode(m){
+    document.querySelectorAll('[data-band]').forEach(function(b){
+      var isTop=b.classList.contains('top');
+      var on = m==='both' || (m==='top'&&isTop) || (m==='bottom'&&!isTop);
+      b.classList.toggle('off', !on);
+    });
+    var l=$('bandmode').querySelectorAll('.chip');
+    for(var i=0;i<l.length;i++) l[i].setAttribute('aria-pressed', l[i].dataset.bm===m?'true':'false');
+    state.bandmode=m;
+  }
+
+  /* ---------- cost ---------- */
+  /* ---- MODELO DE COSTO DE EJEMPLO. Cifras redondas a proposito: son FALSAS.
+         Reemplazalas por el costeo real del proyecto antes de mostrarle esto a nadie. ---- */
+  var COST={termo:500, etiqueta:500, sellos:100, envase:500, formula:1000, mo:1000, gasolina:100, domicilio:100};
+  var CAJA_BASE=500.00, PLANCHAS=100.00;
+  var FIN={emboss:300.00, uv:200.00, matte:100.00};
+  function fmt(n){ return '$'+Math.round(n).toLocaleString('es-CO'); }
+  function costTotal(){
+    var caja=CAJA_BASE+PLANCHAS;
+    if($('c-emboss').checked) caja+=FIN.emboss;
+    if($('c-uv').checked) caja+=FIN.uv;
+    if($('c-matte').checked) caja+=FIN.matte;
+    var t=caja; for(var k in COST) t+=COST[k];
+    return {caja:caja, total:t};
+  }
+  function updateCost(){
+    var c=costTotal(), price=parseFloat($('i-price').value)||0;
+    var pedido=c.total+2500;
+    var margen=price>0?Math.round((price-pedido)/price*100):0;
+    $('costnote').innerHTML =
+      'Caja con estos acabados: <b>'+fmt(c.caja)+'</b> por unidad.<br>'+
+      'Producto puesto en bodega: <b>'+fmt(c.total)+'</b> · pedido de una unidad <b>'+fmt(pedido)+'</b>.<br>'+
+      (price>0 ? 'A '+fmt(price)+' de venta el margen bruto queda en <b>'+margen+'%</b>.' : '');
+    return c.total;
+  }
+
+  /* ---------- snapshot ---------- */
+  function snapshot(){
+    return {
+      variante:$('i-variant').value, contenido:$('i-netwt').value,
+      medidas:$('i-w').value+' × '+$('i-d').value+' × '+$('i-h').value+' cm',
+      colorFranja:$('i-band').value, colorCuerpo:$('i-body').value, colorTinta:$('i-ink').value,
+      franjaVa:state.bandmode, grosorFranja:+$('i-bandh').value,
+      fuenteLogotipo:$('i-logofont').selectedOptions[0].textContent,
+      fuenteVariante:$('i-varfont').selectedOptions[0].textContent,
+      fuenteTexto:$('i-textfont').selectedOptions[0].textContent,
+      tamanoLogotipo:+$('i-logosize').value, grosorLogotipo:+$('i-logoweight').value,
+      interletra:+$('i-logotrack').value, orientacionLogotipo:state.orient,
+      descriptor:$('i-desc').value, claim:$('i-claim').value+' / '+$('i-claim2').value,
+      franjaSuperior:$('i-tagline').value, franjaInferior:$('i-foot').value,
+      acabados:{repujado:$('c-emboss').checked, reservaUV:$('c-uv').checked, plastificadoMate:$('c-matte').checked},
+      precioVenta:+$('i-price').value, costoPuestoEnBodega:Math.round(updateCost())
+    };
+  }
+
+  /* ---------- Claude ---------- */
+  var BRIEF=[
+    'Eres el director de arte de la marca DEMO.',
+    '',
+    'ESTE ES EL BRIEF DE EJEMPLO DE LA PLANTILLA. REEMPLAZALO ENTERO por el del producto real:',
+    'que es el producto, para quien, precio de venta, costo, contra que categoria compite y que',
+    'riesgos de diseno ya se detectaron. Una opinion sin ese contexto es un horoscopo.',
+    '',
+    'PRODUCTO DEMO: articulo de 120 ml en caja plegadiza de 5 x 5 x 13 cm, tres variantes.',
+    'PRECIO DEMO: 10.000 de venta, 3.000 de costo puesto en bodega. Cifras falsas de ejemplo.',
+    '',
+    'Responde en espanol, sin signos de apertura de interrogacion o admiracion, sin emojis,',
+    'sin rayas separadoras. Se especifico y directo, nada generico.'
+  ].join('\n');
+
+  var TASKS={
+    revisar:'TAREA: revisa la version que te paso. Maximo 170 palabras. Primero lo que funciona en una frase, luego los dos o tres problemas concretos con su porque, y cierra con UN cambio puntual que harias ya. Si algun texto de la caja sigue siendo el de la plantilla y no el del producto, dilo sin rodeos.',
+    alternativas:'TAREA: proponme TRES alternativas distintas de direccion para esta caja. Para cada una: un nombre corto, el descriptor exacto que iria impreso, el color de franja en hexadecimal, la tipografia que usarias y una frase de por que funciona a $80.000. Maximo 200 palabras en total.'
+  };
+
+  var sampleFn=null, tried=false, inflight=null;
+  async function ask(task){
+    if(inflight){ inflight.abort(); inflight=null; }
+    if(!tried){ tried=true; try{ sampleFn=await window.claude?.use?.('sample'); }catch(e){ sampleFn=null; } }
+    if(!sampleFn){ $('op-status').textContent='La opinión en vivo no está disponible en esta vista. Mándame una captura por el chat y te la doy ahí.'; return; }
+    $('opinion').textContent=''; $('op-status').textContent='Mirando el diseño...';
+    $('ask-btn').disabled=true; $('ask2-btn').disabled=true;
+    var ctrl=new AbortController(); inflight=ctrl;
+    try{
+      await sampleFn(BRIEF+'\n\n'+TASKS[task]+'\n\nVERSIÓN ACTUAL:\n'+JSON.stringify(snapshot(),null,2), {
+        signal:ctrl.signal, modelTier:'default',
+        onText:function(p){ $('op-status').textContent=''; $('opinion').textContent=p.text; }
+      });
+    }catch(err){
+      if(err && err.code==='cancelled') return;
+      var m = err && err.code==='not_granted' ? 'Necesito tu permiso para revisar el diseño. Toca otra vez y acepta.'
+            : err && err.code==='rate_limited' ? 'Demasiadas revisiones seguidas. Espera un momento.'
+            : 'No pude revisarlo esta vez. Inténtalo de nuevo.';
+      $('op-status').textContent=m;
+      if(err && err.text) $('opinion').textContent=err.text;
+    }finally{ $('ask-btn').disabled=false; $('ask2-btn').disabled=false; inflight=null; }
+  }
+  $('ask-btn').addEventListener('click', function(){ ask('revisar'); });
+  $('ask2-btn').addEventListener('click', function(){ ask('alternativas'); });
+
+  /* ---------- saved versions ---------- */
+  var KEY='mesa-empaque-demo';
+  function readSlots(){ try{ return JSON.parse(localStorage.getItem(KEY)||'{}'); }catch(e){ return {}; } }
+  function writeSlots(o){ try{ localStorage.setItem(KEY, JSON.stringify(o)); return true; }catch(e){ return false; } }
+  function renderSlots(){
+    var s=readSlots(), box=$('slots'); box.innerHTML='';
+    Object.keys(s).forEach(function(name){
+      var b=document.createElement('button'); b.className='chip'; b.type='button';
+      b.textContent=name; b.title='Clic para cargar, clic derecho para borrar';
+      b.addEventListener('click', function(){ loadState(s[name]); $('slot-status').textContent='Cargada la versión "'+name+'".'; });
+      b.addEventListener('contextmenu', function(e){ e.preventDefault(); var o=readSlots(); delete o[name]; writeSlots(o); renderSlots(); });
+      box.appendChild(b);
+    });
+  }
+  function currentState(){
+    var o={};
+    ['i-logotext','i-mono','i-side1','i-side2','i-variant','i-netwt','i-w','i-d','i-h','i-band','i-body','i-ink','i-bandh','i-logofont','i-varfont','i-textfont',
+     'i-logosize','i-varsize','i-logoweight','i-logotrack','i-desc','i-claim','i-claim2','i-tagline','i-foot','i-back',
+     'i-stage','i-price','i-zoom'].forEach(function(id){ o[id]=$(id).value; });
+    ['c-emboss','c-uv','c-matte','c-autoink','c-film'].forEach(function(id){ o[id]=$(id).checked; });
+    o.bandmode=state.bandmode; o.orient=state.orient;
+    return o;
+  }
+  function loadState(o){
+    Object.keys(o).forEach(function(k){
+      var el=$(k); if(!el) return;
+      if(el.type==='checkbox') el.checked=o[k]; else el.value=o[k];
+    });
+    setBandMode(o.bandmode||'both'); setOrient(o.orient||'vertical');
+    refreshAll();
+  }
+  $('save-btn').addEventListener('click', function(){
+    var n=($('i-slot').value||'').trim() || ('versión '+(Object.keys(readSlots()).length+1));
+    var s=readSlots(); s[n]=currentState();
+    $('slot-status').textContent = writeSlots(s)
+      ? 'Guardada como "'+n+'". Vive en este navegador.'
+      : 'Este navegador no deja guardar. Usa "Copiar la ficha".';
+    $('i-slot').value=''; renderSlots();
+  });
+  $('copy-btn').addEventListener('click', function(){
+    var txt=JSON.stringify(snapshot(),null,2);
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(txt).then(function(){ $('slot-status').textContent='Ficha copiada. Pégala en el chat.'; },
+        function(){ $('slot-status').textContent='No pude copiar. Selecciona el texto a mano.'; });
+    } else { $('slot-status').textContent='Este navegador no deja copiar automáticamente.'; }
+  });
+
+  /* ---------- wiring ---------- */
+  function on(id,ev,fn){ $(id).addEventListener(ev,fn); }
+  function setOrient(o){
+    state.orient=o;
+    $('logoblock').className='logoblock '+o;
+    var l=$('orient').querySelectorAll('.chip');
+    for(var i=0;i<l.length;i++) l[i].setAttribute('aria-pressed', l[i].dataset.or===o?'true':'false');
+  }
+
+  function pintarFilm(){
+    var on=$('c-film').checked, txt=$('i-logotext').value || 'Marca';
+    document.querySelectorAll('[data-film]').forEach(function(f){
+      f.classList.toggle('on', on);
+      if(!on){ f.innerHTML=''; return; }
+      if(f.dataset.txt===txt) return;          // no repintar si no cambio
+      f.dataset.txt=txt;
+      var ink=document.createElement('div'); ink.className='film-ink';
+      for(var i=0;i<90;i++){ var sp=document.createElement('span'); sp.textContent=txt; ink.appendChild(sp); }
+      var cut=document.createElement('div'); cut.className='film-cut';
+      f.innerHTML=''; f.appendChild(ink); f.appendChild(cut);
+    });
+  }
+
+  function refreshAll(){
+    setVar('--bandh',$('i-bandh').value+'px'); $('bandh-val').textContent=$('i-bandh').value;
+    setVar('--logofont',$('i-logofont').value);
+    setVar('--varfont',$('i-varfont').value);
+    setVar('--textfont',$('i-textfont').value);
+    setVar('--logosize',$('i-logosize').value+'px'); $('logosize-val').textContent=$('i-logosize').value;
+    setVar('--varsize',$('i-varsize').value+'px'); $('varsize-val').textContent=$('i-varsize').value;
+    setVar('--logoweight',$('i-logoweight').value); $('logoweight-val').textContent=$('i-logoweight').value;
+    setVar('--logotrack',($('i-logotrack').value/100)+'em'); $('logotrack-val').textContent=$('i-logotrack').value;
+    setVar('--stagebg', STAGES[$('i-stage').value]||STAGES.studio);
+    setBand($('i-band').value); setBody($('i-body').value);
+    if(!$('c-autoink').checked){ setVar('--boxink',$('i-ink').value); }
+    $('logo').textContent=$('i-logotext').value;
+    $('mono').textContent=$('i-mono').value;
+    $('topwrap').textContent=$('i-mono').value;
+    var lados=document.querySelectorAll('.side-logo');
+    if(lados[0]) lados[0].textContent=$('i-side1').value;
+    if(lados[1]) lados[1].textContent=$('i-side2').value;
+    pintarFilm();
+    $('variant').textContent=$('i-variant').value;
+    $('descriptor').innerHTML=splitTail($('i-desc').value);
+    $('claim-n').textContent=$('i-claim').value;
+    $('claim-s').textContent=$('i-claim2').value;
+    $('netwt').innerHTML='Net Wt.<span>'+$('i-netwt').value+'</span>';
+    setTagline($('i-tagline').value); setFoot($('i-foot').value); setBack($('i-back').value);
+    $('logo').classList.toggle('emboss',$('c-emboss').checked);
+    $('logo').classList.toggle('uvgloss',$('c-uv').checked);
+    document.querySelectorAll('.face').forEach(function(f){ f.classList.toggle('matte',$('c-matte').checked); });
+    setZoom(parseInt($('i-zoom').value,10)||100);
+    rebuild(); updateCost();
+  }
+
+  ['i-logotext','i-mono','i-side1','i-side2','i-variant','i-netwt','i-desc','i-claim','i-claim2','i-tagline','i-foot','i-back'].forEach(function(id){ on(id,'input',refreshAll); });
+  ['i-bandh','i-logosize','i-varsize','i-logoweight','i-logotrack'].forEach(function(id){ on(id,'input',refreshAll); });
+  ['i-logofont','i-varfont','i-textfont','i-stage'].forEach(function(id){ on(id,'change',refreshAll); });
+  ['i-w','i-d','i-h'].forEach(function(id){ on(id,'input',function(){ rebuild(); applyBox(); }); });
+  on('i-band','input',function(e){ setBand(e.target.value); });
+  on('i-body','input',function(e){ setBody(e.target.value); });
+  on('i-ink','input',function(e){ $('c-autoink').checked=false; setVar('--boxink',e.target.value); });
+  on('c-autoink','change',function(){ setBody($('i-body').value); });
+  on('i-zoom','input',function(e){ setZoom(parseInt(e.target.value,10)); });
+  document.querySelectorAll('[data-zoom]').forEach(function(b){
+    b.addEventListener('click',function(){ setZoom(parseInt(b.dataset.zoom,10)); });
+  });
+  on('i-price','input',updateCost);
+  ['c-emboss','c-uv','c-matte','c-film'].forEach(function(id){ on(id,'change',refreshAll); });
+
+  $('bandmode').addEventListener('click',function(e){ var b=e.target.closest('[data-bm]'); if(b) setBandMode(b.dataset.bm); });
+  $('orient').addEventListener('click',function(e){ var b=e.target.closest('[data-or]'); if(b) setOrient(b.dataset.or); });
+
+  $('bandsw').addEventListener('click',function(e){
+    var b=e.target.closest('.swatch'); if(!b) return; setBand(b.dataset.c);
+  });
+  $('bodysw').addEventListener('click',function(e){
+    var b=e.target.closest('.swatch'); if(!b) return; setBody(b.dataset.c);
+  });
+
+  var REFS={uno:{v:'Variante Uno',b:'#E9C5A8'}, dos:{v:'Variante Dos',b:'#E8A0AE'}, tres:{v:'Variante Tres',b:'#C9D46A'}};
+  $('refchips').addEventListener('click',function(e){
+    var b=e.target.closest('[data-ref]'); if(!b) return;
+    var l=this.querySelectorAll('.chip'); for(var i=0;i<l.length;i++) l[i].setAttribute('aria-pressed','false');
+    b.setAttribute('aria-pressed','true');
+    var r=REFS[b.dataset.ref]; $('i-variant').value=r.v; setBand(r.b); refreshAll();
+  });
+  document.querySelectorAll('[data-desc]').forEach(function(b){
+    b.addEventListener('click',function(){ $('i-desc').value=b.dataset.desc; refreshAll(); });
+  });
+  document.querySelectorAll('[data-claim]').forEach(function(b){
+    b.addEventListener('click',function(){ var p=b.dataset.claim.split('|'); $('i-claim').value=p[0]; $('i-claim2').value=p[1]; refreshAll(); });
+  });
+
+  document.querySelector('.viewbar').addEventListener('click',function(e){
+    var v=e.target.closest('[data-view]');
+    if(v){
+      state.view=v.dataset.view;
+      var l=this.querySelectorAll('[data-view]');
+      for(var i=0;i<l.length;i++) l[i].setAttribute('aria-pressed','false');
+      v.setAttribute('aria-pressed','true');
+      // un plano de troquel se mira de frente: entra a 0,0 y quieto.
+      // girarlo a mano sigue permitido, en las tres vistas.
+      if(state.view==='plano'){ setSpin(false); state.rx=0; state.ry=0; }
+      box.classList.add('animated'); applyFaces(); applyBox(); return;
+    }
+    if(e.target.closest('[data-spin]')) setSpin(!state.spin);
+  });
+
+  $('theme-btn').addEventListener('click',function(){
+    var cur=root.getAttribute('data-theme');
+    var dark=cur?cur==='dark':window.matchMedia('(prefers-color-scheme: dark)').matches;
+    root.setAttribute('data-theme', dark?'light':'dark');
+  });
+
+  var DEFAULT_BACK = "Modo de uso\nTEXTO DE EJEMPLO. Escribe aqui el modo de uso real del producto.\n\nIngredientes\nTEXTO DE EJEMPLO. Escribe aqui el INCI real, en orden decreciente.\n\nPrecauciones\nTEXTO DE EJEMPLO. Escribe aqui las precauciones reales y las advertencias de ley.";
+
+  var ORIGINAL = {
+    'i-logotext':'Nombre de Marca','i-mono':"L'",'i-side1':'Nombre de Marca','i-side2':'Nombre de Marca',
+    'i-variant':'Variante Uno','i-netwt':'4 oz / 120 mL','i-w':'5','i-d':'5','i-h':'13',
+    'i-band':'#E9C5A8','i-body':'#FBFAF8','i-ink':'#191714','i-bandh':'14',
+    'i-logofont':"'Bodoni Moda', serif",'i-varfont':"'Bodoni Moda', serif",'i-textfont':"'Jost', sans-serif",
+    'i-logosize':'30','i-varsize':'16','i-logoweight':'500','i-logotrack':'-1',
+    'i-desc':'Descriptor de Categoría','i-claim':'Claim en','i-claim2':'dos líneas',
+    'i-tagline':"Frase de marca, aquí.",'i-foot':'www.tusitio.com · @tumarca',
+    'i-back':DEFAULT_BACK,'i-stage':'studio','i-price':'80000','i-zoom':'100',
+    'c-film':false,'c-emboss':true,'c-uv':false,'c-matte':true,'c-autoink':true,
+    bandmode:'both', orient:'vertical'
+  };
+  $('reset-btn').addEventListener('click',function(){ loadState(ORIGINAL); recenter(); $('slot-status').textContent='Volvimos al punto de partida.'; });
+
+  /* ---------- boot ---------- */
+  var bc=$('barcode');
+  for(var i=0;i<34;i++){ var b=document.createElement('i'); b.style.width=(0.7+Math.random()*1.4).toFixed(2)+'px'; bc.appendChild(b); }
+
+  loadState(ORIGINAL);
+  applyFaces(); applyBox(); setSpin(true); renderSlots();
+  window.addEventListener('resize', applyBox);
+})();
+</script>

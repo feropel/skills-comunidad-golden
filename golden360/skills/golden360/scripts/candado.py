@@ -3,6 +3,7 @@
 CANDADO MAESTRO (FASE 9) — verifica que el paquete de lanzamiento esté COMPLETO.
 Uso:  python3 candado.py <carpeta PROYECTOS/<PRODUCTO>>          → verifica artefactos
       python3 candado.py --skills                                 → verifica skills hijas instaladas
+      python3 candado.py --autochequeo                            → la skill se revisa a sí misma
 Salida: checklist ✅/❌ + conteo de [PENDIENTE]. Exit 0 si completo, 1 si falta algo.
 Si este script no puede correr (sin python3), haz el checklist a mano con la lista de la Fase 9.
 
@@ -33,7 +34,7 @@ HIJAS = {
     "golden-copywriting": "copys 5/5/5 y textos de orgánico (Fases 6-7)",
     "golden-chatea-pro-prompt-ventas": "venta WhatsApp del producto (Fase 8)",
     "golden-chatea-pro-config-comentarios": "comentarios del producto (Fase 8)",
-    "golden-productos-ganadores": "validar demanda (Compuerta 1)",
+    "golden-dropkiller-productos-ganadores": "validar demanda (Compuerta 1)",
     "golden-meta-ads-analysis": "auditar pauta previa (Fase 0.5)",
     "golden-pdf-check": "PDF Golden del paquete (Fase 9)",
     # golden-qa es un AGENTE (Agent tool), no una skill instalada — no se chequea aquí.
@@ -186,6 +187,115 @@ def check_paquete(carpeta: str) -> int:
     return 0 if fallos == 0 else 1
 
 
+
+# ── AUTOCHEQUEO DE LA PROPIA SKILL ──────────────────────────────────────────────
+# Por qué existe: tres veces se rompió lo mismo por vivir SOLO en prosa que nadie verifica.
+#   (1) 2026-08-07 y (2) 2026-09-03: al recortar la description por el tope del listado se
+#       borraron las FRONTERAS con las hermanas — justo lo que evita que un orquestador se
+#       dispare cuando el usuario quería una pieza suelta.
+#   (3) R1.8 y la adenda del cerebro se sellaron sin entrada de changelog.
+# Una regla que no se puede correr no es una regla: es un buen propósito. Esto la vuelve candado.
+# DOS techos distintos, y confundirlos invalida la skill (pasó aquí el 2026-09-05):
+#   1024 = LÍMITE DE VALIDACIÓN de la especificación. DURO: por encima, `agentskills validate`
+#          sale con código 1 y la skill NO ES VÁLIDA. Es el que manda.
+#   ~1536 = truncado de RUNTIME: donde el motor corta al cargar el listado. Otra cosa. NO decide
+#          validez, y usarlo como tope deja pasar una skill que el validador rechaza.
+TOPE_DESCRIPTION = 1024
+
+def check_autochequeo() -> int:
+    import io
+    base = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    skill = os.path.join(base, "SKILL.md")
+    fallos = 0
+    print("═══ AUTOCHEQUEO · la skill se revisa a sí misma ═══")
+    if not os.path.isfile(skill):
+        print("  ❌ no encuentro SKILL.md"); return 1
+    txt = open(skill, encoding="utf-8").read()
+
+    # 0 · el VALIDADOR OFICIAL manda: si él dice que no, no hay nota que discutir
+    import shutil, subprocess
+    oficial = shutil.which("agentskills")
+    if oficial:
+        r = subprocess.run([oficial, "validate", base], capture_output=True, text=True)
+        ok = r.returncode == 0
+        print(f"  {'✅' if ok else '❌'} validador oficial (agentskills validate): exit {r.returncode}")
+        if not ok:
+            for linea in (r.stdout + r.stderr).strip().splitlines()[:4]:
+                print(f"      {linea.strip()}")
+            fallos += 1
+    else:
+        print("  ⚠️  `agentskills` no está en PATH — se valida solo con el conteo propio (respaldo)")
+
+    # 1 · description: existe, cabe en el tope DURO y CONSERVA las fronteras
+    m = re.search(r"^description: >-?\n((?:  .*\n)+)", txt, re.M)
+    if not m:
+        print("  ❌ sin description en el frontmatter"); fallos += 1
+    else:
+        plano = " ".join(l.strip() for l in m.group(1).strip().split("\n"))
+        print(f"  {'✅' if len(plano) <= TOPE_DESCRIPTION else '❌'} largo: {len(plano)} de {TOPE_DESCRIPTION} (límite DURO de la spec)")
+        fallos += 0 if len(plano) <= TOPE_DESCRIPTION else 1
+        # La frontera se reconoce por SENTIDO, no por un carácter: un "NO es para X" que además
+        # dice a dónde va lo que no es de esta skill. Atarlo a la flecha "→" era frágil — al
+        # recortar por el tope de 1024 desapareció la flecha y el chequeo gritó un falso rojo.
+        # MIRAR LA COSA, NO EL VECINDARIO (fallo medido del CdM el 2026-09-05: probaba el
+        # placeholder contra el contexto en vez de contra el valor, y 4 de 5 credenciales reales
+        # quedaban sin detectar). Aquí pasaba lo simétrico: las señales miraban TODO el texto, así
+        # que una frontera propia y sana MORÍA si en otra frase aparecía "se repuso" o el nombre de
+        # una hermana. Ahora cada aparición se juzga POR SÍ MISMA y basta UNA limpia: un texto no
+        # deja de establecer su frontera porque además cite la de otro.
+        MARCAS = ("NO es para", "NO usar", "NO para")
+        def es_frontera_propia(t, i):
+            """i = posición de una marca de negación. Decide si ESA aparición manda aquí."""
+            antes, despues = t[max(0, i-45):i], t[i:i+160]
+            if not any(x in despues for x in ("deriva", "→", "es de ", "usa la hermana")):
+                return False                                   # no dice a dónde va: no es frontera
+            if re.search(r'golden-[a-z0-9-]+[\s,;]*$', antes):
+                return False                                   # una hermana es el SUJETO: regla ajena
+            if re.search(r'["\u201c\u00ab][^"\u201d\u00bb]{0,10}$', antes):
+                return False                                   # abre entrecomillada: es cita
+            if re.search(r'(historial|ejemplo|se repuso|escriben|decía|catálogo)[^.]{0,60}$',
+                         antes, re.I):
+                return False                                   # narrada en su propia cláusula
+            return True
+        tiene_frontera = any(es_frontera_propia(plano, m.start())
+                             for marca in MARCAS
+                             for m in re.finditer(re.escape(marca), plano))
+        print(f"  {'✅' if tiene_frontera else '❌'} FRONTERAS con las hermanas presentes"
+              f"{'' if tiene_frontera else ' — un recorte se las llevó; sin esto la skill se dispara sobre piezas sueltas'}")
+        fallos += 0 if tiene_frontera else 1
+        if tiene_frontera:
+            print("      límite declarado: esto mide PRESENCIA de la frontera, no que esté bien "
+                  "REDACTADA. Una cita disfrazada de regla se caza; una regla mal escrita, no.")
+            # Se busca con la MISMA lista MARCAS: al ampliarla con "NO para" esta línea se quedó
+            # con dos de las tres y REVENTÓ con una frontera legítima. Un crash sale con exit 1,
+            # igual que "muerde bien", así que por el lado malo era invisible: lo destapó el lado
+            # BUENO. Dos fuentes de verdad para la misma lista es la deuda que se paga así.
+            posiciones = [plano.index(x) for x in MARCAS if x in plano]
+            pos = min(posiciones) if posiciones else 0
+            if posiciones and pos > len(plano) * 0.6:
+                print("  ⚠️  las fronteras viven en el último 40% — el próximo recorte por el final las borra otra vez")
+
+    # 2 · el sello más nuevo tiene su entrada en el changelog
+    chlog = os.path.join(base, "references", "changelog.md")
+    sellos = re.findall(r"GR360_VERSION:\s*(R[0-9.]+[a-z]?)", txt)
+    if sellos and os.path.isfile(chlog):
+        ultimo = sellos[0]
+        cl = open(chlog, encoding="utf-8").read()
+        ok = re.search(r"^##\s*" + re.escape(ultimo) + r"\b", cl, re.M) is not None
+        print(f"  {'✅' if ok else '❌'} el sello {ultimo} tiene entrada en el changelog"
+              f"{'' if ok else ' — sellar sin registrar deja el historial mintiendo'}")
+        fallos += 0 if ok else 1
+
+    # 3 · toda hija nombrada en HIJAS existe en disco
+    faltan = [n for n in HIJAS if not os.path.isdir(os.path.join(SKILLS_DIR, n))]
+    print(f"  {'✅' if not faltan else '❌'} {len(HIJAS)} hijas declaradas, {len(faltan)} sin instalar"
+          + (f": {', '.join(faltan)}" if faltan else ""))
+    fallos += 0 if not faltan else 1
+
+    print("═══ RESULTADO:", "✅ la skill se sostiene" if fallos == 0 else f"❌ {fallos} fallo(s) propios", "═══")
+    return 0 if fallos == 0 else 1
+
+
 def check_skills() -> int:
     print("═══ DEPENDENCIAS · skills hijas instaladas ═══")
     faltan = 0
@@ -209,4 +319,9 @@ if __name__ == "__main__":
     if len(sys.argv) < 2:
         print(__doc__)
         sys.exit(1)
-    sys.exit(check_skills() if sys.argv[1] == "--skills" else check_paquete(sys.argv[1]))
+    arg = sys.argv[1]
+    if arg == "--skills":
+        sys.exit(check_skills())
+    if arg == "--autochequeo":
+        sys.exit(check_autochequeo())
+    sys.exit(check_paquete(arg))

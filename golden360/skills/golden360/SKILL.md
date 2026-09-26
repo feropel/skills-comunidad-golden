@@ -1,18 +1,17 @@
 ---
 name: golden360
 description: >-
-  Golden Group — GOLDEN 360, el ORQUESTADOR que lleva un producto de CERO (incluso de una
-  sola FOTO, sin nombre ni URL) hasta VENDIENDO, uniendo todas las skills Golden en 3
-  bloques (DECIDIR, CONSTRUIR, ENCENDER) sobre el expediente único PRODUCTO.json, con 4
-  compuertas duras que lo frenan si el producto no viabiliza, si un claim no tiene respaldo,
-  si los precios no salen del sistema vivo, o si no pasa QA. Úsala SIEMPRE que el usuario
-  quiera el LANZAMIENTO COMPLETO, o la llame por su nombre: "Golden360", "golden 360",
-  "corre la 360", "ruta 360", "lanza este producto", "de la foto a vender", "monta todo el
-  producto", "producto completo de cero", "hazme todo el sistema de este producto", "quiero
-  vender esto", "de cero a ventas", "sácalo a la calle", "déjalo listo para vender", o pegue
-  una FOTO pidiendo llevarla a la venta. También cuando pida RETOMAR un lanzamiento a medias
-  ("sigamos con el producto X", "en qué quedamos con este producto"): lee el PRODUCTO.json y
-  sigue en su fase actual.
+  Golden Group — GOLDEN 360: el ORQUESTADOR que lleva un producto de CERO (incluso de una sola
+  FOTO, sin nombre ni URL) hasta VENDIENDO, uniendo las skills Golden en 3 bloques (DECIDIR,
+  CONSTRUIR, ENCENDER) sobre el expediente único PRODUCTO.json, con 4 compuertas que lo frenan
+  si no viabiliza, si un claim no tiene respaldo, si los precios no salen del sistema vivo o si
+  no pasa QA. NO es para una PIEZA SUELTA: si solo quiere el estudio, la página, la pauta, las
+  imágenes, el video o el bot, deriva a la hermana dueña de esa pieza — es el DIRECTOR DE
+  ORQUESTA, no un instrumento. Úsala cuando quiera el LANZAMIENTO COMPLETO o la llame por su
+  nombre: "Golden360", "corre la 360", "ruta 360", "lanza este producto", "de la foto a vender",
+  "monta todo el producto", "quiero vender esto", "de cero a ventas", "déjalo listo para
+  vender", o pegue una FOTO pidiendo llevarla a la venta. También para RETOMAR un lanzamiento a
+  medias ("sigamos con el producto X"): lee el PRODUCTO.json y sigue en su fase actual.
 ---
 <!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leían el cerebro de marca — esta entra a la familia que SÍ lo lee. Bloque idéntico en las 6 del CdM + fila a la fábrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
 
@@ -38,7 +37,10 @@ la conversación se pierde en el próximo chat: por eso queda por escrito en el 
 `PRODUCTO.json`. Es un ESTÁNDAR TRANSVERSAL — lo escriben otras skills — y por la convivencia de esta
 skill no se toca sin su aviso previo. Mientras tanto manda la regla del README.
 
-<!-- GR360_VERSION: R2.0 — 2026-09-03 — FASE 5B · TEARDOWN. Encargo directo de FER: `golden-video-teardown` entra en la ruta entre producir los creativos (Fase 5) y escribir los copys (Fases 6-7). Antes el copy se escribia sin que nadie hubiera desarmado el video que lo acompana. Tocadas las CUATRO caras, que es lo que R1.9 enseno que hacia falta: la fase en el cuerpo, la fila en la tabla REQUISITOS, la entrada en HIJAS de candado.py y este sello con su changelog. Ejecutado por el CENTRO DE MANDO con autorizacion expresa de FER, por estar la fabrica (chat exclusivo golden360) cerrada. Fabrica: chat exclusivo golden360. -->
+<!-- GR360_VERSION: R2.3 — 2026-09-05 — CICLO del mandato v2. Cerrado lo TIPO A con cambio medible: (1) 3 palabras que mi propio barrido de acentos del 5-sep había corrompido por dentro — "fábricante" en la REGLA 2 (innegociable), "fórmulario COD" en la Compuerta 4 y "lecciónes" en el changelog: el par formula→fórmula se aplicó como SUBSTRING y se pegó dentro de palabras más largas. Corregidas y verificado cero daño restante. Dos que el detector marcó ("ángulos") eran falsos positivos: plural legítimo. (2) Alineación del --autochequeo con el oficial COMPROBADA CORRIENDO, no leyendo: se saboteó el name: para que el oficial fallara por una causa que este script NO implementa (nombre != carpeta) y el autochequeo la propagó con exit 1 — la delegación es real. (3) Arsenal de hoy re-derivado ejecutando: 15 hijas + 2 auxiliares, 0 faltantes. TIPO B, que no cierro yo: PARA EL 1000 ME FALTA una corrida real de punta a punta — una foto entrando por el Bloque 1 y saliendo por la Compuerta 4. Lo puede dar FER. Techo alcanzable hoy: 985. R2.3c (misma vuelta, causa EXTERNA de golden-presenta vía CdM): TERCER disfraz, el de AUTORIDAD — un catálogo con la forma exacta de una frontera pero que manda sobre OTRA skill pasaba en verde; cazado por estructura (hermana como sujeto = ajena, como destino = propia). Banco de 7 en verde. · R2.3b (causa EXTERNA de golden-ads vía CdM): el detector de fronteras tenía un FALSO NEGATIVO — una description que solo CITABA la frontera dentro de un acta o un ejemplo pasaba en verde; arreglado y probado con 6 casos (3 legítimas aceptadas, 2 disfraces mordidos, 1 control mordido), y ahora declara su límite en vez de dar un verde ciego. FILA DEL CdM aplicada DENTRO de este mismo ciclo (sin vuelta nueva): (a) ley «un detector se prueba en los DOS sentidos» escrita junto al autochequeo y VERIFICADA — el de fronteras calla ante 3 redacciones legítimas y muerde el control; (b) corregido el ALCANCE de mi aviso de acentos: el CdM midió 1.131 ficheros / 38 skills con CERO corrupciones vivas, o sea la clase valía pero el alcance era cero y yo lo di por extendido sin medirlo. -->
+<!-- GR360_VERSION: R2.2 — 2026-09-05 — TOPE EQUIVOCADO CORREGIDO (lo cazó el Centro de Mando y lo confirmé ejecutando el oficial). En R2.1 usé ~1536 (truncado de RUNTIME) como tope de la description cuando el que manda es 1024 (límite de VALIDACIÓN de la spec): `agentskills validate` salía con código 1 — skill INVÁLIDA — y mi propio --autochequeo daba verde porque llevaba el umbral malo horneado, que es peor que no tenerlo. Arreglado: description 1276 → 1004 chars SIN tocar las fronteras (se recortó la enumeración de hermanas y los sinónimos repetidos, no la desambiguación), oficial exit 0 · el --autochequeo ahora CORRE el validador oficial y usa 1024, con los dos techos explicados para que nadie los vuelva a mezclar · el detector de fronteras dejó de depender del carácter "→" (al recortar desapareció la flecha y gritó un falso rojo) y ahora las reconoce por sentido. Probado contra sabotaje: description de 1180 → exit 1. Reserva intacta: la ruta sigue sin correrse entera con un producto real. -->
+<!-- GR360_VERSION: R2.1 — 2026-09-05 — AUTOMEJORA pedida por FER ("qué te falta para ser mil"). Se cerraron los 3 defectos medidos y se atacó su CLASE: (1) el recorte del 3-sep había borrado las FRONTERAS de la description — un orquestador sin desambiguación se dispara sobre piezas sueltas; repuestas y REUBICADAS al 32% del texto, porque el truncado muerde por el final. (2) La entrada R2.0 venía sin tildes: 26 correcciones. (3) NUEVO `candado.py --autochequeo`: convierte en candado ejecutable las tres reglas que se rompieron por vivir en prosa (fronteras + tope, sello con entrada de changelog, hijas en disco); probado contra dos casos malos plantados, muerde con exit 1. (4) SIMULACRO del camino feliz del candado, que nunca se había probado: paquete completo → PAQUETE COMPLETO, exit 0 (antes solo se había visto fallar). Queda la única reserva honesta: la ruta sigue sin correrse entera con un producto real. Fábrica: chat exclusivo golden360. -->
+<!-- GR360_VERSION: R2.0 — 2026-09-03 — FASE 5B · TEARDOWN. Encargo directo de FER: `golden-video-teardown` entra en la ruta entre producir los creativos (Fase 5) y escribir los copys (Fases 6-7). Antes el copy se escribía sin que nadie hubiera desarmado el video que lo acompaña. Tocadas las CUATRO caras, que es lo que R1.9 enseñó que hacía falta: la fase en el cuerpo, la fila en la tabla REQUISITOS, la entrada en HIJAS de candado.py y este sello con su changelog. Ejecutado por el CENTRO DE MANDO con autorización expresa de FER, por estar la fábrica (chat exclusivo golden360) cerrada. Fábrica: chat exclusivo golden360. -->
 <!-- GR360_VERSION: R1.9 — 2026-08-24 — AUDITORÍA FRESCA (golden-skill-auditor v1.16; base 918, veredicto 903 PLATA por la reserva del estreno). Arreglos con evidencia: (1) `golden-brand-brain`, dependencia OBLIGATORIA del Paso 0 desde el 23-ago, no estaba ni en REQUISITOS ni en HIJAS de candado.py — el chequeo decía "ecosistema completo" sobre un hueco; ya está en ambas. (2) "Pasa la ruta del cerebro" era orden sin destino: ahora se declara dónde vive (es de la MARCA, no del producto) y se anota en la cabecera del README del paquete, con su fila en la plantilla de la Fase 9; el campo `marca.cerebro_ruta` del esquema queda ELEVADO al Centro de Mando por ser estándar transversal. (3) El sello R1.8 decía "15/15 hijas" y son 13 (los auxiliares se contaban dos veces) — corregido. (4) R1.8 y la adenda del cerebro no tenían entrada de changelog, reincidencia de la clase que R1.6b ya había registrado: escritas. (5) Sellos reagrupados en un solo bloque (R1.2/R1.1/R1.0 habían quedado partidos por una sección viva). Menores: claude-seo-ai → claude-seo-ai:audit, tildes de la adenda. Reportado al Centro de Mando. Fábrica: chat exclusivo golden360. -->
 <!-- GR360_VERSION: R1.8 — 2026-08-21 — Auditoría golden-skill-auditor (959→1000 ORO). Arreglos: (1)
      concordancia de género en la línea disparadora del description ("este skill" → "esta skill",
@@ -117,7 +119,7 @@ imposible de romper por diseño. Esquema:
 | Paso 0 | **`golden-brand-brain`** | cerebro de marca (voz única de todo el lanzamiento) |
 | B1 completo | **`golden-investigacion-mercado`** | forense + intake + investigación 360 + dossier + .docx |
 | 0.5 | `golden-archivos` · `golden-meta-ads-analysis` · `golden-dropi-analisis` | inventario / pauta previa / pedidos |
-| C1 | `golden-productos-ganadores` | validar demanda |
+| C1 | `golden-dropkiller-productos-ganadores` | validar demanda |
 | 3 | `claude-seo-ai:audit` (opcional — es un PLUGIN, no una skill en `~/.claude/skills`) | auditoría SEO/AIO |
 | 4 | `golden-shopify` **o** `golden-web` · `golden-agenda-citas` | página COD / sitio / agenda |
 | 5 | `golden-imagen-arena` · `golden-ugc-avatar` | imágenes/GIF / video UGC |
@@ -299,6 +301,47 @@ de 7 días recién cerrada SIEMPRE subestima → veredicto con mes corrido + lif
 ## FASE 11 · Retro y registro
 Qué funcionó / qué no / **qué se hornea en qué skill**. Registro: catálogo maestro (nombre + alias),
 Centro de Mando, tabla de botones WhatsApp, traspaso al chat dueño del producto.
+
+## 🔒 AUTOCHEQUEO — la skill se revisa a sí misma (correr antes de cerrar cualquier edición)
+```bash
+python3 ~/.claude/skills/golden360/scripts/candado.py --autochequeo
+```
+Corre **el validador oficial (`agentskills validate`)** y, encima, lo que ya se rompió por vivir solo
+en prosa: que la **description conserve las FRONTERAS** con las hermanas y quepa en el **tope DURO de
+1024** de la especificación (dos recortes por el tope, el 7-ago y el
+3-sep, se las llevaron: sin ellas un ORQUESTADOR se dispara cuando pedían una pieza suelta), que el
+**sello más nuevo tenga su entrada en el changelog** (R1.8 y la adenda del cerebro se sellaron sin
+registrarla), y que **toda hija declarada exista en disco**. Probado contra los dos casos malos: con
+las fronteras borradas y con un sello sin changelog, falla con código 1.
+**UN DETECTOR SE PRUEBA EN LOS DOS SENTIDOS** (ley del ecosistema, 2026-09-05): tiene que MORDER el
+caso malo **y CALLAR ante el caso bueno**. Probar solo el lado malo es lo que deja pasar detectores
+que acusan al idioma en vez de al defecto — muerden, y por eso parecen buenos. El de fronteras se
+verificó con tres redacciones legítimas distintas (con flecha, sin flecha y con otra construcción) **y con el CASO
+DISFRAZADO**, que es el que de verdad prueba: no prosa inocente, sino texto que SE PARECE al dato — un
+acta o un ejemplo que CITAN la frontera sin establecerla, o un catálogo con su forma exacta que manda
+sobre OTRA skill. Los tres disfraces pasaban en verde hasta el 2026-09-05. **La pregunta que los caza
+no es "cómo está escrito" sino "esto MANDA sobre alguien aquí"**: `golden-shopify NO es para pauta`
+tiene la forma perfecta de una frontera y cero autoridad sobre esta skill. Se resuelve por estructura
+— hermana como SUJETO es regla ajena, como DESTINO es regla propia —, no con un catálogo de palabras,
+que acusaría al idioma. **Banco de 14, los DOS lados y vigilando CRASHES**: 6 buenos aceptados (la frontera viva, 3
+redacciones legítimas y 2 con palabra sospechosa en otra frase) y 8 malos mordidos con exit 1
+(3 disfraces, sin frontera, description >1024, sello sin changelog, name distinto de la carpeta,
+hija inexistente). **El banco corre con la carpeta llamada `golden360`**: el oficial exige que la
+carpeta coincida con el `name`, y un banco que la llame de otro modo reprueba TODO sin que falle nada.
+**Y se mira el traceback, no solo el código de salida: un CRASH sale con exit 1 igual que "muerde
+bien", así que por el lado malo es invisible.** **Se corre ENTERO después de cada estrechamiento:**
+quitar falsos positivos CONSISTE en estrechar el criterio, y estrechar es el mecanismo que fabrica
+falsos negativos — golden-shopify lo midió en vivo (arregló 3 disfraces y el mismo arreglo dejó el
+caso malo sin morder, 36 de 37). Probar solo el caso nuevo no vale: el daño aparece en los viejos.
+**Y declara su límite al pasar**: mide PRESENCIA de la frontera, no que esté bien redactada.
+
+**DOS TECHOS, no los confundas** (costó una skill inválida el 2026-09-05): **1024 = límite de
+VALIDACIÓN de la spec**, duro — por encima, `agentskills validate` sale con código 1 y la skill NO ES
+VÁLIDA; **~1536 = truncado de RUNTIME**, donde el motor corta el listado al cargar. El que manda es
+1024. Usar el de runtime como tope deja pasar una skill que el validador rechaza.
+**Las FRONTERAS de la description son intocables:** si hay que recortar por el tope, se recorta la
+lista de disparadores, nunca la desambiguación — y va arriba, no al final, porque el truncado muerde
+por el final.
 
 ## 🔄 AUTO-MEJORA (mandato global — autorización permanente de FER)
 Al cerrar cada corrida real: 1) **auto-califícate** contra el criterio 100/100 de abajo (puntaje

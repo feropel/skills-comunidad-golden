@@ -4,8 +4,9 @@ description: >-
   Golden Group — Fábrica de IMÁGENES de alta conversión con Ecom Magic AI, 100% AUTOMÁTICA
   por su MCP oficial y sin navegador: genera creativos e infografías con la FOTO REAL del
   producto más texto de venta compuesto (no redibuja el producto), en el formato que se
-  necesite (carrusel 1080x1080, secciones 1080x1350, stories, 16:9), los descarga, los
-  optimiza a WebP menor a 150 KB y los entrega para que otra skill los implemente. La foto
+  necesite (galería 2048x2048, secciones 1080x1350, stories, 16:9), los descarga, los
+  optimiza a WebP con el peso que pide cada destino y los entrega para que otra skill los
+  implemente. La foto
   entra por URL pública, así que el usuario no sube ni arrastra nada. Elige plantillas,
   escribe el texto que va DENTRO de cada imagen y supervisa pieza por pieza. Úsala SIEMPRE
   que el usuario quiera: generar imágenes o infografías de producto, "haz las imágenes del
@@ -13,6 +14,8 @@ description: >-
   secciones", "creativos para la ficha", o producir el paquete visual de un producto para
   Shopify.
 ---
+
+**Fábrica:** chat «✅ SKILL golden-ecom-magic»
 <!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
      QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 881 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
      POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
@@ -21,12 +24,13 @@ description: >-
      SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # golden-ecom-magic — Fábrica de imágenes con Ecom Magic AI
 
-<!-- skill v2.3 · 2026-08-23 (cierre del ciclo con el Centro de Mando): la "ley de migración de vía" que nació de la v2.2 quedó canonizada en la gaceta y su barrido pescó la MISMA afirmación-veneno viva fuera de esta skill (golden-imagen-arena/references/motores.md decía "Ecom Magic no tiene API ni MCP"). Aprendizaje horneado aquí: el barrido de negaciones se hace también en las HERMANAS que citan a la skill migrada, no solo adentro -->
-<!-- skill v2.2 · 2026-08-23 (auditoría golden-skill-auditor, 917→ORO): 4 contradicciones entre archivos que la v2.1 no vio. La grave: ui-navegacion.md seguía afirmando "Ecom Magic no tiene API/MCP" (verdad de v1.x) — justo lo contrario del núcleo v2.0; un modelo que leyera ese archivo se iba al navegador y mataba la vía principal. También: la foto seguía documentada como "la arrastra el usuario" en campos-generacion (es fallback, por MCP entra por URL); "Editar anuncio (no regeneres)" contradecía el gotcha de que banners_edit degrada la etiqueta; y la lista negra no estaba donde se redacta el copy. Añadido: tabla de equivalencia campo web → parámetro MCP, el corte de antes/después por vertical señalizado en "Planear el set", ejemplo real completo (4 piezas limpias + 2 reembolsos = la regla de corte en acción) y la conexión con el Centro de Mando -->
-<!-- skill v2.1 · 2026-08-10 (loop del arsenal, semana 2 · producción): CORTE DE ANTES/DESPUÉS POR VERTICAL en references/campos-generacion.md. La heurística de molde daba luz verde a "Antes/Después (resultado en piel/cuerpo)" con el único filtro de "no rostros", y Meta 2026 lo PROHIBE en antiedad/arrugas/reafirmante y en pérdida de peso (permitido solo en cosmética general con 18+). Golden vende crema reafirmante de cuello: la regla como estaba habilitaba justo el caso prohibido. Añadidos también los dos transversales que Meta juzga por significado implícito: segunda persona que señala la condición y titular de plazo con resultado. Mismo parche espejo en golden-imagen-arena y golden-ugc-avatar -->
-<!-- skill v2.0 · MCP NATIVO (2026-07-30): Ecom Magic sacó servidor MCP oficial (ecom-magic.ai/mcp/v1, OAuth) → vía principal por herramientas, sin navegador y sin handoff de foto (entra por URL pública). Validado en vivo: pieza "modo de uso" de Tag Recede generada 100% autónoma en 32 s. Navegador degradado a fallback. Nuevos references/mcp-api.md y capacidades-extra.md; optimizar-webp.py acepta URL. Gotcha nuevo: el generador mete ¡ y ¿ → prohibirlos en additional_instructions -->
-<!-- skill v1.2 · fix auditoría 2026-07-25: optimizar-webp.py ya no aplasta a cuadrado (acepta 1080x1350, misma lógica que golden-imagen-arena) y reporta AVISO honesto cuando no baja del límite en vez de mentir OK; ui-navegacion muestra el uso rectangular explícito -->
-<!-- skill v1.1 · validado en vivo end-to-end (Tag Recede: 2 piezas → WebP → Golden Lab) · autonomía horneada, heurística de plantillas por vertical -->
+<!-- skill v2.7 · sello declarado el 2026-09-21 por el CENTRO DE MANDO en la revision diaria.
+     POR QUE: el censo la reportaba "sin version" y era cierto — SKILL.md no llevaba sello en
+     ningun formato legible; el numero real solo vivia dentro de references/changelog.md, cuya
+     entrada mas reciente es v2.7 (2026-09-13, auditoria golden-skill-auditor). No se invento
+     nada: se copio de ahi. Sin sello, el censo no puede ver que alguien edito la skill.
+     ACTA DE VERSIONES: el historial completo (v2.0 -> v2.7, con lo medido en cada vuelta)
+     vive en references/changelog.md. Aqui se queda solo el procedimiento vivo. -->
 
 Eres el operador de **Ecom Magic AI** para Golden Group. Tu trabajo es producir el **paquete
 visual** de un producto (carrusel + infografías de secciones) con la calidad y el estilo de
@@ -46,12 +50,30 @@ Verifica la vía con `account_me` / `wallet_balance` (gratis). Si no responden, 
 con ToolSearch; si tampoco, dale al usuario los 4 pasos de conexión de `mcp-api.md` y mientras
 opera por navegador.
 
-Ecom Magic **no redibuja** el producto: compone un creativo profesional **sobre la foto real**
-que subes + textos de venta. Esto encaja con la regla de oro de Golden: **producto fiel**
-(foto real, texto compuesto, nada de IA que reinvente el producto). Sobre el color: no metas
-amarillos gratis en fondos/diseño, PERO respeta el color real del producto — si el producto ya
-es amarillo (ej. una línea de veneno de abeja/panal), eso es *producto fiel*, no la regla que
-se evita.
+## 🔴 Lo primero del motor: CLONA la plantilla, no genera desde el texto
+
+**`reference_banner_url` NO es "inspiración de estilo": es la MAQUETA que se rellena.** Ecom
+Magic es un **compositor, no un generador**. Lo que traiga la plantilla sale en el resultado, y
+el prompt pesa mucho menos de lo que parece.
+
+**Medido 2026-09-04 (1 crédito perdido):** se pidió *mujer latina en oficina, incomodidad
+abdominal, titular propio, paleta oro y crema*, con la plantilla 1562 elegida **por número**. Era
+un anuncio de **sombras de ojos** y devolvió un anuncio de sombras de ojos, con sus potes y su
+texto. **Del prompt no sobrevivió nada.**
+
+Lo que gobierna todo el trabajo:
+1. **La plantilla se elige VIENDO la miniatura, jamás por id.** `templates_banner_list` da
+   `thumbnail_url`: ábrela y mírala. Elegir a ciegas es tirar un crédito.
+2. **Elige por PRODUCTO y layout parecidos a los tuyos.** Si la referencia trae otro producto,
+   ese producto contamina la pieza.
+3. **Sin foto de producto propia que inyectar, este motor no sirve** para crear un anuncio desde
+   cero → eso es `golden-imagen-arena` (allí el activo es el motor; aquí es la plantilla).
+4. El orden correcto es **plantilla → foto → texto**, nunca al revés.
+
+Sí se cumple la regla de oro de Golden — **producto fiel**: la foto real que subes se compone, no
+se redibuja. Sobre el color: no metas amarillos gratis en fondos/diseño, PERO respeta el color
+real del producto — si el producto ya es amarillo (ej. una línea de veneno de abeja/panal), eso
+es *producto fiel*, no la regla que se evita.
 
 ## Antes de nada: las 6 leyes que no se rompen
 
@@ -61,8 +83,9 @@ se evita.
    la foto). El resto —set de piezas, tamaños, plantillas, ángulo, copy— lo **decides tú e
    informas**, no lo consultas. "Entre menos actúe el usuario, mejor." Re-generar por un dato
    malo quema créditos.
-2. **Cada imagen = 1 crédito.** Decide el set ideal y proponlo; confirma el gasto una sola vez
-   antes de disparar. Reporta saldo de créditos y cuánto costará.
+2. **Cada imagen = 1 crédito, y el costo se declara ANTES con el saldo delante.** Corre
+   `wallet_balance` (gratis) **antes** de generar, di "hay N créditos, esto cuesta M" y confirma
+   una sola vez. Nunca dispares un lote sin ese número en pantalla.
 3. **Credenciales: nunca las tocas.** No escribes correo, contraseña, API Key ni datos de pago.
    El acceso va por **OAuth del MCP** (el usuario autoriza una vez; no queda credencial escrita).
    La **foto NO es un problema por la vía MCP**: entra como `product_image_url` (URL pública, ej.
@@ -94,10 +117,14 @@ se evita.
      texto original de la foto"*.
    Una pieza bonita con un dato falso cuesta más que 10 créditos.
 
-   **LISTA NEGRA OBLIGATORIA — pégala en `additional_instructions` de CADA generación.** El
-   generador inventa por defecto: en 3 intentos seguidos de la misma pieza inventó (1)
-   ingredientes en la etiqueta, (2) "Resultados Visibles Garantizados", (3) "Más de 10.000
-   usuarios satisfechos". Si no lo prohíbes explícitamente, lo hace. Texto a incluir siempre:
+   **CAUSA RAÍZ corregida (2026-09-05): esas "invenciones" salen de la PLANTILLA, no de una
+   alucinación libre.** El motor clona la maqueta: si la referencia trae "GARANTIZADO", una cifra
+   de usuarios o una etiqueta con otros ingredientes, se copia a tu pieza. El **primer** cinturón
+   es elegir plantilla limpia (mirando la miniatura); la lista negra es el **segundo**.
+
+   **LISTA NEGRA OBLIGATORIA — pégala en `additional_instructions` de CADA generación.** Evidencia
+   de 3 intentos seguidos de la misma pieza: (1) ingredientes en la etiqueta, (2) "Resultados
+   Visibles Garantizados", (3) "Más de 10.000 usuarios satisfechos". Texto a incluir siempre:
 
    > No alteres ni redibujes la etiqueta del envase, ni escribas ingredientes o texto nuevo
    > sobre el producto. PROHIBIDO inventar cifras, estadísticas, cantidad de usuarios,
@@ -130,11 +157,18 @@ CTA + botón van debajo de cada una (trabajo de golden-shopify)". Si `golden-sho
 otra sesión, recuérdale este contrato en el mensaje de entrega. (No edites golden-shopify
 desde aquí: vive bloqueada read-only y su fábrica es otro chat.)
 
+**Además de las imágenes, entrega un DATO que aquí sale gratis:** corre
+`landings_logistics_options(country)` y pásale a golden-shopify las **transportadoras y medios de
+pago reales de ese país** para la barra logística. Es gratis, es síncrono y evita que alguien
+escriba transportadoras de memoria. (Ejecutado 2026-09-05 en `CO`: Servientrega, Envía,
+Coordinadora, Interrapidísimo, TCC · PSE, Nequi, Daviplata, Visa, Mastercard · modo `cod`.)
+Detalle y el resto de herramientas gratis, en `references/capacidades-extra.md`.
+
 ## El flujo completo (de punta a punta, vía MCP)
 
 ```
 1. RECOPILAR   → URL de la foto real + datos reales del producto
-2. PLANEAR     → definir el set: carrusel (1080×1080) + secciones (1080×1350)
+2. PLANEAR     → definir el set: galería (2048×2048) + secciones (1080×1350)
 3. ELEGIR      → templates_banner_list → template_url de referencia por pieza
 4. GENERAR     → banners_generate (1 créd.) → jobs_get hasta succeeded
 5. OPTIMIZAR   → scripts/optimizar-webp.py <url> <salida.webp> [tamaño] → WebP <150 KB
@@ -164,7 +198,7 @@ El estándar Golden para una ficha de producto Shopify es **híbrido** (ver
 convertir/posicionar. Este skill produce **las imágenes**; golden-shopify monta la página.
 
 Set típico:
-- **Carrusel / multimedia del producto → 4-5 imágenes 1080×1080 (cuadradas).** Foto real
+- **Carrusel / multimedia → 4-5 cuadradas, entregadas a 2048×2048.** Foto real
   bella + 1-2 infografías de beneficio máximo. Es el gancho que la gente desliza.
 - **Secciones / infografías → 1080×1350 (Instagram vertical).** Las piezas que en Shopify
   van intercaladas como bloques de imagen: "cómo actúa", antes/después, modo de uso,
@@ -183,10 +217,14 @@ cuesta y confirma el gasto una vez antes de disparar.
 
 ### 3. Elegir la plantilla de referencia
 
-Ecom Magic **imita el estilo/layout de una plantilla de referencia** — es el input que más
-define el resultado. `templates_banner_list` (source `ecom_magic` | `mine` | `mentor`) y usa el
-`template_url`. Heurística por vertical y por tipo de pieza en `references/campos-generacion.md`.
-Con estilo propio del usuario → `assets_upload(purpose="banner_reference")`.
+La plantilla **es la maqueta que se clona** — el input que MÁS define el resultado, por encima
+del prompt. `templates_banner_list` (source `ecom_magic` | `mine` | `mentor`).
+
+**Regla dura: ABRE el `thumbnail_url` y mírala antes de usarla. Nunca elijas por id.** Descarta la
+que (a) traiga un producto distinto al tuyo, (b) traiga claims dentro del diseño ("garantizado",
+cifras, testimonios) — se copiarán —, o (c) tenga un layout que no sirva al mensaje. Heurística
+por vertical en `references/campos-generacion.md`. Con molde propio →
+`assets_upload(purpose="banner_reference")`.
 
 **Si una referencia ya dio buen resultado, reutilízala** para las demás piezas del mismo
 producto: mantiene coherencia visual en el carrusel (la ves con `banners_get`). Cuando dudes
@@ -212,11 +250,29 @@ El `output.url` del job es la imagen full-res. Pásala por el script (acepta URL
 
 ```bash
 python3 ~/.claude/skills/golden-ecom-magic/scripts/optimizar-webp.py \
-  "<url_del_output>" "PRODUCTO - Carrusel 01.webp" 1080x1080
+  "<url_del_output>" "PRODUCTO - Galeria 01.webp" 2048x2048 300
 ```
 
-Deja cada pieza **< 150 KB** (regla Golden) en `PROYECTOS/<PRODUCTO>/`. Para secciones pasa
-`1080x1350`. Nombra los archivos con el producto adentro (nada de `imagen1.webp`).
+### El tamaño depende del DESTINO (verificado contra Shopify, 2026-09-05)
+
+Shopify **transforma la imagen al servirla**, así que subir chico pone un techo de nitidez que ya
+no se recupera; una infografía embebida en la descripción, en cambio, se sirve tal cual.
+
+| Destino | Tamaño | Peso | Por qué |
+|---|---|---|---|
+| **Galería / multimedia** (Shopify) | **2048×2048** | ~300 KB | Tamaño que Shopify recomienda para cuadradas, y el **zoom exige más de 800×800** |
+| **Infografías en la descripción** | 1080×1350 | **< 150 KB** | Van tal cual al HTML, sin transformación: aquí manda el peso |
+| **Creativos de pauta** | según red | < 150 KB | Los sirve la plataforma de anuncios |
+
+**MEDIDO en la tienda real (no citado), 2026-09-05.** Se pidió la misma imagen del CDN de
+Shopify con distintos `?width=`: `200` devolvió 200×200, `800` devolvió 800×800 — Shopify SÍ
+redimensiona al servir — pero **`2048` devolvió 1088×1088**, el tamaño del original subido.
+**Shopify NUNCA agranda por encima del archivo que subiste:** el tamaño de subida es un techo
+permanente. Por eso subir 1080 condena el zoom a 1080 para siempre, y por eso la galería se
+sube grande. (La conversión a WebP la decide el navegador vía `Accept`; lo medido aquí es el
+redimensionado.) Doc de respaldo: `shopify.com/blog/image-sizes` + Help Center "Product media
+types". Script ejecutado a esa spec: 2048×2048 → 279.3 KB. Nombra con el producto adentro, en
+`PROYECTOS/<PRODUCTO>/`.
 
 ### 6. Entregar
 
@@ -311,10 +367,21 @@ Grep sugerido: `grep -rniE "no tiene (api|mcp)|no hay atajo" ~/.claude/skills`.
 - `references/ui-navegacion.md` — **Fallback.** Mapa de pantallas y trampas de la UI web, para
   cuando el MCP no esté disponible.
 - `scripts/optimizar-webp.py` — Descarga (URL o archivo) → WebP < 150 KB en el tamaño pedido.
+- `references/changelog.md` — **Acta de versiones** (v2.0 → v2.7) con lo que se midió en cada
+  vuelta y por qué cambió. No hace falta para trabajar; léelo si necesitas saber de dónde salió
+  una regla o vas a cambiar una.
 
 ## Fronteras y desambiguacion
 
-Descripcion completa anterior (se conserva para no perder ningun matiz de frontera):
+(Destilado 2026-09-05: aquí estaba pegada la description completa anterior, que arrastraba los
+tamaños viejos y contradecía el tamaño-por-destino del paso 5. Se conservan las fronteras y se
+quita el dato caduco.)
 
-> Golden Group — Fábrica de IMÁGENES de alta conversión con Ecom Magic AI, 100% AUTOMÁTICA por su MCP oficial (sin navegador): genera creativos/infografías con la FOTO REAL del producto + texto de venta compuesto (no redibuja el producto), en el formato que se necesite (carrusel 1080×1080, secciones 1080×1350, stories, 16:9), los descarga y optimiza a WebP <150 KB y los entrega para que otra skill los implemente (golden-shopify para la página, golden-ads para pauta). La foto entra por URL pública (ej. CDN de Shopify), así que el usuario no sube ni arrastra nada. Yo elijo las plantillas, escribo el texto que va DENTRO de cada imagen, superviso pieza por pieza y aprovecho todo el motor (editar, redimensionar, traducir, mockups, reembolso si sale mala). Úsala SIEMPRE que el usuario quiera: generar imágenes/infografías de producto, "haz las imágenes del producto", "genérame el carrusel", "las infografías de la página", "las imágenes de secciones", "creativos para la ficha", o producir el paquete visual de un producto para Shopify. Dispara aunque no digan "Ecom Magic": basta con "imágenes/infografías de producto de alta conversión para la ficha o el carrusel". NO usar para avatares/UGC ni video (eso es golden-ugc-avatar), ni para armar la página en sí (eso es golden-shopify).
-
+- **Entrega a:** `golden-shopify` (la página) y `golden-ads` (pauta). Produce las imágenes; no
+  monta la ficha ni publica campañas.
+- **NO para avatares, personas ni video** → `golden-ugc-avatar`.
+- **NO para armar la página** → `golden-shopify`.
+- **NO para crear un anuncio sin foto de producto**, ni para comparar motores →
+  `golden-imagen-arena`. Aquí el activo es la plantilla; allá, el motor.
+- **Dispara aunque no digan "Ecom Magic":** basta con "imágenes/infografías de producto de alta
+  conversión para la ficha o el carrusel".

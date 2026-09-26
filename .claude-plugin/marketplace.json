@@ -131,7 +131,7 @@
       "name": "golden-ecom-magic",
       "source": "./golden-ecom-magic",
       "description": "Fábrica de imágenes de alta conversión con Ecom Magic AI, con la foto real del producto y texto de venta compuesto.",
-      "version": "2.3.0",
+      "version": "2.7.0",
       "category": "design"
     },
     {
@@ -175,13 +175,6 @@
       "description": "El estándar de PDF de la comunidad: marca, márgenes y bloques que no se parten.",
       "version": "6.7.0",
       "category": "education"
-    },
-    {
-      "name": "golden-productos-ganadores",
-      "source": "./golden-productos-ganadores",
-      "description": "Búsqueda y validación de productos ganadores para COD en LatAm.",
-      "version": "1.10.0",
-      "category": "research"
     },
     {
       "name": "golden-shopify",
@@ -229,7 +222,7 @@
       "name": "golden360",
       "source": "./golden360",
       "description": "La ruta completa: de una foto a vender. Investiga, monta la página, la pauta y el bot, con compuertas de calidad en cada paso.",
-      "version": "2.0.0",
+      "version": "2.3.0",
       "category": "research"
     },
     {
@@ -264,7 +257,36 @@
       "name": "golden-presenta",
       "source": "./golden-presenta",
       "description": "Presentaciones cinematograficas en UN archivo HTML: fondo vivo, camara que viaja por el lienzo, modo presentador y salida a PDF. Sin suscripcion ni dependencias externas.",
-      "version": "2.1.0"
+      "version": "2.1.0",
+      "category": "design"
+    },
+    {
+      "name": "golden-dropkiller-productos-ganadores",
+      "source": "./golden-dropkiller-productos-ganadores",
+      "description": "Caza y valida productos ganadores para contra entrega en LatAm con DropKiller: ventas reales, saturación y precio mínimo viable.",
+      "version": "1.25.0",
+      "category": "research"
+    },
+    {
+      "name": "golden-ebook",
+      "source": "./golden-ebook",
+      "description": "Ebooks de regalo para el cliente mientras su pedido viaja, con fuentes citadas y la marca de la empresa, en PDF para celular.",
+      "version": "1.4.0",
+      "category": "marketing"
+    },
+    {
+      "name": "golden-empaque-3d",
+      "source": "./golden-empaque-3d",
+      "description": "Mesa de empaque en 3D: el empaque gira, se desarma y se despliega como troquel, y cambias colores, textos y acabados en vivo.",
+      "version": "1.0.0",
+      "category": "design"
+    },
+    {
+      "name": "golden-finanzas",
+      "source": "./golden-finanzas",
+      "description": "El director financiero de la empresa: precio y margen con modelo y números para contra entrega, combos, servicios y propuestas.",
+      "version": "1.3.0",
+      "category": "operations"
     }
   ]
 }

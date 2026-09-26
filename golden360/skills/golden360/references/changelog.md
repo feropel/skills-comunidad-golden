@@ -1,22 +1,158 @@
 # Changelog — GOLDEN 360
 
+## R2.3 — 2026-09-05 — Ciclo del mandato v2: lo tipo A cerrado, lo tipo B declarado
+- **Mi propio barrido de acentos había corrompido 3 palabras POR DENTRO.** El par
+  `formula → fórmula` se aplicó como SUBSTRING y se pegó dentro de palabras más largas:
+  **"fábricante"** en la REGLA 2 (la innegociable de veracidad de etiqueta), **"fórmulario COD"**
+  en la Compuerta 4 y **"lecciónes"** en el changelog. Corregidas; barrido de verificación con cero
+  daño restante. **La clase es real: un reemplazo de acentos aplicado como substring corrompe las
+  palabras que CONTIENEN la corta.**
+  **ALCANCE MEDIDO DESPUÉS, y corrige lo que yo insinué:** avisé de esto como si hubiera que repartirlo
+  al arsenal. El Centro de Mando lo midió — **1.131 ficheros, 38 skills, CERO corrupciones vivas**: el
+  daño quedó contenido en esta casa y este ciclo ya lo cerró. Las únicas apariciones restantes eran mis
+  propias actas citando la palabra rota para explicar que la había arreglado. **La clase valía; el
+  alcance era cero, y yo lo di por extendido sin medirlo.** Un aviso urgente se reparte DESPUÉS de
+  medirlo: repartirlo antes habría puesto a 38 fábricas a buscar un daño inexistente.
+- **Dos falsos positivos de mi propio detector:** marcó "ángulos" como corrupto y es plural legítimo.
+  Un detector de daño también necesita saber qué NO es daño. El CdM llegó al fondo de esto midiendo
+  cuatro veces con instrumentos distintos (24 → 38 → 20 → 1 → 0 skills, sin que cambiara un byte del
+  arsenal) y dejó la ley: **un detector hecho de patrones acusa al IDIOMA, no al defecto** — páginas,
+  números, ángulos, críticos, análisis son formas correctas que ningún patrón morfológico distingue de
+  una corrupta. Lo que hay que enumerar son las formas ROTAS, una por una.
+- **Ley aplicada a mi propio detector, y verificada aquí:** el de fronteras se probó con tres
+  redacciones legítimas distintas y CALLA en las tres; el control sin desambiguación MUERDE. Hasta hoy
+  solo lo había probado por el lado malo, que es exactamente el error que la ley describe.
+- **REFINAMIENTO DE golden-ads (vía CdM) QUE ME ENCONTRÓ UN FALSO NEGATIVO:** el lado bueno de una
+  prueba no es prosa inocente, es el **CASO DISFRAZADO** — texto que SE PARECE al dato. Probado: una
+  description que solo CITA la frontera dentro de un acta ("en R2.1 se repuso el bloque que decía
+  NO es para una pieza suelta…") o dentro de un ejemplo **pasaba en VERDE**. Mi detector medía la
+  presencia de unas palabras, no que la regla estuviera ENUNCIADA. Arreglado: la cita se delata por ir
+  entrecomillada o por narrar en vez de enunciar. **6 casos ahora: 3 redacciones legítimas aceptadas,
+  2 disfraces mordidos, 1 control mordido.**
+- **TERCER DISFRAZ, el de AUTORIDAD (golden-presenta vía CdM), medido y cazado:** un texto puede tener
+  la forma EXACTA de una frontera y no mandar sobre nadie aquí — *"Catálogo del arsenal: golden-shopify
+  NO es para pauta, deriva a golden-ads"* pasaba en verde. Su formulación cierra la mía y es mejor:
+  **no basta preguntar "cómo está escrito", hay que preguntar "esto MANDA sobre alguien"**. Resuelto
+  por ESTRUCTURA, no por catálogo de palabras (que acusaría al idioma, contra la ley del CdM): una
+  hermana como SUJETO de la negación es regla ajena; como DESTINO, es regla propia. **Banco de 7:
+  3 legítimas aceptadas, 3 disfraces mordidos, 1 control mordido.**
+  Y el aviso que viene con ella, que me parece el más fino de la noche: acusar un bloque cercado o una
+  cita **castiga justo a quien documenta el error**. Un validador que muerde a las actas empuja a no
+  escribirlas.
+- **BANCO COMPLETO CORRIDO TRAS ESTRECHAR DOS VECES (aviso de golden-shopify vía CdM):** quitar
+  falsos positivos **consiste** en estrechar el criterio, y estrechar es justo el mecanismo que
+  fabrica falsos negativos — él lo midió: arregló 3 disfraces y el mismo arreglo le dejó el caso malo
+  sin morder, 36 de 37. Así que corrí **el lado malo ENTERO**, no solo el disfraz nuevo:
+  **8 de 8 muerden** (3 disfraces · sin frontera · description >1024 · sello sin changelog · name
+  distinto de la carpeta · hija inexistente), y los 4 buenos siguen aceptados. **Banco de 12, los dos
+  lados.** Sin defecto: los dos estrechamientos de hoy no rompieron nada. Se registra la verificación
+  aunque saliera limpia, porque "lo corrí y salió bien" solo vale si dice CUÁNTOS y CUÁLES.
+- **MIRAR LA COSA, NO EL VECINDARIO — el fallo del CdM aplicado a mí, y me encontró DOS.** Él midió
+  que probaba el placeholder contra el CONTEXTO en vez de contra el VALOR, y 4 de 5 credenciales
+  reales quedaban sin detectar. Aquí pasaba lo simétrico: mis señales miraban TODO el texto, así que
+  una frontera propia y sana **MORÍA** si en otra frase aparecía "se repuso" o el nombre de una
+  hermana. Medido: 2 de 3 fronteras legítimas mordidas. Arreglado juzgando **cada aparición por sí
+  misma**, y basta UNA limpia: un texto no deja de establecer su frontera porque además cite la de
+  otro. Tercera vez en la noche que el mismo principio aparece desde un terreno distinto.
+- **Y al ampliar el criterio metí un CRASH que el lado malo no podía ver.** Añadí "NO para" a la
+  lista de marcas y dejé una línea que solo conocía dos de las tres: `ValueError` con una frontera
+  legítima. **Un crash sale con exit 1, exactamente igual que "muerde bien"** — por el lado malo era
+  invisible; lo destapó el lado BUENO. Ahora el banco **mira el traceback, no solo el código de
+  salida**, y la posición se busca con la misma lista MARCAS: dos fuentes de verdad para una lista es
+  la deuda que se paga así.
+- **Mi banco volvió a mentir, y por segunda vez en la noche.** Nombré las carpetas de prueba `g0`,
+  `g1`… y los 6 casos buenos "fallaron": el validador oficial exige que la carpeta se llame como el
+  `name`, así que reprobaba TODO sin que hubiera nada roto. **Un banco mal montado se lee igual que
+  un detector roto.** Las copias se llaman `golden360` desde ahora.
+- **Banco final de 14, los dos lados y sin crashes: 6 buenos aceptados, 8 malos mordidos.**
+- **Y el chequeo declara su límite al pasar**, en vez de dar un verde ciego: mide PRESENCIA de la
+  frontera, no que esté bien redactada. Una cita disfrazada de regla se caza; una regla mal escrita,
+  no. Decir lo que un validador NO cubre es parte de lo que valida.
+- **Sobre el md5 que el CdM no pudo verificar:** el número era reproducible, con la receta canónica de
+  la casa que vive en `golden-skill-auditor` Fase 5 — `find . -type f | sort | xargs md5 -q | md5 -q`
+  —, y reproduce exacto. Su diagnóstico ("el mandato nunca dijo QUÉ se hashea") es correcto sobre el
+  mandato, pero la casa **ya tenía receta escrita**: el hueco no era que faltara, era que el mandato no
+  la citó y la búsqueda no llegó hasta donde estaba. Es la misma familia que "preguntar lo ya guardado
+  es un fallo de proceso", aplicada a una regla de verificación.
+- **Alineación del `--autochequeo` con el oficial, comprobada CORRIENDO y no leyendo:** se saboteó el
+  `name:` para que `agentskills validate` fallara por una causa que este script no implementa
+  (nombre distinto de la carpeta) y el autochequeo la propagó con exit 1. La delegación es real, no
+  decorativa: caza fallos que yo nunca programé, que es justo el punto de delegar.
+- **Arsenal re-derivado ejecutando, no citado:** 15 hijas + 2 auxiliares, 0 faltantes hoy.
+  Compuerta oficial con ruta absoluta: **Valid skill, exit 0**.
+- **PARA EL 1000 ME FALTA: una corrida real de punta a punta — una foto entrando por el Bloque 1 y
+  saliendo por la Compuerta 4, con las 4 compuertas dictando sobre un producto que existe. Lo puede
+  dar: FER (una corrida real). No lo puedo cerrar yo.**
+  Techo alcanzable hoy: **985**. Borrar esa reserva para escribir 1000 sería inflar el número en vez
+  de mejorar la skill, que es exactamente lo que el mandato v2 prohíbe.
+
+## R2.2 — 2026-09-05 — El tope estaba equivocado: la skill estaba INVÁLIDA y mi validador lo tapaba
+- **Lo cazó el Centro de Mando; lo confirmé ejecutando el oficial antes de aceptarlo:**
+  `agentskills validate` → código 1, *"Description exceeds 1024 character limit (1276 chars)"*.
+- **El error, en una línea:** R2.1 usó **~1536** como tope. Ese número es el **truncado de RUNTIME**
+  (donde el motor corta el listado al cargar). El que decide si la skill es válida es **1024, el
+  límite de VALIDACIÓN de la especificación**. Son dos mecanismos distintos y los mezclé.
+- **Lo grave no fue el número, fue dónde lo puse:** lo horneé en `--autochequeo`. Un validador con el
+  umbral mal puesto da VERDE sobre una skill inválida — es peor que no tener validador, porque
+  además tranquiliza. Ahora el autochequeo **corre el `agentskills validate` oficial** y solo usa el
+  conteo propio como respaldo si el binario no está en PATH.
+- **Recorte hecho donde no duele:** 1.276 → **1.004** caracteres sin tocar las FRONTERAS. Se fue la
+  enumeración de las seis hermanas una a una (cara, y el usuario no las nombra al invocar) y los
+  sinónimos repetidos de invocación. La desambiguación queda entera y al 38% del texto.
+  Oficial: **Valid skill, exit 0**.
+- **Un falso rojo propio, corregido:** el detector de fronteras exigía el carácter `→`. Al recortar
+  desapareció la flecha y gritó rojo sobre una frontera que estaba perfectamente. Ahora las reconoce
+  por SENTIDO (un "NO es para X" que además dice a dónde va lo que no es de esta skill), no por un
+  carácter tipográfico. **Atar un chequeo a un símbolo es atarlo a la moda de quien redacta.**
+- **Probado contra sabotaje**, como manda la higiene: description de 1.180 → oficial exit 1 y
+  autochequeo exit 1. El primer intento de sabotaje NO mordió porque el patrón de reemplazo no casó
+  y el relleno nunca entró — o sea el sabotaje falló, no el detector; se rehizo sin depender del
+  texto exacto. Un banco de pruebas también se verifica.
+- **DOS TECHOS, escritos ya en el SKILL.md** para que nadie los vuelva a mezclar: 1024 valida,
+  ~1536 trunca.
+
+## R2.1 — 2026-09-05 — Automejora: lo que se rompía en prosa ahora es candado ejecutable
+- Pedido de FER: *"qué te falta para ser mil"*. Se midió, se cerró lo cerrable y se declara lo que no.
+- **Las FRONTERAS de la description habían desaparecido.** El recorte del 3-sep (de 1.344 a 998
+  caracteres) se llevó el bloque "NO es para una pieza suelta — deriva a…". En un ORQUESTADOR que
+  compite con ocho hermanas, esa es la línea que evita que se dispare cuando pedían solo la página o
+  solo la pauta. Repuestas, y **reubicadas al 32% del texto**: el truncado del listado muerde por el
+  final, así que la desambiguación ya no puede volver a caerse por ahí. 1.276 de 1.536 caracteres.
+- **Es la SEGUNDA vez que pasa** (7-ago y 3-sep), así que se atacó la clase, no el caso:
+  **`candado.py --autochequeo`** verifica ahora que la description conserve las fronteras y quepa en
+  el tope, que el sello más nuevo tenga entrada en el changelog, y que toda hija declarada exista en
+  disco. Una regla que no se puede correr no es una regla: es un buen propósito.
+- **El validador se probó contra casos malos** (higiene de FER: si pasa a la primera, sospecha del
+  script). Con las fronteras borradas → falla, exit 1. Con un sello R9.9 sin entrada de changelog →
+  falla, exit 1. Muerde.
+- **SIMULACRO del camino feliz**, que en cinco meses nunca se había corrido: se armó un paquete
+  completo de fixture (expediente con las 2 compuertas, .docx, PAUTA, ORGANICO, CHATEA-PRO con sus 2
+  piezas, README con la ruta del cerebro, /creativos con GIF y PDF) → **PAQUETE COMPLETO, exit 0**.
+  Hasta hoy el candado solo se había visto FALLAR; un script probado en una sola dirección puede
+  tener el camino feliz roto y nadie lo sabría.
+- **Acentos:** la entrada R2.0 y su sello venían sin tildes (escribia, organico, angulo, leccion,
+  autorizacion, fabrica, acompana, enseno) — 26 correcciones, sin tocar el contenido.
+- **Lo que NO se cierra con código, y por eso no hay mil:** la ruta sigue **sin correrse entera con un
+  producto real**. Está auditada, simulada y blindada; no estrenada. Esa reserva la cierra un producto,
+  no un commit.
+
 ## R2.0 — 2026-09-03 — FASE 5B · Teardown de los creativos (encargo de FER)
 
-- **El copy se escribia sin haber desarmado el video.** La ruta iba Fase 5 (creativos) → Fase 6
-  (organico) → Fase 7 (pauta), y en ninguna parada alguien miraba el video segundo a segundo antes
-  de escribir el texto que lo iba a acompanar. Textual de FER: *"ya tengo los videos, entonces voy a
+- **El copy se escribía sin haber desarmado el video.** La ruta iba Fase 5 (creativos) → Fase 6
+  (orgánico) → Fase 7 (pauta), y en ninguna parada alguien miraba el video segundo a segundo antes
+  de escribir el texto que lo iba a acompañar. Textual de FER: *"ya tengo los videos, entonces voy a
   analizar cada video y analizar cada imagen, y con la skill de copywriting voy a crearle sus copys
   a cada anuncio"*.
 - **Nace la FASE 5B**, entre la Compuerta 2 y el Bloque 3: cada video pasa por `golden-video-teardown`
-  y su ficha (beat sheet, angulo, copy quemado, formula) entra al contexto de `golden-copywriting` y
+  y su ficha (beat sheet, ángulo, copy quemado, fórmula) entra al contexto de `golden-copywriting` y
   `golden-ads`. El argumento en una frase: **escribir el copy sin ver el video es narrar un partido
   por radio sin verlo.**
-- **Se tocaron las CUATRO caras**, que es la leccion que dejo R1.9 cuando una dependencia obligatoria
-  "no existia para el sistema" por estar solo en la prosa: la fase en el cuerpo, la fila en la tabla
+- **Se tocaron las CUATRO caras**, que es la lección que dejó R1.9 cuando una dependencia obligatoria
+  "no existía para el sistema" por estar solo en la prosa: la fase en el cuerpo, la fila en la tabla
   REQUISITOS, la entrada en `HIJAS` de `candado.py` y este changelog con su sello.
-- **Frontera declarada:** el rendimiento en numeros (CPA, ROAS, que pausar) sigue siendo de
+- **Frontera declarada:** el rendimiento en números (CPA, ROAS, qué pausar) sigue siendo de
   `golden-meta-ads-analysis` en la Fase 10; 5B es lectura del creativo, no de la cuenta.
-- Ejecutado por el **Centro de Mando** con autorizacion expresa de FER, por estar cerrada la fabrica
+- Ejecutado por el **Centro de Mando** con autorización expresa de FER, por estar cerrada la fábrica
   (chat exclusivo golden360). Origen del hallazgo: chat EL CARTEL DEL CHAT, preparando la charla.
 
 ## R1.9 — 2026-08-24 — Auditoría fresca (918 base · 903 con reserva → PLATA, reparada)
@@ -45,7 +181,7 @@
   próxima poda de sellos. Ahora los 6 sellos van juntos bajo el H1, como manda el patrón de la casa.
 - Menores: `seo-aio-producto.md` citaba `claude-seo-ai` a secas cuando el SKILL.md ya lo precisó como
   `claude-seo-ai:audit` (es un PLUGIN); y la adenda del CdM venía sin tildes ("no leian", "identico",
-  "fabrica") — corregidas sin tocar su contenido.
+  "fábrica") — corregidas sin tocar su contenido.
 - Verificado ejecutando, no citando: `ast.parse` limpio · `candado.py --skills` corrido → ecosistema
   completo con la hija nueva · inventario 0 rotas / 0 huérfanas / 0 dudosos · blindaje 12 de 12 nodos ·
   sin secretos · sin signos de apertura.

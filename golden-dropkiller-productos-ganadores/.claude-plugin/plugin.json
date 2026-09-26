@@ -1,0 +1,18 @@
+{
+  "name": "golden-dropkiller-productos-ganadores",
+  "version": "1.25.0",
+  "description": "Caza y valida productos ganadores para contra entrega en LatAm con DropKiller: ventas reales, saturación y precio mínimo viable.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "dropkiller",
+    "productos",
+    "validacion",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-dropkiller-productos-ganadores/"
+  ]
+}

@@ -35,9 +35,10 @@ conectado, dale los 4 pasos de arriba; mientras, puedes operar por navegador.
 1. `wallet_balance` → reporta créditos.
 2. `products_list` → si el producto existe, **reutiliza su `id`**: trae foto y campos de
    marketing guardados (ahorra trabajo y mantiene coherencia). Si no, `products_create`.
-3. `templates_banner_list` → elige `template_url` de referencia (heurística en
-   `campos-generacion.md`). Para repetir un estilo que ya funcionó, reutiliza la misma URL de
-   referencia (la ves con `banners_get` de una pieza previa).
+3. `templates_banner_list` → **abre el `thumbnail_url` y MIRA la plantilla** antes de elegir su
+   `template_url` (heurística en `campos-generacion.md`). Nunca por id: el motor la clona. Para
+   repetir un estilo que ya funcionó, reutiliza la misma URL de referencia (la ves con
+   `banners_get` de una pieza previa).
 4. `banners_generate` con los parámetros de abajo → devuelve `job_id`.
 5. `jobs_get(job_id)` en bucle (3-5 s) hasta `succeeded`; el `output.url` es la imagen.
 6. `curl` la URL → optimiza a **WebP < 150 KB** con `scripts/optimizar-webp.py` → entrega.
@@ -47,11 +48,15 @@ gran ventaja: **no hay que subir ni arrastrar nada**. Si solo hay archivo local,
 
 ## Parámetros de `banners_generate` (los que usamos)
 
-**Obligatorio:** `reference_banner_url` (estilo a imitar).
+**Obligatorio:** `reference_banner_url` — **la maqueta que se clona** (ver gotcha nº0), no un estilo a imitar.
 **Foto:** `product_image_url` (+ `_2_url`, `_3_url`, hasta 3) o `product_id`.
 **Formato:** `size_preset` — `1080x1080` (carrusel) · `1080x1920` (stories) · `1920x1080` (16:9
 del cine) · `original` · `custom` (+`width`/`height` 64-4096). **Ojo: `1080x1350` NO es preset;
-para vertical de secciones usa `size_preset:"custom", width:1080, height:1350`.**
+para vertical de secciones se usa `size_preset:"custom", width:1080, height:1350`.**
+⚠️ **Riesgo medido:** en algunas sesiones los argumentos numéricos llegan al servidor como string
+y `banners_generate` responde `expected number, received string`. Si eso pasa, NO insistas: genera
+en un preset cuadrado y pásalo a vertical con `banners_resize`, o declara el límite. Las llamadas
+solo-string son las que nunca fallan.
 **Idioma:** `language: "Spanish"`. **Motor:** `model: "ecomagic"` (default) o `"gpt-image-2"`.
 **Calidad:** `thinking_mode: "advanced"` para piezas clave (vale la pena; mismo costo).
 **Contexto:** `product_details`, `sales_angle`, `specific_problem`, `target_avatar`,
@@ -68,6 +73,16 @@ centavos). Opcionales `maw_satisfaction_guarantee`, `maw_quality_guarantee`,
 ficha, `product_aware` o `solution_aware` suelen ir mejor que `most_aware`.
 
 ## Gotchas verificados en vivo
+
+- 🔴🔴 **EL MOTOR CLONA LA PLANTILLA E IGNORA EL PROMPT (el fallo nº0, gobierna todo lo demás).**
+  Medido 2026-09-04: con la plantilla 1562 elegida **por id** (resultó ser un anuncio de sombras
+  de ojos) se pidió una mujer en una oficina con titular y paleta propios → devolvió el anuncio
+  de sombras de ojos, con sus potes y su texto. **Del prompt no sobrevivió nada** y costó 1
+  crédito. `reference_banner_url` es **la maqueta que se rellena**, no inspiración.
+  → **ABRE el `thumbnail_url` y mira la plantilla antes de usarla; nunca elijas por id.**
+  → Descarta plantillas con otro producto o con claims dentro del diseño: **se copian**.
+  → Sin foto de producto propia, este motor no sirve para crear desde cero (eso es
+  `golden-imagen-arena`). Aquí el activo es la plantilla, no el motor.
 
 - 🔴 **ETIQUETA ALTERADA / INGREDIENTES INVENTADOS (el peligro nº1).** El generador puede
   **redibujar el envase y escribirle ingredientes falsos**. Caso real: puso "Ácido Salicílico ·

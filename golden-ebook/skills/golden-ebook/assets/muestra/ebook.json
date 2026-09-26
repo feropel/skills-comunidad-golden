@@ -1,0 +1,440 @@
+{
+  "meta": {
+    "titulo": "Lo que nadie te contó de tu pelo",
+    "subtitulo": "Mitos de peluquería, ciencia de verdad y los hábitos que sí cuidan el cabello que tienes.",
+    "anio": 2026,
+    "idioma": "es-CO",
+    "formato": "movil",
+    "palabras_clave": [
+      "cabello",
+      "mitos",
+      "caída del pelo",
+      "cuidado capilar"
+    ]
+  },
+  "marca": {
+    "nombre": "Marca Demo",
+    "logo": "logo-demo.png",
+    "web": "example.com",
+    "colores": {
+      "primario": "#12324a",
+      "acento": "#e9a23b",
+      "acento_texto": "#8a5a12",
+      "fondo": "#fbfaf7",
+      "texto": "#14202b"
+    },
+    "fuente_de_verdad": "MUESTRA de la autoprueba: colores de demostración, no son de ninguna marca real"
+  },
+  "producto": {
+    "nombre": "Producto Demo",
+    "alias": [
+      "fibra capilar"
+    ],
+    "claims_prohibidos": [
+      "hace crecer el cabello",
+      "cura la alopecia",
+      "detiene la caída"
+    ]
+  },
+  "tema": {
+    "titulo_tema": "Mitos y ciencia del cabello",
+    "familia": "mitos-vs-evidencia",
+    "puente": "Quien compra fibra capilar vive pendiente de su pelo y ha oído cien consejos contradictorios. El libro le da criterio: qué es normal, qué es mito y qué sí cuida lo que tiene, sin prometer lo que ningún producto cosmético puede prometer."
+  },
+  "portada": {
+    "kicker": "Guía de cabello · edición 2026"
+  },
+  "bienvenida": {
+    "kicker": "Antes de empezar",
+    "titulo": "Tu pedido ya va en camino. Esto es para el viaje.",
+    "texto": "Mientras tu Producto Demo llega, queremos regalarte algo que casi nadie explica bien: cómo funciona de verdad tu pelo.\n\nTodos hemos oído que la gorra deja calvo o que afeitarse vuelve el pelo más grueso. Algunas de esas frases son falsas y otras merecen atención.\n\nCada dato trae un número entre corchetes que te lleva a su fuente, al final del libro. Son seis capítulos cortos y cada uno termina con algo que puedes aplicar hoy.",
+    "firma": "El equipo de Marca Demo"
+  },
+  "capitulos": [
+    {
+      "titulo": "Tu pelo vive en ciclos (y eso cambia todo)",
+      "gancho": "Cada pelo de tu cabeza tiene su propio reloj. Entenderlo es la diferencia entre preocuparte por nada y detectar a tiempo lo que sí importa.",
+      "bloques": [
+        {
+          "tipo": "parrafo",
+          "texto": "Tu cuero cabelludo tiene unos cien mil folículos o más, las pequeñas estructuras de donde nace cada pelo [2]. Cada pelo pasa por su propio ciclo de crecimiento, reposo y caída [2], y por eso a diario se sueltan unos cuantos y no todos de golpe [1].\n\nLos dermatólogos dividen la vida de un pelo en tres etapas. Conocerlas te va a servir para leer lo que ves en el cepillo, en la almohada o en el desagüe de la ducha."
+        },
+        {
+          "tipo": "subtitulo",
+          "texto": "Las tres etapas de un pelo"
+        },
+        {
+          "tipo": "lista",
+          "items": [
+            "**Crecimiento (anágena):** el pelo crece de forma activa. Esta etapa dura de dos a ocho años [2].",
+            "**Transición (catágena):** el folículo se encoge y el pelo deja de crecer. Dura unas dos a seis semanas [2].",
+            "**Reposo y caída (telógena):** el pelo descansa y termina por soltarse para dejar sitio a uno nuevo. Dura unos dos a cuatro meses [2]."
+          ]
+        },
+        {
+          "tipo": "parrafo",
+          "texto": "Esa última etapa explica algo que asusta a mucha gente sin motivo: ver pelos sueltos todos los días es parte del ciclo normal. No es el pelo que \"se está muriendo\", es el que ya cumplió su turno."
+        },
+        {
+          "tipo": "dato",
+          "cifra": "50 a 100",
+          "texto": "pelos al día es lo normal que se desprende, según la Academia Americana de Dermatología.",
+          "fuente": 1
+        },
+        {
+          "tipo": "parrafo",
+          "texto": "Cleveland Clinic amplía el rango hasta unos 150 pelos diarios [2].\n\nLa pregunta útil, entonces, no es \"¿se me cae el pelo?\", porque a todos se nos cae. La pregunta útil es si la cantidad cambió de forma clara y sostenida, o si aparecieron zonas donde antes no se veía el cuero cabelludo."
+        },
+        {
+          "tipo": "prueba_hoy",
+          "titulo": "Pruébalo hoy",
+          "items": [
+            "Deja de contar pelos uno por uno: lo que importa es la tendencia, no el número de un día.",
+            "Toma una foto de tu cabeza con la misma luz y el mismo ángulo, y repítela en un mes. La comparación honesta está en la tendencia, no en el día.",
+            "Si notas un cambio brusco, anota qué pasó en tu vida unos meses antes. En el capítulo 4 vas a entender por qué."
+          ]
+        }
+      ],
+      "cierre": "Si la caída diaria es normal, ¿de dónde salió la idea de que la gorra tiene la culpa? Un estudio con gemelos idénticos dio una respuesta que casi nadie espera."
+    },
+    {
+      "titulo": "La gorra no es la culpable",
+      "gancho": "Seguro lo has oído en alguna barbería. La ciencia lo puso a prueba con un método muy ingenioso: comparar gemelos idénticos.",
+      "bloques": [
+        {
+          "tipo": "parrafo",
+          "texto": "Si alguna vez te dijeron que la gorra \"ahoga\" el pelo y te va a dejar calvo, no eres el único. La idea tiene lógica aparente: la gorra aprieta, tapa y calienta. Pero la lógica aparente no es evidencia.\n\nPara separar lo que viene de los genes de lo que viene de los hábitos, un grupo de cirujanos plásticos de Estados Unidos estudió a 92 hombres que eran gemelos idénticos [3]. Como dos gemelos idénticos comparten los mismos genes, si uno pierde más pelo que el otro, esa diferencia no se explica por la herencia; por eso los investigadores buscaron qué hábitos la acompañaban."
+        },
+        {
+          "tipo": "dato",
+          "cifra": "92",
+          "texto": "gemelos idénticos fueron fotografiados y comparados para medir qué hábitos se asociaban con más o menos pérdida de pelo.",
+          "fuente": 3
+        },
+        {
+          "tipo": "parrafo",
+          "texto": "¿Y la gorra? El uso diario de gorra o sombrero se asoció con **menos** pérdida de pelo en las sienes, no con más [3]. Ojo: una asociación no prueba que la gorra proteja el pelo. Lo que sí deja claro es que el estudio no encontró la relación que el mito da por segura.\n\nEn cambio, otros hábitos sí aparecieron ligados a más pérdida de pelo en algunas zonas: fumar durante más años, tener caspa, beber más de cuatro tragos a la semana y vivir periodos largos de estrés [3]."
+        },
+        {
+          "tipo": "mito",
+          "mito": "Usar gorra todos los días te deja calvo.",
+          "realidad": "No hay evidencia de que una gorra normal cause calvicie. En gemelos idénticos, el uso diario de gorra incluso se asoció con menos pérdida en las sienes.",
+          "fuente": 3
+        },
+        {
+          "tipo": "subtitulo",
+          "texto": "Donde el mito sí tiene un grano de verdad"
+        },
+        {
+          "tipo": "parrafo",
+          "texto": "Hay un caso en el que lo que llevas en la cabeza sí importa: cuando **tira** del pelo de forma constante. Los tocados muy ajustados que se usan muchas horas al día pueden causar alopecia por tracción, una pérdida de pelo provocada por la tensión repetida sobre el folículo [4].\n\nUna encuesta citada por Medical News Today encontró pérdida de pelo en el 34 % de las mujeres que usaban hiyab entre 7 y 9 horas diarias, frente al 3 % de quienes lo usaban menos de 3 horas [4]. La diferencia no es la tela: es la tensión y el tiempo."
+        },
+        {
+          "tipo": "prueba_hoy",
+          "titulo": "Pruébalo hoy",
+          "items": [
+            "Si usas gorra, elige tu talla y ajústala sin que deje marca roja en la frente.",
+            "Quítatela unas horas al día y lávala con frecuencia.",
+            "Si al quitártela sientes ardor o tirantez, está demasiado apretada."
+          ]
+        }
+      ],
+      "cierre": "La gorra quedó absuelta. Pero hay otros tres consejos de peluquería que seguramente te repitieron desde niño. Vamos a revisarlos uno por uno."
+    },
+    {
+      "titulo": "Afeitar, lavar, peinar: mitos de peluquería",
+      "gancho": "Hay consejos que pasan de generación en generación sin que nadie los compruebe. Algunos se estudian desde hace casi cien años.",
+      "bloques": [
+        {
+          "tipo": "parrafo",
+          "texto": "En 1928, la revista *The Anatomical Record* publicó un trabajo de Mildred Trotter con un título directo: *Hair growth and shaving*, crecimiento del pelo y afeitado [6]. Casi un siglo después, el mito sigue vivo: que afeitarse hace que el pelo salga más grueso, más oscuro y más rápido."
+        },
+        {
+          "tipo": "mito",
+          "mito": "Si te afeitas o te rapas, el pelo vuelve a salir más grueso y más oscuro.",
+          "realidad": "Afeitar solo corta el pelo al nivel de la piel. El extremo romo del pelo nuevo da la ilusión de que es más oscuro y más grueso, pero no lo es.",
+          "fuente": 5
+        },
+        {
+          "tipo": "parrafo",
+          "texto": "La explicación es visual. Un pelo que crece por su cuenta termina en punta fina. Uno que fue cortado a ras termina en un borde plano, que al tacto se siente áspero y a la vista parece más oscuro, sobre todo contra la piel recién afeitada [5]. El folículo, que es donde se decide cómo sale el pelo, no se entera de que pasó una cuchilla por encima."
+        },
+        {
+          "tipo": "subtitulo",
+          "texto": "¿Cada cuánto hay que lavarse el pelo?"
+        },
+        {
+          "tipo": "parrafo",
+          "texto": "Aquí no hay una regla única: depende de tu tipo de pelo y de qué tan rápido se engrasa tu cuero cabelludo [7]. La recomendación de los dermatólogos es lavarlo según qué tan rápido se ensucia o se engrasa: un cuero cabelludo graso puede necesitar lavado diario, mientras que el pelo rizado o texturizado puede necesitarlo al menos cada dos o tres semanas [7]."
+        },
+        {
+          "tipo": "lista",
+          "titulo": "Cómo lavar sin maltratar",
+          "items": [
+            "Aplica el champú en el cuero cabelludo, no a lo largo de todo el pelo [7].",
+            "Usa acondicionador después de cada lavado; en pelo fino, solo en las puntas [7].",
+            "Seca envolviendo el pelo en una toalla o una camiseta, sin frotar con fuerza [7].",
+            "Desenreda el pelo mojado con peine de dientes anchos, empezando por las puntas [7]."
+          ]
+        },
+        {
+          "tipo": "parrafo",
+          "texto": "El calor también cuenta. La misma guía recomienda limitar el secador y las planchas, usar temperaturas bajas o medias y aplicar un protector térmico [7]. El pelo que ya tienes merece que lo trates con cuidado."
+        },
+        {
+          "tipo": "prueba_hoy",
+          "titulo": "Pruébalo hoy",
+          "items": [
+            "Aplica el champú solo en el cuero cabelludo en tu próxima ducha [7].",
+            "Cambia el cepillo por un peine de dientes anchos cuando tengas el pelo mojado [7].",
+            "Baja un nivel la temperatura del secador o de la plancha [7]."
+          ]
+        }
+      ],
+      "cierre": "Hasta aquí, hábitos del día a día. Pero hay un factor que actúa en silencio, con meses de retraso, y que explica muchos sustos: el estrés."
+    },
+    {
+      "titulo": "El estrés deja huella... tres meses después",
+      "gancho": "¿Te ha pasado que un día empiezas a ver más pelo en la ducha y no entiendes por qué? La respuesta casi nunca está en lo que pasó esa semana.",
+      "bloques": [
+        {
+          "tipo": "parrafo",
+          "texto": "Los dermatólogos distinguen entre **caída de pelo** y **desprendimiento excesivo**. El segundo tiene nombre técnico, efluvio telógeno, y es cuando el cuerpo suelta muchos más pelos de lo normal cada día [1].\n\nLo sorprendente es el calendario: la mayoría de las personas nota el desprendimiento unos meses después del evento que lo provocó [1]. Por eso es fácil no relacionarlo con la causa real."
+        },
+        {
+          "tipo": "lista",
+          "titulo": "Situaciones que pueden provocarlo",
+          "items": [
+            "Bajar de peso de forma marcada: la academia habla de 20 libras o más, unos 9 kilos [1].",
+            "Un parto: el desprendimiento suele verse unos dos meses después y llega a su punto más alto hacia los cuatro meses [1].",
+            "Un periodo de estrés fuerte, como cuidar a un familiar enfermo, un divorcio o perder el trabajo [1].",
+            "Una fiebre alta, una enfermedad o una cirugía [1].",
+            "Dejar de tomar pastillas anticonceptivas [1]."
+          ]
+        },
+        {
+          "tipo": "dato",
+          "cifra": "6 a 9 meses",
+          "texto": "es el tiempo en que el pelo suele recuperar su volumen normal cuando el desprendimiento se debe a un evento puntual.",
+          "fuente": 1
+        },
+        {
+          "tipo": "parrafo",
+          "texto": "La Academia Americana de Dermatología describe este desprendimiento como normal y temporal, con una advertencia: si el estrés continúa, el desprendimiento también puede prolongarse [1].\n\nEl estudio de gemelos del capítulo 2 apunta en la misma dirección: entre hermanos con los mismos genes, los periodos de estrés más largos se asociaron con más pérdida de pelo en la coronilla [3]."
+        },
+        {
+          "tipo": "cita",
+          "texto": "La mayoría de las personas nota el desprendimiento excesivo unos meses después del evento estresante.",
+          "autor": "Academia Americana de Dermatología [1]"
+        },
+        {
+          "tipo": "prueba_hoy",
+          "titulo": "Pruébalo hoy",
+          "items": [
+            "Si ves más pelo de lo normal, mira el calendario hacia atrás: ¿hubo una enfermedad, un parto o una temporada difícil hace unos meses?",
+            "Si atraviesas una temporada difícil, recuerda que este desprendimiento suele ser temporal [1].",
+            "Si el desprendimiento no cede o aparecen zonas despobladas, consulta a un dermatólogo."
+          ]
+        }
+      ],
+      "cierre": "Hasta ahora hablamos de lo que pasa en tu cabeza. El próximo capítulo es sobre lo que pasa en la cabeza de los demás cuando te ven por primera vez."
+    },
+    {
+      "titulo": "Lo que deciden de ti en una décima de segundo",
+      "gancho": "Unos investigadores de la Universidad de Princeton midieron cuánto tarda una persona en formarse una impresión de alguien. El resultado es casi un parpadeo.",
+      "bloques": [
+        {
+          "tipo": "parrafo",
+          "texto": "En 2006, los psicólogos Janine Willis y Alexander Todorov mostraron fotos de rostros desconocidos a un grupo de personas durante tiempos muy cortos, y les pidieron juzgar rasgos como el atractivo, la simpatía, la confianza, la competencia y la agresividad [10].\n\nDescubrieron que con solo 100 milisegundos, una décima de segundo, los juicios ya se parecían mucho a los que la gente hacía sin límite de tiempo [10]."
+        },
+        {
+          "tipo": "dato",
+          "cifra": "100 ms",
+          "texto": "bastaron para que los participantes se formaran una impresión de un rostro muy parecida a la que hacían sin límite de tiempo.",
+          "fuente": 10
+        },
+        {
+          "tipo": "parrafo",
+          "texto": "Hay un detalle todavía más interesante: con más tiempo, las impresiones se volvían algo más negativas y más matizadas, y también crecía la seguridad con la que la gente las sostenía [10]. Los propios autores lo plantean así: el tiempo extra quizá solo aumente la confianza en el juicio [10].\n\nEsto no significa que una primera impresión sea definitiva ni que dependa solo del pelo. El estudio midió rostros completos, no peinados. Lo que sí muestra es que el primer juicio sobre alguien se forma antes de que diga una palabra [10]."
+        },
+        {
+          "tipo": "nota",
+          "titulo": "La otra mitad de la historia",
+          "texto": "El estudio midió cómo juzgamos a otros, no cómo nos sentimos nosotros. Pero vale la pregunta: si la imagen trabaja tan rápido, ¿cuánto de lo que dices se pierde cuando estás pendiente de cómo te ves? Sentirte a gusto con lo que ves en el espejo no es vanidad; es poder concentrarte en la conversación."
+        },
+        {
+          "tipo": "prueba_hoy",
+          "titulo": "Pruébalo hoy",
+          "items": [
+            "Antes de una reunión o una cita, dedica dos minutos a tu arreglo personal. No para impresionar: para dejar de pensar en eso.",
+            "Mira a los ojos al saludar.",
+            "Toma una foto tuya con buena luz natural y compárala con una de luz artificial."
+          ]
+        }
+      ],
+      "cierre": "Ya sabes qué es normal, qué es mito y por qué la imagen importa. Queda lo más útil: una rutina sencilla, respaldada por dermatólogos, para cuidar el pelo que tienes."
+    },
+    {
+      "titulo": "Cuidar el pelo que tienes: la rutina de los dermatólogos",
+      "gancho": "No hace falta una repisa llena de productos. Unos cuantos hábitos recomendados por dermatólogos ayudan a cuidarlo [7].",
+      "bloques": [
+        {
+          "tipo": "subtitulo",
+          "texto": "Primero, lo que no hay que hacer"
+        },
+        {
+          "tipo": "parrafo",
+          "texto": "Los peinados que tiran del pelo pueden hacer más daño del que parece [8]. La Academia Americana de Dermatología advierte que las trenzas muy apretadas, las colas de caballo tirantes, los moños y las extensiones o tejidos, sobre todo en pelo alisado químicamente, pueden causar alopecia por tracción, y que este tipo de pérdida puede volverse permanente cuanto más tiempo pasa sin atenderse [8]."
+        },
+        {
+          "tipo": "lista",
+          "titulo": "Señales de que un peinado está demasiado tirante",
+          "items": [
+            "Dolor en el cuero cabelludo [8].",
+            "Ardor en el cuero cabelludo [8].",
+            "Costras [8].",
+            "Zonas de piel que se levantan como una carpa cuando el pelo está recogido [8]."
+          ]
+        },
+        {
+          "tipo": "parrafo",
+          "texto": "Si notas alguna de estas señales, la recomendación es soltar el peinado, alternar estilos y darle descanso al pelo [8]."
+        },
+        {
+          "tipo": "subtitulo",
+          "texto": "La causa más común no es un hábito"
+        },
+        {
+          "tipo": "parrafo",
+          "texto": "La pérdida de pelo hereditaria, también llamada alopecia androgenética, es la causa más común de pérdida de pelo en el mundo, tanto en hombres como en mujeres [9]. Puede empezar desde la adolescencia, aunque lo habitual es que aparezca más tarde [9].\n\nY aquí está el consejo más valioso de todo este libro: si sospechas que tu caso es hereditario, no esperes. Según la misma academia, cuanto antes se empieza un tratamiento médico, mejor funciona [9]. Eso lo define un dermatólogo, no una tienda ni un video de internet."
+        },
+        {
+          "tipo": "lista",
+          "titulo": "Cuándo ir al dermatólogo",
+          "items": [
+            "Si notas que el desprendimiento aumentó [2].",
+            "Si aparecen zonas ralas o calvas [2].",
+            "Si cambia la línea de nacimiento del pelo [2].",
+            "Si el cuero cabelludo está sensible o irritado [2]."
+          ]
+        },
+        {
+          "tipo": "prueba_hoy",
+          "titulo": "Tu rutina desde hoy",
+          "items": [
+            "Lava según tu tipo de pelo y aplica el champú en el cuero cabelludo [7].",
+            "Acondicionador siempre; seca sin frotar [7].",
+            "Peine de dientes anchos con el pelo mojado [7].",
+            "Menos calor, y con protector térmico cuando lo uses [7].",
+            "Peinados flojos y variados [8].",
+            "Una foto al mes con la misma luz para ver la tendencia real."
+          ]
+        }
+      ],
+      "cierre": "Cuidar la salud de tu pelo es una tarea de largo plazo, y ahora sabes por dónde empezar."
+    }
+  ],
+  "cierre": {
+    "kicker": "Para cerrar",
+    "titulo": "Cuando llegue tu pedido",
+    "texto": "Ya sabes que perder pelo cada día es normal, que la gorra no es la villana y que, ante algo hereditario, consultar pronto a un dermatólogo ayuda [9].\n\nTu Producto Demo es un aliado cosmético: cubre al instante las zonas ralas, y no reemplaza la consulta con el dermatólogo del capítulo 6. Aplícalo sobre el pelo seco y fíjalo con el spray fijador para que resista el viento y el sudor.\n\nSi tienes dudas con tu pedido, escríbenos.",
+    "cta": {
+      "texto": "Conocer más de nuestra empresa",
+      "url": "https://example.com"
+    }
+  },
+  "fuentes": [
+    {
+      "id": 1,
+      "titulo": "Do you have hair loss or hair shedding?",
+      "editor": "American Academy of Dermatology",
+      "url": "https://www.aad.org/public/diseases/hair-loss/insider/shedding",
+      "nivel": "A",
+      "consultado": "2026-09-17",
+      "nivel_porque": "academia médica profesional de dermatología de Estados Unidos"
+    },
+    {
+      "id": 2,
+      "titulo": "When To Worry About Hair Loss",
+      "editor": "Cleveland Clinic",
+      "anio": 2026,
+      "url": "https://health.clevelandclinic.org/how-much-hair-loss-is-normal",
+      "nivel": "B",
+      "consultado": "2026-09-17"
+    },
+    {
+      "id": 3,
+      "titulo": "The contribution of endogenous and exogenous factors to male alopecia: a study of identical twins",
+      "editor": "Gatherwright J. y otros, Plastic and Reconstructive Surgery 131(5)",
+      "anio": 2013,
+      "url": "https://doi.org/10.1097/PRS.0b013e3182865ca9",
+      "nivel": "A",
+      "consultado": "2026-09-17"
+    },
+    {
+      "id": 4,
+      "titulo": "Can wearing a hat cause hair loss? Research and more",
+      "editor": "Medical News Today (revisión médica de Cynthia Cobb, DNP)",
+      "anio": 2026,
+      "url": "https://www.medicalnewstoday.com/articles/can-wearing-a-hat-cause-hair-loss",
+      "nivel": "C",
+      "consultado": "2026-09-17"
+    },
+    {
+      "id": 5,
+      "titulo": "Does Shaving Hair Cause it to Grow Back Faster, Darker and Coarser?",
+      "editor": "UAMS Health, University of Arkansas for Medical Sciences",
+      "anio": 2019,
+      "url": "https://uamshealth.com/medical-myths/does-shaving-hair-cause-it-to-grow-back-faster-darker-and-coarser/",
+      "nivel": "B",
+      "consultado": "2026-09-17"
+    },
+    {
+      "id": 6,
+      "titulo": "Hair growth and shaving",
+      "editor": "Trotter M., The Anatomical Record 37(4)",
+      "anio": 1928,
+      "url": "https://doi.org/10.1002/ar.1090370405",
+      "nivel": "A",
+      "consultado": "2026-09-17"
+    },
+    {
+      "id": 7,
+      "titulo": "Tips for healthy hair",
+      "editor": "American Academy of Dermatology",
+      "url": "https://www.aad.org/public/everyday-care/hair-scalp-care/hair/healthy-hair-tips",
+      "nivel": "A",
+      "consultado": "2026-09-17",
+      "nivel_porque": "academia médica profesional de dermatología de Estados Unidos"
+    },
+    {
+      "id": 8,
+      "titulo": "Hairstyles that pull can lead to hair loss",
+      "editor": "American Academy of Dermatology",
+      "url": "https://www.aad.org/public/diseases/hair-loss/causes/hairstyles",
+      "nivel": "A",
+      "consultado": "2026-09-17",
+      "nivel_porque": "academia médica profesional de dermatología de Estados Unidos"
+    },
+    {
+      "id": 9,
+      "titulo": "Hair loss: Who gets and causes",
+      "editor": "American Academy of Dermatology",
+      "url": "https://www.aad.org/public/diseases/hair-loss/causes/18-causes",
+      "nivel": "A",
+      "consultado": "2026-09-17",
+      "nivel_porque": "academia médica profesional de dermatología de Estados Unidos"
+    },
+    {
+      "id": 10,
+      "titulo": "First impressions: making up your mind after a 100-ms exposure to a face",
+      "editor": "Willis J. y Todorov A., Psychological Science 17(7)",
+      "anio": 2006,
+      "url": "https://doi.org/10.1111/j.1467-9280.2006.01750.x",
+      "nivel": "A",
+      "consultado": "2026-09-17"
+    }
+  ],
+  "aviso": "Este libro es de carácter informativo y educativo. No reemplaza la consulta, el diagnóstico ni el tratamiento de un médico dermatólogo. Producto Demo es un producto cosmético de efecto visual inmediato: no trata, no cura ni previene la pérdida de pelo.",
+  "_nota": "FIXTURE de regresión de golden-ebook. No editar el texto: la autoprueba sabotea copias de este archivo y espera resultados exactos."
+}

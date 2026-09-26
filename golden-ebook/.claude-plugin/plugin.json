@@ -1,0 +1,18 @@
+{
+  "name": "golden-ebook",
+  "version": "1.4.0",
+  "description": "Ebooks de regalo para el cliente mientras su pedido viaja, con fuentes citadas y la marca de la empresa, en PDF para celular.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "ebook",
+    "postcompra",
+    "fidelizacion",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-ebook/"
+  ]
+}

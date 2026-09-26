@@ -1,0 +1,114 @@
+{
+ "_que_es": "Los numeros REALES de la operacion COD de Golden. Reemplazan a los numeros de referencia que circulan en los cursos. Un solo sitio: si cambian, cambian aqui y toda la skill los hereda.",
+ "_medido_por": "Chat FILTRO, 2026-09-06, contra 18.391 pedidos reales de Dropi. 🔴 El universo son 32 informes, no 16: hay una familia 'por producto' y otra 'por pedido'. Los numeros buenos salen de 'por pedido'.",
+ "_por_que_importa": "El Kit del Radar Diario del bootcamp trae una formula bien construida con numeros PRESTADOS. Los prestados y los medidos no coinciden, y la diferencia decide si un producto se lanza o se trabaja gratis.",
+ "medidos": {
+  "tasa_entrega": {
+   "valor": 0.735,
+   "unidad": "proporcion de pedidos generados que terminan entregados",
+   "n": 15543,
+   "base": "ordenes terminales",
+   "referencia_del_curso": 0.75
+  },
+  "flete_entrega_cop": {
+   "valor": 15664,
+   "n": 11409,
+   "base": "entregas",
+   "referencia_del_curso": 12000
+  },
+  "sin_cobro": {
+   "rechazado": "0 de 105",
+   "cancelado": "0 de 2.594",
+   "nota": "Rechazado y cancelado NO cobran (0 de 105 y 0 de 2.594). Solo cobra la DEVOLUCION, y ya esta medida. Ademas 1 sola de 4.120 devoluciones tiene comision > 0, lo que confirma que sin entrega no hay gestion de cobro que pagar."
+  },
+  "costo_pedido_fallido_cop": {
+   "valor": 12518,
+   "n": 4074,
+   "base": "devoluciones con costo, 99% de las 4.120 · TODAS las transportadoras",
+   "referencia_del_curso": 8000,
+   "modelo": "UN SOLO cobro, siempre MENOR que el flete de ida: no hay ida y vuelta. Si el pedido se devuelve no hubo recaudo, asi que no se paga el porcentaje de gestion de cobro. Modelo declarado por FER y confirmado transportadora por transportadora.",
+   "razon_contra_flete_de_ida": {
+    "COORDINADORA": 0.73,
+    "ENVIA": 0.8,
+    "JAMV": 0.8,
+    "VELOCES": 0.81,
+    "TCC": 0.86,
+    "INTERRAPIDISIMO": 0.87,
+    "SERVIENTREGA": 1.0
+   },
+   "nota_servientrega": "FER intuyo que habia una que cobra lo mismo y dijo Interrapidisimo. El fenomeno existe y es SERVIENTREGA, razon 1,00 exacta. Le fallaba el nombre, no la regla.",
+   "🔴_numero_retirado": {
+    "valor": 29182,
+    "por_que_estaba_mal": "Salia del informe 'por producto', donde esa columna SOLO la llena ENVIA (1.537 de 4.120 = 37%) y ademas inflada. Los 2.583 'ceros' no eran dato faltante: eran las demas transportadoras. Exigia $6.008 mas de PVP del necesario a CUALQUIER costo — un desplazamiento constante, no proporcional ($6.258 cuando se retiro, que era el mismo error pasado por la comision del 4%). NO se vuelve a usar."
+   }
+  },
+  "cpa_cop": {
+   "valor": 21428,
+   "es_un_PISO_no_un_punto": true,
+   "unidad": "costo de pauta por PEDIDO GENERADO (no por entregado)",
+   "base": "pauta Meta mensual por cuenta contra pedidos creados por mes (informe 'por pedido')",
+   "fuente": "_MOTOR/_pauta_mensual.csv · agregado 2026: $97.605.767 / 4.555 pedidos",
+   "mensual_2026": {
+    "ene": 20891,
+    "feb": 21290,
+    "mar": 19679,
+    "abr": 16377,
+    "may": 22616,
+    "jun": 25822,
+    "jul": 14947
+   },
+   "🔴_sesgo_declarado": "Va en UNA SOLA direccion, hacia arriba: (1) el denominador son TODOS los pedidos creados, incluidos los que no vinieron de anuncio (organico, WhatsApp, recompra); (2) julio puede estar incompleto. Por las dos razones el CPA real atribuible a pauta es IGUAL O MAYOR. Todo veredicto que salga de aqui es OPTIMISTA, y se dice.",
+   "supuesto_anterior": 14000,
+   "cuanto_erraba": "el supuesto se quedaba 53% corto"
+  },
+  "comision_recaudo": {
+   "valor": 0,
+   "unidad": "proporcion del PVP recaudado que se cobra APARTE del flete",
+   "n": 11669,
+   "base": "pedidos ENTREGADOS de los 17 informes 'por pedido' de Golden Colombia (Gmail + Hotmail), 18.792 filas",
+   "fuente": "FER, 2026-09-23: 'Dropi no cobra nada. Las transportadoras cobran un 5% del flete de base, pero eso ya esta incluido cuando hacemos la orden en Dropi, ya lo cobran ahi.'",
+   "comprobacion_en_los_datos": "1 pedido entregado de 11.669 (0,0086%) trae comision > 0. Los valores distintos de cero que existen en la columna estan en pedidos CANCELADOS de UN informe de 2024 (Mar-Abr), no en entregas. La columna no estaba 'vacia por falta de dato': esta vacia porque no se cobra aparte.",
+   "por_que_NO_es_restar_menos": "La gestion de cobro SI existe: es el 5% del flete base y ya viene cobrada dentro del flete de Dropi. El flete medido ($15.664) sale de lo que Dropi COBRO de verdad, asi que ya la contiene. Restar ademas un porcentaje del PVP era cobrarla DOS VECES, y la segunda sobre una base equivocada: el PVP en vez del flete.",
+   "supuesto_anterior": 0.04,
+   "cuanto_erraba": "exigia $2.926 de PVP minimo de mas en un producto de $10.000 y $4.593 en uno de $50.000: crece con el precio, porque era un porcentaje del PVP",
+   "ojo": "Si algun dia una transportadora cobra el recaudo POR FUERA del flete, este numero vuelve a ser mayor que cero. La senal es la columna COMISION del informe 'por pedido': hoy son 1 de 11.669."
+  }
+ },
+ "supuestos_no_medidos": {
+  "_aviso": "Ninguno. El ultimo que quedaba era la comision de recaudo, cerrada el 2026-09-23 con el dato de FER y comprobada contra los 17 informes: paso a 'medidos' con valor 0. Si aparece un numero nuevo sin medir, va aqui y se declara en cada veredicto."
+ },
+ "umbral": {
+  "utilidad_minima_por_pedido_generado_cop": 8000,
+  "por_que": "Por debajo de eso el producto ocupa operacion, plata y atencion para dejar propina. No es una opinion de riesgo: es el piso operativo de Golden."
+ },
+ "regla_corta": {
+  "enunciado": "NO hay un multiplicador unico. Lo que manda es el PISO de $8.000 de utilidad por pedido GENERADO. El multiplicador se calcula por producto.",
+  "multiplicadores_minimos": {
+   "10000": 7.02,
+   "20000": 4.01,
+   "30000": 3.01,
+   "50000": 2.2
+  },
+  "_antes_del_2026_09_23": {
+   "10000": 7.31,
+   "20000": 4.18,
+   "30000": 3.13,
+   "50000": 2.3,
+   "por_que_bajo": "Salia la comision de recaudo del 4%, que cobraba dos veces algo que ya esta dentro del flete."
+  },
+  "ojo": "El 2,5x del curso no alcanza ni de lejos: un producto de $30.000 necesita 3,01x y uno de $10.000 necesita 7,02x. Y OJO con el numero en si: el multiplicador se movio CUATRO VECES (2,99 -> 2,78 -> 3,13 el 06-sep, y 3,01 el 23-sep al quitar la comision duplicada). A la ficha va el PISO en pesos, nunca una cifra de multiplicador."
+ },
+ "_leccion_de_metodo": "DOS lecciones, las dos del mismo dia. (1) El universo eran 32 informes y se inventariaron 16, porque la memoria solo nombraba una familia. La fase 1 del protocolo dice contar el universo ANTES de tocar: cuando un directorio tiene FAMILIAS de archivos distintas, el inventario son TODAS, no la que ya se conocia. El dueno tuvo que avisar que habia dos informes. (2) Tres veces seguidas la medicion parecio contradecir a FER y las tres el problema fue la interpretacion, no el dato ni el dueno. Antes de decirle que sus numeros no cuadran: preguntarse que significa la columna, y si el archivo puede siquiera responder la pregunta.",
+ "_dos_errores_que_se_compensaban": "Con el informe malo (fallido inflado, que sube el minimo) y el CPA supuesto (14.000, que lo baja) salia 2,99x en $30.000. Con los dos corregidos sale 3,13x. (Las dos cifras son de aquel dia, con la comision al 4%; hoy el minimo de $30.000 es 3,01x.) Casi el mismo numero por dos errores en direcciones opuestas: arreglar SOLO UNO habria empeorado la regla creyendo que se mejoraba. Es la razon mas fuerte para no clavar el multiplicador en ningun sitio.",
+ "senales_en_vigilancia": {
+  "_que_es": "Datos nuevos que TODAVIA no cambian ningun parametro. Se declaran para no perderlos y para que el proximo que mida sepa que ya se vio.",
+  "tasa_entrega_may_ago_2026": {
+   "valor": 0.765,
+   "n": 3218,
+   "contra_el_vigente": 0.735,
+   "por_que_NO_se_cambia": "Son cuatro meses contra dos anos y medio, y puede ser estacional. Ademas 73,5% es el numero MAS EXIGENTE de los dos: mantenerlo es la opcion conservadora, y cambiarlo por el optimista con una muestra corta es exactamente como se cuela un parametro alegre.",
+   "impacto_medido": "$2.238 de PVP minimo, CONSTANTE en todo el rango de costos: 3,01x -> 2,93x en un producto de $30.000 (remedido el 2026-09-23, sin la comision; antes eran $2.331 y 3,13x -> 3,05x). No cambia ninguna decision — para comparar, el fallido inflado erraba $6.008 y el CPA supuesto $10.106.",
+   "cuando_revisarlo": "Cuando haya 12 meses seguidos por encima del 75%, o al cerrar el ano."
+  }
+ }
+}

@@ -1,0 +1,980 @@
+{
+ "_fuente": "DropKiller MCP semantic_search_products por imagen, CO, medido 2026-09-18. Campos recortados a lo que usa el consolidador. _esperado escrito ANTES del script. · GPG1.16: casos V1-V10 escritos con los fallos que encontró el verificador adversarial el 2026-09-18.",
+ "casos": {
+  "probador de inyectores": {
+   "_esperado": {
+    "proveedores_activos": 1,
+    "ventas_totales_mercado": 122,
+    "etapa": "VALIDACION",
+    "espejos_descartados": 2
+   },
+   "_incluir": "probador de inyectores",
+   "data": [
+    {
+     "id": "446de7f2",
+     "externalId": "2254897",
+     "name": "probador de inyectores**",
+     "providerName": "rmh",
+     "platformType": "DROPLATAM",
+     "totalSoldUnits": 122,
+     "stock": 378,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T09:54:09Z"
+    },
+    {
+     "id": "d401f413",
+     "externalId": "2254897",
+     "name": "probador de inyectores**",
+     "providerName": "rmh",
+     "platformType": "WINPY",
+     "totalSoldUnits": 122,
+     "stock": 378,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T07:58:17Z"
+    },
+    {
+     "id": "fc40021e",
+     "externalId": "2254897",
+     "name": "probador de inyectores**",
+     "providerName": "rmh",
+     "platformType": "DROPI",
+     "totalSoldUnits": 122,
+     "stock": 378,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T09:39:42Z"
+    },
+    {
+     "id": "072697e9",
+     "externalId": "2140687",
+     "name": "medidor presión de inyección de gasolina",
+     "providerName": "sonia",
+     "platformType": "DROPI",
+     "totalSoldUnits": 25,
+     "stock": 87,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:45:33Z"
+    },
+    {
+     "id": "06af9760",
+     "externalId": "2057360",
+     "name": "cargador de bateria",
+     "providerName": "distribuciones ayt",
+     "platformType": "WINPY",
+     "totalSoldUnits": 439,
+     "stock": 25,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-06-23T07:20:51Z"
+    }
+   ]
+  },
+  "dr melaxin crema": {
+   "_esperado": {
+    "proveedores_activos": 2,
+    "ventas_totales_mercado": 19049,
+    "etapa": "QUEMADO",
+    "espejos_descartados": 6
+   },
+   "_incluir": "^dr\\.? melaxin$",
+   "data": [
+    {
+     "id": "b25b8141",
+     "externalId": "2199287",
+     "name": "dr. melaxin",
+     "providerName": "xpacefy",
+     "platformType": "DROPI",
+     "totalSoldUnits": 9339,
+     "stock": 85,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T08:00:21Z"
+    },
+    {
+     "id": "02b58bae",
+     "externalId": "2199287",
+     "name": "dr. melaxin",
+     "providerName": "xpacefy",
+     "platformType": "SEVENTY_BLOCK",
+     "totalSoldUnits": 9238,
+     "stock": 86,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T05:36:50Z"
+    },
+    {
+     "id": "953081fd",
+     "externalId": "2199287",
+     "name": "dr. melaxin",
+     "providerName": "xpacefy",
+     "platformType": "WINPY",
+     "totalSoldUnits": 9348,
+     "stock": 77,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T12:12:29Z"
+    },
+    {
+     "id": "7997aac6",
+     "externalId": "2199287",
+     "name": "dr. melaxin",
+     "providerName": "xpacefy",
+     "platformType": "DROPLATAM",
+     "totalSoldUnits": 9339,
+     "stock": 2399,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T23:50:02Z"
+    },
+    {
+     "id": "f04bd5d6",
+     "externalId": "2103809",
+     "name": "dr. melaxin",
+     "providerName": "cosmeticos y skincare",
+     "platformType": "SEVENTY_BLOCK",
+     "totalSoldUnits": 4439,
+     "stock": 296,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T05:39:56Z"
+    },
+    {
+     "id": "4201e5c0",
+     "externalId": "2103809",
+     "name": "dr. melaxin",
+     "providerName": "cosmeticos y skincare",
+     "platformType": "DROPI",
+     "totalSoldUnits": 4966,
+     "stock": 296,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T07:41:39Z"
+    },
+    {
+     "id": "685941a4",
+     "externalId": "2100776",
+     "name": "dr. melaxin peel shot spray",
+     "providerName": "bodega de belleza int",
+     "platformType": "DROPLATAM",
+     "totalSoldUnits": 16086,
+     "stock": 6054,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T23:50:18Z"
+    },
+    {
+     "id": "74b1141c",
+     "externalId": "2103714",
+     "name": "dr. melaxin",
+     "providerName": "cosmeticos y skincare",
+     "platformType": "DROPLATAM",
+     "totalSoldUnits": 4735,
+     "stock": 1088,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T23:29:33Z"
+    },
+    {
+     "id": "2f416a74",
+     "externalId": "2103714",
+     "name": "dr. melaxin",
+     "providerName": "cosmeticos y skincare",
+     "platformType": "DROPI",
+     "totalSoldUnits": 4734,
+     "stock": 1086,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T07:43:34Z"
+    },
+    {
+     "id": "3d24e6ec",
+     "externalId": "2103714",
+     "name": "dr. melaxin",
+     "providerName": "cosmeticos y skincare",
+     "platformType": "WINPY",
+     "totalSoldUnits": 4487,
+     "stock": 1086,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T13:24:16Z"
+    },
+    {
+     "id": "d7351b0f",
+     "externalId": "2208948",
+     "name": "dr melaxin peel shot spray",
+     "providerName": "ventas mayoristas",
+     "platformType": "WINPY",
+     "totalSoldUnits": 51,
+     "stock": 1953,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T12:01:36Z"
+    }
+   ]
+  },
+  "brasier reafirmante (espejos que no cuadran)": {
+   "_esperado": {
+    "ventas_totales_mercado": 1269,
+    "proveedores_activos": 1,
+    "etapa": "VALIDACION",
+    "espejos_descartados": 4
+   },
+   "_porque": "2233043: DROPI 2324 vs WINPY 1193 vs DROPLATAM 1193 → mediana 1193 (no el máximo); 2207511: 76 en los tres, sin verse desde el 19-ago (inactivo) pero sus ventas históricas cuentan. 1193+76 = 1269. tienda oshop es un solo proveedor.",
+   "_incluir": "brasier reafirmante",
+   "data": [
+    {
+     "externalId": "2233043",
+     "name": "brasier reafirmante sin varilla",
+     "providerName": "tienda oshop",
+     "platformType": "DROPI",
+     "totalSoldUnits": 2324,
+     "stock": 1437,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:23:22Z",
+     "createdAt": "2026-08-19T05:11:58"
+    },
+    {
+     "externalId": "2233043",
+     "name": "brasier reafirmante sin varilla",
+     "providerName": "tienda oshop",
+     "platformType": "WINPY",
+     "totalSoldUnits": 1193,
+     "stock": 1432,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T11:21:53Z",
+     "createdAt": "2026-08-19T05:11:58"
+    },
+    {
+     "externalId": "2233043",
+     "name": "brasier reafirmante sin varilla",
+     "providerName": "tienda oshop",
+     "platformType": "DROPLATAM",
+     "totalSoldUnits": 1193,
+     "stock": 1437,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:29:04Z",
+     "createdAt": "2026-08-19T05:11:58"
+    },
+    {
+     "externalId": "2207511",
+     "name": "brasier reafirmante sin varilla",
+     "providerName": "tienda oshop",
+     "platformType": "WINPY",
+     "totalSoldUnits": 76,
+     "stock": 2924,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-08-19T09:12:56Z",
+     "createdAt": "2026-07-20T05:02:03"
+    },
+    {
+     "externalId": "2207511",
+     "name": "brasier reafirmante sin varilla",
+     "providerName": "tienda oshop",
+     "platformType": "DROPI",
+     "totalSoldUnits": 76,
+     "stock": 2924,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-08-19T07:36:55Z",
+     "createdAt": "2026-07-20T05:02:03"
+    },
+    {
+     "externalId": "2207511",
+     "name": "brasier reafirmante sin varilla",
+     "providerName": "tienda oshop",
+     "platformType": "DROPLATAM",
+     "totalSoldUnits": 76,
+     "stock": 2924,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-08-19T07:47:51Z",
+     "createdAt": "2026-07-20T05:02:03"
+    }
+   ]
+  },
+  "tablero LED (espejo alto porque es el más viejo)": {
+   "_esperado": {
+    "ventas_totales_mercado": 4287,
+    "proveedores_activos": 4,
+    "etapa": "ESCALADO",
+    "espejos_descartados": 6
+   },
+   "_porque": "1996419 impor house: DROPI creado 2025-11-15 con 1.981; WINPY y DROPLATAM creados 2026-01-15 con 582 y 278. El alto es el más viejo por 61 días: su cifra es historia real, no inflado. 1707+1981+38+576 = 4302 → ESCALADO. CORREGIDO a mano antes de la corrida final: ideat 2240113 tiene espejos 23/38/23 creados el mismo día → mediana 23, no 38 (la primera versión de este esperado aplicó mal la regla). 1707+1981+23+576 = 4287.",
+   "_incluir": "(tablero|pizarra).*(led|luz)",
+   "data": [
+    {
+     "externalId": "2239277",
+     "name": "tablero luz led pizarra",
+     "providerName": "tienda oshop",
+     "platformType": "DROPI",
+     "totalSoldUnits": 1669,
+     "stock": 1008,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T08:28:37Z",
+     "createdAt": "2026-08-25T04:47:30"
+    },
+    {
+     "externalId": "2239277",
+     "name": "tablero luz led pizarra",
+     "providerName": "tienda oshop",
+     "platformType": "DROPLATAM",
+     "totalSoldUnits": 1707,
+     "stock": 970,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T23:56:09Z",
+     "createdAt": "2026-08-25T04:56:22"
+    },
+    {
+     "externalId": "2239277",
+     "name": "tablero luz led pizarra",
+     "providerName": "tienda oshop",
+     "platformType": "WINPY",
+     "totalSoldUnits": 1669,
+     "stock": 1008,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:24:15Z",
+     "createdAt": "2026-08-25T05:14:27"
+    },
+    {
+     "externalId": "1996419",
+     "name": "tablero de dibujo acrílico con luz led",
+     "providerName": "impor house",
+     "platformType": "DROPLATAM",
+     "totalSoldUnits": 278,
+     "stock": 381,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T23:16:44Z",
+     "createdAt": "2026-01-15T09:13:48"
+    },
+    {
+     "externalId": "1996419",
+     "name": "tablero de dibujo acrílico con luz led",
+     "providerName": "impor house",
+     "platformType": "WINPY",
+     "totalSoldUnits": 582,
+     "stock": 382,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T11:55:16Z",
+     "createdAt": "2026-01-15T13:09:04"
+    },
+    {
+     "externalId": "1996419",
+     "name": "tablero de dibujo acrílico con luz led",
+     "providerName": "impor house",
+     "platformType": "DROPI",
+     "totalSoldUnits": 1981,
+     "stock": 382,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T07:42:20Z",
+     "createdAt": "2025-11-15T06:27:00"
+    },
+    {
+     "externalId": "2240113",
+     "name": "pizarra mágica led acrílica niños, adult",
+     "providerName": "ideat",
+     "platformType": "DROPI",
+     "totalSoldUnits": 23,
+     "stock": 79,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T08:16:49Z",
+     "createdAt": "2026-08-26T04:52:31"
+    },
+    {
+     "externalId": "2240113",
+     "name": "pizarra mágica led acrílica niños, adult",
+     "providerName": "ideat",
+     "platformType": "DROPLATAM",
+     "totalSoldUnits": 38,
+     "stock": 64,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T23:43:42Z",
+     "createdAt": "2026-08-26T05:06:20"
+    },
+    {
+     "externalId": "2240113",
+     "name": "pizarra mágica led acrílica niños, adult",
+     "providerName": "ideat",
+     "platformType": "WINPY",
+     "totalSoldUnits": 23,
+     "stock": 79,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:13:34Z",
+     "createdAt": "2026-08-26T05:24:46"
+    },
+    {
+     "externalId": "1996421",
+     "name": "tablero de dibujo acrílico con luz led",
+     "providerName": "oh homie",
+     "platformType": "WINPY",
+     "totalSoldUnits": 576,
+     "stock": 307,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T11:55:16Z",
+     "createdAt": "2026-01-17T13:27:53"
+    }
+   ]
+  },
+  "V1 fecha solo en el espejo alto (no basta para creerle)": {
+   "data": [
+    {
+     "externalId": "1",
+     "name": "producto x",
+     "providerName": "a",
+     "platformType": "DROPI",
+     "totalSoldUnits": 2324,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z",
+     "createdAt": "2025-11-01T00:00:00"
+    },
+    {
+     "externalId": "1",
+     "name": "producto x",
+     "providerName": "a",
+     "platformType": "DROPI",
+     "totalSoldUnits": 1193,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "1",
+     "name": "producto x",
+     "providerName": "a",
+     "platformType": "DROPI",
+     "totalSoldUnits": 1193,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    }
+   ],
+   "_esperado": {
+    "ventas_totales_mercado": 1193,
+    "_aviso_contiene": "faltó createdAt"
+   }
+  },
+  "V2 dos espejos que no cuadran: el menor, dicho como tal": {
+   "data": [
+    {
+     "externalId": "2",
+     "name": "producto x",
+     "providerName": "a",
+     "platformType": "DROPI",
+     "totalSoldUnits": 2400,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "2",
+     "name": "producto x",
+     "providerName": "a",
+     "platformType": "DROPI",
+     "totalSoldUnits": 1000,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    }
+   ],
+   "_esperado": {
+    "ventas_totales_mercado": 1000,
+    "_aviso_contiene": "con dos espejos no hay mediana"
+   }
+  },
+  "V3 espejo en 0 junto a uno con ventas: se avisa": {
+   "data": [
+    {
+     "externalId": "3",
+     "name": "producto x",
+     "providerName": "a",
+     "platformType": "DROPI",
+     "totalSoldUnits": 0,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "3",
+     "name": "producto x",
+     "providerName": "a",
+     "platformType": "DROPI",
+     "totalSoldUnits": 5000,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    }
+   ],
+   "_esperado": {
+    "ventas_totales_mercado": 5000,
+    "_aviso_contiene": "lectura perdida"
+   }
+  },
+  "V4 ocho proveedores sin stock: cuentan como activos": {
+   "data": [
+    {
+     "externalId": "40",
+     "name": "producto x",
+     "providerName": "prov 0",
+     "platformType": "DROPI",
+     "totalSoldUnits": 50,
+     "stock": null,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "41",
+     "name": "producto x",
+     "providerName": "prov 1",
+     "platformType": "DROPI",
+     "totalSoldUnits": 50,
+     "stock": null,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "42",
+     "name": "producto x",
+     "providerName": "prov 2",
+     "platformType": "DROPI",
+     "totalSoldUnits": 50,
+     "stock": null,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "43",
+     "name": "producto x",
+     "providerName": "prov 3",
+     "platformType": "DROPI",
+     "totalSoldUnits": 50,
+     "stock": null,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "44",
+     "name": "producto x",
+     "providerName": "prov 4",
+     "platformType": "DROPI",
+     "totalSoldUnits": 50,
+     "stock": null,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "45",
+     "name": "producto x",
+     "providerName": "prov 5",
+     "platformType": "DROPI",
+     "totalSoldUnits": 50,
+     "stock": null,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "46",
+     "name": "producto x",
+     "providerName": "prov 6",
+     "platformType": "DROPI",
+     "totalSoldUnits": 50,
+     "stock": null,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "47",
+     "name": "producto x",
+     "providerName": "prov 7",
+     "platformType": "DROPI",
+     "totalSoldUnits": 50,
+     "stock": null,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    }
+   ],
+   "_esperado": {
+    "proveedores_activos": 8,
+    "criterio_2_pocos_proveedores": false,
+    "_aviso_contiene": "sin dato de stock"
+   }
+  },
+  "V5 seis proveedores sin nombre: cada uno aparte": {
+   "data": [
+    {
+     "externalId": "50",
+     "name": "producto x",
+     "providerName": "",
+     "platformType": "DROPI",
+     "totalSoldUnits": 50,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "51",
+     "name": "producto x",
+     "providerName": "",
+     "platformType": "DROPI",
+     "totalSoldUnits": 50,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "52",
+     "name": "producto x",
+     "providerName": "",
+     "platformType": "DROPI",
+     "totalSoldUnits": 50,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "53",
+     "name": "producto x",
+     "providerName": "",
+     "platformType": "DROPI",
+     "totalSoldUnits": 50,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "54",
+     "name": "producto x",
+     "providerName": "",
+     "platformType": "DROPI",
+     "totalSoldUnits": 50,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "55",
+     "name": "producto x",
+     "providerName": "",
+     "platformType": "DROPI",
+     "totalSoldUnits": 50,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    }
+   ],
+   "_esperado": {
+    "proveedores_activos": 6,
+    "criterio_2_pocos_proveedores": false,
+    "_aviso_contiene": "sin nombre de proveedor"
+   }
+  },
+  "V6 filas sin externalId ni id no son espejos": {
+   "data": [
+    {
+     "externalId": null,
+     "name": "producto x",
+     "providerName": "a",
+     "platformType": "DROPI",
+     "totalSoldUnits": 500,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": null,
+     "name": "producto x",
+     "providerName": "b",
+     "platformType": "DROPI",
+     "totalSoldUnits": 700,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    }
+   ],
+   "_esperado": {
+    "ventas_totales_mercado": 1200,
+    "proveedores_activos": 2,
+    "_aviso_contiene": "sin externalId"
+   }
+  },
+  "V7 mercado vacío no aprueba nada": {
+   "data": [],
+   "_esperado": {
+    "criterio_1_ventas_100_a_validacion": false,
+    "criterio_2_pocos_proveedores": false,
+    "_aviso_contiene": "no se concluye nada"
+   }
+  },
+  "V8 tope de proveedores elegido en el menú": {
+   "data": [
+    {
+     "externalId": "81",
+     "name": "producto x",
+     "providerName": "a",
+     "platformType": "DROPI",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "82",
+     "name": "producto x",
+     "providerName": "b",
+     "platformType": "DROPI",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "83",
+     "name": "producto x",
+     "providerName": "c",
+     "platformType": "DROPI",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    }
+   ],
+   "_max_proveedores": 2,
+   "_esperado": {
+    "proveedores_activos": 3,
+    "criterio_2_pocos_proveedores": false,
+    "tope_proveedores": 2
+   }
+  },
+  "V9 etapa ESCALADO pedida en el menú": {
+   "data": [
+    {
+     "externalId": "91",
+     "name": "producto x",
+     "providerName": "a",
+     "platformType": "DROPI",
+     "totalSoldUnits": 4287,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    }
+   ],
+   "_etapa": "ESCALADO",
+   "_esperado": {
+    "etapa": "ESCALADO",
+    "etapa_es_la_pedida": true,
+    "criterio_1_ventas_100_a_validacion": false
+   }
+  },
+  "V10 fechas sin zona y ventas en texto no revientan": {
+   "data": [
+    {
+     "externalId": "10",
+     "name": "producto x",
+     "providerName": "a",
+     "platformType": "DROPI",
+     "totalSoldUnits": "1.193",
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00"
+    }
+   ],
+   "_esperado": {
+    "ventas_totales_mercado": 1193,
+    "proveedores_activos": 1
+   }
+  },
+  "V11 IDs con espacios son la misma ficha": {
+   "data": [
+    {
+     "externalId": " 2233043",
+     "name": "producto x",
+     "providerName": "a",
+     "platformType": "DROPI",
+     "totalSoldUnits": 1500,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "2233043",
+     "name": "producto x",
+     "providerName": "a",
+     "platformType": "DROPI",
+     "totalSoldUnits": 1500,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "2233043 ",
+     "name": "producto x",
+     "providerName": "a",
+     "platformType": "DROPI",
+     "totalSoldUnits": 1500,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    }
+   ],
+   "_esperado": {
+    "ventas_totales_mercado": 1500,
+    "espejos_descartados": 2,
+    "etapa": "VALIDACION"
+   }
+  },
+  "V12 proveedor escrito distinto es el mismo": {
+   "data": [
+    {
+     "externalId": "1",
+     "name": "producto x",
+     "providerName": "évora home",
+     "platformType": "DROPI",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "2",
+     "name": "producto x",
+     "providerName": "evora home",
+     "platformType": "DROPI",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "3",
+     "name": "producto x",
+     "providerName": "Évora  Home",
+     "platformType": "DROPI",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    }
+   ],
+   "_esperado": {
+    "proveedores_activos": 1
+   }
+  },
+  "V13 ficha sin cifra de ventas no deja aprobar la etapa": {
+   "data": [
+    {
+     "externalId": "1",
+     "name": "producto x",
+     "providerName": "a",
+     "platformType": "DROPI",
+     "totalSoldUnits": 500,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "2",
+     "name": "producto x",
+     "providerName": "b",
+     "platformType": "DROPI",
+     "totalSoldUnits": null,
+     "stock": 100,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    }
+   ],
+   "_esperado": {
+    "criterio_1_ventas_100_a_validacion": false,
+    "etapa_es_la_pedida": false,
+    "_aviso_contiene": "etapa NO asegurada"
+   }
+  },
+  "V14 status vacío o en minúscula cuenta ACTIVO": {
+   "data": [
+    {
+     "externalId": "0",
+     "name": "producto x",
+     "providerName": "p0",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "lastSeenAt": "2026-09-18T10:00:00Z"
+    },
+    {
+     "externalId": "1",
+     "name": "producto x",
+     "providerName": "p1",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "lastSeenAt": "2026-09-18T10:00:00Z",
+     "status": ""
+    },
+    {
+     "externalId": "2",
+     "name": "producto x",
+     "providerName": "p2",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "lastSeenAt": "2026-09-18T10:00:00Z",
+     "status": "active"
+    },
+    {
+     "externalId": "3",
+     "name": "producto x",
+     "providerName": "p3",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "lastSeenAt": "2026-09-18T10:00:00Z",
+     "status": "Active"
+    },
+    {
+     "externalId": "4",
+     "name": "producto x",
+     "providerName": "p4",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "lastSeenAt": "2026-09-18T10:00:00Z",
+     "status": " ACTIVE "
+    },
+    {
+     "externalId": "5",
+     "name": "producto x",
+     "providerName": "p5",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "lastSeenAt": "2026-09-18T10:00:00Z",
+     "status": "active"
+    },
+    {
+     "externalId": "6",
+     "name": "producto x",
+     "providerName": "p6",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "lastSeenAt": "2026-09-18T10:00:00Z",
+     "status": "active"
+    }
+   ],
+   "_esperado": {
+    "proveedores_activos": 7,
+    "criterio_2_pocos_proveedores": false
+   }
+  },
+  "V15 solo INACTIVE o BLOCKED explícito apaga": {
+   "data": [
+    {
+     "externalId": "1",
+     "name": "producto x",
+     "providerName": "a",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "lastSeenAt": "2026-09-18T10:00:00Z",
+     "status": "INACTIVE"
+    },
+    {
+     "externalId": "2",
+     "name": "producto x",
+     "providerName": "b",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "lastSeenAt": "2026-09-18T10:00:00Z",
+     "status": "blocked"
+    },
+    {
+     "externalId": "3",
+     "name": "producto x",
+     "providerName": "c",
+     "totalSoldUnits": 100,
+     "stock": 100,
+     "lastSeenAt": "2026-09-18T10:00:00Z",
+     "status": "ACTIVE"
+    }
+   ],
+   "_esperado": {
+    "proveedores_activos": 1
+   }
+  }
+ }
+}

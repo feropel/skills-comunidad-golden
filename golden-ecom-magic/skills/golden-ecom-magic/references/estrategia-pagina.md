@@ -22,7 +22,11 @@ el ajuste no es "meter párrafos", es "no depender de una sola imagen y sumar pr
 
 ## Estructura recomendada
 
-1. **Carrusel / multimedia del producto → 4-5 imágenes 1080×1080 (Ecom Magic).**
+1. **Carrusel / multimedia del producto → 4-5 imágenes a 2048×2048 (Ecom Magic).**
+   (El porqué exacto de cada tamaño —incluida la medición en vivo contra Shopify— vive en
+   `SKILL.md` → paso 5 "Optimizar a WebP", tabla "El tamaño depende del DESTINO". Aquí solo se
+   usa el resultado, sin repetir la cifra, para que las dos versiones no se desincronicen si esa
+   medición cambia.)
    Foto real bella + 1-2 infografías de beneficio máximo. El gancho que se desliza.
    (Dato: 5+ imágenes convierten ~60% más que una sola.)
 2. **Cuerpo → bloques NATIVOS con golden-shopify (texto real):** título, precio dinámico,

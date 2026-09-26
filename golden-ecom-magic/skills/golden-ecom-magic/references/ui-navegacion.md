@@ -106,10 +106,10 @@ saca la URL de la pieza generada desde el DOM y bájala tú directo:
    (`PROYECTOS/<PRODUCTO>/`).
 3. Optimiza a **WebP < 150 KB** con el script incluido (sips de macOS no exporta WebP;
    `cwebp`/`magick` pueden no estar). Pásale el tamaño como `AnchoxAlto`: cuadrado de
-   carrusel `1080x1080`, infografía de sección `1080x1350` (si no lo pasas, asume
+   galería `2048x2048 300`, infografía de sección `1080x1350` (si no lo pasas, asume
    cuadrado y una infografía vertical se deformaría):
    ```bash
-   python3 ~/.claude/skills/golden-ecom-magic/scripts/optimizar-webp.py hero-original.png tag-recede-hero.webp 1080x1080
+   python3 ~/.claude/skills/golden-ecom-magic/scripts/optimizar-webp.py hero-original.png tag-recede-hero.webp 2048x2048 300
    python3 ~/.claude/skills/golden-ecom-magic/scripts/optimizar-webp.py seccion-original.png tag-recede-seccion.webp 1080x1350
    ```
    (Ej. real Tag Recede: quality 85 → 124.8 KB. Requiere Pillow: `pip install Pillow`.

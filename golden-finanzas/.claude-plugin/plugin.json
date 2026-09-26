@@ -1,0 +1,18 @@
+{
+  "name": "golden-finanzas",
+  "version": "1.3.0",
+  "description": "El director financiero de la empresa: precio y margen con modelo y números para contra entrega, combos, servicios y propuestas.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "precio",
+    "margen",
+    "finanzas",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-finanzas/"
+  ]
+}

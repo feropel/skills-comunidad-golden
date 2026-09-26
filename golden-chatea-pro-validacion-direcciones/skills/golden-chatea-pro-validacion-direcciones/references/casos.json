@@ -1,0 +1,321 @@
+{
+  "_meta": {
+    "que_es": "BANCO DE CASOS TRAMPA. Direcciones reales que un validador de direcciones falla si el pack no trae la regla concreta. Cada caso apunta a UNA regla que debe existir en el pack del pais.",
+    "por_que": "Fase 4 del protocolo de FER: lo no ejecutado no se da por bueno. Un pack se puede leer entero y parecer correcto mientras le falta la regla que decide el caso dificil. Aqui esos casos estan escritos y se comprueban.",
+    "como_se_corre": "python3 scripts/validar_pack.py --casos",
+    "que_comprueba": "Que el pack contiene las MARCAS de la regla. No ejecuta el modelo del bot: comprueba que el criterio esta escrito. Un pack sin la regla no puede resolver el caso, aunque el modelo a veces acierte por su cuenta.",
+    "actualizado": "2026-09-08",
+    "marcas": "Las marcas son FRASES de la regla, no palabras sueltas. Una verificacion adversarial (2026-09-08) borro la regla real de Costa Rica dejando una frase decorativa con las palabras 'una cuadra', y el banco siguio diciendo 26 de 26: comprobaba vocabulario, no criterio.",
+    "de_donde_salen_las_marcas": "Del CUERPO ENTREGABLE del pack, nunca de su nota HTML. La marca de Chile se tomo por error del texto de la nota y dio un hueco falso: el pack SI tenia la regla, escrita con otras palabras, en la linea que se pega.",
+    "cobertura_por_pais": "Hasta el 2026-09-22 el banco cubria 16 de 23 paises; siete no tenian ni un caso (CROACIA, ECUADOR, ESLOVAQUIA, GUATEMALA, PANAMA, PARAGUAY, PERU) y por eso '26 de 26' sonaba a cobertura total sin serlo — un pais sin caso no puede bajar nunca del 100%. Hallado por verificacion adversarial (2026-09-22). Anadido un caso real por cada uno, con marca tomada literal del cuerpo entregable del pack. Cobertura ahora: 23 de 23."
+  },
+  "casos": [
+    {
+      "pais": "COSTA_RICA",
+      "entrada": "200 metros norte",
+      "trampa": "metros y rumbo SIN punto de partida: no se sabe desde donde",
+      "esperado": "pedir el punto de referencia",
+      "marcas": [
+        "desde que punto de referencia"
+      ]
+    },
+    {
+      "pais": "COSTA_RICA",
+      "entrada": "Del parque 300 metros sur, casa verde",
+      "trampa": "300 metros son TRES CUADRAS, no una distancia medida. Si el pack no lo dice, el criterio pide precision metrica que nadie da",
+      "esperado": "aceptar: es direccion completa",
+      "marcas": [
+        "\"100 metros\" = una cuadra",
+        "es la unidad de cuenta"
+      ]
+    },
+    {
+      "pais": "COSTA_RICA",
+      "entrada": "150 sur de la antigua Pops",
+      "trampa": "referencia a un negocio QUE YA NO EXISTE: parece error y no lo es",
+      "esperado": "aceptar la referencia historica",
+      "marcas": [
+        "referencias a lo que ya no existe",
+        "no lo trates como error"
+      ]
+    },
+    {
+      "pais": "COSTA_RICA",
+      "entrada": "San Isidro",
+      "trampa": "hay decenas de San Isidro en el pais",
+      "esperado": "pedir el canton",
+      "marcas": [
+        "hay decenas de \"san isidro\""
+      ]
+    },
+    {
+      "pais": "HUNGRIA",
+      "entrada": "1051 Budapest, Vaci utca 12.",
+      "trampa": "el orden hungaro es INVERSO (CP y ciudad primero). Un validador que espere orden latino lo marca mal",
+      "esperado": "aceptar el orden inverso",
+      "marcas": [
+        "el orden hungaro es inverso",
+        "no lo trates como error ni lo reordenes"
+      ]
+    },
+    {
+      "pais": "HUNGRIA",
+      "entrada": "Budapest V. kerulet",
+      "trampa": "el distrito en numeros romanos equivale al CP",
+      "esperado": "reconocer el distrito",
+      "marcas": [
+        "en numeros romanos aparte del cp"
+      ]
+    },
+    {
+      "pais": "BULGARIA",
+      "entrada": "zh.k. Mladost 1, bl. 45, vh. B, et. 3, ap. 12",
+      "trampa": "direccion COMPLETA que NO lleva calle. Un validador que exija calle la rechaza siendo perfecta",
+      "esperado": "aceptar sin calle",
+      "marcas": [
+        "es direccion completa y no lleva calle",
+        "no pidas calle en ese caso"
+      ]
+    },
+    {
+      "pais": "BULGARIA",
+      "entrada": "ул. Витоша 20",
+      "trampa": "llega en cirilico; tambien puede llegar transliterada",
+      "esperado": "aceptar ambos alfabetos",
+      "marcas": [
+        "llegan en cirilico o transliteradas",
+        "acepta las dos formas"
+      ]
+    },
+    {
+      "pais": "BRASIL",
+      "entrada": "Rua das Flores, 250, Vila Mariana, Sao Paulo",
+      "trampa": "falta el CEP, que en Brasil es obligatorio y sin el no hay ruteo",
+      "esperado": "pedir el CEP",
+      "marcas": [
+        "si la direccion no trae cep, pidelo"
+      ]
+    },
+    {
+      "pais": "BRASIL",
+      "entrada": "SQN 210 Bloco B apto 401, Brasilia",
+      "trampa": "sistema de ciudad planificada: no lleva rua ni numero y esta completo",
+      "esperado": "aceptar sin rua",
+      "marcas": [
+        "ya es direccion completa: no pidas rua ni numero"
+      ]
+    },
+    {
+      "pais": "ARGENTINA",
+      "entrada": "Av. Corrientes 1234, PB, CABA, 1043",
+      "trampa": "PB (planta baja) es un piso valido, no un dato que falte",
+      "esperado": "aceptar PB",
+      "marcas": [
+        "pb es un piso valido, no un dato faltante"
+      ]
+    },
+    {
+      "pais": "ARGENTINA",
+      "entrada": "Rivadavia al 4500",
+      "trampa": "'al 4500' ES la altura; pedirla otra vez es pedir de mas",
+      "esperado": "reconocer la altura",
+      "marcas": [
+        "eso es la altura",
+        "no la vuelvas a pedir"
+      ]
+    },
+    {
+      "pais": "MEXICO",
+      "entrada": "Calle Hidalgo 245, Col. Centro",
+      "trampa": "falta el CP, que en Mexico define la zona de reparto. Es la trampa historica de esta familia",
+      "esperado": "pedir el codigo postal",
+      "marcas": [
+        "si la direccion no trae cp"
+      ]
+    },
+    {
+      "pais": "COLOMBIA",
+      "entrada": "Calle 25 # 30-45",
+      "trampa": "tres numeros ya incluyen numero de puerta: pedirlo otra vez es pedir de mas",
+      "esperado": "aceptar",
+      "marcas": [
+        "ya incluye numero de puerta/casa: no lo pidas otra vez"
+      ]
+    },
+    {
+      "pais": "ESPANA",
+      "entrada": "C/ Mayor 12, bajo, Madrid",
+      "trampa": "'bajo' es un piso valido; falta el CP",
+      "esperado": "pedir el codigo postal",
+      "marcas": [
+        "\"bajo\" y \"atico\" son pisos validos"
+      ]
+    },
+    {
+      "pais": "ESPANA",
+      "entrada": "Ctra. N-340 Km 25, s/n",
+      "trampa": "'s/n' es valido si hay referencia o kilometro",
+      "esperado": "aceptar s/n con referencia",
+      "marcas": [
+        "\"s/n\" (sin numero) es valido en vias donde no hay numeracion"
+      ]
+    },
+    {
+      "pais": "POLONIA",
+      "entrada": "ul. Kwiatowa 12/5, 00-950 Warszawa",
+      "trampa": "la barra separa casa y apartamento: ya esta completo",
+      "esperado": "aceptar",
+      "marcas": [
+        "es casa 12, piso 5"
+      ]
+    },
+    {
+      "pais": "POLONIA",
+      "entrada": "os. Piastowskie 24/3, Poznan",
+      "trampa": "'osiedle' sustituye a la calle y es direccion completa",
+      "esperado": "aceptar sin calle",
+      "marcas": [
+        "sustituye a la calle",
+        "es direccion completa"
+      ]
+    },
+    {
+      "pais": "RUMANIA",
+      "entrada": "Str. Aviatorilor 12, Bucuresti",
+      "trampa": "en bloque hacen falta bloc, scara y apartament; y en Bucarest el SECTOR",
+      "esperado": "pedir bloc/scara/ap y sector",
+      "marcas": [
+        "el sector (1 a 6) es obligatorio"
+      ]
+    },
+    {
+      "pais": "PORTUGAL",
+      "entrada": "Rua do Ouro 45, 1100 Lisboa",
+      "trampa": "CP incompleto: faltan los tres digitos tras el guion, que afinan la calle",
+      "esperado": "pedir los siete digitos",
+      "marcas": [
+        "tras el guion afinan la calle"
+      ]
+    },
+    {
+      "pais": "CHEQUIA",
+      "entrada": "Namesti Miru 12/3, Praha",
+      "trampa": "las dos numeraciones (popisne y orientacni) ya completan el numero",
+      "esperado": "no pedir mas numero",
+      "marcas": [
+        "si vienen las dos, ya esta completo: no pidas mas numero"
+      ]
+    },
+    {
+      "pais": "GRECIA",
+      "entrada": "Ermou 15, Athina",
+      "trampa": "llega transliterada al latino; tambien puede llegar en alfabeto griego",
+      "esperado": "aceptar ambos alfabetos",
+      "marcas": [
+        "acepta las dos formas por igual y no pidas que la reescriba"
+      ]
+    },
+    {
+      "pais": "VENEZUELA",
+      "entrada": "Urb. El Marques, Qta. Marisela",
+      "trampa": "la quinta se identifica por NOMBRE, no por numero: pedir numero de casa es pedir de mas",
+      "esperado": "aceptar la quinta con nombre",
+      "marcas": [
+        "el nombre de la quinta es el identificador",
+        "no pidas numero de casa"
+      ]
+    },
+    {
+      "pais": "VENEZUELA",
+      "entrada": "De Miracielos a Hospital, Caracas",
+      "trampa": "sistema de esquinas del casco central: es direccion valida sin calle ni numero",
+      "esperado": "aceptar",
+      "marcas": [
+        "sistema de esquinas",
+        "no pidas calle ni numero"
+      ]
+    },
+    {
+      "pais": "CHILE",
+      "entrada": "Santiago",
+      "trampa": "'Santiago' es comuna, provincia y ciudad a la vez",
+      "esperado": "confirmar la comuna",
+      "marcas": [
+        "no es comuna en si misma",
+        "exige la comuna real"
+      ]
+    },
+    {
+      "pais": "ESLOVENIA",
+      "entrada": "Bled 45",
+      "trampa": "en pueblos pequenos el nombre del lugar + numero es direccion completa, sin calle",
+      "esperado": "aceptar sin calle",
+      "marcas": [
+        "sin calle: \"bled 45\" es direccion valida"
+      ]
+    },
+    {
+      "pais": "CROACIA",
+      "entrada": "Ilica 25, Prizemlje, 10000 Zagreb",
+      "trampa": "'Prizemlje' es planta baja: un validador que no lo sepa pide un piso que no existe",
+      "esperado": "aceptar, es planta baja valida",
+      "marcas": [
+        "es planta baja y es valida"
+      ]
+    },
+    {
+      "pais": "ESLOVAQUIA",
+      "entrada": "Hlavna 25/3, Prizemie, 811 01 Bratislava",
+      "trampa": "'Prizemie' es planta baja: mismo caso que Croacia, en otro idioma",
+      "esperado": "aceptar, es planta baja valida",
+      "marcas": [
+        "es planta baja y es valida"
+      ]
+    },
+    {
+      "pais": "ECUADOR",
+      "entrada": "Rocafuerte y Garcia Moreno",
+      "trampa": "solo interseccion, sin numero de casa: parece incompleta y es dato fuerte de ubicacion",
+      "esperado": "tratar la interseccion como referencia fuerte, no rechazarla de plano",
+      "marcas": [
+        "es dato fuerte de ubicacion"
+      ]
+    },
+    {
+      "pais": "GUATEMALA",
+      "entrada": "5a Avenida 10-32, Zona 1",
+      "trampa": "'10-32' YA es el numero exacto de la casa (formato puerta-acera): pedirlo otra vez es pedir de mas",
+      "esperado": "aceptar, no repetir el numero de casa",
+      "marcas": [
+        "no lo vuelvas a pedir si aparece"
+      ]
+    },
+    {
+      "pais": "PANAMA",
+      "entrada": "Barriada Nuevo Belen, casa de porton azul, San Miguelito",
+      "trampa": "sin numero de casa visible: muchas casas panamenas no lo tienen y se ubican por barriada + color",
+      "esperado": "aceptar, no es direccion mala por no tener numero",
+      "marcas": [
+        "no es direccion mala por si sola"
+      ]
+    },
+    {
+      "pais": "PARAGUAY",
+      "entrada": "Avda. Mcal. Lopez c/ Republica Argentina, Barrio Villa Morra",
+      "trampa": "esquina sin numero de casa: en Paraguay muchas casas no lo tienen visible y se entrega igual",
+      "esperado": "aceptar, esquina + barrio ya es suficiente",
+      "marcas": [
+        "se entrega igual"
+      ]
+    },
+    {
+      "pais": "PERU",
+      "entrada": "Lima",
+      "trampa": "solo la ciudad, sin distrito: Lima tiene 43 distritos y sin distrito el reparto se cae",
+      "esperado": "pedir el distrito",
+      "marcas": [
+        "a secas no basta"
+      ]
+    }
+  ]
+}

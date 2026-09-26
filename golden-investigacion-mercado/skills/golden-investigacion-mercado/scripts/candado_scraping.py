@@ -22,6 +22,23 @@ Manual: ../references/scraping-firecrawl.md
 import json
 import re
 import sys
+import unicodedata
+
+
+def _plegar(s):
+    """Minúsculas y SIN tildes, SOLO para comparar (CHECK 4).
+
+    Por qué existe (23-sep-2026): `--pedi "PEPTEA serum"` daba DESCARTAR sobre la página correcta
+    "PEPTÉA Sérum", y "colageno glow" solo casaba "glow". Es la clase `coterra` contra `côterra`,
+    esta vez fallando hacia el ROJO: descartaba páginas buenas.
+
+    Reglas para no provocar el fallo simétrico (plegar tildes rompió 20 nombres sanos en otra skill):
+    se usa SOLO dentro de la comparación, jamás sobre `textos`, el JSON ni nada que salga del candado.
+    Riesgo propio, declarado: plegar la ñ hace que "año" case con "ano". Para una pregunta de
+    pertinencia ("¿esta página es de lo que pedí?") el daño posible es un PASA falso en un caso raro.
+    """
+    s = unicodedata.normalize("NFD", str(s).lower())
+    return "".join(c for c in s if unicodedata.category(c) != "Mn")
 
 # Marcas de captcha / muro de seguridad vistas en vivo (MercadoLibre, Amazon)
 SENALES_CAPTCHA_URL = ("/captcha", "captcha/wall", "/errors/validatecaptcha", "/sorry/")
@@ -123,9 +140,9 @@ def auditar(resp, pedi=None):
                               f"{marcadores[:3]}. Medido en MercadoLibre: 'Producto 1'..'Producto 8'.")
 
             if pedi:
-                claves = [w for w in re.findall(r"\w+", pedi.lower()) if len(w) > 3]
+                claves = [w for w in re.findall(r"\w+", _plegar(pedi)) if len(w) > 3]
                 if claves:
-                    cuerpo = " ".join(textos).lower()
+                    cuerpo = _plegar(" ".join(textos))
                     hit = [k for k in claves if k in cuerpo]
                     if not hit:
                         fallos.append(f"CHECK 4 · EL DATO NO RESPONDE A LO PEDIDO: ninguna palabra "
@@ -144,8 +161,32 @@ def auditar(resp, pedi=None):
     return "PASA", (fallos, avisos, oks)
 
 
+def _autoprueba():
+    """Banco del CHECK 4 con tildes, en los dos sentidos y con control negativo.
+    Medido el 24-sep-2026: la versión sin `_plegar` falla 2 de estos 5; sobre 14 respuestas reales
+    guardadas x 5 pedidos, el arreglo cambió 0 de 70 veredictos."""
+    def r(nombre, desc):
+        return {"json": {"nombre": nombre, "precio": "89900", "descripcion": desc},
+                "metadata": {"sourceURL": "https://tienda.example/p", "url": "https://tienda.example/p",
+                             "title": nombre, "statusCode": 200}}
+    banco = [(r("PEPTÉA Sérum", "Sérum facial de péptidos"), "PEPTEA serum", "PASA"),
+             (r("PEPTEA SERUM", "Serum facial"), "PEPTÉA sérum", "PASA"),
+             (r("Colágeno Glow crema", "Crema de colágeno"), "colageno glow", "PASA"),
+             (r("Crema de manos de karité", "Hidratante"), "PEPTEA serum", "DESCARTAR"),
+             (r("Protector solar FPS 50", "Bloqueador"), "colageno glow", "DESCARTAR")]
+    malos = 0
+    for resp, pedi, debe in banco:
+        v = auditar(resp, pedi)[0]
+        malos += v != debe
+        print(f"  {'OK ' if v == debe else 'MAL'} pedi={pedi!r:18} -> {v} (debe {debe})")
+    print(f"  {len(banco) - malos} de {len(banco)}")
+    return 1 if malos else 0
+
+
 def main():
     args = [a for a in sys.argv[1:]]
+    if "--autoprueba" in args:
+        return _autoprueba()
     pedi = None
     if "--pedi" in args:
         i = args.index("--pedi")

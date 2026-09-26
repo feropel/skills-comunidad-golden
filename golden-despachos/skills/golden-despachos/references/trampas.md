@@ -95,3 +95,20 @@ toda la historia de la cuenta.
 
 → Contar guías generadas por transportadora en el export **antes** de calcular nada. Lo que la
 bodega no ha despachado nunca, no se recomienda aunque gane el cálculo.
+
+## 14 · Un detector de patrones acusa el lenguaje, no el defecto
+
+`analiza_dir` marcaba `BLOQUEO` cualquier dirección con la palabra **oficina**, aunque fuera la
+oficina propia del cliente con nomenclatura completa (`Calle 17 # 2E-30 oficina EMNFC SAS`). Daba
+`INCOMPLETA` a las nomenclaturas de **dos letras** (`# 100 AB - 03`, `# 65 GG - 22`, `# 23AN-45`),
+que son normales en Medellín, Bogotá y el norte de Cali, porque el patrón admitía una sola letra. Y
+le pedía **número de puerta a una vereda**, donde no existe ni existirá.
+
+Doce direcciones de 895 (1,3%) mal clasificadas, todas en el sentido que nadie había probado: el de
+los casos BUENOS. Un banco que solo verifica que el detector muerda mide la mitad del detector.
+
+→ Todo detector de patrones se prueba en los **dos sentidos**: los casos que debe morder y los que
+debe dejar pasar, estos últimos tomados de datos reales. Y al escribir el caso hay que comprobar
+que **alcance la rama** que dice proteger: uno de los casos de este mismo banco resultó decorativo
+(la dirección traía puerta completa, así que la rama rural nunca se ejecutaba) y solo se descubrió
+saboteando el código a propósito y viendo que el banco seguía en verde.

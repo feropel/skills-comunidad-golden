@@ -17,6 +17,17 @@ anuncio estático, que es justo lo que hace esta arena.
 Cuándo NO usar esta skill y usar Ecom Magic:
 - **Anuncio sobre plantilla probada** → `banners_generate`, 1 crédito. Su catálogo tiene cientos de
   referencias y admite nivel de conciencia de Schwartz (`awareness_level`).
+
+  > 🔴 **AVISO MEDIDO, y cuesta créditos de FER: `banners_generate` NO genera desde tu texto.
+  > CLONA LA PLANTILLA e IGNORA el prompt.** Caso real: se pidió una mujer en una oficina y
+  > devolvió un anuncio de sombras de ojos, porque la plantilla elegida era de maquillaje.
+  > **La plantilla se elige VIENDO la miniatura, nunca por número**, y el costo se declara
+  > ANTES con el saldo delante.
+  > **Corolario que hay que entender antes de intentar arreglarlo:** las "invenciones" que se
+  > le achacaban al generador — ingredientes falsos, garantías que nadie dio — **salían de la
+  > plantilla clonada, no del modelo.** Pelear con instrucciones adicionales contra una maqueta
+  > contaminada es el remedio equivocado: se cambia la plantilla, o se viene a esta arena, que
+  > sí genera desde el prompt y desde la foto real.
 - **Sección de landing tipada** (hero, oferta, comparativa, testimonios, FAQ) → `landings_generate`.
 - **Sección de LOGÍSTICA con transportadoras reales por país y sello contra entrega** → no existe
   en ningún otro lado.
@@ -30,7 +41,7 @@ Cuándo NO usar esta skill y usar Ecom Magic:
 Contrastado el catálogo del MCP (60 modelos inventariados el 23-ago) contra el RUNBOOK de un
 cliente REST público:
 
-| Endpoint REST | ¿Está en el catálogo del MCP? |
+| Endpoint REST | Está en el catálogo del MCP? |
 |---|---|
 | `POST /veo3.1/fast/text-to-video` | **NO** — es Google Veo 3.1 |
 | `POST /lightricks/ltx-2.5/text-to-video/pro` | **NO** |

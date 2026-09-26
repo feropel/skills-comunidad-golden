@@ -5,13 +5,13 @@ orgánico, WhatsApp). Meta y TikTok RECHAZAN anuncios que violen esto; TikTok es
 Regla base transversal: **enfoque positivo del beneficio**, nunca diagnóstico ni promesa de cura, sin
 atributos personales ("sufres de…?"), sin antes/después corporal engañoso.
 
-**El NOMBRE del producto también es un ítem de compliance** (caso "Dental un producto de cliente", Chile
+**El NOMBRE del producto también es un ítem de compliance** (caso "Dental Cavity Healing", Chile
 2026-08-07: el nombre promete curación y era el mayor pasivo legal del negocio; ninguna revisión lo
 detectaba porque el mapa miraba el copy, no el nombre). Si el nombre promete cura o resultado
 médico → proponer renombre. Ver `00-identificacion-forense.md`.
 
 ## Salud bucal (gotas dentales, remineralizantes, blanqueadores)
-Redacción probada en campo (estudio Dental un producto de cliente · Chile · 2026-08-07):
+Redacción probada en campo (estudio Dental Cavity Healing · Chile · 2026-08-07):
 - ❌ "sana caries", "elimina la caries", "repara el diente", "reemplaza al dentista",
   antes/después de dentadura, porcentajes de efectividad, odontólogo firmando o avalando.
 - ✅ "ayuda a cuidar el esmalte", "apoya la remineralización", demostración del gotario,
@@ -43,6 +43,17 @@ Redacción probada en campo (estudio Dental un producto de cliente · Chile · 2
 
 > Si el vertical no está listado, aplica la regla base (beneficio positivo, sin claim médico) y
 > anótalo para agregarlo aquí. El disclaimer del producto (si la página ya lo tiene) es la mejor guía.
+
+## 🚨 ALÉRGENOS (transversal a TODO vertical ingerible o tópico)
+No es "compliance de marketing": es **seguridad física**. Un claim exagerado cuesta una cuenta de
+anuncios; un alérgeno callado manda a alguien a urgencias.
+- **Se transcribe literal del envase y se publica siempre**, aunque el copy quede menos bonito:
+  "CONTAINS/Contiene…", trazas, "elaborado en instalaciones que también procesan…".
+- Frecuentes en suplemento COD: **frutos secos (nuez negra, almendra), soya, lácteos, gluten,
+  marisco, huevo, sulfitos**. En tópicos: frutos secos, lanolina, propóleo, fragancia/limoneno.
+- Sin foto legible del panel → `[ALÉRGENOS NO VERIFICADOS]` + pedir foto. **Nunca "no tiene".**
+- Origen: incidente 2026-09-05 — nuez negra sin declarar en un suplemento, por copiar la ficha de
+  un competidor homónimo (ver `00-identificacion-forense.md`).
 
 ## Compliance por PAÍS (el marco legal cambia con el destino)
 

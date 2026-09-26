@@ -57,6 +57,50 @@ def sin_historia(texto):
     return RX_COMENT.sub(" ", texto)
 
 
+# Prefijo del arsenal propio: `golden-algo` y `golden360`. Sobre estos, la lista de
+# excusas en prosa no tiene efecto — su existencia es un hecho comprobable, no una
+# opinion del que escribe la frase.
+RX_ARSENAL_PROPIO = re.compile(r"^golden(?:360|-[a-z0-9-]+)$")
+
+# NO hay lista de excusas en prosa, ni para el arsenal ni para nada. Hubo una,
+# `EXCUSAS_CONDICIONALES`, justificada como "usa `ripgrep` si lo tiene en el PATH".
+# Al ir a cubrirla con un caso de banco se vio que esa justificacion era falsa:
+# `RX_NOMBRE` solo captura tokens que empiezan por `golden` o `fer`, o sea que el
+# detector NUNCA pudo ver una herramienta de terceros. La lista llevaba versiones
+# apagando avisos de tokens `fer*` y `golden*` — el universo que esta skill SI
+# controla — bajo una coartada que no correspondia a nada.
+# LA CLASE: una lista de excepciones cuya justificacion escrita no corresponde a nada
+# que el detector pueda ver no cubre ese caso: solo tapa los que si ve.
+
+# NO hay lista de excusas para el arsenal propio, y no debe volver a haberla.
+# Hubo una, `DECLARA_INEXISTENCIA`, con la idea de que "planeado, no construido todavia"
+# ya reporta el hallazgo. El verificador adversarial la tumbo el mismo dia: era un
+# `any(w in frase)` sin ninguna comprobacion, asi que bastaba escribir "planeado" para
+# tapar una cita muerta de verdad — y el caso peligroso pasaba igual:
+#     "La skill `golden-x` aun no la usamos, pero es la que corre el cierre."
+# La frase dice que la skill SE USA y aun asi quedaba exenta.
+# LA REGLA: la existencia de una skill se comprueba con os.path.exists, no leyendo un
+# adjetivo. Ninguna declaracion en prosa, del signo que sea, sustituye a esa comprobacion.
+# Los avisos que esto produce son VERDADEROS (3 en 189 skills, medido) y por eso se dejan.
+
+
+# NOTA: aqui vivio `_frases_con()`, el cortador de frases que servia a las dos listas
+# de excusas. Al borrarlas quedo sin un solo llamador. Un validador no guarda funciones
+# "por si acaso": codigo muerto en un validador es de la misma familia que una lista de
+# excepciones vacia de contenido — aparenta cubrir algo y no cubre nada. Si vuelve a
+# hacer falta cortar por frase, se reescribe con su banco al lado, y el corte reconoce
+# fin de frase, parrafo Y vineta (un item de lista es una unidad propia: sin eso, una
+# excusa en el ultimo item silenciaba los de arriba).
+def _solo_como_variable_css(texto, token):
+    """True si TODAS las apariciones del token van precedidas de `--`.
+
+    Con una sola aparicion suelta ya no es sintaxis: es una cita, y se juzga como tal.
+    """
+    total = len(re.findall(re.escape(token), texto))
+    css = len(re.findall(r"--" + re.escape(token), texto))
+    return total > 0 and total == css
+
+
 def revisar_conexiones(dir_skill, univ):
     """Devuelve (fallos, avisos) de conexion."""
     skills, agentes, memoria, familias = univ
@@ -74,8 +118,11 @@ def revisar_conexiones(dir_skill, univ):
         if os.path.exists(os.path.join(dir_skill, r)):
             continue
         # regla 2: calificada con la skill dueña CERCA — antes o DESPUES.
-        # Medido: "scripts/x.json de golden-investigacion-mercado" nombra al
-        # dueño DESPUES de la ruta. Mirar solo hacia atras daba falso positivo.
+        # Medido: una ruta seguida de "de golden-investigacion-mercado" nombra
+        # al dueño DESPUES de la ruta. Mirar solo hacia atras daba falso positivo.
+        # (Sin ruta literal aqui a proposito: un ejemplo con "scripts/" entre
+        # comillas confundia a inventario.sh, que lo leia como cita real de ESTA
+        # skill y la marcaba rota — bug medido 2026-09-05, ver changelog v1.17.)
         ventana = vivo[max(0, m.start() - 160):m.end() + 160]
         duenos = [d for d in RX_NOMBRE.findall(ventana) if d in skills and d != nombre]
         otras = re.findall(r"`([a-z0-9-]{4,})`", ventana)
@@ -103,10 +150,19 @@ def revisar_conexiones(dir_skill, univ):
                for sub in ("assets", "references")
                for ext in (".css", ".json", ".js", ".md", ".png", ".svg")):
             continue
-        # mencion condicional declarada ("si lo tiene en el PATH", "opcional")
-        i = prosa.find(c)
-        ctx = prosa[max(0, i - 120):i + 120].lower()
-        if any(w in ctx for w in ("si el equipo", "si lo tiene", "opcional", "atajo", "si existe")):
+        # La existencia se COMPRUEBA, no se excusa. Un token `golden-*` o `fer*` citado
+        # y ausente de ~/.claude/skills es una cita muerta, y ninguna frase la revive.
+        if RX_ARSENAL_PROPIO.match(c):
+            # Sintaxis, no cita: `--golden-gold` es una variable CSS. Se distingue por
+            # el guion doble, no por una lista de nombres permitidos — pero se exige que
+            # lo sean TODAS sus apariciones. Antes bastaba una: declarar la variable en
+            # cualquier punto del documento tapaba una cita real en otro (F8, medido por
+            # el verificador adversarial). Una puerta de alcance DOCUMENTO contradice la
+            # doctrina de esta skill, que es que cada mencion se juzga donde vive.
+            if _solo_como_variable_css(vivo, c):
+                continue
+            avisos.append(f"cita '{c}', que parece skill golden y NO existe en el arsenal "
+                          f"(una excusa de prosa no la hace existir)")
             continue
         avisos.append(f"cita '{c}', que no resuelve a skill, agente ni memoria (puede ser un token de marca)")
 

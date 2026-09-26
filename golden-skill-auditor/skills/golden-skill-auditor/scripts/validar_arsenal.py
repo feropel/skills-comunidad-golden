@@ -135,31 +135,38 @@ def oficial(dir_skill, binario):
 def main():
     args = [a for a in sys.argv[1:] if not a.startswith("--")]
     solo_casa = "--casa" in sys.argv
-    raiz = args[0] if args else os.path.expanduser("~/.claude/skills")
-    if os.path.exists(os.path.join(raiz, "SKILL.md")):
-        dirs = [raiz]
-    else:
-        # BARRIDO RECURSIVO, no de un solo nivel.
-        # Medido 2026-09-03: el patron '*/SKILL.md' se saltaba 20 skills ANIDADAS
-        # dentro del plugin claude-ads (claude-ads/ads/ y claude-ads/skills/ads-*).
-        # No fallaban: NI SE MIRABAN. El instrumento no reportaba rojo, reportaba
-        # MENOS FILAS — la trampa de conteo en su forma mas silenciosa.
-        vistos = set()
-        dirs = []
-        for sk in sorted(glob.glob(raiz + "/**/SKILL.md", recursive=True)):
-            d = os.path.dirname(sk)
-            if d not in vistos:
-                vistos.add(d)
-                dirs.append(d + "/")
+    # 🔴 TODAS las rutas que se pasan, no solo la primera (26-sep, CdM). Con
+    # `validar_arsenal.py ~/.claude/skills/golden-*` el shell entrega 41 rutas y el script
+    # revisaba solo args[0]: imprimia "UNIVERSO: 1 · 1 de 1 sanas" y salia 0 sobre 41 skills.
+    # Un verde sobre un universo que el que lo corre no eligio.
+    raices = args or [os.path.expanduser("~/.claude/skills")]
+    raiz = raices[0] if len(raices) == 1 else os.path.dirname(os.path.commonpath(raices)) or "/"
+    dirs, vistos = [], set()
+    for r in raices:
+        if not os.path.exists(r):
+            print("no existe la ruta:", r); return 2
+        if os.path.exists(os.path.join(r, "SKILL.md")):
+            encontrados = [r]
+        else:
+            # BARRIDO RECURSIVO, no de un solo nivel.
+            # Medido 2026-09-03: el patron '*/SKILL.md' se saltaba 20 skills ANIDADAS
+            # dentro del plugin claude-ads (claude-ads/ads/ y claude-ads/skills/ads-*).
+            # No fallaban: NI SE MIRABAN. El instrumento no reportaba rojo, reportaba
+            # MENOS FILAS — la trampa de conteo en su forma mas silenciosa.
+            encontrados = [os.path.dirname(sk) + "/" for sk in
+                           sorted(glob.glob(r + "/**/SKILL.md", recursive=True))]
+            if not encontrados and os.path.isdir(r):
+                # Un directorio que existe pero no tiene SKILL.md ni skills hijas es una
+                # skill INCOMPLETA, no una ruta ilegible: eso es FALLO, no error de lectura.
+                encontrados = [r]
+        for d in encontrados:
+            if d.rstrip("/") not in vistos:
+                vistos.add(d.rstrip("/"))
+                dirs.append(d)
     if solo_casa:
         dirs = [d for d in dirs if os.path.basename(d.rstrip("/")).startswith(("golden", "fer-"))]
     if not dirs:
-        # Un directorio que existe pero no tiene SKILL.md ni skills hijas es una
-        # skill INCOMPLETA, no una ruta ilegible: eso es FALLO, no error de lectura.
-        if os.path.isdir(raiz):
-            dirs = [raiz]
-        else:
-            print("no existe la ruta:", raiz); return 2
+        print("no existe la ruta:", raiz); return 2
 
     global _UNIV
     if universo:

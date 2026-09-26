@@ -9,6 +9,17 @@ Se lee de arriba: **gano? escalo?** (bloque 1) y luego **dónde se rompe?** (emb
 en el embudo señala el culpable (creativo / landing / checkout / cierre del bot).
 
 ## Los 5 bloques (orden exacto)
+> 📏 CONTEO MEDIDO sobre esta misma lista, 2026-09-05 — 5 bloques y 40 columnas
+> (10 + 17 + 3 + 6 + 4). Los 17 del bloque 2 salen de 15 nombres donde dos traen `(+costo)`
+> (métrica + su costo = 2 columnas cada uno); los 4 del bloque 5 son 3 clasificaciones + el
+> identificador. Esta lista es LA FUENTE del número: quien lo cite en otro archivo cita ESTE,
+> y si la lista cambia, el conteo se rehace aquí. La nota va sin negrita-dos-puntos a
+> propósito: con ese formato el contador la leía como un bloque más y devolvía 6 y 43. Por eso
+> la lista va encerrada entre marcas `COLUMNAS:INICIO/FIN` y el conteo lo hace un script con
+> autoprueba en los dos sentidos: `python3 scripts/contar-columnas.py --test`. **Ese script es la
+> fuente del número; esta prosa solo lo repite.**
+
+<!-- COLUMNAS:INICIO -->
 **🟩 1 · GANO? (decisión escalar/pausar):** Entrega · Presupuesto · Importe gastado · Resultados ·
 Compras · Costo por resultado · CPA (final) · Tasa de CPA % · Ticket Promedio $ · ROAS de compras.
 **🟦 2 · EMBUDO WEB (dónde se cae):** Alcance · Impresiones · CPM · Frecuencia · FTIR · Clics únicos
@@ -17,6 +28,7 @@ contenido (+costo) · Artículos agregados al carrito (+costo) · Pagos iniciado
 **🟨 3 · EMBUDO WHATSAPP:** Conversaciones iniciadas · Costo por conversación · Tasa Conv WP %.
 **🟪 4 · CREATIVO/VIDEO:** Video 3s · Hook Rate % · Video 50% · Video 75% · Video 100% · Hold Rate %.
 **⬜ 5 · SUBASTA:** Clasif. de calidad · Clasif. de interacción · Clasif. de conversiones. — **Ident:** ID anuncio.
+<!-- COLUMNAS:FIN -->
 
 ## Métricas de fórmula (CUSTOM, creadas a nivel NEGOCIO → sirven en TODAS las cuentas)
 Se crean en Personalizar columnas → "Crear métrica personalizada", acceso "Todas las personas con
@@ -94,7 +106,7 @@ Punto de partida COD LatAm; calibrar con el histórico real de la cuenta cuando 
 > Alcance, impresiones, carritos, checkouts = contexto: se leen en relación entre sí (embudo), no solos.
 
 ## 📄 Documento entregable para el usuario/cliente
-Existe guía imprimible con las 40 columnas + fórmulas + semáforo: `GOLDEN PRO - Guia de Metricas y
+Existe guía imprimible con las columnas de arriba (conteo medido en la cabecera de este archivo) + fórmulas + semáforo: `GOLDEN PRO - Guia de Metricas y
 Columnas` (.docx y .pdf, Desktop del usuario, v1.1). Si piden "el documento de las métricas" o hay que
 re-generarlo: tabla de 7 columnas (# · Español · English · Tipo · Fórmula · Meta objetivo · Qué mide),
 horizontal, 5 bloques con intro cada uno, custom en dorado, metas en verde, notas COD al final.

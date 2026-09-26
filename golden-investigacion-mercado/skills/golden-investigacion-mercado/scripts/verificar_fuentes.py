@@ -100,13 +100,17 @@ def huella(url):
         r = subprocess.run(
             ["curl", "-sL", "-A", UA, "--max-time", "30", "-w",
              "\n@@%{http_code}@@%{url_effective}", url],
-            capture_output=True, text=True, timeout=45)
+            capture_output=True, timeout=45)
     except subprocess.TimeoutExpired:
         return {"error": "timeout"}
     if r.returncode != 0:
         return {"error": f"curl salio {r.returncode}"}
 
-    salida = r.stdout
+    # bytes crudos, nunca text=True: algunos sitios devuelven contenido
+    # comprimido o en una codificacion distinta de UTF-8 y con text=True
+    # subprocess intenta decodificar y revienta con UnicodeDecodeError,
+    # tumbando el chequeo de ESA fuente (medido en vivo 2026-09-06).
+    salida = r.stdout.decode("utf-8", errors="replace")
     corte = salida.rfind("\n@@")
     if corte == -1:
         return {"error": "respuesta ilegible"}
@@ -127,26 +131,43 @@ def huella(url):
     }
 
 
-def sonda_ytdlp(s):
-    """Corre yt-dlp de verdad. Este veredicto SI es definitivo."""
+def sonda_ytdlp(s, intentos=3):
+    """
+    Corre yt-dlp de verdad. Este veredicto SI es definitivo — pero SOLO si reintenta.
+
+    MEDIDO el 2026-09-08: TikTok resuelve un reto JS antes de entregar los datos y falla
+    de forma INTERMITENTE ('Unable to extract universal data for rehydration'). En seis
+    corridas seguidas del mismo video, dos fallaron y cuatro devolvieron 54.000 vistas y
+    1.118 likes. Una sonda de un solo intento concluia 'la extraccion se rompio' sobre una
+    herramienta sana: un detector que grita en falso se termina ignorando, que es la peor
+    forma de fallar. Por eso se reintenta y la intermitencia se REPORTA, no se esconde.
+    """
     if not shutil.which("yt-dlp"):
         return {"error": "yt-dlp no instalado (brew install yt-dlp)"}
     dest = os.path.join("/tmp", f"vf_{s['id']}")
     f = dest + ".info.json"
-    try:
-        os.remove(f)
-    except OSError:
-        pass
     cmd = ["yt-dlp", "--skip-download", "--no-warnings", "--write-info-json",
            "--write-comments", "--extractor-args",
            "youtube:comment_sort=top;max_comments=15",
            "-o", dest + ".%(ext)s", s["url"]]
-    try:
-        subprocess.run(cmd, capture_output=True, text=True, timeout=240)
-    except subprocess.TimeoutExpired:
-        return {"error": "timeout"}
-    if not os.path.exists(f):
-        return {"error": "no genero .info.json (la extraccion se rompio)"}
+
+    fallidos = 0
+    for intento in range(1, intentos + 1):
+        try:
+            os.remove(f)
+        except OSError:
+            pass
+        try:
+            subprocess.run(cmd, capture_output=True, text=True, timeout=240)
+        except subprocess.TimeoutExpired:
+            fallidos += 1
+            continue
+        if os.path.exists(f):
+            break
+        fallidos += 1
+    else:
+        return {"error": f"no genero .info.json en {intentos} intentos (la extraccion se rompio)"}
+
     try:
         d = json.load(open(f, encoding="utf-8"))
     except Exception as e:
@@ -156,8 +177,11 @@ def sonda_ytdlp(s):
             os.remove(f)
         except OSError:
             pass
-    return {"titulo_ok": bool(d.get("title")), "vistas": d.get("view_count"),
-            "likes": d.get("like_count"), "comentarios": len(d.get("comments") or [])}
+    r = {"titulo_ok": bool(d.get("title")), "vistas": d.get("view_count"),
+         "likes": d.get("like_count"), "comentarios": len(d.get("comments") or [])}
+    if fallidos:
+        r["intermitente"] = f"{fallidos} de {intentos} intentos fallaron"
+    return r
 
 
 def autobloqueo(ahora, antes):

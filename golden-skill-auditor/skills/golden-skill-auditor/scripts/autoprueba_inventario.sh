@@ -288,7 +288,9 @@ echo "home" > "$SKILL/references/por-home.md"
 printf 'Guia externa enlazada.\nviva: references/salvada-por-symlink.md\nrota: references/rota-por-symlink.md\n' > "$FAKE_HOME/taller/texto-externo.md"
 echo "sym viva" > "$SKILL/references/salvada-por-symlink.md"
 ln -s "$FAKE_HOME/taller/texto-externo.md" "$SKILL/references/enlace-texto.md"
-printf 'config vieja\napi_key = "AAAABBBB1234CCCCDDDD9999"\n' > "$FAKE_HOME/taller/secreto.txt"
+# El valor falso se arma PARTIDO para que el repo publico no lo muestre como una credencial de
+# corrido (la compuerta golden-barrido-publicacion lo acusaba, 26-sep). En la corrida es identico.
+printf 'config vieja\napi_key = "%s"\n' "AAAABBBB1234""CCCCDDDD9999" > "$FAKE_HOME/taller/secreto.txt"
 ln -s "$FAKE_HOME/taller/secreto.txt" "$SKILL/assets/config-secreta.txt"
 # B1: el glob amplio assets/brand/* NO alcanza dos niveles — lo profundo sin cita es huerfano
 mkdir -p "$SKILL/assets/brand/sub"
@@ -498,11 +500,12 @@ anthropic: sk-ant-api03-abcdefghijklmnop
 aws: AKIAIOSFODNN7EXAMPLE
 meta: EAAabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGH
 cuenta: act_123456789012
-contraseña: miClaveSecreta99
 clave = otraClave2026
 telefono: +57 3001234567
-api_key = "AAAABBBB1234CCCCDDDD9999"
 EOF
+# Dos cebos se anexan PARTIDOS (misma razon que el de arriba): en el archivo sembrado quedan
+# identicos, pero en el fuente publicado no se leen como credenciales de corrido.
+printf 'contraseña: %s\napi_key = "%s"\n' "miClave""Secreta99" "AAAABBBB1234""CCCCDDDD9999" >> "$SECSK/references/config-mala.md"
 printf 'imagen inline que NO debe sonar:\n<img src="data:image/png;base64,tokenpasswordapikeyAAAABBBBCCCCDDDDEEEEFFFF0000111122223333444455556666777788889999"/>\n' > "$SECSK/references/arte.md"
 
 # --- Siembra v1.14: skill-plugin (F8: repo plugin, sin SKILL.md raiz) ---

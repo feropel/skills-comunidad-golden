@@ -11,7 +11,8 @@ description: >-
   Úsala SIEMPRE que el usuario quiera: "revisa los pendientes", "califica estos pedidos",
   "qué cambio antes de despachar", "cuál transportadora le pongo", "este cliente sirve",
   "analiza las direcciones", "hay pedidos duplicados", "me rechazaron un pedido", "por dónde
-  mando este envío", o suba un export de órdenes de Dropi.
+  mando este envío", o suba un export de órdenes de Dropi. Novedades ya
+  despachadas: golden-logistica.
 ---
 <!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
      QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 944 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
@@ -21,13 +22,35 @@ description: >-
      SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # Golden Despachos — calificar antes de que se genere la guía
 
+<!-- skill GD1.8 · auditoría golden-skill-auditor: la description no decía a dónde derivar las
+     novedades ya trabadas (rúbrica, dimensión Activación — "dice cuándo NO usarla / a qué skill
+     hermana derivar"), aunque el cuerpo ("## Fronteras y desambiguación") sí lo tenía por completo.
+     Un pedido de novedades logísticas podía competir entre golden-despachos y golden-logistica sin
+     que el disparador mismo marcara la frontera. Se agregó "Novedades ya despachadas:
+     golden-logistica." al final de la description (944 → 988 de 1024, sigue con margen). Nada se
+     quitó: los disparadores existentes quedaron intactos. Resto de la auditoría (inventario.sh,
+     validar_arsenal.py, las tres autopruebas de scripts/) en verde sin cambios: 0 referencias rotas,
+     0 huérfanos, sintaxis OK, sin secretos, blindaje 15/15 con chflags uchg. -->
+<!-- skill GD1.7 · auditoría golden-skill-auditor (verificado EJECUTANDO, no leyendo):
+     `scripts/calificar.py` moria con traceback crudo si faltaba `datos/FLETES-CALI.json`
+     (linea sin try/except, a diferencia de COSTO-RETORNO y TRANSPORTADORAS-OPERATIVAS, que si
+     lo tenian) — reproducido con DROPI_DATA apuntando a una carpeta vacia. `scripts/decidir_vivo.py`
+     tenia la MISMA clase de hueco en TRES puntos: `datos/COTIZACIONES-VIVO.json`,
+     `datos/RECHAZOS-FULFILLMENT.json` (este SI estaba guardado en calificar.py — la duplicacion
+     entre los dos scripts habia desincronizado el guardia) y `salidas/salida-v3.json`. Los cuatro
+     ahora terminan con `sys.exit` (o aviso + lista vacia, igual que su gemelo en calificar.py) y
+     el nombre exacto de lo que falta, nunca un traceback. Verificado reproduciendo los cuatro
+     casos antes (traceback) y despues (mensaje) del arreglo, y regresion contra los datos reales
+     de Golden (895 ordenes, direcciones.py, duplicados.py y las tres autopruebas siguen en verde). -->
+<!-- skill GD1.6 · las DIRECCIONES entran por su propia puerta (scripts/direcciones.py) con banco en los DOS sentidos, 27 casos. Se midio contra las 895 direcciones reales del export: 12 estaban mal clasificadas (1,3%) porque el detector acusaba el LENGUAJE y no el defecto — la palabra 'oficina' bloqueaba la oficina PROPIA del cliente, las nomenclaturas de DOS letras (# 100 AB - 03, # 65 GG - 22, # 23AN-45) salian INCOMPLETA, y a las veredas se les pedia numero de puerta. Nuevo estado RURAL. Las tres correcciones se vieron morder bajo sabotaje, y un caso del banco resulto DECORATIVO (no alcanzaba la rama que decia guardar): se reemplazo por uno que si la alcanza. -->
+<!-- skill GD1.5 · la efectividad entra por UNA puerta (scripts/efectividad.py): cascada municipio/departamento/nacional SIN umbral, con muestra_envios y fuente_efectividad en el informe, y GUARDIA DE PROCEDENCIA que descarta el archivo sin _fuente (EFECTIVIDAD-PLATAFORMA.json tenia Envia 95,51% contra 81,09% real y decidia mal: la recomendacion #1 cambiaba de transportadora) · duplicados distingue FANTASMA de duplicado (editar cambia el id) y los cuatro estados terminales por igualdad exacta · COSTO-RETORNO por negocio con DROPI_NEGOCIO · dos bancos de autoprueba, ambos vistos morder bajo sabotaje -->
 <!-- skill GD1.4 · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 <!-- skill GD1.3 · auditoría golden-skill-auditor: decidir_vivo.py NO tenía rama prepago (calificaba TODOS los pedidos, prepago incluido, con el valor esperado de contra entrega — retorno y probabilidad de devolución que un prepago nunca paga; contradecía criterios-decision.md, que manda el precio en prepago). Ahora replica la lógica de calificar.py: descarta candidatas a más de 3 puntos de la mejor efectividad, elige la más barata salvo excepción de $1.500, retorno en cero, y la columna GANA reporta ahorro de flete (no valor esperado) para prepago. De paso: filtro explícito de HABILITADAS (antes solo vivía en calificar.py; Servientrega y otras no habilitadas podían colarse si alguna vez cotizaban), y se quitó un bucle muerto (`for c in x['cands']: pass`). CHANGELOG.md se movió a `references/changelog.md` (vivía suelto en la raíz: material que se publicaría tal cual al marketplace). Probado con fixtures sintéticos (un pedido prepago, uno contra entrega) contra el propio script: confirmado el cambio de comportamiento antes→después. -->
 <!-- skill GD1.2 · auditoría: los scripts aplican por fin el filtro de TRANSPORTADORAS-OPERATIVAS.json (la regla GD1.1 vivía solo en prosa; la corrida de prueba reprodujo el total equivocado) · retorno leído de COSTO-RETORNO.json por confianza (trampa 5) · scripts portables (DROPI_DATA + export por argumento/variable/Escritorio) · pipeline documentado (.psv de huellas y COTIZACIONES-VIVO.json) · frontera con golden-chatea-pro-validacion-direcciones también en el description · changelog deduplicado y dato de cliente anonimizado -->
 <!-- skill GD1.1 · TRANSPORTADORAS-OPERATIVAS.json se antepone a todo cálculo; el protocolo de rechazo mira el patrón acumulado -->
 <!-- skill GD1.0 · creación: seis criterios en orden, protocolo de rechazo, huella por transportadora, prepago por precio, duplicados, teléfono junto al ID -->
 
-**Versión** `GD1.4` · Fábrica: chat «✅ SKILL golden-despachos» · Historial detallado en
+**Versión** `GD1.8` · Fábrica: chat «✅ SKILL golden-despachos» · Historial detallado en
 `references/changelog.md`.
 
 En contra entrega la plata no se pierde en la venta, se pierde en el despacho. Un pedido mal
@@ -91,25 +114,53 @@ primeros bloquean: si uno se dispara, no importa lo bien que califiquen los otro
 
 ### Paso 0 · Cargar el cerebro
 Leer de `DROPI-LOGISTICA/datos/`: **`TRANSPORTADORAS-OPERATIVAS.json` primero**,
-`RECHAZOS-FULFILLMENT.json`, `EFECTIVIDAD-PROPIA.json`,
-`COSTO-RETORNO.json`, `EFECTIVIDAD-PLATAFORMA.json`, `FLETES-CALI.json`. Si el usuario trae un
-export nuevo de Dropi, **recalcular efectividad propia y costo de retorno con él** antes de decidir.
+`RECHAZOS-FULFILLMENT.json`, `EFECTIVIDAD-PROPIA.json`, y los fletes (`FLETES-CALI.json`).
+
+**La efectividad entra por UNA sola puerta: `scripts/efectividad.py`.** No se lee un archivo de
+efectividad a mano. Ese módulo resuelve la cascada **municipio → departamento → nacional SIN
+umbral** (orden de FER: si el municipio tiene un envío, ese es el dato) y devuelve siempre
+`muestra_envios` y `fuente_efectividad`, que el informe imprime. Trae además una **guardia de
+procedencia**: un archivo sin `_fuente` ni `_nota` se descarta con aviso y no entra al cálculo.
+Nació de un caso real: `EFECTIVIDAD-PLATAFORMA.json` vivió semanas dentro de la fórmula con Envía
+al 95,51% cuando la Torre madura da 76-81%, y nadie lo vio porque el número no traía de dónde
+salía. Se prueba sola con `python3 scripts/efectividad.py --autoprueba` (6 casos, guardia incluida).
+
+**El costo de retorno es de ESTA empresa, no se hereda.** Se prefiere `COSTO-RETORNO-<NEGOCIO>.json`
+declarando `DROPI_NEGOCIO=GOLDEN`; sin esa variable cae al genérico y lo dice en el informe.
+
+Si el usuario trae un export nuevo de Dropi, **recalcular efectividad propia y costo de retorno con
+él** antes de decidir.
 
 ### Paso 1 · Traer la cola
 Del panel de Dropi (`app.dropi.co/dashboard/orders`), filtro Estado = `PENDIENTE CONFIRMACION` y
 `PENDIENTE`, `Mostrar 500`, y **confirmar que la paginación quedó cerrada** — un conteo sin paginar
 es falso. El método de captura y sus trampas están en `references/captura-panel.md`.
 
-### Paso 2 · Duplicados
+### Paso 2 · Duplicados y órdenes fantasma
 `python3 scripts/duplicados.py <export.xlsx>`. Cruza por teléfono y por nombre+dirección contra
-TODOS los pedidos no cancelados, no solo los pendientes. Nunca cancelar solo: **se le pregunta al
+TODOS los pedidos no anulados, no solo los pendientes. Nunca cancelar solo: **se le pregunta al
 cliente si quiere un segundo producto o si fue un error.**
 
+Distingue **duplicado** de **fantasma**, que no es lo mismo y confundirlos hace preguntarle al
+cliente por un pedido que nunca hizo. Niveles: `EDICION` (sospecha de fantasma), `CRITICO`, `ALTO`,
+`MEDIO`, `VIGILAR`. **Un cero se prueba, no se cree**: el script reporta el universo ("0 alertas
+sobre N órdenes, M pendientes") y trae banco sembrado, `python3 scripts/duplicados.py --autoprueba`
+(7 casos, con los falsos positivos que NO deben saltar).
+
 ### Paso 3 · Direcciones
-Aplicar `references/direcciones-colombia.md` a cada una. Salidas posibles: `OK`, `INCOMPLETA` (no
-despachar), `REVISAR` (verificar antes), `OFICINA` (bloquea la transportadora), `BLOQUEO`
-(transportadora no habilitada). Por cada problema, **entregar la pregunta exacta al cliente** en la
-plantilla del país: trato de usted, una sola pregunta, sin saludo, sin explicaciones.
+**Entran por UNA sola puerta: `scripts/direcciones.py`.** Criterio en
+`references/direcciones-colombia.md`. Salidas posibles: `OK`, `INCOMPLETA` (no despachar),
+`REVISAR` (verificar antes), `RURAL` (vereda o kilómetro: se pide punto de referencia, **nunca**
+número de puerta), `OFICINA` (bloquea la transportadora) y `BLOQUEO` (retiro en punto no
+habilitado). Por cada problema, **entregar la pregunta exacta al cliente** en la plantilla del
+país: trato de usted, una sola pregunta, sin saludo, sin explicaciones.
+
+**Este detector acusa el LENGUAJE de la dirección, no el defecto, así que se prueba en los dos
+sentidos** (`python3 scripts/direcciones.py --autoprueba`, 27 casos: 14 que deben morder y 13 que
+NO). Medido sobre las 895 direcciones del export, tres clases estaban al revés: la palabra
+«oficina» bloqueaba la oficina PROPIA del cliente, las nomenclaturas de dos letras
+(`# 100 AB - 03`, `# 65 GG - 22`, `# 23AN-45`) salían incompletas, y a las veredas se les pedía un
+número de puerta que allí no existe.
 
 ### Paso 4 · Huella del cliente
 Del panel, ícono `.buyer-history-icon` en cada fila. Da tipo de comprador, total, **en tu tienda vs
@@ -153,8 +204,10 @@ Si el usuario reporta un rechazo de la bodega, **ver el protocolo de abajo antes
 
 Cuando el usuario diga "me rechazaron este pedido por X transportadora":
 
-1. **Consultar la Torre Logística** (`EFECTIVIDAD-PLATAFORMA.json`): esa transportadora opera en
-   ese departamento para el resto de la plataforma? con cuántos envíos y qué efectividad?
+1. **Consultar la Torre Logística** por `scripts/efectividad.py` (municipio primero, luego
+   departamento): esa transportadora opera en ese destino para el resto de la plataforma? con
+   cuántos envíos y qué efectividad? La respuesta trae `muestra_envios`, así que se ve si el
+   número se apoya en miles de envíos o en tres.
 2. **Consultar la cotización**: Dropi la cotiza en ese municipio y en los vecinos?
 3. **Dictaminar el alcance:**
    - Si funciona bien en la zona para todos → **es una restricción de la bodega**, alcance
@@ -178,7 +231,19 @@ Cuando el usuario diga "me rechazaron este pedido por X transportadora":
   envíos se marca como tal y, si implica pagar más, no se recomienda.
 - **No ejecutar.** Esta skill recomienda; el usuario cambia y aprueba en el panel. Abrir `Editar
   Orden` para leer la cotización es lectura; salir siempre por `Cancelar`.
-- **El teléfono manda sobre el ID.** Agrupar historial por ID es un error: Dropi lo cambia al editar.
+- **La clave de identidad es (teléfono, ID de orden).** El teléfono manda para agrupar; el ID
+  distingue pedido de pedido. Agrupar solo por ID pierde al cliente cuando Dropi le cambia el ID al
+  editar; agrupar solo por teléfono borra del radar al comprador recurrente con una orden nueva viva.
+- **Editar una orden le cambia el ID, y la vieja sigue en el export ya descargado.** Esa venta
+  aparece dos veces. El discriminador autoritativo es el DETALLE, no el listado:
+  `GET /integrations/orders/myorders/{id}` sobre la vieja responde `"Orden no encontrada"`, mientras
+  que una real, incluso CANCELADA, responde `isSuccess:true`.
+- **Cuatro estados terminales: ENTREGADO, DEVOLUCIÓN, CANCELADO, RECHAZADO** — y son terminales de
+  ESA orden, no del cliente. `ENTREGADO A TRANSPORTADORA` **no** es una venta: es entrega al courier
+  y la plata no ha entrado, así que los estados se comparan por igualdad exacta, nunca por substring.
+- **Un dato medido caduca.** Si otro puede escribir mientras tanto, se relee en el momento de usarlo,
+  no en el de reportarlo. Y una operación que devolvió error puede haberse ejecutado igual: se relee
+  el estado, nunca se reintenta a ciegas.
 
 ## Encadenado al ecosistema
 
@@ -194,6 +259,14 @@ Cuando el usuario diga "me rechazaron este pedido por X transportadora":
 - `references/criterios-decision.md` — la fórmula, los pesos, los umbrales y por qué son esos.
 - `references/direcciones-colombia.md` — qué hace entregable una dirección y qué preguntar cuando no.
 - `references/trampas.md` — los errores que ya se cometieron, para no repetirlos.
+
+Los scripts se prueban solos, y un validador que no se ha visto morder no vale:
+
+```bash
+python3 scripts/efectividad.py --autoprueba   # 6 casos: guardia, cascada, sin umbral
+python3 scripts/duplicados.py  --autoprueba   # 7 casos: fantasma, duplicado real, falsos positivos
+python3 scripts/direcciones.py --autoprueba   # 27 casos: 14 que muerden y 13 que NO deben morder
+```
 
 ## Auto-mejora
 

@@ -1,0 +1,69 @@
+{
+  "_bot_field": "[Carritos] Configuracion · Tipo JSON · el panel avisa: menos de 20000 caracteres",
+  "_carpeta_en_el_panel": "Agente Carritos IA",
+  "_uso": "Molde de las 29 llaves del campo. Se rellenan los {{MARCADORES}} y se pega completo. NO se renombran claves: el flujo las lee por NOMBRE. Los valores de ejemplo que quedan literales (si/no, numeros, posicion_imagen) son los defaults medidos, no invenciones.",
+  "_🔴_ESTE_CAMPO_NO_LLEVA_PRODUCTOS": "Los productos del carrito entran por el WEBHOOK de Shopify, no se configuran aqui. Si alguien intenta meterlos en este JSON, esta en el sitio equivocado.",
+  "_medido": "2026-09-08, contra el campo real del espacio de referencia (29 llaves) mas el mapa de pantalla del panel.",
+  "onboarding_completed": true,
+  "identidad_asistente": {
+    "nombre_asesor": "{{NOMBRE_ASESOR}}",
+    "adaptacion_lenguaje": "{{ADAPTACION_LENGUAJE}}",
+    "metodo_anticancelacion": "{{METODO_ANTICANCELACION}}"
+  },
+  "datos_tienda": {
+    "nombre_tienda": "{{NOMBRE_TIENDA}}",
+    "ubicacion_tienda": "{{UBICACION_TIENDA}}",
+    "pais": "{{PAIS_MINUSCULA}}",
+    "ofrecer_descuento": "{{OFRECER_DESCUENTO_SI_NO}}",
+    "descuento_maximo": "{{DESCUENTO_MAXIMO_NUMERO}}",
+    "mensaje_descuento": "{{MENSAJE_DESCUENTO}}"
+  },
+  "datos_logisticos": {
+    "tiempos_envio": "{{TIEMPOS_ENVIO}}",
+    "metodo_pago": {
+      "contraentrega": "{{CONTRAENTREGA_SI_NO}}",
+      "anticipado": "{{ANTICIPADO_SI_NO}}",
+      "datos_pago_anticipado": "{{DATOS_PAGO_ANTICIPADO}}"
+    },
+    "transportadoras_disponibles": "{{TRANSPORTADORAS}}"
+  },
+  "mensajes_recuperacion": {
+    "posicion_imagen": 1,
+    "carritos": {
+      "carritos_mensaje_1": {
+        "name": "{{PLANTILLA_CARRITO_1}}",
+        "lang": "es",
+        "namespace": "{{NAMESPACE_META}}",
+        "status": "APPROVED"
+      },
+      "recordatorio_1": {
+        "name": "{{PLANTILLA_RECORDATORIO_1}}",
+        "lang": "es",
+        "namespace": "{{NAMESPACE_META}}",
+        "status": "APPROVED"
+      },
+      "recordatorio_2": {
+        "name": "{{PLANTILLA_RECORDATORIO_2}}",
+        "lang": "es",
+        "namespace": "{{NAMESPACE_META}}",
+        "status": "APPROVED"
+      }
+    },
+    "tiempo_recordatorio_1": "{{TIEMPO_R1}}",
+    "tiempo_recordatorio_2": "{{TIEMPO_R2}}",
+    "tiempo_recordatorio_3": "",
+    "mensaje_agradecimiento": "{{MENSAJE_AGRADECIMIENTO}}"
+  },
+  "envio_correos": {
+    "activar_envio": "{{CORREOS_SI_NO}}",
+    "asunto": "{{ASUNTO_CORREO}}",
+    "contenido": "{{CONTENIDO_CORREO}}"
+  },
+  "acciones_especiales": {
+    "subida_automatica": "{{SUBIDA_AUTOMATICA_SI_NO}}",
+    "imagenes_producto": "{{IMAGENES_PRODUCTO_SI_NO}}",
+    "origen_datos": "{{ORIGEN_DATOS}}"
+  },
+  "_recordatorios": "El panel muestra DOS pares (tiempo, plantilla) mas el mensaje con imagen (visto 18-sep). tiempo_recordatorio_3 es una llave SIN casilla: va vacia.",
+  "_plantillas": "Las plantillas NO son configuracion: vienen instaladas o las diseña el dueño. Solo se revisa su estado (existen y APPROVED). name y namespace son de CADA cuenta."
+}

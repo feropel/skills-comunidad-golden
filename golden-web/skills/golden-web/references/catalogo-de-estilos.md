@@ -24,7 +24,7 @@ Ruta base: `~/.claude/skills/web-design-engineer/references/style-recipes/`
 |---|---|---|
 | **MARCA PROPIA** (cuidado personal, cosmética) | Le'côterra, Toppik | `aesop` · `muji-kenya-hara` · `monocle-magazine` |
 | **CREADOR DE CONTENIDO** (link-in-bio, portafolio) | marca personal, infoproducto | `stripe-press` · `are-na` · `notion-pre-ai` |
-| **EMPRESA** (corporativo, servicios, captación) | Llanos Constructores | `pentagram` · `vignelli-swiss-helvetica` · `monocle-magazine` |
+| **EMPRESA** (corporativo, servicios, captación) | constructora regional | `pentagram` · `vignelli-swiss-helvetica` · `monocle-magazine` |
 
 ## Y para lo que esta skill NO construye, pero Golden sí tiene
 

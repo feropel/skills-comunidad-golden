@@ -7,13 +7,14 @@ usan el prompt de respuesta pública y el de venta conversacional del asistente.
 el panel y guarda, y ahí se corta. Ya pasó: una `desc` de 3.928 caracteres tuvo que recortarse a
 483 conservando la regla dura.
 
-> **De dónde sale el 500, con honestidad.** Lo fija `BRIEFING-PARA-SKILLS.md` (2026-08-07) para la
-> descripción del producto de Comentarios. La extracción del código de la app
-> (`TOPES-NATIVOS-POR-CAMPO.md`) ancla ese `maxLength` de 500 al formulario de producto de **Ventas
-> WhatsApp**, y su tabla "definitiva" de los 9 campos de Comentarios **no incluye** la descripción
-> del producto. O sea: el número viene del briefing, no de la extracción de código. Trátalo como
-> tope firme —es el criterio vigente de la casa y equivocarse por arriba se paga— pero si alguna
-> vez alguien mide el formulario en vivo, que anote aquí la fecha y el valor.
+> **De dónde sale el 500 · MEDIDO EN VIVO, reserva cerrada.** Hasta el 2026-09-22 este número
+> venía del briefing y no de una medición del formulario de Comentarios, y así estaba declarado
+> aquí. Ya no: el **2026-09-22** se leyó el contador del propio formulario en la pantalla "Agregar
+> nuevo producto" del agente de comentarios (cuenta 236245), y marcaba **"481/500 caracteres"** en
+> rojo. El tope es real y es del formulario de Comentarios, no heredado del de Ventas WhatsApp.
+>
+> En la misma pantalla se midieron los otros dos: **nombre 255** ("36/255 caracteres") y
+> **`rela` 10 ETIQUETAS** ("7/10 etiquetas"). Los tres están en la tabla del `SKILL.md`.
 
 **Va con tildes.** Es el texto con el que el bot escribe en público; un acento comido se ve. Cada
 tilde pesa 6 contra el techo del campo (ver `escritura-api.md`), pero en 500 caracteres eso son
@@ -60,6 +61,25 @@ Cuatro bloques, en este orden: **qué es → precios → confianza → reglas de
 mayúscula sin dos puntos gastan menos y se leen igual.
 
 ---
+
+## Qué NO entra: el semáforo de encaje
+
+Antes de recortar por tamaño, recorta por **verdad**. Kevin lo clasifica así (clase M7, 1:55:42),
+y aplica directo a los bullets de "Lo que puedes esperar":
+
+| | Qué significa | Qué se hace |
+|---|---|---|
+| 🟢 verde | la promesa se cumple y se nota rápido | va al frente |
+| 🟡 amarillo | funciona, pero necesita uso continuado | va con su "con uso constante" |
+| 🔴 rojo | no hay efecto directo | **no se menciona como promesa de valor** |
+
+Su ejemplo: magnesio y colesterol alto es **rojo** — *"no tiene efecto directo sobre los lípidos,
+el encaje real es hacia el calambre"*. Un beneficio rojo no entra aunque suene bien y aunque
+sobre espacio.
+
+El material de donde se elige sale abundante a propósito: él pide *"15 beneficios como mínimo"* y
+*"mínimo 10 ángulos de venta"* por nivel de conciencia, para luego quedarse con los 5 o 6 que
+caben. Ver `kevin-doctrina.md`.
 
 ## Cómo se recorta (y cómo NO)
 

@@ -1,5 +1,26 @@
 # Imágenes — cómo dejar la página "todo listo"
 
+## 🔴 LEY DEL TECHO DE NITIDEZ (medida 2026-09-05, no heredada)
+**Shopify ACHICA pero NUNCA agranda: el tamaño de SUBIDA es un techo permanente.** Medido sobre
+una imagen real del CDN (original 1088 px):
+`?width=800` → 800 px · `?width=1600` → **1088** · `?width=2048` → **1088**.
+Consecuencia: si la galeria se sube a 1080, **ninguna pantalla podra recibir mas de 1080 jamas**, y
+en un movil retina (2x) sobre un contenedor de 600-800 px CSS eso se ve blando. No se arregla luego:
+hay que volver a subir la imagen.
+
+**Por eso el tamano va POR DESTINO, y el criterio es UNO: ¿Shopify transforma esa imagen o no?**
+
+| Destino | Sube a | Peso | Por que |
+|---|---|---|---|
+| **Galeria / multimedia del producto** | **2048×2048** | ~300 KB | Shopify SI transforma: genera y sirve las variantes livianas solo. Subir grande no penaliza al visitante y deja techo alto. |
+| **Infografias de la DESCRIPCION** (body_html) | **1080×1350** | **<150 KB** | Van al HTML **sin transformacion**: lo que subes es lo que viaja. Aqui el peso si lo paga el cliente. |
+| **Escalera `P#_IMG` y secciones** | 1080×1080 (1:1) | <150 KB | Igual que la descripcion: URL directa, sin transformacion. |
+| **Cine / fondo full-bleed** | 1920×1080 (16:9) | <300 KB | Ocupa el ancho entero: 1080 de ancho se nota. |
+
+La regla plana de "1080 y <150 KB para TODO" estaba poniendo el techo bajo justo donde Shopify si
+podia servir calidad. **Peso y tamano no son la misma decision:** el peso importa donde no hay
+transformacion; el tamano importa donde si la hay.
+
 La meta: entregar la página con el máximo "listo" posible, sin inventar el producto.
 
 ## Modo imágenes — PREGUNTAR al usuario (2 opciones)
@@ -25,7 +46,8 @@ van dentro del texto de la descripción.
 > `<img>` de la **descripción** (el cliente maneja **infografías** ahí → se duplicarían y la página
 > se ve rota). Reusar la **galería oficial** solo es válido para el HERO. Sin URL propia, la escalera
 > queda como **tarjeta de solo texto** (limpia) y el cine con **gradiente de marca** — nunca vacío.
-> Specs: WebP <150 KB, con width/height + alt, `loading="lazy"` bajo el pliegue (sin CLS).
+> Specs: WebP con width/height + alt — **el peso depende del destino** (galería ~300 KB porque
+> Shopify la transforma; descripción y secciones <150 KB porque viajan tal cual), `loading="lazy"` bajo el pliegue (sin CLS).
 
 ## Pipeline AUTOMÁTICO probado (Nano Banana Pro → Shopify) — v1.20
 Cuando el usuario elige **CON generación** y hay API de Gemini conectada, este flujo deja TODO
@@ -102,13 +124,14 @@ imágenes." No explicar más de eso (mantener la skill ligera).
 ## SET DE IMÁGENES DE LANDING GANADORA (specs del usuario + patrón real)
 
 ### Specs técnicas (del usuario — respetar SIEMPRE)
-- **Galería multimedia (arriba, fotos del producto):** **4–6 imágenes CUADRADAS 1080×1080**,
+- **Galería multimedia (arriba, fotos del producto):** **4–6 imágenes CUADRADAS 2048×2048** (~300 KB;
+  Shopify sirve la variante liviana — ver LEY DEL TECHO DE NITIDEZ arriba),
   cada una **< 300 KB**. Optimizar peso (WebP/compresión) sin perder nitidez.
 - **Infografías de la DESCRIPCIÓN:** formato **VERTICAL 1080×1350** (4:5). ~8–10 paneles.
 - Se producen con **golden-imagen-arena** o el usuario las aporta. La skill las
   **coloca y ordena**, NO las duplica en HTML (ver [[no duplicar infografías]]).
 
-### Galería (1080×1080) — qué suele ir (4–6)
+### Galería (2048×2048, ~300 KB) — qué suele ir (4–6)
 1. Producto principal (PNG real sobre fondo limpio). 2. Banner de gancho/beneficio.
 3. Beneficios clave. 4. Antes/después o resultado. 5. Ingredientes/fórmula. 6. Banner promo.
 
@@ -128,7 +151,7 @@ Adaptar el guion al producto (REGLA #1: distinto por producto), pero mantener el
 PAS**: dolor → problema → mecanismo → prueba → ingredientes → garantía → CTA.
 
 ### Cómo lo usa la skill
-- Deja **slots** para galería (`[IMG 1080x1080: ...]` ×4-6) y para las infografías de
+- Deja **slots** para galería (`[IMG 2048x2048: ...]` ×4-6) y para las infografías de
   descripción (`[INFO 1080x1350: hook]`, etc.) en el orden de arriba.
 - En las **secciones en código** NO repite lo que la infografía ya dice; complementa
   (countdown, precio dinámico, sticky, reseñas editables, FAQ, garantía).

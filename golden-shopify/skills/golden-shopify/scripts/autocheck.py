@@ -20,6 +20,7 @@ USO
 SALIDA   0 = limpio · 1 = hay fallos · 2 = no se pudo leer/parsear
 """
 import json, re, sys
+from urllib.parse import unquote_plus
 
 VERSION_CHECKS = 29  # sube cuando agregues un check (y agregale su caso en autoprueba.py)
 
@@ -63,13 +64,20 @@ def revisar(ruta, es_base=False):
         for b in [s] + list(s.get("blocks", {}).values())
     )
 
+    #    LO QUE SE PUBLICA se calcula UNA vez y lo usan TODOS los checks de contenido.
+    #    Medido 2026-09-05 con el caso disfrazado: los checks 2 y 22 miraban `allcl` (todo el
+    #    liquid, comentarios incluidos) mientras 18/25/27/28 ya miraban solo lo visible. Un ACTA
+    #    dentro de un comentario —citando el disparador viejo y el hex retirado— los encendia a los
+    #    dos. La funcion compartida existia; dos consumidores no la usaban (refinacion 5).
+    visible_txt = solo_visible(allcl)
+
     # 2) Colores DEMO/huerfanos.
     #    OJO (falso positivo medido 2026-09-02): NO son suciedad ni la DEFINICION de la
     #    paleta ({% assign BRAND_PRIMARY = "#b82622" %}) ni el FALLBACK dentro de
     #    var(--brand-primary,#b82622) — este ultimo es justo el patron que la skill EXIGE.
     #    Marcar esos dos hacia 4 avisos falsos en cada corrida, y un validador que siempre
     #    grita en falso ensena a ignorar su salida. Se buscan solo los hex SUELTOS.
-    sueltos = re.sub(r'\{%\s*assign\s+[A-Z_]*BRAND[A-Z_]*\s*=\s*"[^"]*"\s*%\}', '', allcl)
+    sueltos = re.sub(r'\{%\s*assign\s+[A-Z_]*BRAND[A-Z_]*\s*=\s*"[^"]*"\s*%\}', '', visible_txt)
     sueltos = re.sub(r'var\(\s*--[a-z0-9-]+\s*,\s*#[0-9a-fA-F]{3,8}\s*\)', '', sueltos)
     for hexd in ["#b82622", "#8e1c19", "#ff5247", "#0F6F5C", "#0B5345", "#0bd4fd"]:
         if re.search(hexd, sueltos, re.I):
@@ -183,7 +191,25 @@ def revisar(ruta, es_base=False):
     #     con un disparador registrado, o cae en el tablero "No automatizado" que nadie mira.
     #     Este check nacio de un fallo propio: G4.8 emitia "Hola, quiero informacion de X"
     #     (coma de mas, "y precio" de menos) y no casaba con nada.
-    for m in re.finditer(r'(?i)hola,?\s+quiero\s+informaci[oó]n[^"\'<}\n]{0,60}', allcl):
+    #     DONDE MANDA (medido 2026-09-05): el disparador solo tiene autoridad dentro del enlace
+    #     de WhatsApp — es el `text=` que el cliente ENVIA al pulsar. El mismo texto en un
+    #     <pre><code> que documenta el error, en un <script type="application/json"> de config o
+    #     en un atributo data-* NO manda sobre nadie, y marcarlo **castiga justo a quien documenta
+    #     el fallo**. Antes se miraba todo el texto visible y los tres disfraces disparaban.
+    #     La pregunta no es "como esta escrito" sino "esto MANDA sobre alguien".
+    #     OJO: el href se corta en la COMILLA, no en el espacio. El mensaje del disparador lleva
+    #     espacios sin codificar muy a menudo ("...?text=Hola quiero informacion y precio de X"),
+    #     y un patron que pare en \s se queda con "wa.me/57300?text=Hola," y pierde justo lo que
+    #     hay que juzgar. Medido: con \s el caso malo dejo de morder (falso NEGATIVO).
+    #     Y SE DECODIFICA ANTES DE JUZGAR: en produccion los espacios del `text=` viajan como
+    #     `+` (o `%20`), no como espacios literales — medido 2026-09-05 en la tienda viva:
+    #     `?text=Hola+quiero+información+y+precio+de+...`. Un patron con \s NO ve ese enlace,
+    #     asi que un mensaje MAL escrito pasaba invisible. El banco no podia cazarlo porque sus
+    #     sabotajes usaban espacios literales: el formato del banco no era el de produccion.
+    enlaces_wa = [unquote_plus(e) for e in
+                  re.findall(r'(?:wa\.me|api\.whatsapp\.com)/[^"\'<>]*', visible_txt)]
+    for m in re.finditer(r'(?i)hola,?\s+quiero\s+informaci[oó]n[^"\'<}\n]{0,60}',
+                         "\n".join(enlaces_wa)):
         frag = m.group(0)
         if not re.match(r'(?i)^hola quiero informaci[oó]n y precio de ', frag.strip()):
             fallos.append(f"mensaje de WhatsApp que NO casa con el disparador: «{frag.strip()[:52]}» "
@@ -199,7 +225,6 @@ def revisar(ruta, es_base=False):
     # 25) Signos de APERTURA. Regla dura de FER: se escriben solo los de cierre.
     #     Se mira el texto VISIBLE (fuera de comentarios): un comentario del codigo no se
     #     publica, y marcarlo seria el falso positivo que la regla 0-H prohibe.
-    visible_txt = solo_visible(allcl)
     apertura = re.findall(r'[¿¡][^\n]{0,40}', visible_txt)
     if apertura:
         fallos.append(f"signo de APERTURA en texto visible ({len(apertura)}): «{apertura[0][:40]}» "

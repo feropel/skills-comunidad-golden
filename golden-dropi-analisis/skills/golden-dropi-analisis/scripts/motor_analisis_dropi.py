@@ -92,7 +92,7 @@ def classify(estatus):
 def pipeline(estatus, clase):
     """Estado de FLUJO/caja: dónde está la plata de esta orden hoy."""
     if clase == "entregado": return "realizado"      # cobrado
-    if clase == "devolucion": return "devuelto"       # perdido (flete de ida y vuelta)
+    if clase == "devolucion": return "devuelto"       # perdido: un solo flete, el de devolución (COSTO DEVOLUCION FLETE)
     if clase == "cancelado": return "cancelado"       # nunca salió, no cuenta
     e = up(estatus)                                    # clase == transito
     if any(w in e for w in ("DEVOLUC", "REEXPED", "RECOGIDA FALLIDA")): return "en_camino_devol"

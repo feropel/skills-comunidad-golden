@@ -16,6 +16,11 @@
 #    el mosaico: un mosaico corto que calla piezas invalida la verificación visual.
 set -u
 DIR="${1:?carpeta}"; OUT="${2:?salida.png}"; COLS="${3:-5}"; ROWS="${4:-}"
+# Normaliza la ruta: quita las barras finales. `for U in "$R"/*/` — la forma
+# canonica de recorrer productos — SIEMPRE entrega barra final, y sin esto
+# "$DIR/archivo" no se puede recortar contra "$DIR", asi que el script
+# devolvia 0 SIN error (medido 2026-09-05: 1 pieza sin barra, 0 con barra).
+while [ "$DIR" != "/" ] && [ "${DIR%/}" != "$DIR" ]; do DIR="${DIR%/}"; done
 command -v ffmpeg >/dev/null 2>&1 || { echo "🔴 Falta ffmpeg (instalar: brew install ffmpeg). Sin mosaico, verifica abriendo los archivos uno a uno con Read." >&2; exit 1; }
 S=230
 WORK=$(mktemp -d)
@@ -24,7 +29,7 @@ WORK=$(mktemp -d)
 # Si un formato falta aquí, su archivo no se intenta siquiera: no sale en el
 # mosaico NI en la línea "no se pudo leer" — desaparece en silencio, y un mosaico
 # que calla piezas invalida la verificación visual (que es el corazón de la fase 6).
-MEDIA_EXTS="jpg jpeg png webp gif heic heif tiff tif bmp svg psd mp4 mov webm m4v avi mkv hevc"
+MEDIA_EXTS="jpg jpeg png webp gif heic heif tiff tif bmp svg psd ai eps mp4 mov webm m4v avi mkv hevc"
 ARGS=(); primero=1
 for e in $MEDIA_EXTS; do
   [ $primero -eq 1 ] && primero=0 || ARGS+=(-o)

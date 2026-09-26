@@ -7,6 +7,11 @@
 set -u
 DIR="${1:?Uso: clasificar.sh \"<carpeta>\" \"<movimientos.log>\"}"
 LOG="${2:?Falta el log. Uso: clasificar.sh \"<carpeta>\" \"<movimientos.log>\"}"
+# Normaliza la ruta: quita las barras finales. `for U in "$R"/*/` — la forma
+# canonica de recorrer productos — SIEMPRE entrega barra final, y sin esto
+# "$DIR/archivo" no se puede recortar contra "$DIR", asi que el script
+# devolvia 0 SIN error (medido 2026-09-05: 1 pieza sin barra, 0 con barra).
+while [ "$DIR" != "/" ] && [ "${DIR%/}" != "$DIR" ]; do DIR="${DIR%/}"; done
 [ -d "$DIR" ] || { echo "  (no existe: $DIR)"; exit 0; }
 # El log debe poder escribirse ANTES de mover nada
 mkdir -p "$(dirname "$LOG")" && touch "$LOG" && [ -w "$LOG" ] || { echo "🔴 Log no escribible: $LOG — no se mueve nada" >&2; exit 1; }

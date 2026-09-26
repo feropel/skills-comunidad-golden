@@ -1,0 +1,104 @@
+{
+    "_fuente": "INTERRUPTORES DEL FLUJO de Ventas WhatsApp. NO son la configuracion del asistente: la CONFIGURACION son los 2 campos JSON ([Ventas Wp] Configuracion general y general 2), que entre los dos llevan 24 llaves (medido contra el espacio vivo: 24 de 24 coincidencia exacta) y son las cuatro secciones del panel (Modelo de la IA, Acciones especiales, Notificaciones, Comportamiento de la IA). Estos 16 son bot fields SUELTOS, cada uno en su propio campo, y el panel no los muestra en esa pantalla. Medidos en vivo contra el espacio de Golden (f218311) el 2026-09-08 sobre sus 95 bot fields.",
+    "_por_que": "Se documentan porque la plantilla de fabrica de Chatea es COLOMBIANA y estos interruptores viajan con ella: un espacio de Mexico hereda 'Oficina' encendida donde no existe recogida en oficina. No se tocan al configurar salvo que el pais o el modelo lo exijan.",
+    "booleanos": {
+        "[Ventas Wp] Desactivar Skill Datos producto físico": {
+            "valor": "false",
+            "por_que": "la skill de datos del producto fisico se queda activa: es la que pide medidas y peso"
+        },
+        "[Ventas Wp] Desactivar Skill Potencial": {
+            "valor": "false",
+            "por_que": "califica al cliente potencial; se deja activa"
+        },
+        "[Ventas Wp] Desactivar Skill Programar": {
+            "valor": "false",
+            "por_que": "permite programar el pedido para otra fecha"
+        },
+        "[Ventas Wp] Desactivar asignación a asesor": {
+            "valor": "false",
+            "por_que": "deja que el bot escale a un humano cuando toca"
+        },
+        "[Ventas Wp] Desactivar solicitud inicial teléfono": {
+            "valor": "true",
+            "por_que": "pedir el telefono al ABRIR la conversacion espanta; se pide al final, cuando ya hay pedido"
+        },
+        "[Ventas Wp] Desactivar solicitud final teléfono": {
+            "valor": "false",
+            "por_que": "gemela de la anterior: el telefono SI se pide al cerrar, que es cuando el cliente ya quiere el pedido"
+        },
+        "[Ventas Wp] Intento de cancelación ⁉️": {
+            "valor": "true",
+            "por_que": "activa el rescate cuando el cliente intenta cancelar"
+        },
+        "[Ventas Wp] Pedido programado ⏱️": {
+            "valor": "true",
+            "por_que": "acepta pedidos para fecha futura"
+        },
+        "[Ventas Wp] Respuesta Múltiple": {
+            "valor": "true",
+            "por_que": "va de la mano con division.limite=2: deja responder en 2 mensajes"
+        },
+        "[Ventas Wp] Solo Pendiente confirmación": {
+            "valor": "false",
+            "por_que": "no restringe el flujo a un solo estado de orden"
+        },
+        "[Ventas Wp] Oficina 📦": {
+            "valor_por_defecto": "true",
+            "DERIVADO_DE": "pais",
+            "regla": "false en MEXICO (no existe recogida en oficina: todo va a domicilio). true en el resto. Ofrecer recogida en oficina donde su operacion no la tiene rompe la config y confunde al cliente.",
+            "por_que": "es el unico booleano que cambia por pais"
+        },
+        "[Ventas Wp] Solo Con Recaudo": {
+            "valor_por_defecto": "true",
+            "DERIVADO_DE": "modelo",
+            "regla": "true con dropshipping (contra entrega: la transportadora recauda). false con marca propia (pago anticipado: no hay recaudo que hacer).",
+            "por_que": "es el booleano que cambia por modelo de pago"
+        },
+        "[Ventas Wp] Solo Sin Recaudo": {
+            "valor_por_defecto": "false",
+            "DERIVADO_DE": "modelo",
+            "regla": "el ESPEJO de 'Solo Con Recaudo': false con dropshipping, true con marca propia. Los dos en true, o los dos en false, dejan el filtro sin sentido.",
+            "por_que": "gemelo del anterior; si se cambia uno y no el otro, la configuracion queda incoherente"
+        }
+    },
+    "textos": {
+        "[Ventas Wp] Mensaje inicial solicitud teléfono": {
+            "valor": "Me haces un favor? dame acceso a tu número de WhatsApp tocando el botón de aqui abajo👇\n\nLo voy a necesitar mas adelante para agendar tu pedido.",
+            "nota": "solo se usa si 'Desactivar solicitud inicial teléfono' esta en false. Con el default (true) este texto queda cargado pero no se envia."
+        },
+        "[Ventas Wp] Mensaje final solicitud teléfono": {
+            "valor": "Necesito que hagas una ultima cosa por mi, para continuar con tu pedido necesito acceso a tu número de WhatsApp 📲\n\nPulsa el botón de aquí abajo para autorizarlo y poder hacerte el envío, aqui recibirás seguimiento del pedido. 👇",
+            "nota": "este SI se envia con el default. Es el que consigue el telefono."
+        },
+        "[Ventas Wp] Prompt teléfono de contacto recibido": {
+            "valor": "Instrucción especial: En esta respuesta agradece por dar su número de teléfono y continua la conversación con la siguiente interacción, no repitas la ultima pregunta que se hizo la ultima vez.",
+            "nota": "es un PROMPT para la IA, no un mensaje literal al cliente."
+        }
+    },
+    "_vocabulario_por_pais": "Los 3 textos van en el vocabulario del pais. Colombia usa 'pedido' y 'agendar'; en Mexico se dice 'paquete' o 'pedido' y 'repartidor', nunca 'domicilio' para el pedido. Ver references/paises.md.",
+    "interruptores_operativos_whatsapp_ia": {
+        "_fuente": "Prefijo [WhatsApp IA] ([Whatsapp IA] en un caso: inconsistencia real de Chatea, no de esta skill). Medidos en vivo contra Golden (f218311) el 2026-09-08: 10 campos en total bajo este prefijo. De los 10, solo estos 2 son decision real del negocio; los otros 8 son ESTADO que escribe el bot (ver estado_del_bot_NO_TOCAR).",
+        "[WhatsApp IA] Desactivar consulta de recordatorios": {
+            "valor_por_defecto": "false",
+            "por_que": "si es true, el recordatorio NO revisa el estado actual del producto antes de enviarse: mas rapido, pero puede recordar un producto que ya cambio de precio o se agoto. Por defecto false: mas lento, pero exacto.",
+            "_trampa_doble_negativo": "el nombre del campo es un negativo (Desactivar) sobre un negativo (Desactivar LA CONSULTA, no el recordatorio). false NO significa 'recordatorios apagados': significa 'la consulta de estado NO esta desactivada', o sea la consulta esta ACTIVA y el recordatorio SI revisa el producto antes de enviarse -- que es el estandar (mas exacto). true es el que apaga la consulta (mas rapido, menos exacto). Verificado contra el espacio real de Golden (2026-09-22): vivo=true -> se puso en false para volver al estandar, y el recordatorio SIGUE enviandose en los dos valores; lo unico que cambia es si revisa el producto antes. Antes de tocar este campo, releer esta nota: el nombre solo, sin ella, invita a invertirlo."
+        },
+        "[WhatsApp IA] Nota estado de ventas": {
+            "valor_por_defecto": "true",
+            "por_que": "con true sale la nota de felicitacion en el chat cada venta. Los contadores de pedidos y facturacion siguen actualizandose igual en false: apagarla solo quita el aviso visual, no el dato."
+        }
+    },
+    "estado_del_bot_NO_TOCAR": {
+        "_advertencia": "Estos 7 campos los ESCRIBE el flujo mientras opera: contadores de venta, logs, version. Configurar aqui significa NO tocarlos: escribir sobre ellos borra datos de venta reales del dia. No forman parte de ningun archivo que esta skill genere.",
+        "campos": [
+            "[Whatsapp IA] Tipo de actividad",
+            "[WhatsApp IA] Facturación de hoy",
+            "[WhatsApp IA] Pedidos de hoy",
+            "[WhatsApp IA] Fecha anterior",
+            "[WhatsApp IA] Registros del bot",
+            "[WhatsApp IA] Ventas de productos #1",
+            "[WhatsApp IA] Versión de bot"
+        ]
+    },
+    "_pendiente_declarado": "[WhatsApp IA] Instrucciones recolección de datos: vacio, sin descripcion en el panel. El nombre sugiere que guia como el bot pide datos al cliente, pero no hay como confirmar su semantica sin verlo operar en el flujo real. NO se le asigna valor hasta confirmarlo: inventarlo seria el mismo error que un placeholder sin llenar."
+}

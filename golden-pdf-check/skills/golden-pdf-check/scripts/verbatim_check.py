@@ -76,6 +76,38 @@ def segments(text):
     return segs
 
 
+
+# v6.2 · EL PUNTO CIEGO DE ESTA COMPUERTA, medido ejerciendo el Paso C contra un
+# PDF ajeno de verdad. Esta compuerta compara EXTRACCION contra EXTRACCION, asi
+# que garantiza "no cambie lo que lei", NO "lo que lei es lo que el documento
+# decia". Si el PDF de origen usa una fuente monoespaciada con ligaduras, el
+# extractor ya entrega el texto corrompido y los dos lados traen el MISMO error:
+# la comparacion da OK con el dano dentro. Medido: un `<<JSON>>` del documento
+# original salio `<>` en la extraccion, viajo al PDF reconstruido y la compuerta
+# lo bendijo. Es la misma clase que se arreglo en v5.5 para JetBrains Mono, pero
+# ahora en una fuente que no controlamos. No se puede reparar desde aqui; SI se
+# puede AVISAR, que es la diferencia entre un riesgo conocido y una trampa.
+# AQUI VIVIO UN DETECTOR DE LIGADURAS, RETIRADO EN v6.4. Se escribio en v6.2
+# para defender de un fallo que resulto NO EXISTIR: yo mismo escribi `<<JSON>>`
+# sin escapar en el HTML del fixture con el que lo "medi", el navegador se comio
+# `<JSON>` como una etiqueta desconocida y el PDF YA DECIA `<>` antes de que
+# ningun extractor lo tocara. El extractor fue fiel y la compuerta acerto al dar
+# OK. Comprobado despues con los dos fixtures lado a lado: escapado devuelve
+# `<<JSON>>`, sin escapar devuelve `<>`.
+#
+# Se retira por dos razones y las dos importan:
+#   1. No defendia de nada demostrado. Un guardian contra un fallo imaginario
+#      es deuda: hay que mantenerlo y enseña a desconfiar de lo que esta bien.
+#   2. SI hacia dano medible. Acusaba al IDIOMA, no al defecto: contra un prompt
+#      de programacion legitimo (funcion flecha, operador !=, etiquetas HTML,
+#      fragmento <> de React) marcaba LAS CUATRO secuencias, todas correctas.
+#
+# Lo que SI queda, porque es cierto por construccion y no por medicion: esta
+# compuerta compara EXTRACCION contra EXTRACCION, asi que no puede ver un error
+# del extractor. Eso no se arregla con patrones; se arregla pidiendo la FUENTE
+# ORIGINAL al reconstruir un PDF ajeno, y asi esta escrito en el Paso C.
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument("--old", required=True)
@@ -99,6 +131,9 @@ def main():
     print("Segmentos verificados:", checked)
     if ok:
         print("Resultado: OK — el texto se conservó idéntico.")
+        print("   (idéntico ENTRE LOS DOS PDFs. Si el original venía de otra")
+        print("    herramienta, esto NO prueba que el PDF viejo dijera lo que")
+        print("    decía su documento fuente: para eso hace falta la fuente.)")
     else:
         print("Resultado: DIFERENCIAS —", len(missing), "segmento(s) del original NO aparecen idénticos:")
         for m in missing[:40]:
@@ -107,7 +142,8 @@ def main():
 
     if args.json:
         with open(args.json, "w", encoding="utf-8") as f:
-            json.dump({"ok": ok, "checked": checked, "missing": missing},
+            json.dump({"ok": ok, "checked": checked, "missing": missing,
+                       },
                       f, ensure_ascii=False, indent=2)
 
     sys.exit(0 if ok else 3)

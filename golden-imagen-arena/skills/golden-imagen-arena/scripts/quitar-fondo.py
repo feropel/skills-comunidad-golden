@@ -141,7 +141,8 @@ def main():
     if archivos:
         print(f"\n⏱️  {total:.1f}s en total · {total/len(archivos):.2f}s por imagen · "
               f"0 créditos gastados")
-        print("   siguiente paso: optimizar-webp.py para dejarlas < 150 KB")
+        print("   siguiente paso: optimizar-webp.py <entrada> <salida> <destino>")
+        print("   destinos: galeria-shopify (2048) · ficha-html · ig-feed · ig-reel · cuadrado")
 
 
 if __name__ == "__main__":

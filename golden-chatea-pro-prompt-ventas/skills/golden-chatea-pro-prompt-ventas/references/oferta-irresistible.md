@@ -17,6 +17,44 @@ Una oferta irresistible es aquella en la que **el valor percibido supera tanto a
 8. **ESCASEZ** — cantidad realmente limitada. ⛔ Solo si el vendedor confirmó el stock. "Quedan pocas" cuando hay bodega llena es engaño, y en COD se paga con rechazo del pedido cuando el cliente vuelve y encuentra lo mismo.
 9. **PRECIO ANCLADO CONTRA EL VALOR TOTAL** — suma en voz alta TODO lo que recibe (producto + bonos + garantía + envío) y recién entonces di el precio. El precio no se compara contra cero: se compara contra el valor apilado y contra lo que hoy le cuesta NO resolver el problema.
 
+## ELIGE LA MECÁNICA ANTES DE ESCRIBIR LA OFERTA (2026-09-23)
+Los 9 elementos dicen **qué valor tienes**. La mecánica dice **cómo lo presentas**, y son decisiones distintas. Hasta aquí la skill traía la presentación horneada como un único default —tres opciones con Hoy vs Antes—, que es correcto para la mayoría de productos pero no para todos. Elegir la mecánica es un paso del trabajo, no un adorno.
+
+**El criterio, en una línea: la mecánica se elige por DÓNDE VIVE EL VALOR de ese producto.** Si eliges la que no corresponde, presentas impecablemente el argumento más débil que tenías.
+
+| Mecánica | Úsala cuando el valor vive en… | Dónde está construida en esta skill |
+|---|---|---|
+| **Comparación de precios** (Hoy vs Antes) | el descuento: hay un precio anterior REAL y el ahorro es el argumento más fuerte. **Es el default** | `HAZ TÚ LA CUENTA DEL AHORRO` + PASO 0.9 |
+| **Salto de valor** ("por solo $X más te llevas…") | el salto: la distancia entre la 1 y la 2 es chica en pesos y grande en contenido. Es la que más sube el ticket | `BONOS ESCALONADOS` |
+| **Obsequios** (cada nivel incluye regalos) | lo que acompaña: el producto es uno solo y lo que crece es el paquete alrededor | `BONOS DE COSTO MARGINAL CERO` |
+| **Por cantidad** ("pagas X y llevas N") | la cantidad: el producto se consume, se comparte, se regala o se revende | `combos por cantidad` en `plantilla-prompt.md` |
+| **Gancho por envío** (envío pago en la 1, gratis en la 2 y 3) | ⛔ **NO SE USA.** Ver abajo | — |
+
+Léelo al revés cuando dudes: si el producto no tiene "Antes" real, la comparación de precios no es que sea opcional — es que **no la tienes**, y forzarla obliga a inventar el precio anterior, que es exactamente la ley de la urgencia real rota por otro camino.
+
+### ⛔ Por qué el gancho por envío no entra
+Cobrar el envío en la opción 1 para empujar a la 2 **contradice una regla fija de la skill**: `plantilla-prompt.md` dice *"no cobres envío nunca; solo sube a prioritario desde 2 unidades"*. Y el efecto que busca **ya lo produce la escalera**: la opción 1 queda como ancla baja y la etiqueta va en la 2. No hace falta poner una fricción de plata en la puerta de entrada, que es justo donde decide el cliente que todavía no conoce la marca.
+
+Si algún día se quisiera cobrar envío en la unidad suelta, **eso es una decisión de modelo de negocio, no una de redacción**: la toma FER, igual que el descuento por anticipado. La fábrica no la decide sola.
+
+### ⛔ SE IMPORTA EL CRITERIO, JAMÁS LA REDACCIÓN AJENA
+Esta taxonomía llegó desde la skill de un tercero, en forma de cinco plantillas listas para pegar. **El menú sirve; los textos no.** Medido sobre las cinco plantillas de origen, una por una:
+
+| Contaminante horneado en el texto | Aparece en | Choca con |
+|---|---|---|
+| Escasez inventada: *"solo nos quedan [N] unidades"* | **5 de 5** | `cumplimiento.md` §4 y LEY DE LA URGENCIA REAL |
+| Falsa cercanía: *"Magnífico Corazón 💚"* | **5 de 5** | `psicologia-del-chat.md` (el límite que marca Gaviria: ni reina, ni amor, ni princesa) |
+| Envío gratis incondicional *"por ser cliente nuevo"* | **4 de 5** | LEY DEL CLAIM ACOTADO: solo si es cierto siempre |
+| Autoridad sin prueba: *"testeado y validado por [especialista]"* | 1 de 5 | ⛔ PRUEBA SOCIAL: REAL O NO EXISTE |
+| Exclusividad: *"único producto de nuestro catálogo con garantía"* | 1 de 5 | Veracidad: es falso en cuanto el catálogo tiene otro |
+
+**La lección de clase, que vale para cualquier material ajeno que llegue:** una plantilla lista para pegar **trae sus afirmaciones horneadas dentro**, y esas afirmaciones son del negocio que la escribió, no del tuyo. Lo reutilizable de una plantilla es su ESQUELETO —qué va primero, qué compara el cliente, dónde va la pregunta—; el relleno hay que volver a llenarlo con lo que este negocio sí puede sostener.
+
+⛔ **Y prohibir no basta: hay que dictar con qué se llena el hueco.** Un modelo al que se le dice "no digas que quedan pocas unidades" escribe otra escasez inventada. Se le dicta el reemplazo literal:
+- En lugar de la escasez inventada → **la urgencia operativa, que siempre es cierta**: *"si confirmas hoy, sale mañana"*.
+- En lugar de *"Magnífico Corazón"* → **el saludo neutro o con @**: *"Hola 😊"*, *"Bienvenid@"*, o el nombre del cliente si ya lo dio.
+- En lugar de la autoridad prestada → **el mecanismo único** (elemento 3), que es una afirmación sobre el producto y no sobre un tercero que no existe.
+
 ## PONLE NOMBRE A CADA OFERTA (no las llames "1, 2 y 3")
 Nombrarlas cambia lo que el cliente compara. Con números compara solo precio; con nombres compara PAQUETES.
 Molde: `*[MARCA] START — 1 [unidad]*` · `*[MARCA] PLUS — 2 [unidades]*` · `*[MARCA] PRO — 3 [unidades]*`

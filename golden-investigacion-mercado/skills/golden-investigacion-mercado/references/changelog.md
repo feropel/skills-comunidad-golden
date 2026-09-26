@@ -1,9 +1,368 @@
 # Changelog — GOLDEN INVESTIGACIÓN DE MERCADO
 
 ## Índice (orden cronológico DESCENDENTE — más reciente arriba)
-G5.12 · G5.11 · G5.10 · G5.9 · G5.8.1 · G5.8 · G5.7 · G5.6 · G5.5 · G5.4 · G5.3 · G5.2 · G5.1 · G5.0 · G4.3
+G5.21.1 · G5.21 · G5.20 · G5.19 · G5.18 · G5.17 · G5.16 · G5.15 · G5.14 · G5.13 · G5.12 · G5.11 · G5.10 · G5.9 · G5.8.1 · G5.8 · G5.7 · G5.6 · G5.5 · G5.4 · G5.3 · G5.2 · G5.1 · G5.0 · G4.3
 · G4.2.1 · G4.2 · G4.1 · G4.0 · G3.10 · G3.9 · G3.8 · G3.7 · G3.6 · G3.5 · G3.4 · G3.3 · G3.2 · G3.1
 · G3.0 · G2.5 · G2.4 · G2.3 · G2.2 · G2.1 · G2.0 · G1.0
+
+## G5.21.1 — 2026-09-24 — El candado de scraping deja de descartar páginas buenas por una tilde (CENTRO DE MANDO)
+
+**El fallo, medido por el chat de Colágeno el 23-sep:** `candado_scraping.py`, CHECK 4, solo hacía
+`.lower()`. `--pedi "PEPTEA serum"` daba **DESCARTAR** sobre la página correcta "PEPTÉA Sérum", y
+`--pedi "colageno glow"` solo casaba "glow". Es la clase `coterra` contra `côterra`, fallando hacia el
+ROJO: tiraba datos buenos.
+
+**El arreglo, hecho para no provocar el fallo simétrico** (en otra skill, plegar tildes arregló 1
+nombre y rompió 20 sanos): `_plegar()` quita tildes y pasa a minúsculas **solo dentro de la
+comparación**. No toca `textos`, el JSON ni nada que salga del candado. Riesgo declarado en el propio
+script: plegar la ñ hace que "año" case con "ano", lo que en una pregunta de pertinencia puede dar un
+PASA falso en un caso raro.
+
+**De paso salió un segundo defecto que nadie había visto:** con texto en forma NFD (la ñ o la é como
+letra más tilde suelta, que es como llegan muchos textos pegados en macOS), `\w+` partía la palabra en
+la tilde: "PEPTÉA" daba la clave `pepte`, que casaba por accidente. `_plegar` normaliza antes de
+partir, así que la clave vuelve a ser `peptea`.
+
+**Verificación:**
+- Línea base: candado viejo contra nuevo sobre **14 respuestas reales guardadas × 5 pedidos: 0 de 70
+  veredictos cambian.** El arreglo no mueve nada que no tenga tilde.
+- Banco de 5 casos (tilde en el pedido, tilde en la página, las dos palabras, y dos controles
+  negativos con otro producto): nuevo 5 de 5. El viejo falla 2 de 5.
+- La prueba vive dentro del script: `candado_scraping.py --autoprueba`. Un mutante con el
+  comportamiento viejo la hace fallar (3 de 5, exit 1).
+
+**Lo que NO entra en esta versión:** los 11 fallos del verificador sobre G5.21 y las decisiones de FER
+del 22 y 23-sep (5 ángulos, 12 plataformas, casilla en PRODUCTO.json, Dropkiller, inventario de tres
+fuentes, excepción PDF). Siguen en `STACK-GOLDEN/VERIFICACION-G5.21-HALLAZGOS-22SEP2026.md` para la
+pasada única, que espera a que FER cierre el método desde el chat de Colágeno.
+
+**Orden del archivo:** la entrada de G5.21 estaba al final, fuera del orden descendente que declara el
+índice, y el índice no la nombraba. Se movió aquí debajo sin tocar su texto.
+
+## G5.21 — 2026-09-22 — Ampliación de FER: los ÁNGULOS (horneada por el CENTRO DE MANDO)
+
+**Quién:** el Centro de Mando. Esta skill no tiene fábrica declarada en
+`STACK-GOLDEN/REGISTRO-FABRICAS.md`, así que por ley el dueño es el CdM.
+
+**Por qué:** FER dio la orden el 22-sep-2026 (llegó por el chat 📦 COLAGENO, que pidió expresamente
+propagarla a esta skill "para TODOS los productos, no solo el mío"). La orden amplía el mandato
+anterior —*"no vendemos productos, solucionamos problemas"*— en cuatro puntos medibles.
+
+**Qué cambió:**
+1. **SKILL.md** — nueva **FASE 3.5 · LOS ÁNGULOS**, entre la Fase 3 y la Fase 2. De 3 a 10 ángulos,
+   2 creativos por ángulo, investigación global, criterio de LIKES, comparación de motores.
+   Candado: menos de 3 ángulos sostenidos con fuente = la fase no cierra.
+2. **references/03-mercado-en-vivo.md** — nueva **§3.6** con el detalle operativo: las dos vetas
+   (replicar lo que paga en otro país / tomar el hueco), el filtro de likes con `yt-dlp`, la lista
+   completa de fuentes (entran **Alibaba** y **Temu**, que faltaban) y la ficha de entrega de cada
+   ángulo, incluida la columna de qué debe recoger el prompt del bot.
+3. **Sello** GIM_VERSION → G5.21.
+
+**Lo que NO cambió:** las 13 reglas de oro, el esquema de `PRODUCTO.json`, los scripts y el
+blindaje (`scripts/fuentes_baseline.json` sigue sin flag, a propósito).
+
+**Citas que sostienen el cambio** (de FER, mismo día):
+- *"Un solo ángulo no es conveniente porque a lo mejor funciona y fue coincidencia."*
+- *"La investigación de mercado tiene que abarcar todo el mercado, no solo Colombia."*
+- *"Leer los comentarios que deja la gente… y mirar si tienen likes."*
+- *"No te preocupes por las imágenes, si me toca comprar más crédito lo compro."*
+- *"No importa lo que te demores, no importa los recursos que necesites."*
+
+**Memoria canónica:** `feedback_investigacion_antes_de_generar_creativos.md`.
+
+## G5.20 — 2026-09-20 — Auditoría golden-skill-auditor: blindaje PARCIAL reparado, referencias rotas reportadas ya no existen
+
+Corrida de `golden-skill-auditor` con la orden de FER (Fase 0 obligatoria de esa skill). Dos verificaciones:
+
+**(1) Blindaje.** `inventario.sh` midió 20 de 21 nodos con `chflags uchg` — el nodo suelto era
+`scripts/fuentes_baseline.json` (editado el 2026-09-08 sin re-blindar). Reparado: `chflags -R uchg`
+sobre el árbol completo, ahora 21 de 21.
+
+**(2) Las tres referencias rotas del encargo** (`references/estructura-campanas.md`,
+`references/estructura-reporte.md`, `references/copies-cumplimiento.md`, marcadas antes como "no existe
+y no dice de quien es"). Verificado con `grep -rn` sobre TODO el árbol de esta skill (SKILL.md, los 11
+references, los 6 scripts): **cero coincidencias de los tres nombres**, en ningún archivo, ni siquiera en
+el changelog. Estas rutas no fueron citadas por ningún G5.x ni por ningún G2.x-G4.x visible hoy: el
+pipeline vigente usa `03-mercado-en-vivo.md`, `producto-json.md`, `dossier-psicologico.md`,
+`compliance-por-vertical.md` — ninguno se llamó nunca así. Conclusión: el hallazgo del validador
+correspondía a una corrida sobre una versión anterior a la rearquitectura G2.2 (2026-06-25), que ya
+eliminó y renombró varios references (`04-meta-ads.md`, `05-tiktok-ads.md`, `google-ads.md`,
+`06-creativos-copy-prompts.md`) — la cita viva ya no está en el disco desde entonces. `inventario.sh` y
+`validar_arsenal.py` corridos de nuevo hoy confirman 0 rotas, 0 huérfanos, 0 dudosos.
+
+## G5.19 — 2026-09-08 — La trampa GEMELA: dos `N+` no se comparan (la creó la cura de G5.17)
+
+Detectado por el Centro de Mando al revisar la Fase 3 **antes de que se usara**, y es el caso más fino
+de la serie: **el arreglo de una trampa de conteo fabricó otra un piso más arriba.**
+
+G5.17 curó que "40" no era un conteo, obligando a marcar los conteos como cerrados o `N+ (abierto)`.
+Pero **dos competidores marcados `100+` pueden ser 101 y 4.000**, y leerlos como parejos es exactamente
+el error de los cinco cuarentas — con la misma consecuencia, porque ese número alimenta la saturación
+del nicho, que es uno de los 5 datos de viabilidad.
+
+**La regla, ahora en los tres sitios donde alguien la puede leer:** un conteo abierto autoriza a decir
+**"al menos N"** y nada más. **Nunca ordena, nunca rankea, nunca mide saturación, nunca entra en un "X
+pauta más que Y".** Si una decisión de lanzar o matar necesita comparar dos competidores: **se cierran
+los dos conteos, o no se comparan.** Un `N+` comparado vale menos que no tener el dato, porque parece
+que lo hay. Escrito en `03-mercado-en-vivo.md` (junto a la tabla de países, con el aviso de que una
+columna con `N+` no se ordena), en las reglas de coherencia de `producto-json.md`, y **en el propio
+script**, que ahora lo dice en pantalla en vez de dejarlo en la prosa.
+
+**Y con banco que muerde: `scripts/banco_google_transparency.py`.** La regla no se queda en un aviso
+escrito — se prueba. Tres casos, en los dos sentidos: (1) servidor que siempre llena la página → dos
+países abiertos → **debe** avisar; (2) servidor con 7 anuncios → la página viene incompleta → cierra →
+**no debe** avisar (falso positivo); (3) un solo país abierto → marca el `N+` pero **no** grita sobre
+comparaciones que nadie puede hacer. **3 de 3.** Y probado contra sabotaje: desactivando el guarda, el
+banco falla con `exit 1` y nombra el caso — un banco que no muerde ante el sabotaje de la pieza que
+vigila no prueba nada (el archivo se restauró y se verificó byte a byte).
+
+**Lo que esta ronda enseña sobre corregir:** una corrección mueve un criterio, y el error simétrico
+aparece del otro lado. La cura de "no confundas el tope con un conteo" invita a usar `N+` como si fuera
+un número comparable. Por eso una corrección se cierra **midiendo los dos sentidos**, no solo el que
+falló.
+
+**Sigue PARCIAL, sin cambios:** el script no está verificado de punta a punta contra la red — Google
+mantiene el 302 por auto-bloqueo. Pendiente añadido por el CdM para cuando ceda: **medir el tope máximo
+que acepta el endpoint.** Si corta en 100, cualquier anunciante grande saldrá siempre `100+` y el
+conteo cerrado solo existirá para los pequeños — eso cambia cómo se lee la saturación y hay que saberlo
+antes de que alguien decida con ese número.
+
+## G5.18 — 2026-09-08 — FASE 3: el mercado EN VIVO, y los huecos como entregable
+
+Encargo de FER, literal: *"todo es todo, hasta lo que no se están sembrando"*. La skill sabía qué ES el
+producto (Fase -1) y qué SIENTE el cliente (Fase 1), pero no **cómo se está vendiendo ahora mismo**. Se
+cierran los cuatro huecos que la auditoría del 06-sep había medido y dejado abiertos.
+
+**Nueva `references/03-mercado-en-vivo.md`** con cuatro bloques y una salida:
+
+**(a) Mapa de mercados.** La investigación dejaba de ser de un solo país. La lista no se arma a ciegas:
+**origen** (donde se fabrica y están las reseñas con foto real), **mercado maduro** (EEUU y España: sus
+ángulos ya pasaron por selección natural), **vecinos COD** (donde el hallazgo se copia mañana) y
+**destino**. Una fila por país con vendedores, precio en moneda local **y en USD** —sin eso dos países
+no se comparan—, oferta, modelo de pago, anuncios activos y antigüedad. Lo que la tabla deja decidido:
+dónde está saturado, el delta de precio real contra el mundo, y **qué ángulo viaja entre países**, que
+es la diferencia entre estructura y casualidad cultural.
+
+**(b) Matriz de oferta y combos.** El hueco más caro que tenía la skill: *casi nadie compite en
+producto, todos compiten en oferta*. Competidor por competidor: 1, 2 y 3 unidades con el precio por
+escalón, regalo, envío, garantía, ancla, urgencia y modelo de pago. Salida accionable, no descriptiva:
+el escalón que todos ignoran, el punto de precio vacío y la garantía que nadie da.
+
+**(c) Autopsia de página.** Sobre las 2-3 páginas de los que **más llevan anunciando**, que es el
+filtro honesto de "a quién copiar". Se anota el ORDEN de las secciones, porque el orden es la
+estrategia, más el stack técnico por `rawHtml` + `grep` (tema, apps de upsell, píxeles) — la vía más
+honesta que hay, porque no pasa por ningún extractor que pueda inventar.
+
+**(d) Inventario de creativos.** Se capturaba el copy y se perdían **las piezas**. Ahora una fila por
+creativo con formato, **días activo**, gancho de los 3 primeros segundos, qué muestra y texto en
+pantalla, **ordenado por días activo**: la pieza vieja que sigue viva es la que paga. El video se
+desarma con `golden-video-teardown`, no se resume de memoria.
+
+**(e) §3.5 LOS HUECOS, que es para lo que existen los otros cuatro.** Ocho familias: dolores que nadie
+nombra, públicos sin atacar, ángulos ausentes, escalones de precio vacíos, secciones de página y
+formatos de creativo que nadie usa, países con demanda y sin oferta, objeciones sin responder, usos
+secundarios. **Cada hueco lleva dos líneas: la evidencia de que está vacío Y por qué podría estarlo** —
+a veces nadie lo hace porque no funciona, y decirlo vale tanto como el hueco. Un hueco sin la segunda
+línea es una corazonada.
+
+**Nuevo `scripts/google_ads_transparency.py`** — la receta de Google deja de ser prosa y pasa a ser
+herramienta, precisamente porque la prosa ya falló una vez (G5.17). Barre `--paises CO,MX,CL`, y el
+conteo **cierra** (la última página vino incompleta) o sale marcado **`N+ (ABIERTO)`**: la trampa de
+leer el tope de página como conteo ya no se puede cometer. Extrae además **los días que lleva corriendo
+cada pieza** desde las claves 6 y 7 de la respuesta, verificadas contra el reloj: primera vez
+2026-09-01 02:52, última 2026-09-08 10:22 — 7,3 días, coherente con el momento de la medición.
+
+**Tres cosas medidas mientras se construía, que van al manual:**
+- **El offset NO pagina.** Repetir la llamada con offset 40 devuelve **los mismos 40 ids**. Por eso el
+  conteo se cierra subiendo el TOPE. La respuesta trae un cursor en la clave "2" cuyo sitio en la
+  petición **no se descubrió**: queda declarado como pendiente, no disimulado.
+- **`--buscar` busca MARCAS y DOMINIOS, no productos.** "faja reductora" devuelve 0 y "temu" devuelve
+  la lista. Se entra por el dominio del competidor. Sin esto, alguien concluiría "no hay anunciantes".
+- **Rate limit real:** tras ~15 llamadas en pocos minutos Google responde **302** y deja de servir. El
+  script pausa entre llamadas, lo detecta y **para**, en vez de insistir en bucle. Es el mismo patrón
+  de auto-bloqueo que la suite de fuentes ya tenía documentado para AliExpress: sondear dispara las
+  defensas que se están midiendo.
+
+**Enganchado en todo el circuito**, que es lo que evita que una fase nueva quede huérfana: Fase 3 en el
+flujo del `SKILL.md`, puente desde la puerta de la Fase 1, **sección 8.bis del documento maestro** y
+bloque **`mercado_en_vivo`** en el expediente `PRODUCTO.json`, con sus reglas de coherencia:
+`medido_el` obligatorio, `anuncios_activos` siempre acompañado de `conteo_cerrado`, y los precios de
+esta fase rotulados como REFERENCIA — el precio de venta lo fija solo el dueño (REGLA 11).
+
+**Sigue abierto:** las cuatro llaves que dependen de FER (sesión de TikTok Ads, app de Mercado Libre,
+Ahrefs y SimilarWeb, y la decisión sobre el histórico de TikTok). Sin ellas, un estudio sale con tres
+huecos declarados: TikTok en LatAm, Mercado Libre y el tráfico de los competidores.
+
+## G5.17 — 2026-09-08 — La receta de Google traía una TRAMPA DE CONTEO, puesta por mí en G5.16
+
+Salió de una pregunta de FER —"funcionó bien o queda algún arreglo"— que obligó a probar lo que en
+G5.16 se había dejado como **razonamiento y no como medida**: "el país es un número, así que barre el
+mundo" era una deducción sobre una sola corrida con un solo país.
+
+**Lo que apareció al probar cinco países.** Colombia, México, Argentina, España y Chile devolvieron
+**40, 40, 40, 40 y 40**. Ese 40 no es un conteo: es el `"2":40` que pide la propia llamada. Puesto en
+100, devuelve 100. **La redacción de G5.16 decía "40 anuncios activos de temu.com en Colombia" y eso
+era falso.** El daño no es cosmético: de ese número sale la lectura de **saturación del nicho**, que es
+uno de los 5 datos de viabilidad — o sea, alimenta la decisión de lanzar o matar un producto. Un
+competidor con 40 y otro con 40 se habrían leído como empatados cuando ninguno de los dos fue contado.
+Corregido, con la forma de contar de verdad: **paginar subiendo el tope hasta que una página devuelva
+menos que el límite pedido**.
+
+**Lo que sí quedó probado, y era la duda de fondo:** el filtro por país **no se está ignorando**.
+Colombia (2170) y España (2724) sobre el mismo dominio devolvieron **0 ids en común, 40 contra 40**. Si
+el parámetro se ignorara, las dos listas serían idénticas. Esa comparación queda escrita como la
+comprobación obligatoria antes de fiarse de cualquier filtro geográfico. Códigos verificados con
+respuesta real: CO 2170 · MX 2484 · AR 2032 · CL 2152 · ES 2724.
+
+**La lección, que es de la casa y ya tiene familia:** un número que llega redondo y repetido —cinco
+países, cinco veces 40— casi nunca es un dato; es el límite de la herramienta mirándote de frente.
+Y el que lo escribió fui yo, en la ronda anterior, midiendo de verdad **una** vez y generalizando a
+partir de ahí. Medir una vez y extender es el mismo error que este manual corrige en todas partes.
+
+## G5.16 — 2026-09-08 — Las TRES bibliotecas de anuncios, y una sonda que gritaba en falso
+
+Turno dado por el Centro de Mando (esta skill no tiene fábrica declarada: la lleva el CdM). Origen:
+auditoría contra el estándar de exhaustividad de FER — "que vaya a cada país y a cada biblioteca de
+anuncios; si algo no se puede, se dice y se hace posible".
+
+**(a) Google · Centro de Transparencia: de "ni se nombraba" a receta ejecutable, gratis.** La skill
+solo conocía dos bibliotecas de anuncios. Se probó scrapear la web y devuelve la portada (los
+resultados los pinta JavaScript). Se capturó el cuerpo real de su RPC envolviendo `window.fetch` y
+`XMLHttpRequest.prototype.send` en la página, y se reprodujo por curl **sin llave, sin cookies**:
+**40 anuncios activos de `temu.com` en Colombia en una sola petición.** El país es un NÚMERO
+(Colombia = 2170), así que la misma llamada **barre país por país** — es la vía más barata al mapa
+mundial que pide FER. Horneado en `scraping-firecrawl.md` §Bibliotecas de anuncios y en la Fase 1.7.
+Vale por dos: **la técnica de capturar el `f.req` sirve para cualquier sitio que "no se pueda
+scrapear"** — con el cuerpo inventado responde `400 BadRequestException`; con el capturado, los datos.
+
+**(b) La Ad Library de TikTok es SOLO EUROPA — límite legal, no técnico.** Se leyó su selector de país
+completo: los 27 de la UE más Reino Unido, Suiza, Noruega, Islandia, Liechtenstein y Turquía. **No
+existen Colombia, México, LatAm ni Estados Unidos.** Por eso `region=CO` devuelve "Total de anuncios:
+0". Antes de esto, ese cero se habría reportado como bloqueo o como "no hay competencia": las dos
+lecturas son falsas y las dos dañan una decisión de lanzamiento. Regla nueva: **antes de dar por rota
+una fuente que devuelve cero, mirar si el país está en su lista.** Para TikTok LatAm, Creative Center
+con sesión iniciada (sin login se ve recortado; su API sin sesión responde `40101 no permission`).
+
+**(c) La sonda de TikTok de `verificar_fuentes.py` daba FALSO POSITIVO.** Reportaba "no genero
+.info.json (la extraccion se rompio)" sobre una herramienta sana. Medido: TikTok resuelve un reto JS
+y **falla de forma intermitente** — en seis corridas seguidas del mismo video, dos fallaron y cuatro
+devolvieron 54.000 vistas y 1.118 likes. La sonda hacía **un solo intento** y concluía rotura. Ahora
+reintenta 3 veces y **reporta la intermitencia en vez de esconderla**. Es el mismo daño que la suite
+existe para evitar: un detector que grita en falso se termina ignorando, y ahí muere en silencio.
+
+**(d) Amazon: la alarma era real y la vía NO estaba rota.** La suite marcó CAMBIO (de 1.716.438 b a
+~173.000-245.000 b por HTTP plano, y desapareció `anti-csrftoken`). Re-verificado con la herramienta
+real el mismo día: **48 tarjetas, 30 con contador de compras, 44 con precio, total 145 resultados**.
+Cambió lo que Amazon le sirve a un curl desnudo, no lo que ve un navegador. Caso de manual de por qué
+el veredicto es CAMBIO / IGUAL y nunca FUNCIONA / NO FUNCIONA. Matriz actualizada con la fecha.
+
+**Lección de proceso, y esta duele:** el parte que arrancó esta ronda reportaba el crash de
+`verificar_fuentes.py` **como si siguiera abierto**. Estaba medido de verdad, pero sobre **G5.14**, y
+`golden-skill-auditor` ya lo había arreglado en **G5.15** ese mismo día. Un hallazgo verdadero
+envejece en horas cuando el arsenal se repara solo: **antes de transmitir un fallo, se re-mide contra
+el estado vivo, no contra la libreta.** Lo cazó el Centro de Mando corriendo el script.
+
+**Sigue abierto** (reparto del CdM, no cabe en esta ronda): barrido multipaís como fase propia, matriz
+de combos (1/2/3 unidades con precio, regalo, envío y garantía), autopsia de landing y product page
+del competidor, e inventario de las imágenes y videos de los anuncios. Y cuatro llaves que dependen de
+FER: sesión de TikTok Ads, app de Mercado Libre, autorizar Ahrefs y SimilarWeb, y decidir si se paga
+histórico de TikTok.
+
+## G5.15 — 2026-09-06 — verificar_fuentes.py ya no crashea con fuentes no-UTF-8
+
+Auditoría `golden-skill-auditor`. Al correr `python3 scripts/verificar_fuentes.py` en vivo (evidencia,
+no lectura), el script murió con `UnicodeDecodeError: 'utf-8' codec can't decode byte 0x8b in
+position 1: invalid start byte`. Causa: `huella()` llama `subprocess.run(["curl", ...],
+capture_output=True, text=True, ...)` — `text=True` fuerza a Python a decodificar el stdout de curl
+como UTF-8, y una de las 5 fuentes de la matriz devolvió contenido que no lo es (gzip sin
+descomprimir o codificación distinta). El resultado: el chequeo MENSUAL completo tumbado por una
+sola fuente, con traceback, en vez de marcar solo esa fila como `{"error": ...}` y seguir con las
+demás — exactamente el fallo que este script existe para evitar (un dato caído en silencio).
+
+Arreglo (`scripts/verificar_fuentes.py`, función `huella()`): se quita `text=True` de la llamada a
+`subprocess.run` y se decodifica el stdout a mano con `.decode("utf-8", errors="replace")`. Verificado
+re-corriendo el script completo contra las 5 fuentes de la matriz: ya no crashea, entrega el informe
+final con las 4 recetas de scraping/navegador tal como antes.
+
+No se tocó nada más: los dos avisos del inventario de `golden-skill-auditor` (blindaje "parcial" en
+`scripts/fuentes_baseline.json` y un `¿` dentro de un comentario bash de `SKILL.md:151`) son
+excepciones ya declaradas explícitamente en el propio `SKILL.md` — el primero porque el script
+regraba ese archivo y blindarlo lo dejaría escribiendo en el vacío, el segundo porque vive dentro de
+un comentario de código para quien lee el bloque `bash`, no en texto que la skill le entregue al
+cliente.
+
+## G5.14 — 2026-09-05 — El acta sale del cuerpo: 2.780 tokens que se pagaban en cada activación
+
+Fila del Centro de Mando, medida y **confirmada por mí antes de actuar**: el `SKILL.md` tenía
+**11.120 caracteres de comentario de sello — el 47% del archivo, ~2.780 tokens pagados en CADA
+activación** para cargar un historial que nadie consulta mientras trabaja. Sobre el arsenal completo
+eran 234.666 caracteres (22% del corpus de los SKILL.md).
+
+**Nada se borró: se mudó**, y en este orden, que es el que evita perder texto:
+1. Se comprobó que los hechos del sello YA estaban en este changelog (muestreo de cadenas exactas:
+   `BLACK WALNUT`, `importlib`, `2560×1920`, `drawtext`, `homónimo`, `143 menciones`,
+   `nano-hidroxiapatita`, `Toppik` — todas presentes).
+2. **Se cazó la excepción**: el tope del `description` (`~1.536` caracteres) aparecía **0 veces** en
+   el changelog. Era una **regla viva** escondida en un comentario, no un acta. Se convirtió en la
+   **regla 14 de `reglas-de-oro.md`** (1024 valida, ~1536 trunca, 879 hoy, cómo medirla) y se releyó
+   del disco para confirmar que llegó **antes** de tocar el `SKILL.md`.
+3. Solo entonces se reemplazó el sello largo por uno de una línea que apunta aquí.
+
+Lección de método, aplicable a cualquier skill: **un comentario puede contener una regla operativa
+disfrazada de historia**. Mudar sellos a ciegas habría borrado el único sitio donde vivía el límite
+que hace que esta skill dispare o no.
+
+También de esta ronda, cerrado desde fuera por el Centro de Mando y verificado aquí: dos hermanas
+(`golden-copywriting`, `golden-blindaje`) citaban ficheros míos con rutas a secas
+(`references/01-investigacion-360.md`), no copiables desde otra carpeta. Ya están cualificadas a
+`golden-investigacion-mercado/...` y **comprobadas en disco**. Corolario adoptado: **una ruta se
+escribe completa desde la raíz del arsenal — copiable, no deducible.**
+
+## G5.13 — 2026-09-05 — La ficha sale de la ETIQUETA: el alérgeno que nadie amplió
+
+**El incidente (madrugada del 05-sep, suplemento COD).** Se publicó una ficha con **cinco
+ingredientes falsos** y un **ALÉRGENO sin declarar — nuez negra —** durante horas. Causa: los
+ingredientes se copiaron de la **página de un COMPETIDOR** que vendía otra formulación **con el
+mismo nombre comercial**. La fuente correcta llevaba días dentro del material del cliente: impresa
+en la etiqueta del frasco, legible **ampliando un fotograma de un video del proveedor**.
+
+**Qué encontré al medirme contra el caso (grep, no impresión):** la skill tenía la compuerta de
+identidad y la regla de "ficha vieja contaminada", pero **cero cobertura de esta clase concreta**:
+0 hits de "mismo nombre comercial/homónimo", 0 de "alérgeno", 0 de "ampliar el envase", 0 de "el
+error es tuyo". Cubría al *revendedor* y a la *ficha vieja*; no al **competidor homónimo**, y no
+tenía **ningún** mecanismo para sacar el dato de una foto.
+
+### Herramienta nueva: `scripts/etiqueta_desde_video.py`
+Convierte la lección en un paso mecánico. Video del cliente → N fotogramas repartidos por la
+duración → recorte opcional del panel → ampliado ×2–×8 con Lanczos → PNG que el modelo **abre con
+Read** y transcribe. Declara lo que NO hace: no es OCR y **ampliar no inventa nitidez** (lo ilegible
+se marca `[ILEGIBLE]` y se pide otra foto).
+
+**Probado, no supuesto** — y la prueba encontró un bug que la lectura no vio: `importlib.util`
+usado sin importar, que hacía reventar la comprobación de Pillow (`AttributeError`). Corregido y
+re-corrido. Medido el 2026-09-05: de un video 640×480, **4 fotogramas a 2560×1920** (×4 real);
+recorte + ×6 → 2262×552; y al abrir ese PNG **se leyó literal `CONTAINS: BLACK WALNUT (nuez
+negra)`** — la cadena exacta del incidente. Muerde con archivo inexistente (`No existe`) y con
+extensión no soportada. Dato de entorno hallado de paso: **el ffmpeg de este equipo no trae el
+filtro `drawtext`** (hubo que generar la etiqueta de prueba con Pillow).
+
+### Doctrina horneada
+- **Regla 11** — la ficha técnica sale de la **etiqueta del producto que se despacha**, jamás de un
+  competidor aunque venda lo mismo con el mismo nombre; un competidor solo sirve para precio,
+  oferta y ángulo. **Todo alérgeno del envase se transcribe literal y se publica** (lo único de una
+  ficha que puede causar daño físico). **Ampliar el envase es un paso**, no un extra. Y: **si el
+  material del cliente contradice tu trabajo, la hipótesis por defecto es que el error es TUYO** —
+  en el incidente, dos veces el proveedor tuvo razón y dos veces se asumió que se equivocaba él.
+- **Regla 12** — **un CERO se prueba, no se cree**: "no hay reseñas/competidores/alérgenos" exige
+  método, términos, fecha y cobertura, igual que un hallazgo.
+- **Regla 13** — **un dato medido caduca**: fecha de medición al lado de cada cifra.
+- **Expediente**: `alergenos`, `alergenos_verificados`, `fuente_etiqueta`. Lista vacía con
+  `verificados:false` significa "no comprobado", **no** "no tiene", y bloquea publicar.
+- **Documento maestro** §2 exige ingredientes de etiqueta + alérgenos literales.
+- **Compliance**: bloque de alérgenos transversal a todo vertical ingerible o tópico.
+
+Compuerta oficial `agentskills validate` (ruta absoluta): **exit 0**. SKILL.md creció solo 14
+líneas — la doctrina vive en references y el acta aquí, porque el cuerpo se paga en cada activación.
 
 ## G5.12 — 2026-08-23 — Auditoría `golden-skill-auditor` (888 → 985): la skill se aplicó a sí misma lo que predica
 
@@ -155,7 +514,7 @@ eso **la locución de los videos no se minaba nunca**. Ahora es concreto y medid
 Porqué del hueco, para que no se repita: la capacidad ya existía en `golden-video-editor` desde
 antes y **nunca se propagó** a las skills que la necesitaban.
 
-## G5.7 — 2026-08-07 — Cosecha del chat "ESTUDIO 360 DENTAL un producto de cliente (Chile)" (6 ítems)
+## G5.7 — 2026-08-07 — Cosecha del chat "ESTUDIO 360 DENTAL CAVITY HEALING (Chile)" (6 ítems)
 Repartido por el Centro de Mando desde la bandeja (orden de FER: "sin omitir detalle"). Todo salió
 de una corrida real de la skill sobre una tienda real de gotas dentales COD en Chile (dominio
 omitido a propósito — no es información que aporte a la lección técnica):
@@ -165,7 +524,8 @@ omitido a propósito — no es información que aporte a la lección técnica):
   declara nano-hidroxiapatita. Regla: rastrear el original (Amazon/eBay/AliExpress) para costo
   real, ml e ingredientes, y PROHIBIDO escribir un claim de ingrediente sin la foto macro de la
   etiqueta del frasco que el dueño va a despachar.
-- **El NOMBRE del producto es un ítem de compliance** (forense + compliance): "Dental un producto de cliente" promete curación y era el mayor pasivo legal del negocio; ninguna revisión lo detectaba
+- **El NOMBRE del producto es un ítem de compliance** (forense + compliance): "Dental Cavity
+  Healing" promete curación y era el mayor pasivo legal del negocio; ninguna revisión lo detectaba
   porque el mapa miraba el copy, no el nombre. Si promete cura → proponer renombre (caso real:
   "Dental Shield / Escudo Dental").
 - **Vertical SALUD BUCAL** en `compliance-por-vertical.md` con la redacción probada en campo

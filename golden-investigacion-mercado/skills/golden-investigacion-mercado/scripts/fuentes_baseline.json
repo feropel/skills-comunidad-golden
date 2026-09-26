@@ -1,9 +1,9 @@
 {
-  "fecha": "2026-08-02",
+  "fecha": "2026-09-08",
   "http": {
     "aliexpress": {
       "http": "200",
-      "bytes": 640990,
+      "bytes": 695890,
       "magnitud": 6,
       "redirigido": false,
       "destino": "aliexpress.com",
@@ -13,13 +13,11 @@
     },
     "amazon": {
       "http": "200",
-      "bytes": 1716438,
-      "magnitud": 7,
+      "bytes": 187421,
+      "magnitud": 6,
       "redirigido": false,
       "destino": "amazon.com",
-      "marcas": [
-        "anti-csrftoken"
-      ]
+      "marcas": []
     },
     "temu": {
       "http": "200",
@@ -31,7 +29,7 @@
     },
     "mercadolibre": {
       "http": "200",
-      "bytes": 23984,
+      "bytes": 23337,
       "magnitud": 5,
       "redirigido": true,
       "destino": "mercadolibre.com.co",
@@ -43,15 +41,16 @@
   "ytdlp": {
     "youtube_comentarios": {
       "titulo_ok": true,
-      "vistas": 1799734121,
-      "likes": 19305183,
+      "vistas": 1813268203,
+      "likes": 19377092,
       "comentarios": 15
     },
     "tiktok_comentarios": {
       "titulo_ok": true,
-      "vistas": 49400,
-      "likes": 986,
-      "comentarios": 0
+      "vistas": 54000,
+      "likes": 1118,
+      "comentarios": 0,
+      "intermitente": "2 de 3 intentos fallaron"
     }
   }
 }

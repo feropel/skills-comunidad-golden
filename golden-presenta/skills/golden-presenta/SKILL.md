@@ -1,7 +1,7 @@
 ---
 name: golden-presenta
 description: >-
-  Golden Group — PRESENTACIONES CINEMATOGRÁFICAS en un solo archivo HTML, con FONDO VIVO (9
+  Golden Group — PRESENTACIONES CINEMATOGRÁFICAS en un solo archivo HTML, con FONDO VIVO (8
   atmósferas WebGL y canvas), láminas de cristal, cámara que viaja por un lienzo (el efecto
   Prezi), modo presentador con notas y cronómetro, vista de mapa, salida a PDF y marca
   parametrizable. CADA PRESENTACIÓN SE VE DISTINTA: atmósfera, paleta y tipografía se eligen
@@ -14,29 +14,19 @@ description: >-
   muestre Prezi, Gamma, Beautiful.ai, Tome o Canva como referencia. Dispara también con
   "mejora este deck" o "esta presentación se ve fea".
 ---
-<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
-     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 1013 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '
-## Atmósferas disponibles
-
-Nueve atmósferas más la opción `ninguna`: **nebulosa, aurora, pulso, candela, enjambre, retabla, retícula, duna, viaje**. `candela` (novena, añadida el 2026-09-03 por encargo de FER) es nebulosa de candela naranja con cian y estrellas, con los colores muestreados del video de los mentores del Cartel del Chat; usa `u_a`/`u_b`/`u_bg`, así que respeta los tokens de cada deck y no lleva colores quemados. El catálogo completo con el mapa tema → fondo → paleta vive en `references/atmosferas.md`.
-
-## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare · (4) Esta skill estaba SIN BLINDAR: se le puso 'uchg' y se comprobo que el candado muerde. Para editarla: chflags -R nouchg <ruta>, y al cerrar chflags -R uchg · (5) Se le construyo la AUTOPRUEBA que no tenia (scripts/autoprueba_deck.py): su verificador nunca se habia probado contra un caso que se supiera malo.
-     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
-     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
-     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
-     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # Golden Presenta — el deck como activo propio, no como suscripción
 
-**Versión:** `GP2.0` · **Fábrica: chat `✅ SKILL golden-presenta`.**
+**Versión:** `GP2.1h` · **Fábrica: chat `✅ SKILL golden-presenta`.**
 
 Ahí se construye y se repara esta skill. Los demás chats la USAN y mandan fila a la fábrica;
 no la editan por su cuenta. Si un chat necesita un cambio, lo pide, no lo hace.
 
-<!-- skill GP1.0 · 2026-09-02 · Nace de un encargo de FER: Prezi AI como referencia,
-     con la pregunta de si conectarse a su cuenta o replicar el modelo. Medido ese día
-     en prezi.com/es/features/ai: su flujo es prompt/archivo -> esquema editable ->
-     estilo/paleta, y su foso real son el lienzo con zoom y 160 millones de usuarios,
-     no su IA. Decisión: motor propio, porque alquilar el de otro es ser su cliente. -->
+
+## Atmósferas disponibles
+
+Ocho fondos vivos más la opción `ninguna`.
+
+Catálogo del motor: `ninguna`, `nebulosa`, `aurora`, `pulso`, `candela`, `enjambre`, `reticula`, `duna`, `viaje` (entre acentos graves porque es lo que se escribe tal cual en `data-atmosfera`, sin tilde). La lista autoritativa es `Atmosfera.lista` dentro de `assets/atmosferas.js`; si esta línea y esa lista no coinciden, manda el motor y `scripts/verificar_deck.py` lo caza. `candela` (octava, añadida el 2026-09-03 por encargo de FER) es nebulosa de candela naranja con cian y estrellas, con los colores muestreados del video de los mentores del Cartel del Chat; usa `u_a`/`u_b`/`u_bg`, así que respeta los tokens de cada deck y no lleva colores quemados. El catálogo completo con el mapa tema → fondo → paleta vive en `references/atmosferas.md`.
 
 ## Por qué existe esta skill
 
@@ -111,7 +101,7 @@ Los recursos van incrustados con `scripts/incrustar_recurso.py`, nunca como ruta
 
 Se parte de `assets/deck-base.html`, se copian los bloques `<section class="slide">` que
 haga falta y se colocan en el lienzo. La disposición y las coordenadas están en
-`references/motor.md`; los ocho tipos de lámina y su criterio de uso, en
+`references/motor.md`; los 11 tipos de lámina y su criterio de uso, en
 `references/arquitectura-narrativa.md`.
 
 **Disposición por defecto: serpentina.** Filas de 4 láminas, separación 1560 en x y 900 en
@@ -185,17 +175,23 @@ TODOS de abrirla en un navegador**, ninguno del script — la bitácora está en
 ## Referencias de esta skill
 
 - `references/arquitectura-narrativa.md` — **empieza SIEMPRE aquí.** Cómo se arma el
-  esquema, los frameworks por tipo de encargo y los 8 tipos de lámina con su criterio
-- `references/atmosferas.md` — **las 9 atmósferas y el mapa tema → fondo → paleta →
+  esquema, los frameworks por tipo de encargo y los 11 tipos de lámina con su criterio
+- `references/atmosferas.md` — **los 8 fondos vivos y el mapa tema → fondo → paleta →
   receta.** Se consulta SIEMPRE: es lo que hace que dos decks no se parezcan
 - `references/marca-blanca.md` — los 4 perfiles de Golden con hex exactos y su contraste
   medido, y cómo se entrega con la marca de un cliente
 - `references/motor.md` — coordenadas, atajos, cómo añadir tipos de lámina, y la
   **bitácora de los 6 fallos medidos** al construir esta skill
 - `assets/deck-base.html` — la plantilla funcional. No se reescribe desde cero: se copia
-- `assets/atmosferas.js` — el motor de fondos vivos (17 KB, cero red). Fuente única: se
+- `assets/atmosferas.js` — el motor de fondos vivos (21 KB medidos con `ls -l`, cero red). Fuente única: se
   incrusta en el deck con `scripts/incrustar_atmosferas.py`, nunca se copia a mano
 - `scripts/verificar_deck.py` — el auditor. Se corre siempre antes de entregar
+- `scripts/autoprueba_deck.py` — prueba al auditor contra casos que SE SABEN malos.
+  Se corre después de tocar el auditor: si pasa a la primera, sospecha del script
+- `references/changelog.md` — el acta de cada versión, fuera de aquí a propósito
+- `scripts/abrir_blindaje.sh` — abre el blindaje Y captura el md5 ANTES en el mismo
+  acto. `--cerrar` imprime los pares que cambiaron y vuelve a blindar. Se usa
+  SIEMPRE para editar esta skill: el antes tomado de memoria se pierde
 
 ## Encadena con
 
@@ -206,10 +202,13 @@ TODOS de abrirla en un navegador**, ninguno del script — la bitácora está en
   movimiento y prohibiciones) en `references/style-recipes/`. Una por deck, entera
 - `golden-cinematica` → de donde salen el preloader y el estándar de movimiento; úsala
   cuando el encargo necesite una escena 3D de verdad (objeto cromado, modelo que rota,
-  entorno HDRI). Aquí el fondo acompaña; allí la escena ES la página
+  entorno HDRI). Aquí el fondo acompaña; allí la escena ES la página. 🔴 **Si piden la
+  propuesta como PÁGINA que se lee haciendo scroll por escenas** (no láminas), se delega a
+  `golden-cinematica`: desde GC1.5 ese formato es suyo, con sus 12 piezas y su vara de calidad.
+  Las láminas, el modo presentador y la cámara por el lienzo siguen siendo de esta skill
 - `golden-web/references/estandar-movimiento.md` → los números del movimiento
 - `golden-imagen-arena` o Higgsfield → producir las imágenes del deck
-- `golden-finanzas` (**agente**, vive en `~/.claude/agents/`) → si el deck es una propuesta
+- `golden-finanzas` (skill desde el 19-sep-2026; antes era agente) → si el deck es una propuesta
   comercial, los números salen de ahí
 - `pptx` → cuando el entregable DEBE ser un PowerPoint editable
 - `gws-slides` → cuando debe vivir en Google Slides
@@ -233,69 +232,7 @@ TODOS de abrirla en un navegador**, ninguno del script — la bitácora está en
 - **El encargo real necesita editor visual o colaboración en vivo:** se dice de entrada y
   se deriva, en vez de entregar algo que el cliente no va a poder mantener.
 
-## Changelog
+## Historial
 
-- **GP2.0** (2026-09-02) — **Fondo vivo.** Veredicto de FER sobre GP1.1: "muy plana, le falta
-  dinamismo, movimiento, tecnología, fondo, vida", con la orden de desplegar lo que ya
-  sabíamos y quizá no estaba instalado. Añadido:
-  (1) **motor de 9 atmósferas** (`assets/atmosferas.js`, 21 KB) en **WebGL puro y canvas 2D,
-  sin Three.js** — decisión medida: la ley de cero dependencias de red, más el hallazgo del
-  Centro de Mando de que un fragment shader de ~1 KB aguanta framerate en móvil donde una
-  escena Three.js no. Three.js minificado ronda 600 KB y entra por CDN;
-  (2) **láminas de cristal** con `backdrop-filter` y filo de luz, para que el fondo se vea
-  a través sin comerse el texto;
-  (3) **mapa tema → atmósfera → paleta → receta** en `references/atmosferas.md`, que es lo
-  que responde al encargo de que cada presentación sea distinta;
-  (4) **enganche con `web-design-engineer`**, 26 recetas de estilo que estaban instaladas y
-  que ninguna skill de presentaciones nombraba;
-  (5) revelado con desenfoque que se resuelve, en vez de solo opacidad.
-  Tres fallos hallados ejecutando en Chrome real con Playwright, ninguno visible en el
-  script: el título salía como "MBA Comunidad Golden_TARJETAS" porque `GP_TITULO` es
-  prefijo de `GP_TITULO_TARJETAS` y se sustituía a medias (arreglado sustituyendo de la
-  clave más larga a la más corta, y añadido un check que caza el resto colgando); y en
-  móvil las láminas no activas salían borrosas, primero por el `filter` del `.slide` y
-  después por el del revelado escalonado, que es del modo lienzo y se colaba al de flujo.
-
-- **GP1.1** (2026-09-02) — Ronda del agente `golden-verificador` (adversarial, 16 corridas
-  del script contra archivos fabricados para romperlo, más Chrome headless en 4 anchos).
-  Encontró 10 fallas y **la clase que las une: reglas duras de Golden degradadas a aviso, y
-  variables calculadas que nunca llegaban a un `check()`**. Corregido:
-  (1) el deck entregable no tenía **un solo acento** en `aria-label`, texto visible ni notas
-  de presentador, y el script contaba las tildes sin comprobarlas nunca. Ahora hay un check
-  que busca palabras que en español siempre llevan tilde, mirando solo lo que ve el usuario
-  (texto, atributos accesibles y cadenas del JS), no el CSS ni los comentarios;
-  (2) una lámina sin posición se saltaba el check de notas por un `continue`;
-  (3) "sin dependencias externas" solo miraba `<script>` y `<link>`, dejaba pasar `<img>`,
-  `<iframe>` y `@import`, y excluía Google Fonts a propósito: ahora mira cualquier
-  referencia de red y es FALLA;
-  (4) el detector de mojibake usaba controles latin-1 en vez de los caracteres cp1252
-  reales y se le colaban 2 de 6 variantes, incluida la comilla curva, que es la más común
-  al pegar desde Word;
-  (5) los signos de apertura y (6) la densidad de 550 caracteres pasan de aviso a FALLA,
-  porque la vara decía "no se entrega" y el script daba exit 0;
-  (7) SKILL.md mandaba a `motor.md` por los tipos de lámina, que viven en
-  `arquitectura-narrativa.md`;
-  (8) contradicción de 8 a 14 contra 8 a 12 láminas en propuesta comercial;
-  (9) "26 comprobaciones" se presentaba como fijo siendo variable, y el denominador se
-  encoge justo cuando el archivo está peor: ahora se explica como señal;
-  (10) `golden-finanzas` y `golden-verificador` se citaban como skills siendo agentes.
-  Además, este SKILL.md se reescribió con acentuación correcta: tenía una sola tilde en
-  todo el archivo, y esa costumbre fue la que arrastró el fallo (1) hasta el entregable.
-
-- **GP1.0** (2026-09-02) — Creación. Encargo de FER a partir de Prezi AI. Motor de cámara
-  sobre lienzo, 8 tipos de lámina, modo presentador con notas y cronómetro, vista general,
-  deep-link, modo flujo en móvil, salida a PDF y marca parametrizable. Verificador con
-  contraste WCAG calculado. Seis fallos detectados y corregidos ejecutando en navegador,
-  no razonando: láminas sin colocar en el lienzo, preloader congelado por ralentización de
-  temporizadores en segundo plano, cronómetro con el mismo defecto, el arranque pisando la
-  navegación del usuario, el modo sin recuperarse al cambiar el tamaño de ventana (caso
-  "conectar el proyector") y el HUD apelmazado en 375 px. Además, un fallo del propio
-  verificador: contaba como lámina un ejemplo que vivía dentro de un comentario HTML.
-
-## Fronteras y desambiguacion
-
-Descripcion completa anterior (se conserva para no perder ningun matiz de frontera):
-
-> Golden Group — PRESENTACIONES CINEMATOGRÁFICAS de un solo archivo HTML, con FONDO VIVO (9 atmósferas en WebGL y canvas: nebulosa, aurora, pulso, enjambre, retícula, duna, viaje), láminas de cristal con desenfoque, cámara que viaja por un lienzo (el efecto Prezi), modo presentador con notas y cronómetro, vista general del mapa, salida a PDF y marca parametrizable. CADA PRESENTACIÓN SE VE DISTINTA: la atmósfera, la paleta y la tipografía se eligen por el tema del que se habla. Cero dependencias externas: no hay CDN que se caiga ni suscripción. Trae verificador ejecutable (scripts/verificar_deck.py) que mide contraste real, colisiones de láminas, acentos y densidad de texto, y reporta COBERTURA, nunca "quedó perfecto". Úsala SIEMPRE que el usuario pida: "hazme una presentación", "un deck", "unas diapositivas", "un pitch", "una propuesta para un cliente", "slides para la charla", "algo tipo Prezi", "una presentación que se vea cara", "pasa este documento a presentación", "material para el MBA o la comunidad", "presentación para vender X"; o cuando muestre Prezi, Gamma, Beautiful.ai, Tome o Canva Presentaciones como referencia. Dispara también con "mejora este deck", "esta presentación se ve fea" o si pega un guion, un esquema o un documento y pide convertirlo en presentación. NO usar para: página de producto Shopify COD (golden-shopify), sitio web o landing (golden-web / golden-cinematica), PDF que NO es presentación (golden-pdf-check), ni un .pptx que el cliente deba editar en PowerPoint (skill `pptx`) — aunque esta skill sí decide cuándo derivar a esas.
-
-x
+El acta completa de cada versión, con lo que se midió y lo que se rompió, vive en
+`references/changelog.md`. Aquí no, para que este archivo sea instrucción y no memoria.

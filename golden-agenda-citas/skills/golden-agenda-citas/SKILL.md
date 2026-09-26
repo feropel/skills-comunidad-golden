@@ -10,21 +10,17 @@ description: >-
   un negocio, montar un sistema de reservas, "agéndame con", "qué horarios hay libres",
   "reserva para el paciente/cliente", confirmar, mover o cancelar citas, avisar de un choque
   de horario, o configurar el agendamiento de un consultorio/negocio. Se apoya en el MCP de
-  Google Calendar (list_calendars, list_events, suggest_time, create_event, update_event,
-  delete_event, get_event) — si esas tools no responden, la skill lo declara en vez de
-  inventar disponibilidad.
+  Google Calendar — si no responde, la skill lo declara en vez de inventar disponibilidad.
+  No reemplaza al bot de WhatsApp (golden-chatea-pro-*), a golden-automatizacion, ni a
+  golden-cobros/golden-finanzas.
 ---
-<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
-     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 987 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
-     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
-     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
-     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
-     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
+
+**Fábrica:** chat «✅ SKILL golden-agenda-citas»
 # Golden Group — Agenda de Citas
 
-<!-- skill v1.2 · 2026-08-23 · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
-<!-- skill v1.1 · 2026-08-21 · auditoría golden-skill-auditor: quitó el emoji 🦷 fijo (fosilizado a odontología pese a declarar negocio genérico), agregó casos borde (sin huecos, MCP caído, choque de horario, cliente sin contacto, zona horaria ambigua), manejo de error por paso, checklist de "terminado", ejemplo end-to-end, y delegación explícita a golden-automatizacion / golden-chatea-pro-* / golden-cobros. Reserva declarada: aún sin corrida en vivo contra un Google Calendar real con datos de un consultorio — validar el primer caso real y anotar aquí el resultado. -->
-<!-- skill v1.0 · fábrica de este chat · primera versión -->
+<!-- skill v1.4 — 2026-09-13 — golden-skill-auditor: auditoria fresca encontro un hallazgo real con evidencia (rubrica, dimension Activacion, chequeo "dice cuando NO usarla / a que skill hermana derivar"): la description no declaraba la frontera, solo el cuerpo (seccion "Fronteras y desambiguacion", ya existente). Arreglo: se movio el listado de las 7 tools del MCP (list_calendars...get_event) de la description al cuerpo (seccion Herramientas, que ya las explicaba una por una) para liberar espacio dentro del tope duro, y se agrego al final de la description una frase corta de frontera ("No reemplaza al bot de WhatsApp... ni a golden-cobros/golden-finanzas"). Description: 987 -> 994/1024 caracteres. validar_arsenal.py en exit 0 antes y despues. Resto de la skill sin cambios: 0 referencias rotas, 0 huerfanos, sin secretos, sin signos de apertura, blindaje chflags uchg 4/4 nodos confirmado. -->
+<!-- Historial completo de esta skill: references/changelog.md (2 actas, mudadas el 2026-09-05). El cuerpo se paga en cada activación; el acta no. -->
+
 
 Convierte solicitudes de cita en eventos confirmados en Google Calendar, con disponibilidad real verificada antes de crear nada. Doble uso: **agenda propia** (asesorías/VIP de Golden) y **servicio vendible** a consultorios/clínicas/salones.
 
@@ -32,6 +28,8 @@ Convierte solicitudes de cita en eventos confirmados en Google Calendar, con dis
 
 ## Herramientas (MCP Google Calendar)
 
+Las siete tools que usa esta skill: `list_calendars`, `list_events`, `suggest_time`,
+`create_event`, `update_event`, `delete_event`, `get_event` (detalle de cada una abajo).
 Asume que el MCP ya está conectado. Antes del primer paso de cada sesión, confirma con un `list_calendars` que responde — si falla o no hay MCP de Calendar en las tools disponibles, dilo de inmediato ("no tengo conexión al calendario de Google en esta sesión; conéctalo o dime qué horarios están libres y yo preparo el evento cuando lo actives") y NO inventes disponibilidad ni horarios.
 
 - `list_calendars` — elegir el calendario del negocio (si hay más de uno, pregúntalo en el intake, no en cada cita).
@@ -130,3 +128,25 @@ Modelo: cobrar setup + mensualidad por gestionar la agenda del consultorio (rece
 ## Fronteras y desambiguacion
 
 NO usar para: automatizar el cruce entre varias apps (Shopify/Dropi/Sheets) o webhooks — eso es golden-automatizacion; montar el bot de WhatsApp que recibe la solicitud del paciente antes de que llegue aquí — eso es la familia golden-chatea-pro-*; cobrar el setup/mensualidad del servicio — eso es golden-cobros / golden-finanzas.
+
+## Operación de esta skill
+
+Comprobar que está en norma. **Ruta ABSOLUTA siempre: con `.` da fallo falso.**
+```bash
+agentskills validate ~/.claude/skills/golden-agenda-citas
+python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py ~/.claude/skills/golden-agenda-citas
+```
+Salida 0 = en norma. Se corre **DESPUÉS** de tocar la `description`, no solo antes.
+Los dos techos NO son el mismo: **1024 VALIDA (duro) · ~1536 TRUNCA en runtime.**
+
+Blindaje. `chflags uchg` y `chmod` conviven en el mismo árbol y **el orden importa**:
+- abrir: `chflags nouchg <ruta>` **primero**, luego `chmod 644`
+- cerrar: `chmod 444` **primero**, luego `chflags uchg`
+- el **directorio** lleva su propio `uchg` + `555`, y hay que abrirlo para crear ficheros
+
+Al revés, el `chmod` choca contra el flag ya puesto y la skill queda de solo lectura pero
+borrable.
+
+Antes de publicar, **el repo de skills es PÚBLICO**: `~/.golden/bin/golden-barrido-publicacion ~/.claude/skills/golden-agenda-citas`
+
+Historial completo en `references/changelog.md`.

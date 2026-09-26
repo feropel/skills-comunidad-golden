@@ -8,6 +8,30 @@ Es la llave que más se subestima y la que decide si el asistente sirve. Sin ell
 **el asistente de comentarios no tiene campo de ID de anuncio** (verificado en vivo el
 2026-08-07), así que no existe una segunda vía de anclaje.
 
+## La tesis que ordena todo lo demás
+
+**Un disparador no se acepta porque describa bien el producto. Se acepta porque SOLO ESE PRODUCTO
+puede reclamarlo.** Es de Kevin Galeano, montándolo en vivo (clase M7, 1:50:24): con tres
+magnesios en la tienda, poner `magnesio` hace que *"el bot se me va a enloquecer sin saber a cuál
+de los 3 responder"*. Y en la misma escena descarta `dormir` — que describe el producto
+perfectamente — porque **otro** magnesio suyo también sirve para dormir.
+
+Léelo despacio: descartó una etiqueta buena por **compartida**, no por genérica. Ese es el filtro.
+Antes de meter cualquier disparador, pregúntate si un segundo producto del catálogo podría
+reclamarlo. Si la respuesta es sí, no entra.
+
+Detalle, citas y huecos en `kevin-doctrina.md`.
+
+## 🔴 Y el `rela` no se valida solo: se valida contra el COPY
+
+Puede estar perfecto y no disparar nunca, porque el fallo está del otro lado. Kevin (2:14:54):
+*"trata siempre que dentro de ese copy diga el nombre exacto con el mismo disparador que estás
+utilizando en Chatea Pro… me pasaba que la IA me generaba el copy pero me decía magnesio, no
+Magnesio Complex 8 en 1, entonces a veces no lograba relacionarlo."*
+
+**Auditar un `rela` sin mirar el copy del anuncio es media auditoría.** Cuando te digan "no
+reconoce los comentarios de este producto", pide el copy que está corriendo antes de tocar nada.
+
 ---
 
 ## Las 5 capas · un `rela` completo las tiene todas
@@ -90,6 +114,36 @@ conviene perder filo. Qué hacer, en este orden:
 
 Lo que no se hace: pegar el hook con la coma y darlo por cargado.
 
+#### 🔴 El anuncio de VARIAS IMÁGENES rompe la capa 4 (medido, clase M7)
+
+Cuando un anuncio de Meta lleva **contenido dinámico** —varias imágenes o tarjetas dentro del
+mismo anuncio— Meta solo entrega la palabra clave, el copy y el ID **de la primera**. Los
+comentarios que llegan desde cualquiera de las otras entran **sin ese copy**, como un *"quiero más
+información"* pelado.
+
+Qué significa aquí: **tu capa 4 puede estar perfecta y aun así el comentario no trae el texto que
+la activa.** No es un `rela` mal escrito, es el formato del anuncio. Hasta ahora la casa tenía
+escrito que el disparador se rompe por el NOMBRE; también se rompe por el FORMATO.
+
+Tres cosas que sí puedes hacer:
+
+1. **Copia el hook de TODAS las imágenes del anuncio, no solo el de la primera.** Cuesta cuatro
+   líneas más de `rela` y recupera los comentarios de las demás tarjetas cuando el copy sí viaja.
+2. **Cuenta con el genérico.** Con anuncios dinámicos corriendo, la proporción de comentarios sin
+   texto reconocible sube. Ahí manda la regla del `estado`: cuantos menos productos en `activo`,
+   menos lotería (ver `SKILL.md`, §2).
+3. **Cosecha del tablero de "no automatizados" de Chatea.** Ese tablero es la lista de los
+   comentarios que el bot no pudo anclar, con el texto que sí llegó. Es la mejor fuente de capa 4
+   que existe, porque son fallos reales de esta cuenta y no suposiciones: lee lo que dice cada uno
+   y mete esas frases en el `rela` del producto que le correspondía.
+
+**Y aguas con el disparador del lado de VENTAS:** ahí la palabra clave tiene que aparecer
+**literal** en el texto principal del anuncio — poner `magnesio` cuando el disparador es
+`Magnesium Complex 8 en 1` no automatiza — y por eso ese asistente admite además el **ID del
+anuncio** como vía alterna. **El de comentarios no tiene campo de ID** (medido el 2026-08-07 sobre
+sus 5 bot fields; si algún día aparece, esta sección cambia), así que aquí la única defensa sigue
+siendo el `rela`. Eso es precisamente lo que hace que la cosecha del tablero valga tanto.
+
 ### Capa 5 · Las preguntas típicas del comentario
 Lo que la gente escribe cuando pregunta — **siempre atado al producto**.
 
@@ -113,10 +167,64 @@ precio del spray Frescalia, cuánto vale Frescalia, hacen envíos de Frescalia, 
 
 **Entre 15 y 30** para un producto con pauta corriendo. Menos de 8 es un producto que va a fallar.
 
+*(Este rango es **criterio de la casa, no de Kevin**. Él no da número óptimo; lo que da es el caso
+en contra, 2:16:40: *"a veces yo le ponía 20 disparadores y eran tan genéricos que me los
+confundía"*. O sea que el problema de sus 20 no era la cantidad, era que eran genéricos. Y el tope
+de 10 del formulario es de la herramienta, tampoco suyo.)*
+
+🔴 **Pero el FORMULARIO del panel solo admite 10 etiquetas.** Medido el 2026-09-22 en su propio
+contador ("7/10 etiquetas" bajo *Cómo relacionar el post*). O sea que las dos vías no caben lo
+mismo, y la diferencia es brutal:
+
+| Vía | Cuántas etiquetas entran |
+|---|---|
+| Formulario del panel | **10** |
+| JSON / Campos de Bot | todas |
+
+Lo que se pierde al recortar a 10 es **la cola**, que es justo la capa 4: los hooks literales de
+los anuncios, que son los que salvan el comentario genérico. Medido en un campo vivo real: un
+producto con **71 etiquetas se queda en 10 y pierde 61**.
+
+**Cómo se decide:** si el producto va a entrar o a tocarse por el formulario, elige las **10 que
+más rinden** — nombre, dos erratas, dos de categoría o problema, tres hooks del anuncio que esté
+corriendo y dos preguntas con la marca dentro. Si va por JSON, van todas, pero se entrega también
+la lista de 10 para el día que alguien abra ese producto en el panel. El validador bloquea por
+formulario y avisa por JSON.
+
 No hay tope propio del `rela`, pero **todo el campo comparte el techo del bot field** (la física
 está en `escritura-api.md`; el validador la mide). Lo que importa aquí: si el campo se acerca al
 techo, **recorta primero las `desc`, nunca los `rela`**. La `desc` la usa el bot *después* de
 reconocer el producto; el `rela` es lo que decide si llega a reconocerlo.
+
+---
+
+## 🔴 La colisión: el fallo que NO se ve mirando un producto
+
+El detector de genéricos mira cada producto por separado, y así **una colisión es invisible**:
+una etiqueta puede ser perfectamente específica y aun así arruinarlo todo si **otro producto del
+catálogo también puede reclamarla**. Por eso `validar_producto.py` compara **todos los pares de
+etiquetas del catálogo** y lo reporta como **ERROR**, no como aviso.
+
+Kevin lo enseña con el descarte más contraintuitivo de la clase: **"dormir" describe perfectamente
+su magnesio**, y aun así lo tira, *"porque tengo otro magnesio de 12 ingredientes que también
+sirve para dormir"*. **El criterio no es "describe bien el producto", es "solo ESTE producto puede
+reclamarla".**
+
+| Gravedad | Qué es | Ejemplo |
+|---|---|---|
+| `IDENTICA` | la misma etiqueta literal en dos productos | `dormir` / `dormir` |
+| `NORMALIZADA` | la misma sin tildes, mayúsculas ni signos | `Le'côterra` / `lecoterra` |
+| `CONTENIDA` | una dentro de otra | `base coreana` dentro de `base coreana hidratante` |
+
+**La salida no es borrar la etiqueta: es meterle el nombre comercial** que desempata — la solución
+del propio Kevin (`Magnesio Complex 8 en 1` contra `Magnesio 2 en 1`, CITA 2:15:02). Por eso el
+detector **no marca** una etiqueta que ya lleva una palabra distintiva de su producto: ahí el
+nombre ya hizo el trabajo, y marcarla obligaría a borrar disparadores buenos.
+
+> **Caso real, catálogo de Golden, 2026-09-22.** Dos colisiones auténticas que ningún detector de
+> genéricos habría visto: `cuál tono me sirve` la reclamaban **Toppik y el Moisture Cushion** (los
+> dos tienen tonos), y `se me va la base` la reclamaban **Marbella** (polvo que sella la base) y
+> el **Cushion** (que ES una base). Ancladas al nombre, resueltas.
 
 ---
 

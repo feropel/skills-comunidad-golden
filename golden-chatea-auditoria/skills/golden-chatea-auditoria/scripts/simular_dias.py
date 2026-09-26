@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 """
-SIMULADOR DE DIAS · golden-chatea-auditoria
+SIMULADOR DE DIAS · golden-chatea-auditoria · CONTROLES K2 (los dias se simulan,
+no se esperan) y K3 (cada dia se corre con el arreglo vivo Y con el arreglo roto:
+si pasa en los dos, la comprobacion se esta auto-aprobando)
 
 Corre el ciclo de vigilancia sobre un espacio que EVOLUCIONA dia a dia, en vez de esperar a
 que pasen los dias de verdad. Cada dia aplica un evento que ocurre en la vida real de un

@@ -92,6 +92,16 @@ def sab_lock_dup(d, k):
     main.setdefault("block_order", []).append("custom_liquid_lock")
 def sab_peso(d, k):      d["sections"][k]["settings"]["custom_liquid"] += "á" * 26_000  # >50KB en UTF-8
 def sab_trigger(d, k):   d["sections"][k]["settings"]["custom_liquid"] += '\n<a href="https://wa.me/57300?text=Hola, quiero informacion de Marca">wa</a>'
+def sab_trigger_produccion(d, k):
+    """El MISMO fallo pero en el formato REAL de produccion: espacios como `+`. Copiado del
+    enlace vivo de la tienda (medido 2026-09-05), no inventado. El banco solo tenia espacios
+    literales y por eso este caso pasaba invisible."""
+    d["sections"][k]["settings"]["custom_liquid"] += (
+        '\n<a href="https://wa.me/573232460865?text=Hola+quiero+informacion+de+Tag+Recede">wa</a>')
+def ok_trigger_produccion_ok(d, k):
+    """Y el correcto en formato de produccion: no debe disparar."""
+    d["sections"][k]["settings"]["custom_liquid"] += (
+        '\n<a href="https://wa.me/573232460865?text=Hola+quiero+informaci%C3%B3n+y+precio+de+Tag+Recede">wa</a>')
 def sab_wa_place(d, k):  d["sections"][k]["settings"]["custom_liquid"] += '\n<a href="https://wa.me/573001234567">wa</a>'
 def sab_related(d, k):
     d["sections"].setdefault("related-products", {"type": "related-products"})["disabled"] = False
@@ -142,6 +152,31 @@ def ok_raya_en_comentario_js(d, k):
     """Los componentes usan separadores para orientar a quien EDITA el codigo. No se publican."""
     d["sections"][k]["settings"]["custom_liquid"] += (
         "\n<script>/* ═══ EDITAR AQUI ═══ */</script>\n{%- comment -%} ───── nota ───── {%- endcomment -%}")
+def ok_acta_disfrazada(d, k):
+    """CASO DISFRAZADO (refinamiento de golden-ads, 2026-09-05): el lado bueno no puede ser solo
+    prosa inocente — prosa cualquiera no mueve casi ningun contador. Lo que de verdad pone a prueba
+    un detector es texto que **SE PARECE al dato**: un acta, una nota tecnica, una fila de tabla
+    escrita a mano. Aqui se mete UN acta con TODOS los patrones prohibidos a la vez —disparador mal
+    escrito, signo de apertura, raya separadora, lenguaje de tienda y hex huerfano— pero DENTRO de
+    un comentario Liquid, o sea sin publicarse. No debe disparar NI UNO.
+    Ademas prueba la funcion compartida `solo_visible()` contra sus CUATRO consumidores de una vez:
+    si se rompe, aqui saltan varios checks juntos en vez de uno."""
+    d["sections"][k]["settings"]["custom_liquid"] += (
+        "\n{%- comment -%}\n"
+        "  ACTA G4.9 ─────────────────────────────\n"
+        "  ¿Que se corrigio? el mensaje decia 'Hola, quiero informacion de X' y no casaba.\n"
+        "  Nota: en nuestra tienda el acento viejo era #0bd4fd.\n"
+        "  ───────────────────────────────────────\n"
+        "{%- endcomment -%}")
+def ok_doc_del_error(d, k):
+    """DISFRAZ 'tiene la forma pero NO manda' (golden-presenta, 2026-09-05). Tres sitios donde el
+    disparador aparece con su forma exacta y cero autoridad: un <pre><code> que DOCUMENTA el error,
+    un <script application/json> de configuracion y un atributo data-*. Marcarlos castiga a quien
+    documenta el fallo. Los tres disparaban antes de G4.26."""
+    d["sections"][k]["settings"]["custom_liquid"] += (
+        '\n<pre><code>Hola, quiero informacion de X  &lt;- asi NO se escribe</code></pre>'
+        '\n<script type="application/json">{"ej":"Hola, quiero informacion de X"}</script>'
+        '\n<div data-nota="Hola, quiero informacion de X">texto real</div>')
 def ok_atencion(d, k):
     d["sections"][k]["settings"]["custom_liquid"] += (
         '\n<a href="https://wa.me/57300?text=Hola, tengo una pregunta sobre Marca">wa</a>')
@@ -154,6 +189,13 @@ CASOS_BUENOS = [
     ("tildes correctas NO son mojibake",                   ok_tildes_correctas,       "ACENTOS ROTOS"),
     ("raya em suelta en prosa es correcta",                ok_raya_em_en_prosa,       "RAYA SEPARADORA"),
     ("separador dentro de comentario de codigo no se publica", ok_raya_en_comentario_js, "RAYA SEPARADORA"),
+    ("ACTA DISFRAZADA en comentario: ningun check dispara", ok_acta_disfrazada, "APERTURA"),
+    ("  la misma acta no dispara el de tienda",             ok_acta_disfrazada, "lenguaje de TIENDA"),
+    ("  la misma acta no dispara el de rayas",              ok_acta_disfrazada, "RAYA SEPARADORA"),
+    ("  la misma acta no dispara el del disparador",        ok_acta_disfrazada, "disparador"),
+    ("  la misma acta no dispara el del hex huerfano",      ok_acta_disfrazada, "#0bd4fd"),
+    ("DISFRAZ: el disparador donde NO manda (doc, config, data-*)", ok_doc_del_error, "disparador"),
+    ("disparador CORRECTO en formato de produccion (+ y %C3%B3)",   ok_trigger_produccion_ok, "disparador"),
     ("«tiendas fisicas» sin posesivo no es el vicio",      ok_palabra_tienda_suelta,  "lenguaje de TIENDA"),
     ("clase CSS larga NO es una credencial",               ok_clase_larga_no_es_token, "CREDENCIAL"),
 ]
@@ -165,6 +207,7 @@ CASOS_MALOS = [
     ("candado landing ausente (el cliente se va al home)",          sab_candado,  "CANDADO"),
     ("custom_liquid sobre el tope de 50 KB en bytes UTF-8",         sab_peso,     "bytes UTF-8"),
     ("disparador de Chatea que NO casa byte a byte (bug G4.8)",     sab_trigger,  "disparador"),
+    ("el MISMO fallo en formato de PRODUCCION (espacios como +)",   sab_trigger_produccion, "disparador"),
     ("WhatsApp con el numero placeholder",                          sab_wa_place, "PLACEHOLDER"),
     ("related-products encendido",                                  sab_related,  "related-products"),
     ("hex huerfano suelto fuera de la paleta",                       sab_hex,      "#0bd4fd"),

@@ -1,9 +1,9 @@
 # Packs por país (COD / venta conversacional LatAm)
 
-## SOLO 7 PAÍSES (tope de la plataforma)
-Chatea Pro solo acepta estos países, en mayúscula y sin acentos: **COLOMBIA, ECUADOR, CHILE, MEXICO, PANAMA, PERU, PARAGUAY**. Nada de Guatemala, Argentina, Bolivia ni Costa Rica. Si el vendedor está en un país no listado, avísale que la plataforma no lo soporta.
-⚠️ País clonado de otra plantilla HEREDA el criterio equivocado (caso real: el pack México decía "nunca exijas código postal" — era criterio de Colombia copiado). Revisa el pack del país, no asumas.
-
+## 10 PAÍSES (corregido 2026-09-05 — antes decía 7 y era FALSO)
+Chatea Pro acepta **10 países** (remedido 2026-08-29 por la familia). Hay PACK completo para 8: **COLOMBIA, ECUADOR, CHILE, MEXICO, PANAMA, PERU, PARAGUAY, GUATEMALA**. **ARGENTINA y BRASIL** están soportados por la plataforma pero AÚN SIN PACK: hueco declarado — se le preguntan los datos de dirección y logística al negocio, no se inventan ni se clonan de otro país.
+🔴 Esta ficha decía "SOLO 7 PAÍSES... nada de Guatemala" hasta 2026-09-05, contradiciendo a `golden-chatea-pro-validacion-direcciones` y a `config-ventas-wp`, que ya decían 10. Consecuencia real: la skill le negaba el servicio a un cliente activo del ecosistema en Guatemala. **Lección: cuando dos skills hermanas discrepan sobre un dato de plataforma, gana la que lo REMIDIÓ, y la fecha de medición debe ir escrita al lado del número.**
+⚠️ País clonado de otra plantilla HEREDA el criterio equivocado (caso real: el pack México decía "nunca exijas código postal", criterio de Colombia copiado). Revisa el pack del país, no asumas.
 ## Tiempos de entrega DEFAULT (regla de FER: NO se preguntan)
 Los tiempos de entrega NO se le preguntan al vendedor: se aplican estos predeterminados (todos los países LatAm COD) y se muestran en el borrador como supuesto; solo se ajustan si el vendedor los corrige por iniciativa propia.
 ```
@@ -65,5 +65,16 @@ Al construir, usa el pack del país del negocio: nomenclatura de dirección, med
 - **Pago anticipado:** transferencia, giros.
 - **Tono:** cercano, voseo suave. Moneda: PYG (Gs. 150.000).
 
+## 🇬🇹 Guatemala
+- **Dirección:** 🆔 Nombre · 📱 Teléfono · 🗺 Departamento · 🏙 Ciudad/Municipio · 🏠 Dirección completa · 📍 **ZONA** (particularidad guatemalteca: las ciudades se organizan por zonas — zona 1, zona 10; sin zona el mensajero no llega) · 📍 Punto de referencia · 🔢 Cantidad · 💳 Pago
+- **Moneda:** quetzales, con espacio tras la Q: `Q 189` · `Q 249` · `Q 299`.
+- **Vocabulario:** pedido · repartidor · pisto (dinero, coloquial) · "va pues" para cerrar. Tono amable, claro y cercano.
+- **Transportadoras:** las define la operación local — usa el default "varias transportadoras según tu zona" y solo nombra una si el vendedor la da.
+- **Pago anticipado:** transferencia bancaria, depósito. Confirma con el vendedor qué usa de verdad.
+
+## FORMATO DE LA MONEDA (se escribe distinto en cada país y el bot lo nota)
+Colombia `$59.900` · México `$499` · Guatemala `Q 189` · Ecuador `$29,90 USD` · Perú `S/ 89` · Chile `$24.990` · Panamá `$29.90` · Paraguay `Gs. 150.000`.
+Escribir la moneda como no se escribe en ese país delata al bot en el primer mensaje de precio, que es justo donde más se lee.
+
 ## Regla
-Solo los 7 países de la plataforma. Nunca uses "barrio/departamento" (CO) en un país que usa "colonia/estado" (MX), y revisa SIEMPRE el pack del país destino antes de construir: cada campo de captura, la zonificación y el vocabulario salen del pack, no de otra plantilla.
+Solo los 10 países de la plataforma (8 con pack, 2 declarados sin pack). Nunca uses "barrio/departamento" (CO) en un país que usa "colonia/estado" (MX), y revisa SIEMPRE el pack del país destino antes de construir: cada campo de captura, la zonificación y el vocabulario salen del pack, no de otra plantilla.

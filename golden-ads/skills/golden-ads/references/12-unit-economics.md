@@ -15,7 +15,7 @@ Pide los datos concreto; si falta uno, márcalo y avanza.
 |---|---|---|
 | Cuándo se cobra | al entregar, si el cliente recibe | **al comprar, siempre** |
 | Tasa de entrega | 55–75%, castiga el breakeven | **100% — no se descuenta nada** |
-| Costo de devolución | sí, flete de ida y vuelta | no |
+| Costo de devolución | sí: el **flete de devolución** (un solo flete; igual o menor al de ida, nunca mayor, según transportadora) | no |
 | Comisión | recaudo del operador | **pasarela (Stripe / Mercado Pago), ~3–4% + fijo** |
 | Evento de checkout | **no existe** `InitiateCheckout` | **sí existe**, y es señal temprana valiosa |
 | Fórmula del breakeven | margen × % de entrega | **margen, sin multiplicar** |

@@ -2,16 +2,22 @@
 """
 Validador del campo [Comentarios] Productos de Chatea Pro.
 
-Comprueba lo que rompe en silencio: las 5 llaves exactas, los tipos, el tope nativo de
-`desc` (500), los dos techos del bot field (20.000 escapados / ~17.000 crudos), las
-colisiones de disparadores entre productos y los disparadores demasiado genericos.
+Comprueba lo que rompe en silencio: las 5 llaves exactas, los tipos, los topes del
+formulario (name 255 · desc 500 · rela 10 ETIQUETAS), el techo de GUARDADO del campo
+(~20.000 CRUDOS en tipo JSON, 500.000 en LONG JSON), las colisiones de disparadores entre
+productos y los disparadores demasiado genericos.
+
+El techo se mide en CRUDOS, no en escapados: hay produccion viva con 21.457 escapados que
+guarda y se relee identica. El escapado se reporta como AVISO porque el limite de EJECUCION
+del flujo es otro y mas estrecho. Detalle y las cinco mediciones en references/escritura-api.md.
 
 Termina en 0 si no hay errores, en 1 si los hay. Los avisos no hacen fallar.
 
 Uso:
-    python3 validar_producto.py productos.json
-    python3 validar_producto.py productos.json --json     # salida estructurada
-    cat productos.json | python3 validar_producto.py -
+    python3 validar_producto.py productos.json --via formulario   # se pega en el panel
+    python3 validar_producto.py productos.json --via json         # entra por Campos de Bot
+    python3 validar_producto.py productos.json --via json --json  # salida estructurada
+    cat productos.json | python3 validar_producto.py - --via formulario
 
     # medir un texto suelto contra el tope de 500 mientras lo recortas (no valida nada mas)
     python3 validar_producto.py --medir borrador_desc.txt
@@ -26,10 +32,58 @@ import sys
 import unicodedata
 
 LLAVES = ["img", "name", "desc", "rela", "estado"]
+
+# TOPES DEL FORMULARIO DEL PANEL, leidos de sus propios contadores el 2026-09-22 en la
+# pantalla "Agregar nuevo producto" del agente de comentarios (cuenta 236245):
+#   "36/255 caracteres" bajo Nombre del producto
+#   "481/500 caracteres" (en rojo) bajo Descripcion del producto
+#   "7/10 etiquetas" bajo "Como relacionar el post", que es el campo `rela`
+# Los tres BLOQUEAN por la via formulario y solo AVISAN por la via json.
+TOPE_NAME = 255
 TOPE_DESC = 500
-TOPE_ESCAPADO = 20000
-OBJETIVO_ESCAPADO = 19000
+TOPE_ETIQUETAS = 10
+
+# 🔴 NO HAY UN TECHO: HAY DOS, y se observan con pruebas DISTINTAS. Contrastadas las cinco
+# mediciones de la casa, ninguna hipotesis de techo unico las explica todas:
+#
+#   Observando GUARDAR y RELEER (config-comentarios, 2026-09-22, campo array de comentarios):
+#     13.004 crudos                     -> guarda
+#     19.617 crudos / 21.457 escapados  -> guarda y se relee IDENTICO byte a byte
+#     20.811 crudos                     -> error 500 al guardar
+#   Observando SI EL BOT DISPARA al ejecutarse (BRIEFING, 2026-08):
+#     16.882 crudos / 19.895 escapados  -> dispara
+#     19.922 crudos / 23.266 escapados  -> NO dispara
+#
+# El caso de 21.457 escapados GUARDADO Y FUNCIONANDO mata la idea de "20.000 escapados" como
+# tope de guardado. Y el de 19.922 crudos que NO dispara mata la idea de que crudos explique
+# el disparo. Conclusion honesta: el GUARDADO topa en ~20.000 CRUDOS (entre 19.617 que entra y
+# 20.811 que revienta), y el EJECUTAR tiene un limite propio, mas estrecho, para el que la
+# unica evidencia que hay esta en escapados.
+#
+# 🔴 Y OJO CON LA SEGUNDA MITAD, que es el fallo simetrico que casi se nos cuela: las dos
+# observaciones de EJECUCION (19.895 dispara / 23.266 no) se midieron sobre campos
+# [Producto Ventas Wp], que es EL MISMO CAMPO AJENO del que venia el error del guardado. O sea
+# que la frontera de ejecucion es HEREDADA, no medida en el campo de comentarios: aqui no hay
+# ni un "dispara" ni un "no dispara" observado. La ley que corrigio el primer numero se aplica
+# igual al segundo.
+#
+# Por eso aqui: CRUDOS bloquea (medicion directa de escritura EN ESTE CAMPO) y ESCAPADO solo
+# AVISA, Y EL AVISO DECLARA QUE SU FRONTERA ES HEREDADA. Poner error con un numero prestado es
+# exactamente lo que ya nos mordio una vez.
+TOPE_CRUDO = 20000
+TOPE_CRUDO_LONG = 500000
+OBJETIVO_CRUDO = 19000
+AVISO_ESCAPADO = 20000
 ESTADOS = {"activo", "inactivo"}
+
+# LA VIA POR LA QUE ENTRA EL PRODUCTO. No es un detalle de forma: decide si el tope
+# nativo de 500 BLOQUEA o solo avisa. Por eso es un dato de entrada obligatorio y no
+# se supone (FILA 2 del Centro de Mando, 2026-09-05).
+#   formulario = alguien lo pega en el formulario del panel  -> el campo CORTA en 500
+#   json       = entra por Campos de Bot / API con el JSON   -> 500 es exceso aceptable
+VIAS = ("formulario", "json")
+VIA = "formulario"          # se fija en main(); el default es el estricto por si acaso
+TECHO = TOPE_CRUDO          # se fija en main(); JSON por defecto, LONG JSON con --long-json
 
 MIN_DISPARADORES = 8
 IDEAL_DISPARADORES = 15
@@ -133,8 +187,56 @@ def es_variante_del_nombre(token, formas):
     return False
 
 
+def palabras_distintivas(nombre):
+    """Palabras del nombre que sirven para DESEMPATAR: las largas y no vacias."""
+    fuera = {"de", "la", "el", "los", "las", "y", "con", "para", "premium", "original", "ml", "g"}
+    # str() a proposito: este detector corre DESPUES de que se hayan apuntado los errores de tipo,
+    # y un `name` que no es string tiene que salir como ERROR REPORTADO, no como AttributeError.
+    # Un validador que revienta a mitad se lleva por delante los avisos que ya habia encontrado.
+    return {w for w in normaliza(str(nombre)).split() if len(w) >= 4 and w not in fuera}
+
+
+def colisiones_entre(productos):
+    """Etiquetas que DOS productos del mismo catalogo pueden reclamar.
+
+    Devuelve (gravedad, etiqueta_a, indice_a, etiqueta_b, indice_b):
+      IDENTICO     la misma etiqueta literal en dos productos
+      NORMALIZADO  la misma sin tildes/mayusculas/signos ('Le'coterra' vs 'lecoterra')
+      CONTENIDO    una contenida en otra ('base coreana' dentro de 'base coreana hidratante')
+
+    NO marca una etiqueta que ya lleva una palabra distintiva de SU producto: ahi el nombre
+    comercial ya desempata, que es exactamente la salida de Kevin en 2:15:02.
+    """
+    idx = []
+    for i, p in enumerate(productos):
+        if not isinstance(p, dict):
+            continue
+        propias = palabras_distintivas(p.get("name", ""))
+        for e in disparadores(str(p.get("rela", ""))):
+            n = normaliza(str(e))
+            idx.append((i, e, n, bool(propias & set(n.split()))))
+
+    choques = []
+    for a in range(len(idx)):
+        ia, ea, na, anca = idx[a]
+        for b in range(a + 1, len(idx)):
+            ib, eb, nb, ancb = idx[b]
+            if ia == ib:
+                continue
+            if na == nb:
+                choques.append(("IDENTICA" if ea == eb else "NORMALIZADA", ea, ia, eb, ib))
+            elif len(na) >= 9 and len(nb) >= 9 and (na in nb or nb in na) \
+                    and not (anca and ancb):
+                choques.append(("CONTENIDA", ea, ia, eb, ib))
+    return choques
+
+
 def cargar(ruta):
-    crudo = sys.stdin.read() if ruta == "-" else open(ruta, encoding="utf-8").read()
+    try:
+        crudo = sys.stdin.read() if ruta == "-" else open(ruta, encoding="utf-8").read()
+    except OSError as e:
+        print(f"ERROR  no se pudo leer '{ruta}': {e.strerror}", file=sys.stderr)
+        sys.exit(1)
     crudo = crudo.strip()
     try:
         datos = json.loads(crudo)
@@ -154,7 +256,11 @@ def cargar(ruta):
 
 def modo_medir(ruta):
     """Mide un borrador de `desc` mientras se recorta, sin montar el JSON entero."""
-    texto = sys.stdin.read() if ruta == "-" else open(ruta, encoding="utf-8").read()
+    try:
+        texto = sys.stdin.read() if ruta == "-" else open(ruta, encoding="utf-8").read()
+    except OSError as e:
+        print(f"ERROR  no se pudo leer '{ruta}': {e.strerror}", file=sys.stderr)
+        sys.exit(1)
     texto = texto.strip("\n")
     n = len(texto)
     sobra = n - TOPE_DESC
@@ -217,18 +323,32 @@ def valida_producto(i, p):
         elif not img.startswith(("http://", "https://")):
             err(f"{etq}: 'img' no es una URL ni un marcador de pendiente")
 
-    if isinstance(nombre, str) and not nombre.strip():
-        err(f"{etq}: 'name' vacio")
+    if isinstance(nombre, str):
+        if not nombre.strip():
+            err(f"{etq}: 'name' vacio")
+        elif len(nombre) > TOPE_NAME:
+            msg = (f"{etq}: 'name' mide {len(nombre)} — se pasa por {len(nombre) - TOPE_NAME} "
+                   f"del tope del formulario ({TOPE_NAME})")
+            err(msg + ". La via es FORMULARIO: el campo CORTA al guardar") if VIA == "formulario" \
+                else avi(msg + ". Por la via JSON entra, pero se corta si alguien abre el formulario")
 
     desc = p.get("desc")
     if isinstance(desc, str):
         n = len(desc)
         if n > TOPE_DESC:
-            err(
-                f"{etq}: 'desc' mide {n} — se pasa por {n - TOPE_DESC} del tope nativo ({TOPE_DESC}). "
-                "Por API entra, pero se corta el dia que alguien guarde desde el panel. "
-                "Recortala con --medir"
-            )
+            if VIA == "formulario":
+                err(
+                    f"{etq}: 'desc' mide {n} — se pasa por {n - TOPE_DESC} del tope nativo "
+                    f"({TOPE_DESC}) y la via es FORMULARIO: el campo CORTA al guardar y el texto "
+                    "sobrante se pierde. Recortala con --medir, o entrega la version larga solo "
+                    "por la via json"
+                )
+            else:
+                avi(
+                    f"{etq}: 'desc' mide {n} (tope nativo {TOPE_DESC}). Por la via JSON entra "
+                    "completa, pero el dia que alguien abra ESE producto en el formulario del "
+                    "panel y guarde, se corta. Entrega tambien la version de 500 y dilo"
+                )
         elif n > TOPE_DESC * 0.96:
             avi(f"{etq}: 'desc' en {n} de {TOPE_DESC} ({n * 100 // TOPE_DESC}%) — queda poco margen")
         if not desc.strip():
@@ -253,6 +373,17 @@ def valida_producto(i, p):
             )
         elif len(toks) < IDEAL_DISPARADORES:
             avi(f"{etq}: 'rela' con {len(toks)} disparadores; apunta a {IDEAL_DISPARADORES}-30")
+
+        if len(toks) > TOPE_ETIQUETAS:
+            sobran = len(toks) - TOPE_ETIQUETAS
+            if VIA == "formulario":
+                err(f"{etq}: 'rela' con {len(toks)} etiquetas y el formulario topa en "
+                    f"{TOPE_ETIQUETAS}: por esa via se PIERDEN {sobran}, que es justo la capa 4 "
+                    "(los hooks del anuncio). Entra completo solo por la via json")
+            else:
+                avi(f"{etq}: 'rela' con {len(toks)} etiquetas (el formulario topa en "
+                    f"{TOPE_ETIQUETAS}). Por JSON entran todas, pero si alguien abre ese producto "
+                    f"en el panel y guarda, se quedan {TOPE_ETIQUETAS} y se van {sobran}")
 
         for t in toks:
             plano = normaliza(t)
@@ -282,6 +413,12 @@ def main():
     ap = argparse.ArgumentParser(description="Valida el campo [Comentarios] Productos de Chatea Pro")
     ap.add_argument("archivo", nargs="?", help="JSON con la lista de productos, o '-' para stdin")
     ap.add_argument("--json", action="store_true", help="salida estructurada")
+    ap.add_argument("--long-json", action="store_true",
+                    help="el campo destino es de tipo LONG JSON (techo 500.000, no 20.000)")
+    ap.add_argument("--via", choices=VIAS,
+                    help="POR DONDE entra el producto: 'formulario' (se pega en el panel: el "
+                         "tope de 500 BLOQUEA) o 'json' (Campos de Bot / API: 500 solo avisa). "
+                         "Obligatoria al validar un archivo")
     ap.add_argument("--medir", metavar="ARCHIVO",
                     help="mide un borrador de desc contra el tope de 500 ('-' para stdin)")
     args = ap.parse_args()
@@ -296,6 +433,15 @@ def main():
         return modo_medir(args.medir)
     if not args.archivo:
         ap.error("falta el archivo JSON (o usa --medir para medir una desc suelta)")
+
+    if not args.via:
+        ap.error("falta --via. La via NO se supone: decide si el tope de 500 bloquea o avisa.\n"
+                 "  --via formulario  el producto se pega en el formulario del panel (500 CORTA)\n"
+                 "  --via json        entra por Campos de Bot / API (500 solo avisa)\n"
+                 "Preguntasela al usuario si no la sabes.")
+    global VIA, TECHO
+    VIA = args.via
+    TECHO = TOPE_CRUDO_LONG if args.long_json else TOPE_CRUDO
 
     datos = cargar(args.archivo)
 
@@ -352,11 +498,44 @@ def main():
     crudo = len(compacto)
     esc = escapado(compacto)
 
-    if esc > TOPE_ESCAPADO:
-        err(f"TECHO DEL BOT FIELD: {esc} escapados sobre {TOPE_ESCAPADO}. "
-            "La API responde 200 ok, guarda el JSON CORTADO y el asistente muere en silencio")
-    elif esc > OBJETIVO_ESCAPADO:
-        avi(f"{esc} escapados — sobre el objetivo de {OBJETIVO_ESCAPADO}, sin margen para crecer")
+    # 1 · GUARDAR. Medido escribiendo y releyendo: se topa en CRUDOS. Esto bloquea.
+    if crudo > TECHO:
+        err(f"NO VA A GUARDAR ENTERO: {crudo} crudos sobre {TECHO}. 🔴 Y NO VAS A VER EL FALLO: "
+            f"medido directo el 2026-09-22 sobre un campo `array` propio, la API acepta el "
+            f"payload, responde HTTP 200 y TRUNCA EN SILENCIO a {TOPE_CRUDO} exactos (19.898 "
+            f"entra entero; 20.128, 23.125 y 60.000 vuelven todos releidos en 20.000). El corte "
+            f"cae a mitad de palabra, el JSON deja de parsear y el bot se queda SIN productos. "
+            f"Aqui perderias {crudo - TECHO} caracteres sin un solo aviso")
+    elif TECHO == TOPE_CRUDO and crudo > OBJETIVO_CRUDO:
+        avi(f"{crudo} crudos — sobre el objetivo de {OBJETIVO_CRUDO}, sin margen para crecer")
+
+    # 2 · EJECUTAR. Otro limite, mas estrecho, y la unica evidencia esta en escapados. AVISA,
+    # no bloquea: hay produccion viva por encima de este numero.
+    if esc > AVISO_ESCAPADO and crudo <= TECHO:
+        avi(f"{esc} escapados. El campo GUARDA (los crudos caben). AVISO CON FRONTERA HEREDADA: "
+            "las unicas observaciones de que un campo demasiado grande deja de DISPARAR el bot "
+            "(19.895 si / 23.266 no) se midieron en campos [Producto Ventas Wp], NO en el de "
+            "comentarios, asi que para ESTE campo el limite de ejecucion no esta medido ni por "
+            "arriba ni por abajo. No recortes por este numero: si el asistente se queda mudo sin "
+            "error visible, mira Panel -> Registros de errores y sospecha de esto")
+
+    # 3 · COLISIONES ENTRE PRODUCTOS. La regla CENTRAL de Kevin, y la unica que no se puede
+    # comprobar mirando un producto de uno en uno: el criterio no es "describe bien el producto"
+    # sino "solo ESTE producto puede reclamar la etiqueta".
+    #   CITA 1:50:24: "vendemos 3 tipos de magnesio. Si solo le pongo magnesio, el bot se me va a
+    #   enloquecer sin saber a cual de los 3 responder."
+    #   CITA misma escena: "le voy a poner dormir... NO, porque tengo otro magnesio que tambien
+    #   sirve para dormir."
+    # Fijate en el segundo descarte: "dormir" DESCRIBE PERFECTAMENTE el producto. Lo descarta por
+    # COMPARTIDO. Por eso el detector de genericos de arriba NO cubre esto: mide cada producto
+    # por separado, y una colision solo existe cuando se miran DOS a la vez.
+    for grav, ea, ia, eb, ib in colisiones_entre(datos):
+        na = str(datos[ia].get("name", f"#{ia}"))[:32]
+        nb = str(datos[ib].get("name", f"#{ib}"))[:32]
+        err(f"COLISION {grav}: la etiqueta '{ea}' ({na}) y '{eb}' ({nb}) las pueden reclamar los "
+            f"DOS productos. El bot no sabra a cual responder. Metele a cada una el nombre "
+            f"comercial que las distinga, que es la salida que da el propio Kevin "
+            f"(`Magnesio Complex 8 en 1` contra `Magnesio 2 en 1`)")
 
     activos = sum(1 for p in datos if isinstance(p, dict) and p.get("estado") == "activo")
     if activos > MAX_ACTIVOS_COMODOS:
@@ -366,6 +545,7 @@ def main():
     if args.json:
         print(json.dumps({
             "ok": not errores,
+            "via": VIA,
             "productos": len(datos),
             "activos": activos,
             "crudo": crudo,
@@ -377,14 +557,18 @@ def main():
         }, ensure_ascii=False, indent=2))
         return 1 if errores else 0
 
-    print(f"\n  Productos: {len(datos)}  ({activos} activo(s), {len(datos) - activos} inactivo(s))")
-    print(f"  Campo:     {crudo} crudos / {esc} escapados  (techo {TOPE_ESCAPADO}, objetivo {OBJETIVO_ESCAPADO})")
+    print(f"\n  Via:       {VIA}  ({'el tope de 500 BLOQUEA' if VIA == 'formulario' else 'el tope de 500 solo avisa'})")
+    print(f"  Productos: {len(datos)}  ({activos} activo(s), {len(datos) - activos} inactivo(s))")
+    tipo = "LONG JSON" if TECHO == TOPE_CRUDO_LONG else "JSON"
+    print(f"  Campo:     {crudo} crudos / {esc} escapados  (tipo {tipo}, guardado topa en {TECHO} CRUDOS)")
     for i, p in enumerate(datos, 1):
         if isinstance(p, dict):
             d = p.get("desc") if isinstance(p.get("desc"), str) else ""
             r = p.get("rela") if isinstance(p.get("rela"), str) else ""
             nm = (p.get("name") or "")[:44] if isinstance(p.get("name"), str) else "?"
-            print(f"    {i}. desc {len(d):>4}/{TOPE_DESC}   rela {len(disparadores(r)):>3} disp.   {nm}")
+            nd = len(disparadores(r))
+            marca = "!" if (len(d) > TOPE_DESC or nd > TOPE_ETIQUETAS) else " "
+            print(f"   {marca}{i}. desc {len(d):>4}/{TOPE_DESC}   rela {nd:>3}/{TOPE_ETIQUETAS} etiq.   {nm}")
 
     for n in notas:
         print(f"\n  nota: {n}")

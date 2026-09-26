@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>GP_TITULO</title>
+<!-- Icono incrustado. Sin esta linea el navegador pide /favicon.ico y deja un 404
+     en la consola de TODO deck: la unica peticion de red que quedaba viva en una
+     skill cuya ley es cero red. Medido en navegador real el 2026-09-05.
+     GP_ACENTO_HEX son los SEIS digitos del acento SIN la almohadilla: dentro de un
+     data: URI la "#" abre un fragmento y corta la URL, por eso va como %23. -->
+<link rel="icon" href='data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><circle cx="16" cy="16" r="13" fill="%23GP_ACENTO_HEX"/></svg>'>
 <meta name="description" content="GP_DESCRIPCION">
 
 <!--
@@ -1091,7 +1097,6 @@ body.presentador #presentador{transform:none}
   };
 
   /* 5 · RETICULA — malla que se hunde bajo el cursor. Tecnologia, datos, panel. */
-  ATM.retabla = null;
   ATM.reticula = function () {
     return montar2D(function (ctx, w, h, t, pt, A, B, st) {
       var paso = (w < 900 * DPR ? 34 : 46) * DPR;

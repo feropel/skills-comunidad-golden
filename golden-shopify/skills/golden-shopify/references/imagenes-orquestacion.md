@@ -74,7 +74,7 @@ pieza es video o foto photoreal sin texto, **cambia de generador** — no se lo 
 ## Arquitectura visual por ubicación (matriz de formatos)
 | Ubicación | Cuántas | Formato | Generador por defecto | Notas |
 |---|---|---|---|---|
-| **Galería / multimedia** (arriba, junto al carrito) | 4-5 | **1080×1080** (cuadrada) | imagen-arena | foto hero + 3-4 infografías de beneficio. 5+ imágenes ≈ +60% conversión |
+| **Galería / multimedia** (arriba, junto al carrito) | 4-5 | **2048×2048** (cuadrada, ~300 KB) | imagen-arena | foto hero + 3-4 infografías de beneficio. 5+ imágenes ≈ +60% conversión |
 | **Descripción** (body_html) | **solo 1-3 CLAVE** | **1080×1350** (vertical IG) | imagen-arena | NO metas 8-12; solo "cómo actúa" / antes-después / lo que una imagen vende mejor que el texto. Alt-text SIEMPRE (SEO) |
 | **Escalera** (`P#_IMG`, nuestras secciones) | 3-5 | **1080×1080** (1:1) | imagen-arena o Nano Banana | 1:1 calza al lado del texto en desktop y apila en móvil. URLs NUEVAS, nunca las de la descripción |
 | **Cine / visión** (fondo full-bleed) | 1 | **16:9** (o video) | imagen-arena / Nano Banana (estático) · Higgsfield (video) | la arena SÍ hace 16:9 (ratio custom). Escena lifestyle o video corto. Sin texto (el texto es HTML encima) |
@@ -85,7 +85,9 @@ pieza es video o foto photoreal sin texto, **cambia de generador** — no se lo 
 - Quedan SIEMPRE como **texto nativo** (no imagen): título, precio, reseñas, FAQ, botón COD.
 - **Descripción liviana:** 1-3 infografías; el resto de la historia visual la cargan NUESTRAS secciones
   (escalera, cine, bloques de video). Menos peso, más SEO, edición sin regenerar créditos.
-- **WebP < 150 KB**, con width/height + alt (sin CLS). Producto FIEL (foto real, nada de amarillo).
+- **WebP con width/height + alt** (sin CLS). Peso POR DESTINO: galería ~300 KB (Shopify la transforma
+  y sirve la liviana), descripción y secciones **<150 KB** (viajan sin transformar). Shopify NUNCA
+  agranda: el tamaño de subida es techo permanente — ver `imagenes.md`. Producto FIEL (foto real, nada de amarillo).
 
 ## Cómo se invoca (handoff)
 1. golden-shopify arma el **BRIEF VISUAL** (tabla de arriba) con el usuario y confirma el set.

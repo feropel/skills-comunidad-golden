@@ -727,8 +727,18 @@ def main():
     ap.add_argument("--mapa", action="store_true",
                     help="añade un mapa corto de secciones con su página (por defecto NO va)")
     ap.add_argument("--no-index", action="store_true",
-                    help="obsoleto: el índice ya no va por defecto; se conserva por compatibilidad")
+                    help="RETIRADO: el mapa ya no va por defecto, asi que apagarlo no significa "
+                         "nada. Se acepta para no romper comandos viejos, pero AVISA")
     args = ap.parse_args()
+
+    # v6.2 · un flag que se acepta EN SILENCIO y no hace nada es peor que uno que
+    # falla: quien lo escribe cree que surtio efecto. --no-index quedo declarado y
+    # nunca leido cuando el mapa paso a opt-in; lo cazo la prueba 22 al probarla
+    # contra su propio caso real. Se conserva por compatibilidad, pero hablando.
+    if args.no_index:
+        sys.stderr.write(
+            "\n⚠️  --no-index esta RETIRADO y no hace nada: desde v6.0 el mapa NO va\n"
+            "   por defecto. Si lo que querias era ponerlo, el flag es --mapa.\n\n")
 
     with open(args.input, encoding="utf-8") as f:
         raw = f.read()

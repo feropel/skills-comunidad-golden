@@ -6,7 +6,7 @@ Corre los controles del catalogo (references/clasificacion.md) sobre un DUMP pro
 extraer.py y emite hallazgos con evidencia citada del hilo real, mas cobertura medida.
 
 Uso:
-    python3 clasificar.py <DUMP.json> --modo cod|prepago [--json salida.json] [--zona-horas N]
+    python3 clasificar.py <DUMP.json> --modo cod|prepago [--json salida.json] [--zona-horas N | --pais <nombre>]
 
 NO escribe nada en Chatea. Clasifica y reporta.
 
@@ -17,9 +17,18 @@ como fallo confirmado -- nunca se asume el modelo de pago.
 `--zona-horas` (entero, offset UTC en horas, ej. -5) declara la zona horaria del espacio para
 acotar R2/R3/R4/Q4 al dia auditado (ver ZONA_HORAS_DEFAULT_NO_CONFIRMADA y
 references/api.md). Sin declararlo, usa el default -5 -- medido SOLO contra el espacio de
-Colombia validado (ESPACIO-REF); la plataforma sirve 7 paises con offsets distintos, asi que un
-espacio de otro pais debe declarar su propio offset hasta confirmarlo contra el panel de
-Chatea.
+Colombia validado (ESPACIO-REF); la plataforma sirve 10 paises (corregido 2026-09-05, el conteo
+subio de 7 a 10 el 2026-08-29) con offsets distintos, asi que un espacio de otro pais debe
+declarar su propio offset hasta confirmarlo contra el panel de Chatea.
+
+`--pais <nombre>` (agregado 2026-09-05, mejora sin datos nuevos -- ver PAISES_ZONA_HORAS mas
+abajo) es un atajo sobre `--zona-horas`: resuelve el offset ESTANDAR PUBLICO del pais (fuente:
+convencion horaria oficial de cada pais, no medicion de Chatea) para que el operador no tenga
+que calcularlo a mano. IMPORTANTE, no lo confundas con "confirmado": el offset estandar de un
+pais NO prueba que el servidor de Chatea reporte `last_message_at` en la hora local de ESE
+espacio -- esa es la pregunta de fondo que sigue sin cerrarse (ver mas abajo, "Lo que NO
+resuelve esto"). Paises con horario de verano (Chile, Paraguay) o con mas de una zona horaria
+real (Mexico) emiten un aviso declarando la ambiguedad en vez de fingir precision.
 
 Si la COMPUERTA DE CORDURA se activa, o si el denominador de la Fase 1 no cuadra, el script
 NO IMPRIME el informe normal (universo + hallazgos + cobertura completos): imprime solo el
@@ -58,10 +67,60 @@ UMBRAL_UNIVERSO_COMPUERTA_BAJA = 10   # F5: lado bajo de la compuerta, ver clasi
 # ROTO NUEVO (tercera ronda de verificacion, 2026-08-22): offset UTC del "dia" que declara
 # `last_message_at` en extraer.py, medido en UN espacio (ESPACIO-REF, Colombia): -5h EXACTAS y
 # CONSTANTES en 161 de 161 pares comparables de los 4 DUMPs reales. NO confirmado contra el
-# panel de Chatea, y NO universal -- la plataforma sirve 7 paises con offsets distintos. Se usa
-# como DEFAULT declarado (nunca silencioso: ver `universo['zona_horas_usada']`), pasable como
-# `zona_horas=` a `Clasificador` para un espacio de otro pais.
+# panel de Chatea, y NO universal -- la plataforma sirve 10 paises (corregido 2026-09-05, el
+# conteo subio de 7 a 10 el 2026-08-29) con offsets distintos. Se usa como DEFAULT declarado
+# (nunca silencioso: ver `universo['zona_horas_usada']`), pasable como `zona_horas=` a
+# `Clasificador` para un espacio de otro pais.
 ZONA_HORAS_DEFAULT_NO_CONFIRMADA = -5
+
+# Agregado 2026-09-05: tabla de offset ESTANDAR PUBLICO por pais (fuente: convencion horaria
+# oficial de cada pais -- IANA tz database / uso civil corriente, NO una medicion contra Chatea).
+# Reduce friccion (el operador no calcula el offset a mano con --pais) pero NO cierra el
+# pendiente de zona horaria: la pregunta sin responder sigue siendo si el servidor de Chatea
+# reporta `last_message_at` en la hora local de CADA espacio o en una zona fija -- eso solo lo
+# confirma una corrida real contra un token de ese pais. `dst` marca paises que observan horario
+# de verano (el offset cambia parte del ano); `ambiguo` marca paises con mas de una zona horaria
+# civil real, donde un solo numero es una simplificacion declarada, no una medicion.
+PAISES_ZONA_HORAS = {
+    # nombre en minusculas, sin tildes -> (offset_estandar, dst, ambiguo, nota)
+    "colombia":  (-5, False, False, "unico pais con corrida real confirmada (ESPACIO-REF)"),
+    "ecuador":   (-5, False, False, "continental; Galapagos es -6, no cubierto aqui"),
+    "peru":      (-5, False, False, None),
+    "panama":    (-5, False, False, None),
+    "mexico":    (-6, False, True,  "Zona Centro (CDMX, mayoria poblacional); Baja California "
+                                     "es -8, Baja California Sur/Sonora/Quintana Roo difieren"),
+    "guatemala": (-6, False, False, None),
+    "chile":     (-3, True,  False, "observa horario de verano; el offset civil real cambia "
+                                     "parte del ano, -3 es el de verano austral"),
+    "paraguay":  (-3, True,  False, "observa horario de verano; el offset civil real cambia "
+                                     "parte del ano, -3 es el de verano austral"),
+    "argentina": (-3, False, False, "pais 9/10 de la plataforma segun corrección CdM 2026-08-29"),
+    "brasil":    (-3, True,  True,  "pais 10/10; territorio con varias zonas y DST regional -- "
+                                     "-3 es Brasilia/costa este, la mas poblada"),
+}
+
+
+def resolver_zona_horas_por_pais(nombre_pais):
+    """Devuelve (offset, aviso_o_None) para el nombre de pais dado (sin acentos, minusc.).
+    No lanza excepcion sobre un pais no listado: devuelve (None, aviso) para que el llamador
+    decida -- un pais desconocido no es lo mismo que un offset confirmado."""
+    pais_normalizado = (nombre_pais or "").strip().lower()
+    pais_normalizado = (pais_normalizado.replace("á", "a").replace("é", "e")
+                        .replace("í", "i").replace("ó", "o").replace("ú", "u"))
+    if pais_normalizado not in PAISES_ZONA_HORAS:
+        return None, (f"'{nombre_pais}' no esta en la tabla de paises conocidos "
+                       f"({', '.join(sorted(PAISES_ZONA_HORAS))}) -- declara --zona-horas "
+                       f"directamente en vez de --pais.")
+    offset, dst, ambiguo, nota = PAISES_ZONA_HORAS[pais_normalizado]
+    avisos = [f"offset ESTANDAR PUBLICO de {nombre_pais} ({offset}h), NO confirmado contra "
+              f"Chatea -- sigue pendiente saber si el servidor reporta la hora local del "
+              f"espacio o una zona fija."]
+    if dst:
+        avisos.append(f"{nombre_pais} observa horario de verano: el offset civil real cambia "
+                       f"parte del ano y este valor puede no aplicar segun la fecha.")
+    if ambiguo:
+        avisos.append(f"{nombre_pais} tiene mas de una zona horaria civil real: {nota}")
+    return offset, " ".join(avisos)
 
 MODOS_VALIDOS = ("cod", "prepago")
 
@@ -1537,11 +1596,16 @@ def _parsear_argv(argv):
     `--zona-horas` (tercera ronda de verificacion, 2026-08-22): offset UTC en horas del
     espacio auditado, para el acotado de R2/R3/R4/Q4 al dia real -- ver
     `ZONA_HORAS_DEFAULT_NO_CONFIRMADA`. Sin declararlo, se usa el default (-5, medido SOLO
-    en el espacio de Colombia validado; otro pais puede necesitar otro valor)."""
+    en el espacio de Colombia validado; otro pais puede necesitar otro valor).
+    `--pais NOMBRE` (agregado 2026-09-05) es un atajo que resuelve el offset ESTANDAR PUBLICO
+    de PAISES_ZONA_HORAS -- no se puede combinar con `--zona-horas` a la vez (ambiguo cual
+    manda), y un pais no reconocido en la tabla aborta con la lista de paises validos en vez
+    de adivinar."""
     ruta = None
     modo = None
     json_salida = None
     zona_horas = None
+    pais = None
     i = 0
     while i < len(argv):
         a = argv[i]
@@ -1566,11 +1630,26 @@ def _parsear_argv(argv):
                 sys.exit(f"--zona-horas debe ser un entero, no {argv[i + 1]!r}")
             i += 2
             continue
+        if a == "--pais":
+            if i + 1 >= len(argv):
+                sys.exit("--pais requiere un nombre (ej. mexico, chile, colombia)")
+            pais = argv[i + 1]
+            i += 2
+            continue
         if ruta is None:
             ruta = a
         i += 1
     if ruta is None:
         sys.exit(__doc__)
+    if pais is not None and zona_horas is not None:
+        sys.exit("--pais y --zona-horas son excluyentes -- declara uno solo (si el pais no "
+                  "calza con la tabla estandar, usa --zona-horas directo).")
+    if pais is not None:
+        offset, aviso = resolver_zona_horas_por_pais(pais)
+        if offset is None:
+            sys.exit(aviso)
+        print(f"AVISO --pais: {aviso}")
+        zona_horas = offset
     return ruta, modo, json_salida, zona_horas
 
 

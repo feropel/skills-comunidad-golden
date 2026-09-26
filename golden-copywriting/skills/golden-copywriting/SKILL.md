@@ -14,20 +14,8 @@ description: >-
   tendencias que se refresca cada 8 días, así que sirve también para "cuántos caracteres
   debe tener" y "qué copy funciona ahora".
 ---
-<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
-     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 999 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare · (4) Esta skill estaba SIN BLINDAR: se le puso 'uchg' y se comprobo que el candado muerde. Para editarla: chflags -R nouchg <ruta>, y al cerrar chflags -R uchg.
-     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
-     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
-     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
-     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
+<!-- Historial completo de esta skill: references/changelog.md (1 actas, mudadas el 2026-09-05). El cuerpo se paga en cada activación; el acta no. -->
 # Golden Group — Copywriting Multicanal
-<!-- skill GCW1.6.0 · 2026-09-01 (corrida 5 de copywriting-tendencias-8-dias) · TRES cambios de base y UNA corrección grande. (1) SE REFUTA el titular de la corrida 4: el "hueco estructural de la API de lectura" era TRANSITORIO — GOLDEN CP6 pasó de 0% a 98,8% de cobertura y BLUE CP1 de 4,7% a 99,8% con el mismo método ocho días después; la regla de cuadrar cobertura NO se deroga, se refuerza a chequeo de cada corrida. (2) SUBE A LA BASE: WhatsApp le gana a SHOP_NOW con el mismo texto byte por byte, 1,7x-2,3x, TRES mediciones independientes (29 vs 16 vs 12 compras la última, mapeo creativo→anuncio verificado con ads_get_creative_ads). (3) SUBE A LA BASE: la oferta logística va al TÍTULO, no forzada en los 125 — 0 de 5 cuerpos del mercado la meten en 125, 4 de 5 la ponen en título o descripción. (4) Se retira "cabe en 40 = 79-87% estable" que afirmó la corrida 4: el rango real de cinco corridas es 79-93%; lo que aguanta es el enunciado, no la cifra. Hallazgo limpio nuevo: el emoji del título va al principio o al final, NUNCA en el medio (66 de 66). Censo de cuentas: 76 (eran 74). Cita nueva del artículo canónico 223409425500940 que respalda el 5+5+5 con opciones cargadas por el anunciante, y hueco declarado: placement asset customization no está en la skill. -->
-<!-- skill GCW1.5.0 · 2026-08-27 (chat FILTRO) · NUEVO references/anatomia-del-hook.md. ORIGEN: 00_CONTEXTO_MAESTRO.md del Agente Generador de Hooks v1.3 que trajo FER. HUECO MEDIDO: golden-ads ya sabe MEDIR el hook (17 menciones de hook rate, 15 de hold rate) pero ESTA skill, que los escribe, tenia 0 menciones de scroll-stop, snapback, context lean, trigger words, la regla de los 3 segundos y el 85% sin sonido. Se trajo el METODO, NO el pipeline de video del documento (Gemini+Seedance+ElevenLabs, ~1.52 USD/set): no esta instalado y duplicaria golden-imagen-arena, golden-ugc-avatar y golden-video-editor. Conecta con Andromeda: 4 hooks del mismo angulo con otras palabras cuentan como UNO para Meta. -->
-<!-- skill GCW1.4.0 · 2026-08-25 (corrida 4 de copywriting-tendencias-8-dias): la lectura por API NO cubre el gasto de la cuenta (GOLDEN CP6 y BLUE CP5 devuelven vacío con gasto real; BLUE CP1 al 4,7%) → regla nueva de cuadre de cobertura en estandar-meta-medido.md; se corrige la afirmación de 3 corridas de que la media del título era estable (lo estable es "cabe en 40", 79-87%); dos citas oficiales nuevas (la descripción de 25 es para info NO esencial; el generador de variantes de Meta soporta español); el banco de pruebas del reparto 2+3 se apagó. -->
-<!-- skill GCW1.3.9 · 2026-08-24 (centro de mando, remediación del verificador de cierre): línea de RUTA del cerebro en el Paso 0 (las lectoras ordenaban LÉELO PRIMERO sin decir dónde — un chat limpio no podía ejecutar la orden) + bump que las ediciones del 23-24 dejaron sin subir. -->
-<!-- GCW1.3.8 — 2026-08-24 · Barrido total del arsenal (pluma delegada del CdM). POLÍTICA DE BLINDAJE DECLARADA: esta skill va SIN BLINDAR (sin uchg, chmod 644) por decisión del CdM — la tarea copywriting-tendencias-8-dias le escribe cada 8 días y el flag venía produciendo el ciclo documentado en la bitácora (corridas encontrándola desblindada, choque de dos manos el 21-ago). La protección es la regla de manos autorizadas, no el flag. Se encontró blindada en 5 de 6 nodos contra esa política → liberada. Además: aviso DATO LOCAL agregado al puntero de tendencias-vivas.md (el rótulo existía solo dentro del archivo — quien empaque la skill leyendo SKILL.md no se enteraba de excluirlo), typo "premita"→"premia" y mini-índice en estandar-meta-medido.md, ruta de la fuente Panamá precisada en la referencia externa. tendencias-vivas.md NO se tocó (DATO LOCAL: solo la tarea de 8 días escribe ahí; su encabezado "¿Argumento en 125?" viola la regla de la casa de signos de apertura — queda reportado para que la próxima corrida lo corrija). -->
-<!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leian el cerebro de marca — esta entra a la familia que SI lo lee. Bloque identico en las 6 del CdM + fila a la fabrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
-<!-- GCW1.3.7 — Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 
 ## Paso 0 · Cerebro de marca (obligatorio antes de generar)
 
@@ -38,17 +26,17 @@ antes de continuar; si el usuario pide seguir sin cerebro, se declara en la entr
 se generó sin voz de marca cargada.
 
 
-
-**Versión:** `GCW1.6.0` · **Fábrica: el CENTRO DE MANDO** (chat "🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR").
+**Versión:** `GCW1.6.0` · **Fábrica:** chat «✅ SKILL golden-copywriting».
 
 > 🔓 **Política de blindaje (CdM, 2026-08-24): esta skill va SIN blindar.** La tarea
 > `copywriting-tendencias-8-dias` le escribe cada 8 días; el flag `uchg` solo producía choques de
 > manos (ver bitácora, corridas 2 y 3). Al cerrar cualquier edición se deja `chmod 644`, sin
 > `uchg`. La protección real es la regla de manos autorizadas de abajo.
 
-> 🏭 **Quién puede editar esta skill.** No tiene chat-fábrica propio, y por la regla de la casa
-> *skill sin chat-fábrica = su fábrica es el Centro de Mando*. Manos autorizadas, solo dos:
-> el **Centro de Mando**, y la tarea **`copywriting-tendencias-8-dias`** como **brazo delegado**
+> 🏭 **Quién puede editar esta skill.** Su fábrica es el chat **«✅ SKILL golden-copywriting»**
+> (declarada el 24-sep-2026; hasta entonces el dueño era el Centro de Mando). La autoridad sigue
+> siendo FER → Centro de Mando → skill: la fábrica tiene el TURNO de escritura, no manda. Manos
+> autorizadas: esa fábrica, el **Centro de Mando**, y la tarea **`copywriting-tendencias-8-dias`** como **brazo delegado**
 > —la única mano automática que puede escribir aquí, siempre con el ritual completo y dejando
 > parte en la bandeja del CdM.
 >
@@ -125,7 +113,7 @@ Si existen videos ganadores (propios o de competidores), se transcriben EN LOCAL
 escribir una sola línea: los hooks validados salen de la locución real de los anuncios que ya
 funcionan, no de la imaginación. Receta canónica (whisper local, gratis, sin que el material
 salga del equipo — medido 7,5 min de audio en 29 s) en `golden-investigacion-mercado` →
-`references/01-investigacion-360.md` §1.6; el desglose segundo a segundo lo hace
+`golden-investigacion-mercado/references/01-investigacion-360.md` §1.6; el desglose segundo a segundo lo hace
 `golden-video-teardown`. Ojo de campo: en reels el subtítulo va quemado UNA PALABRA POR
 FOTOGRAMA — leerlo de la imagen devuelve basura; sin transcripción un video hablado es ilegible.
 
@@ -320,7 +308,7 @@ lo señala.
   variante del MECANISMO leída en mercado. **(4)** §6 NUEVA — **el copy no es la variable
   dominante**: tres creativos con el mismo cuerpo byte por byte dan CPA de 14.794 a 119.346; §7
   NUEVA con qué del mercado es medible y qué no (emoji y MAYÚSCULAS eran ruido, corrige a la
-  corrida 2). Los dos fallos de higiene de un cliente (negrita Unicode falsa, Markdown sin renderizar)
+  corrida 2). Los dos fallos de higiene de Dolce (negrita Unicode falsa, Markdown sin renderizar)
   siguen sin corregir y el de Markdown se replicó de 1 a 3 creativos; reportado otra vez a la
   bandeja del CdM, fuera de mi dominio ejecutarlo. Cobertura: 74 cuentas inventariadas / 42
   barridas (excl. BACK UP, +6 sin medio de pago que antes no se miraban) / 17 con gasto / 5 a
@@ -339,11 +327,11 @@ lo señala.
   inventariadas, 36 revisadas (excluida BACK UP), 17 con gasto en 30 días (sube de 14); mercado:
   3 términos, 150 anuncios, 46 páginas, 60 títulos únicos, 4 cuerpos completos. Hallazgo mayor:
   **la regla de los 125 caracteres deja de ser ley dura** — 0 de 5 mayores vendedores medidos
-  (Le'côterra, Tag Recede, un cliente por primera vez cruzada) meten el argumento en la ventana
+  (Le'côterra, Tag Recede, Dolce por primera vez cruzada) meten el argumento en la ventana
   visible, y ya no es solo un vertical con restricción de claims. Actualizado
   `estandar-meta-medido.md` §3 con el número y la fuente. También: la skill se encontró
   **desblindada** al empezar esta corrida (sin forcejeo detectado); dos fallos de higiene
-  hallados en copy PROPIO de un cliente (negrita Unicode falsa, asteriscos Markdown sin renderizar)
+  hallados en copy PROPIO de Dolce (negrita Unicode falsa, asteriscos Markdown sin renderizar)
   reportados a la bandeja del CdM por estar fuera de mi dominio ejecutarlos. El reparto
   2 cortos + 3 largos sigue sin poder verificarse (van 2 corridas: la API no expone
   `asset_feed_spec`). Nueva entrada en `tendencias-vivas.md`. Respaldo previo:
@@ -408,3 +396,25 @@ Descripcion completa anterior (se conserva para no perder ningun matiz de fronte
 > Golden Group — Copywriting de respuesta directa para TODOS los canales: anuncios de Meta (Facebook/Instagram), TikTok Ads, y mensajes orgánicos para WhatsApp, Facebook e Instagram. Escribe hooks, primary text, headlines, descripciones, guiones de video (UGC/TikTok), captions y secuencias de mensajes, con ángulos de venta, frameworks probados (AIDA, PAS, BAB, 4U) y tono LatAm que convierte tanto en contra entrega como en pago anticipado. Úsala SIEMPRE que el usuario quiera: escribir/mejorar copy de anuncios, hooks, textos para Meta o TikTok, guiones de reels/UGC, captions para redes, mensajes de WhatsApp/orgánicos, "hazme el copy de", "dame ángulos de venta", "ganchos para este producto", "textos para vender X". Aplica a cualquier producto/país. Trae el estándar MEDIDO de largos de Meta (125/40/25, rendimiento bimodal, la ventana visible de 125 caracteres) y una bitácora de tendencias que se refresca cada 8 días con el mercado y con las campañas reales, así que úsala también para "cuántos caracteres debe tener", "qué copy está funcionando ahora", "qué está vendiendo en el mercado". Para el PROMPT del bot de ventas usa golden-chatea-pro-prompt-ventas.
 
 x
+
+## Operación de esta skill
+
+Comprobar que está en norma. **Ruta ABSOLUTA siempre: con `.` da fallo falso.**
+```bash
+agentskills validate ~/.claude/skills/golden-copywriting
+python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py ~/.claude/skills/golden-copywriting
+```
+Salida 0 = en norma. Se corre **DESPUÉS** de tocar la `description`, no solo antes.
+Los dos techos NO son el mismo: **1024 VALIDA (duro) · ~1536 TRUNCA en runtime.**
+
+Blindaje. `chflags uchg` y `chmod` conviven en el mismo árbol y **el orden importa**:
+- abrir: `chflags nouchg <ruta>` **primero**, luego `chmod 644`
+- cerrar: `chmod 444` **primero**, luego `chflags uchg`
+- el **directorio** lleva su propio `uchg` + `555`, y hay que abrirlo para crear ficheros
+
+Al revés, el `chmod` choca contra el flag ya puesto y la skill queda de solo lectura pero
+borrable.
+
+Antes de publicar, **el repo de skills es PÚBLICO**: `~/.golden/bin/golden-barrido-publicacion ~/.claude/skills/golden-copywriting`
+
+Historial completo en `references/changelog.md`.

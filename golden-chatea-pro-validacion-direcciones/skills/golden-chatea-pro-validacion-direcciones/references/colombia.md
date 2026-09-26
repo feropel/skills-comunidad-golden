@@ -27,7 +27,7 @@ Reglas: sin emojis, sin saludos (el bot ya saludó), sin explicaciones, una sola
 Evalúa SIEMPRE la dirección completa acumulada (incluyendo lo que el cliente agregue en la conversación); responde "dirección correcta" solo cuando ya no quede duda operativa.
 
 📦 TRANSPORTADORAS HABILITADAS
-[PENDIENTE — confirmar con el negocio antes de usar este pack: transportadoras de domicilio, cuáles permiten recogida en oficina, y si alguna está PROHIBIDA para este negocio. No inventar ninguna ni heredar la lista de otro negocio. La lista de Golden vive en PROYECTOS/CHATEA-PRO-ASISTENTES-MAPA/GOLDEN-TRANSPORTADORAS-COLOMBIA.md y solo se pega en espacios de Golden.]
+[PENDIENTE — confirmar con el negocio antes de usar este pack: transportadoras de domicilio, cuáles permiten recogida en oficina, y si alguna está PROHIBIDA para este negocio. No inventar ninguna ni heredar la lista de otro negocio.]
 Si el negocio prohíbe una transportadora, la dirección que la mencione es inválida aunque esté bien escrita → Para completar su envío, nos regala una dirección con una transportadora habilitada, o prefiere recoger en oficina de una habilitada?
 No habilitada: cualquier transportadora fuera de la lista confirmada por el negocio, o recogida en oficina con una que el negocio no habilitó, también es inválida.
 

@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 GOLDEN PDF · autoprueba.py
-Prueba de regresión de la skill: **23 comprobaciones** sobre PDFs construidos
+Prueba de regresión de la skill: **26 comprobaciones** sobre PDFs construidos
 de verdad (nada simulado). Hay una prueba por cada versión que cambió el
 comportamiento, para que una regresión no pase en verde:
 
@@ -22,9 +22,20 @@ comportamiento, para que una regresión no pase en verde:
   lleva NINGUNA marca de Golden — ni pie, ni autor, ni kicker, ni logo.
   Existe porque hasta v6.0 la marca era el valor por defecto y quien usara
   la skill firmaba sus documentos con la marca de FER sin enterarse ·
-  22. Estado del REGISTRO DE FÁBRICAS, la cara que vive fuera del árbol
+  22. CORTE EN PDF AJENO que rebasa la banda del pie (v6.6): candado del
+  estrechamiento de v6.5 — estrechar un criterio es el mecanismo que fabrica
+  falsos negativos, y aqui un falso negativo entrega un prompt partido ·
+  23. LA COMPUERTA VERBATIM MUERDE (v6.3): la garantía central de la skill,
+  probada en sus dos caras (la interna de build_pdf y la del Paso C) y en las
+  dos direcciones. Existía porque sus cinco menciones anteriores iban TODAS en
+  la dirección buena: se la veía decir OK y nunca fallar ·
+  24. EL CUERPO CONTRA EL CÓDIGO (v6.2): todo flag y todo bloque ::: que el
+  SKILL.md promete existe en el parser. Las otras 23 miden el MOTOR; esta mide
+  el archivo que lee QUIEN EJECUTA, y es la que faltaba cuando el cuerpo se
+  quedó dos versiones desfasado sin que nada sonara ·
+  25. Estado del REGISTRO DE FÁBRICAS, la cara que vive fuera del árbol
   (informativo: entre sellar y que el CdM regenere hay desfase legítimo) ·
-  23. COHERENCIA DEL SELLO: las comprobaciones declaradas aquí arriba son
+  26. COHERENCIA DEL SELLO: las comprobaciones declaradas aquí arriba son
   exactamente las que la corrida imprime.
 
 La cifra de arriba es la que imprime una corrida SANA, y es la que va en el
@@ -46,6 +57,11 @@ SKILL_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 SCRIPTS = os.path.join(SKILL_DIR, "scripts")
 SAMPLE = os.path.join(SKILL_DIR, "assets", "autoprueba-muestra.md")
 EXPECTED_CARDS = 3
+
+
+def io_open(p):
+    with open(p, encoding="utf-8") as f:
+        return f.read()
 
 
 def run(cmd):
@@ -570,6 +586,167 @@ def main():
                         not _neu, "; ".join(_neu) if _neu else
                         "sin pie, sin autor, sin kicker y sin logo"))
 
+    # v6.6 · UN PDF AJENO CUYO BLOQUE MONO REBASA LA BANDA DEL PIE SIGUE
+    # DETECTANDOSE COMO CORTE. Es el CANDADO del estrechamiento de v6.5: al
+    # excluir la banda del pie del analisis, se estrecho el criterio, y estrechar
+    # un criterio es EXACTAMENTE el mecanismo que fabrica falsos negativos (ley
+    # del CdM, medida en golden-shopify: quitar tres falsos positivos le creo un
+    # falso negativo en el mismo turno).
+    # Aqui la asimetria es brutal: un falso POSITIVO hace reconstruir un PDF que
+    # estaba bien; un falso NEGATIVO entrega a la comunidad un prompt partido,
+    # que es el unico defecto que esta skill existe para impedir.
+    # Se comprobo ademas por geometria que el filtro es neutro (su limite
+    # superior es el MISMO que el de la ventana de deteccion), pero una
+    # coincidencia entre dos constantes que nadie vigila se rompe el dia que
+    # alguien toca una de las dos. Esta prueba es quien la vigila.
+    # El fixture usa margenes AJENOS (casi cero) a proposito: un documento de
+    # Word o Canva no reserva los 16mm que reserva Golden, asi que su bloque
+    # copiable SI baja hasta el borde fisico de la hoja.
+    if not chrome:
+        results.append(("Corte en PDF ajeno que rebasa la banda del pie", None,
+                        "no verificable: sin Chrome para fabricar el caso"))
+    else:
+        try:
+            ajeno = os.path.join(tmp, "ajeno_rebasa.pdf")
+            filas = "\n".join("PROMPT_AJENO linea %03d de un bloque copiable largo" % i
+                               for i in range(1, 90))
+            chrome_pdf(chrome,
+                       "<!doctype html><html><head><meta charset=utf-8><style>"
+                       "@page{size:A4;margin:0} body{margin:0;padding:2mm 12mm}"
+                       "pre{font-family:'Courier New',monospace;font-size:10pt;"
+                       "margin:0;white-space:pre-wrap}</style></head><body>"
+                       "<p>Guia exportada de otra herramienta.</p><pre>"
+                       + filas + "</pre></body></html>", ajeno)
+            salida = audit_text(ajeno)
+            caza = "cortado entre páginas" in salida
+            # CONTROL: el mismo documento en UNA sola pagina no debe marcarse.
+            corto = os.path.join(tmp, "ajeno_corto.pdf")
+            chrome_pdf(chrome,
+                       "<!doctype html><html><head><meta charset=utf-8><style>"
+                       "@page{size:A4;margin:0} body{margin:0;padding:2mm 12mm}"
+                       "pre{font-family:'Courier New',monospace;font-size:10pt;"
+                       "margin:0;white-space:pre-wrap}</style></head><body>"
+                       "<pre>PROMPT_AJENO linea unica</pre></body></html>", corto)
+            limpio = "cortado entre páginas" not in audit_text(corto)
+            fallos = []
+            if not caza:
+                fallos.append("FALSO NEGATIVO: no caza un prompt partido en PDF ajeno")
+            if not limpio:
+                fallos.append("falso positivo: marca corte en un documento de una pagina")
+            results.append(("Corte en PDF ajeno que rebasa la banda del pie",
+                            not fallos, "; ".join(fallos) if fallos else
+                            "caza el partido y calla con el entero (medido con control)"))
+        except Exception as e:
+            results.append(("Corte en PDF ajeno que rebasa la banda del pie", False,
+                            "la prueba revento: %s: %s" % (type(e).__name__, e)))
+
+    # v6.3 · LA COMPUERTA VERBATIM MORDIENDO. Es la garantia CENTRAL de la skill —
+    # la regla inviolable de FER, "el texto no se toca" — y hasta aqui las cinco
+    # menciones que tenia en esta autoprueba iban TODAS en la direccion buena: la
+    # veian decir OK y ninguna la obligaba a fallar. Un cero se prueba, no se cree:
+    # "0 prompts alterados" no vale nada si nunca se ha visto la compuerta morder.
+    # Se prueba en sus DOS caras, porque son dos codigos distintos:
+    #   (a) la INTERNA de build_pdf (verbatim_gate), que compara el .md contra el
+    #       PDF recien construido. Se le da un PDF bueno y una tarjeta que NO esta
+    #       en el: tiene que listar el prompt y decir que linea falta.
+    #   (b) la del PASO C (verbatim_check.py), que compara dos PDFs. Se construyen
+    #       dos con UNA palabra distinta: tiene que salir con codigo 3 y nombrar el
+    #       segmento perdido.
+    _vb = []
+    _detv = ""
+    try:
+        sys.path.insert(0, SCRIPTS)
+        import build_pdf as _bp
+        # (a) INTERNA · caso que DEBE morder
+        _ok_falso, _fails = _bp.verbatim_gate(pdf, ["ESTE TEXTO JAMAS ESTUVO EN EL PDF 12345"])
+        if _ok_falso is not False or not _fails:
+            _vb.append("la compuerta INTERNA no mordio con una tarjeta ausente")
+        # (a2) DIRECCION POSITIVA: una tarjeta que SI esta no debe morder. El texto
+        # se SACA de la muestra oficial, no se clava aqui: una cadena inventada a
+        # mano dio falso fallo la primera vez y la culpa era de la prueba, no de la
+        # compuerta. El fixture es la fuente, siempre.
+        _real = _re3.search(r"```[^\n]*\n(.+?)\n```", io_open(SAMPLE), _re3.S)
+        _ok_real, _fr = _bp.verbatim_gate(pdf, [_real.group(1)]) if _real else (True, [])
+        if _ok_real is False:
+            _vb.append("falso positivo: mordio con una tarjeta que SI esta: %s" % _fr)
+        # (b) PASO C · dos PDFs con UNA palabra distinta
+        base = os.path.join(tmp, "vb_a.md")
+        with open(base, "w", encoding="utf-8") as fh:
+            fh.write("---\ntitle: Compuerta\n---\n\n## Bloque\n\n"
+                     "``` Prompt\nPalabra ORIGINAL dentro del prompt copiable.\n```\n")
+        alt = os.path.join(tmp, "vb_b.md")
+        with open(alt, "w", encoding="utf-8") as fh:
+            fh.write(io_open(base).replace("ORIGINAL", "CAMBIADA"))
+        pa, pb = os.path.join(tmp, "vb_a.pdf"), os.path.join(tmp, "vb_b.pdf")
+        for m, o in ((base, pa), (alt, pb)):
+            run([sys.executable, os.path.join(SCRIPTS, "build_pdf.py"), m, o, "--no-verify"])
+        rvb = run([sys.executable, os.path.join(SCRIPTS, "verbatim_check.py"),
+                   "--old", pa, "--new", pb])
+        if rvb.returncode != 3:
+            _vb.append("verbatim_check devolvio %s con dos PDFs distintos, se espera 3"
+                       % rvb.returncode)
+        if "ORIGINAL" not in rvb.stdout:
+            _vb.append("verbatim_check no nombro el segmento perdido")
+        # (b2) DIRECCION POSITIVA: el mismo PDF contra si mismo NO debe morder
+        rok = run([sys.executable, os.path.join(SCRIPTS, "verbatim_check.py"),
+                   "--old", pa, "--new", pa])
+        if rok.returncode != 0:
+            _vb.append("verbatim_check marco diferencias comparando un PDF CONSIGO MISMO")
+        _detv = ("interna muerde con tarjeta ausente; Paso C sale 3 y nombra el "
+                 "segmento; ninguna muerde en el caso bueno")
+    except Exception as e:
+        _vb = ["la prueba revento: %s: %s" % (type(e).__name__, e)]
+    results.append(("La compuerta verbatim MUERDE (las dos caras, ambas direcciones)",
+                    not _vb, "; ".join(_vb) if _vb else _detv))
+
+    # v6.2 · EL CUERPO CONTRA EL CÓDIGO. La prueba que faltaba y que explica cómo
+    # el SKILL.md pudo quedarse DOS VERSIONES desfasado sin que nada sonara: las
+    # otras 23 pruebas miden el MOTOR, y ninguna leía el archivo que lee quien
+    # ejecuta. Cada versión arreglaba el código y anotaba el porqué en el acta
+    # mientras la instrucción se pudría. Aquí se comprueba que todo flag y todo
+    # bloque ::: que el cuerpo PROMETE existe de verdad en el parser, y que no
+    # cita ninguno de los retirados (así se habría cazado el `--no-index` que la
+    # norma revocada de FER dejó escrito en el cuerpo).
+    _doc = []
+    _detd = ""
+    try:
+        _skill = io_open(os.path.join(SKILL_DIR, "SKILL.md"))
+        # TODOS los scripts, no solo build_pdf: --old/--new son de verbatim_check
+        # y --palette de audit_pdf. La primera versión de esta prueba miraba un
+        # solo archivo y marcó tres flags buenos como inexistentes — un guardián
+        # con el alcance mal puesto acusa al inocente, que es su forma de mentir.
+        _build = "".join(io_open(os.path.join(SCRIPTS, f))
+                         for f in sorted(os.listdir(SCRIPTS)) if f.endswith(".py"))
+        # Solo el CUERPO: el acta histórica nombra a propósito cosas retiradas.
+        _cuerpo = _re3.sub(r"<!--.*?-->", "", _skill, flags=_re3.S)
+        _flags = set(_re3.findall(r"--[a-z][a-z-]+", _cuerpo))
+        # Los que no son flags de esta skill (pip, playwright, CSS, Chrome).
+        _ajenos = {"--window-size", "--card-max-mm", "--gold-text", "--json"}
+        for f in sorted(_flags - _ajenos):
+            if ('"%s"' % f) not in _build:
+                _doc.append("el cuerpo cita %s y el parser no lo tiene" % f)
+        for b in sorted(set(_re3.findall(r"`?:::\s*([a-z]+)", _cuerpo))):
+            if b not in _build:
+                _doc.append("el cuerpo cita el bloque ::: %s y no existe" % b)
+        # FLAGS MUERTOS: declarados en el parser y nunca leidos. Peor que un flag
+        # inexistente, porque ese falla y este se acepta EN SILENCIO: quien lo
+        # escribe cree que surtio efecto. Asi estaba --no-index tras pasar el mapa
+        # a opt-in, y por eso la version anterior de esta prueba lo dejo pasar:
+        # buscaba existencia, no EFECTO. Ahora un flag muerto tiene que avisar.
+        for f in sorted(_flags - _ajenos):
+            if ('"%s"' % f) in _build:
+                var = f[2:].replace("-", "_")
+                leido = _build.count("args." + var) + _build.count("args, \"" + var)
+                if leido == 0:
+                    _doc.append("%s esta DECLARADO y nunca se lee: se acepta en "
+                                "silencio sin hacer nada" % f)
+        _detd = ("%d flags verificados: existen, se leen, y sus bloques ::: tambien"
+                 % len(_flags - _ajenos))
+    except Exception as e:
+        _doc = ["la prueba reventó: %s: %s" % (type(e).__name__, e)]
+    results.append(("El cuerpo del SKILL.md promete solo lo que el código hace",
+                    not _doc, "; ".join(_doc) if _doc else _detd))
+
     # LA CUARTA CARA, la que vive FUERA del árbol: la fila del REGISTRO-FABRICAS,
     # que leen los otros chats y que ningún bump ni blindaje alcanza. Se reporta
     # como INFORMATIVO, no como fallo: entre que la fábrica sella y el Centro de
@@ -623,6 +800,29 @@ def main():
     sys.exit(0 if core else 1)
 
 
+# v6.5 · EL LIMITE DE CADA CHEQUEO, EN LA MISMA LINEA DEL OK (fila del CdM,
+# venida de golden360). Un verde liso MIENTE POR OMISION: quien lee "[PASS]
+# Anti-corte" entiende "el PDF esta bien", cuando lo que se midio es que ningun
+# bloque roza el borde — no que el documento se lea bien, ni que la tarjeta sea
+# legible al tamaño al que quedo. Es "cobertura, no veredicto" bajado del
+# informe al CHEQUEO. Solo se anota donde el nombre promete mas de lo que mide;
+# un chequeo cuyo nombre ya es exacto no necesita coletilla, y ponersela a todos
+# seria ruido que se deja de leer.
+LIMITES = {
+    "Anti-corte": "mide que nada roza el borde, no que el documento se lea bien",
+    "Compuerta verbatim (texto": "mide que el texto llego igual, no que sea buen texto",
+    "La compuerta verbatim MUERDE": "prueba las dos caras del codigo, no PDFs de otras herramientas",
+    "Fuente de marca incrustada": "mide que la fuente viaja dentro, no como se ve impresa",
+    "Contraste WCAG": "mide los pares declarados en el tema, no cada pixel del PDF",
+    "Documento largo": "mide el numero y el tamaño de letra, no que el mapa oriente",
+    "Componentes visuales": "mide que se dibujan con etiqueta, no que el grafico sea el correcto para el dato",
+    "Identidad por tema": "mide que DOS temas salen distintos, no que los valores sean los de esa marca",
+    "Neutralidad por defecto": "mide texto y logo, NO la paleta: sin tema el estilo sigue siendo el de Golden",
+    "El cuerpo del SKILL.md": "mide flags y bloques, no que la doctrina escrita siga siendo cierta",
+    "El auditor NO marca": "una muestra limpia, no todo PDF limpio posible",
+}
+
+
 def report(results):
     """TRES estados, no dos. `ok=None` significa NO SE PUDO VERIFICAR (falta una
     dependencia opcional, no hay Chrome): eso NO es un fallo del estándar y no
@@ -644,6 +844,11 @@ def report(results):
         elif ok is None:
             sin_medir += 1
         line = f"[{mark}] {name}"
+        if ok is True:
+            for clave, limite in LIMITES.items():
+                if name.startswith(clave):
+                    line += f"  ·  LIMITE: {limite}"
+                    break
         if detail:
             line += "  ·  " + detail
         print(line)

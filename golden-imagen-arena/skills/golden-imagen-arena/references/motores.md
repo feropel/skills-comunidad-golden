@@ -24,6 +24,15 @@ generate_image {
   Bytedance/BFL/OpenAI-Hazel usan `image_references`. Ante la duda:
   `models_explore {action:"get", model_id:"<id>"}` y mira `medias[].roles`.
 - `get_cost: true` devuelve el costo sin generar. Úsalo en el preflight.
+- 🔴 **Si `generate_image` falla siempre con `params: Invalid input`, no es tu prompt: es el
+  CANAL.** Medido el 2026-09-04 — en algunas sesiones los argumentos no escalares (objetos,
+  arrays) y **los números** llegan al servidor serializados como string, y solo pasan limpios
+  los strings. Síntomas hermanos: `generate_image_batch` respondiendo `requests: expected array,
+  received string`, y `banners_generate` rechazando `width`/`height` con `expected number,
+  received string`. **Diagnóstico en una llamada:** prueba con `params` vacío `{}`; si también
+  falla, el canal no pasa objetos y esta arena no se puede disparar desde esa sesión.
+  **Dilo y detente — no insistas variando el prompt**, que es gastar turnos contra un transporte
+  roto. Es la Ley del Instrumento del cuerpo aplicada al MCP.
 - La generación es **asíncrona**: `generate_image` devuelve un job. **No hay `job_status`**:
   espera la tanda con `jobs_wait` (bloqueante) o mira un job con `job_display {job_id}` para
   obtener las URLs de resultado (manejo de `failed`/moderación: paso 4 del SKILL.md).
@@ -63,9 +72,18 @@ generate_image {
 - `remove_background` — recorte / fondo transparente para componer. **Cuesta créditos por imagen.**
 
   > 🆓 **Para lotes usa el recortador LOCAL: `scripts/quitar-fondo.py`** (rembg, MIT, corre en tu
-  > máquina). Medido el 2026-08-02 con un packshot 1080×1080 de Golden: **0,63 s por imagen, cero
+  > máquina). Medido el 2026-08-02 con un packshot 1080×1080 de Golden: **0,86 s por imagen, cero
   > créditos**, y resolvió bien el caso difícil — tapa blanca sobre fondo blanco — sin halos ni
   > bordes duros (52% transparente, 1,7% de borde con antialiasing sano).
+  >
+  > ⚠️ Aquí decía **0,63 s** y el propio script decía **0,86 s** para la MISMA corrida del mismo
+  > día. Dos cifras para una sola medición: se corrigió a la del script, que es donde se tomó.
+  > **Instalación verificada el 2026-09-08:** el venv `~/.golden-rembg` existe, `rembg` importa y
+  > `~/.u2net/u2net.onnx` está descargado. Un chat hermano reportó "rembg no está instalado en
+  > este equipo" — buscó en el Python del sistema, no en el venv aislado: **el instrumento
+  > estaba mal apuntado, la instalación está sana.**
+  > El modelo correcto aquí es el genérico `u2net`, que es lo que hace el script. `u2net_human_seg`
+  > es para PERSONAS (con el genérico se les come el hombro) y esta skill recorta producto.
   > Instalación una sola vez: `python3 -m venv ~/.golden-rembg` y
   > `~/.golden-rembg/bin/pip install "rembg[cpu]"`. La primera corrida baja el modelo (~176 MB) y
   > después **funciona sin conexión**: esa descarga es su única salida a internet.
@@ -74,8 +92,16 @@ generate_image {
   > transparencias reales — ahí el modelo grande gana. Para packshots de frasco, caja o producto
   > sólido, el local basta y el ahorro en un catálogo es real.
 - `outpaint_image` — expandir el encuadre (pasar un 1:1 a 4:5 sin recortar el producto).
-- `upscale_image` / `topaz_image` — subir a 2K/4K la pieza ganadora si se va a imprimir o
-  usar en pantalla grande. Para web NO hace falta: la meta es WebP < 150 KB.
+- `upscale_image` / `topaz_image` — subir a 2K/4K la pieza ganadora.
+
+  > 🔴 **Corregido el 2026-09-08.** Aquí decía *"para web NO hace falta: la meta es WebP
+  > < 150 KB"*. **Esa frase fabricaba el techo de nitidez de las fichas.** Medido contra el
+  > CDN de Shopify: `?width=` REDUCE pero **nunca AGRANDA**, así que el tamaño de subida es
+  > un techo permanente y una galería subida a 1080 se queda con zoom de 1080 para siempre.
+  > **Para la galería de una ficha SÍ hace falta 2048**; el "< 150 KB" solo aplica a lo que
+  > va al HTML sin transformación (las infografías de la descripción) y a pauta.
+  > La tabla que manda es `references/formato-por-destino.md`. Genera en 2K desde el motor
+  > cuando la pieza vaya a galería: sale más barato que subir el 1K después.
 
 ## Cuánto cuesta DE VERDAD una generación (benchmark de mercado)
 

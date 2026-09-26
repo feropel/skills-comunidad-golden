@@ -14,6 +14,12 @@ Opciones:
                             gritar (se muestra aparte, con su motivo y su fecha)
     --anterior <DUMP.json>  diff contra una corrida previa: que se movio desde entonces
     --handoff <archivo.md>  escribe el paquete listo para la skill que SI corrige
+    --alcance <que>         config (POR DEFECTO) · productos · todo. Esta skill audita la
+                            CONFIGURACION de los asistentes; lo de producto se aparta y se
+                            DECLARA con su severidad, nunca se omite en silencio.
+    --incluir-excluidos     audita tambien los asistentes que FER saco del ecosistema
+                            (hoy: Remarketing IA). Solo cuando FER lo pida para un espacio;
+                            sin la bandera se apartan y se declaran contados en el universo.
 
 NO escribe nada en Chatea. Audita y reporta.
 
@@ -24,6 +30,7 @@ Esos se declaran como NO VERIFICADO en la cobertura, nunca se omiten en silencio
 """
 
 import hashlib
+import os
 import json
 import re
 import sys
@@ -32,6 +39,45 @@ from pathlib import Path
 
 RAIZ = Path(__file__).resolve().parent.parent
 TOPES = json.loads((RAIZ / "assets" / "topes-nativos.json").read_text())
+
+# 🔴 ASISTENTES QUE FER SACO DEL ECOSISTEMA. No se auditan por NINGUNA puerta: ni como faltantes
+# (B6), ni su pais (L4), sus topes, su disparador (D3/D5) o su contenido. Hasta el 2026-09-24 el
+# JSON de esperados ya decia `"opcional": true` para Remarketing IA y este script no leia esa
+# bandera (0 usos): B6 lo gritaba igual. Una regla escrita donde se lee y no donde se ejecuta.
+# Por eso el corte se hace AL CARGAR el inventario: sus campos se apartan antes de que los vea
+# ningun control, y se DECLARAN contados en el universo (apartar es legitimo; esconder, no).
+# Opt-in: vuelven solo si FER lo pide para un espacio concreto, con --incluir-excluidos.
+EXCLUIDOS_POR_FER = {
+    "[remarketing ia": "FER: salio del ecosistema el 21-sep-2026; no se configura ni se audita (24-sep)",
+}
+
+
+def _llave(s):
+    """Minusculas, sin tildes y sin nada que no sea letra o numero: "[Remarketing  IA]",
+    "[REMARKETING-IA]" y "[Remarketing IA]" dan la misma llave (verificador, 24-sep)."""
+    s = unicodedata.normalize("NFKD", str(s or "")).lower()
+    return re.sub(r"[^a-z0-9]", "", "".join(c for c in s if not unicodedata.combining(c)))
+
+
+# Las mismas exclusiones, pasadas por _llave: un campo es del asistente si su nombre EMPIEZA asi.
+_LLAVES_EXCLUIDAS = [_llave(p) for p in EXCLUIDOS_POR_FER]
+
+
+def es_excluido_por_fer(nombre):
+    """Campo de bot de un asistente excluido: el nombre empieza por su prefijo."""
+    k = _llave(nombre)
+    return any(k.startswith(p) for p in _LLAVES_EXCLUIDAS)
+
+
+# Los agentes de IA no se llaman como los campos: el de Remarketing es "Agente de Remarketing",
+# sin "IA". Comparar contra la llave del campo ("remarketingia") no lo encontraba (medido 24-sep).
+_AGENTES_EXCLUIDOS = ["remarketing"]
+
+
+def es_agente_excluido_por_fer(nombre):
+    """Agente o tarea de IA de un asistente excluido: su nombre CONTIENE la palabra."""
+    k = _llave(nombre)
+    return any(p in k for p in _AGENTES_EXCLUIDOS)
 
 # Los endpoints puramente de conteo que B4 audita. I3 (bloque_i, "lo que entra al DUMP se
 # audita o se declara") usa esta MISMA lista para decidir que zonas quedan sin control: dos
@@ -43,6 +89,16 @@ ENDPOINTS_B4 = ("/flow/subflows", "/flow/tags", "/flow/ai-agents", "/flow/ai-tas
 
 TECHO_ESCAPADO = TOPES["techo_bot_field"]["practico_escapado"]
 ALERTA = TOPES["techo_bot_field"]["alerta_porcentaje"]
+
+_ruta_prod = RAIZ / "assets" / "campos-de-producto.json"
+PATRONES_PRODUCTO = [re.compile(p) for p in (
+    json.loads(_ruta_prod.read_text())["patrones"] if _ruta_prod.exists() else [])]
+
+
+def es_campo_de_producto(nombre):
+    """El disparador NO entra: nombra productos pero es cableado, o sea configuracion."""
+    return any(rx.match(nombre or "") for rx in PATRONES_PRODUCTO)
+
 
 PREFIJOS_CONOCIDOS = [
     "[Comentarios]", "[Comentarios IA]", "[Ventas Wp]", "[Producto Ventas Wp]",
@@ -75,7 +131,7 @@ PLACEHOLDERS = ["{{", "TU_TOKEN", "TU_NOMBRE", "TU_TIENDA", "XXXX", "[NOMBRE",
 # una palabra de encargo dentro — el idioma con el que un humano se deja una nota a si mismo.
 # El corchete de VARIABLE del flujo va en minusculas ([total], [saldo]) y no dispara.
 # DOS niveles de confianza, porque medir importa mas que gritar. Contrastado contra los 12
-# productos de Golden: la version que trataba "mayusculas sostenidas" como hueco acuso 4
+# productos reales de un espacio: la version que trataba "mayusculas sostenidas" como hueco acuso 4
 # corchetes y solo 1 era real — los otros 3 eran variables de plantilla ([CATEGORIA],
 # [NOMBRE ASESORA]) que el motor de "Producto en Segundos" rellena, y una variable larga con
 # instruccion adentro en la lista de datos del pedido. Un auditor que acusa 3 de 4 en falso
@@ -126,16 +182,63 @@ DUENA_POR_PREFIJO = {
 }
 
 
+def _valor_trivial(v):
+    """Un valor es TRIVIAL si por su FORMA no puede llegarle a un cliente: booleano, numero,
+    version, o un JSON cuyas hojas son todas de esas. NO se mide por longitud -- medir por
+    longitud acusaria al idioma y dejaria pasar un placeholder corto que si sale en pantalla
+    (el caso real: "string" repetido en los 13 huecos de plantilla de mensaje)."""
+    import re as _re
+    SIMPLE = _re.compile(r"^(true|false|si|no|none|null|0|1|\d+|\d+(?:\.\d+)+)$", _re.I)
+
+    def hoja_trivial(x):
+        if isinstance(x, bool) or isinstance(x, (int, float)) or x is None:
+            return True
+        if isinstance(x, str):
+            return not x.strip() or bool(SIMPLE.match(x.strip()))
+        return False
+
+    if isinstance(v, str):
+        t = v.strip()
+        if hoja_trivial(t):
+            return True
+        try:
+            v = json.loads(t)
+        except Exception:                                     # noqa: BLE001
+            return False
+    if isinstance(v, dict):
+        return all(_valor_trivial(x) if isinstance(x, (dict, list)) else hoja_trivial(x)
+                   for x in v.values()) and bool(v)
+    if isinstance(v, list):
+        return all(_valor_trivial(x) if isinstance(x, (dict, list)) else hoja_trivial(x)
+                   for x in v) and bool(v)
+    return hoja_trivial(v)
+
+
 class Auditoria:
-    def __init__(self, dump):
+    # Ley de FER, 2026-09-05, en su voz: "esta skill es exclusivamente para analizar
+    # configuracion, configuracion de asistentes, no vemos productos". Por eso el alcance
+    # por defecto es `config` y hay que PEDIR explicitamente el de producto.
+    ALCANCES = ("config", "productos", "todo")
+
+    def __init__(self, dump, alcance="config"):
+        if alcance not in self.ALCANCES:
+            raise ValueError(f"alcance debe ser uno de {self.ALCANCES}, no {alcance!r}")
         self.d = dump
+        self.alcance = alcance
+        # Lo que el alcance aparta NO se tira: se guarda con su severidad y se cuenta en el
+        # informe. Recortar es legitimo; esconder es lo que convierte un auditor en adorno.
+        self.fuera_de_alcance = []
         self.hallazgos = []
         self.cobertura = []          # (bloque, control, estado, revisados, nota)
         self.campos = {}
+        self.incluir_excluidos = False   # opt-in de FER: ver EXCLUIDOS_POR_FER
+        self.excluidos_por_fer = []      # nombres de campo apartados, se declaran en el universo
         self.universo = {}
         self.productos = {}
         self._cache = {}
         self._vistos = set()
+        # CONTROL K1 · la decision CADUCA sola: `evidencia_al_decidir` es la foto del dia
+        # en que se tomo, y si la de hoy difiere el hallazgo vuelve a contar.
         self.decisiones = {}     # clave -> {motivo, fecha, reabrir_si, evidencia_al_decidir}
         self._reabiertos = []    # decisiones que caducaron porque la situacion cambio
         self._sin_foto = []      # decisiones sin evidencia_al_decidir: no pueden caducar
@@ -224,6 +327,44 @@ class Auditoria:
                 h["severidad"] = "DECIDIDO"
                 if antes is None:
                     self._sin_foto.append(h["clave_decidida"])
+        # El alcance se aplica AQUI y no al leer los campos: asi todos los controles
+        # siguen corriendo sobre el universo entero y los conteos del informe no mienten.
+        # Lo unico que cambia es donde aterriza el hallazgo.
+        # 🔴 EL FILTRO VA POR LO QUE EL CONTROL JUZGA, NO POR EL NOMBRE DEL CAMPO.
+        # Hasta el 2026-09-08 casaba solo `es_campo_de_producto(h["campo"])`, y con eso
+        # **le estaba ocultando a FER parte de SU configuracion**: D1 (la palabra clave que
+        # tiene que coincidir BYTE A BYTE entre el producto y el disparador) apunta a
+        # `[Producto Ventas Wp] N`, asi que en la corrida por defecto se archivaba como "de
+        # producto" y no se reportaba. Un desajuste de palabra clave es CABLEADO puro y deja
+        # el producto sin arrancar. El propio SKILL.md ya decia lo contrario que el codigo:
+        # "el disparador NO entra ahi: nombra productos, pero es cableado del asistente".
+        # Lo caz el golden-verificador sembrando el sabotaje y viendo el hallazgo aterrizar
+        # en `fuera_de_alcance`.
+        #
+        # LA FRONTERA, y es la que cierra el hueco por el que dos chats se metieron en
+        # productos el mismo dia: **un control de configuracion que APUNTA a un campo de
+        # producto mira el CABLEADO del campo, jamas su CONTENIDO.** El nombre de la ranura,
+        # si esta registrada en el disparador, si su palabra clave coincide, si esta activa,
+        # cuanto ocupa el campo y si lleva una credencial: todo eso es cableado. Que producto
+        # es, su marca, su precio, sus imagenes: eso es contenido, y solo se juzga con
+        # --alcance productos.
+        CABLEADO = {
+            "D1",  # palabra clave byte a byte producto <-> disparador
+            "D2",  # emoji de 4 bytes en el disparador
+            "D3",  # ranura sin entrada en el disparador (y su gemelo D3b)
+            "D3b",
+            "D4",  # estado incoherente entre producto y disparador
+            "D5",  # ranuras del disparador mal contadas
+            "D6",  # producto activo sin ningun id de anuncio
+            "C1", "C2", "C3", "C4", "C5", "C6",   # techos y tipo del campo
+            "E3",  # credencial de voz heredada
+            "G3",  # credencial guardada como valor de un campo
+        }
+        de_producto = es_campo_de_producto(h["campo"]) and h.get("control") not in CABLEADO
+        if (self.alcance == "config" and de_producto) or \
+           (self.alcance == "productos" and not de_producto):
+            self.fuera_de_alcance.append(h)
+            return
         self.hallazgos.append(h)
 
     def cubre(self, control, estado, revisados=None, nota=""):
@@ -313,11 +454,19 @@ class Auditoria:
             return []
         return []
 
+    def _apartar_excluidos(self, campos):
+        """Indexa los campos y aparta los de asistentes que FER saco del ecosistema."""
+        todos = {c["name"]: c for c in campos if isinstance(c, dict) and "name" in c}
+        if self.incluir_excluidos:
+            self.excluidos_por_fer = []
+            return todos
+        self.excluidos_por_fer = sorted(n for n in todos if es_excluido_por_fer(n))
+        return {n: c for n, c in todos.items() if n not in self.excluidos_por_fer}
+
     def campos_pre(self):
         """Los campos indexados, disponibles ya en el bloque A."""
         if not self.campos:
-            self.campos = {c["name"]: c for c in self.filas("/flow/bot-fields")
-                           if isinstance(c, dict) and "name" in c}
+            self.campos = self._apartar_excluidos(self.filas("/flow/bot-fields"))
         return self.campos
 
     # ------------------------------------------------------- A · identidad y acceso
@@ -353,7 +502,8 @@ class Auditoria:
         self.universo["pais_declarado"] = pais.strip() or "(vacio)"
         self.universo["monedas_en_productos"] = sorted(monedas)
         COHERENTE = {"COLOMBIA": "COP", "MEXICO": "MXN", "CHILE": "CLP", "PERU": "PEN",
-                     "ECUADOR": "USD", "PANAMA": "USD", "PARAGUAY": "PYG"}
+                     "ECUADOR": "USD", "PANAMA": "USD", "PARAGUAY": "PYG",
+                     "GUATEMALA": "GTQ", "ARGENTINA": "ARS", "BRASIL": "BRL"}
         esperada = COHERENTE.get(pais.strip().upper())
         if esperada and monedas and monedas != {esperada}:
             self.falla("A3", "DUDA",
@@ -401,10 +551,13 @@ class Auditoria:
     # ---------------------------------------------------------- B · inventario
     def bloque_b(self):
         campos = self.filas("/flow/bot-fields")
-        self.campos = {c["name"]: c for c in campos if isinstance(c, dict) and "name" in c}
+        self.campos = self._apartar_excluidos(campos)
         conteo = (self.d.get("_conteos") or {}).get("/flow/bot-fields") or {}
         traidos, declarados = conteo.get("traidos"), conteo.get("declarados_por_servidor")
-        self.universo["campos_bot"] = len(self.campos)
+        self.universo["campos_bot"] = len(self.campos) + len(self.excluidos_por_fer)
+        self.universo["campos_excluidos_por_fer"] = {
+            "cuantos": len(self.excluidos_por_fer), "campos": self.excluidos_por_fer,
+            "motivo": "; ".join(EXCLUIDOS_POR_FER.values())} if self.excluidos_por_fer else 0
         self.universo["campos_declarados"] = declarados
 
         if isinstance(declarados, int) and traidos != declarados:
@@ -414,7 +567,9 @@ class Auditoria:
                        "Un denominador incompleto invalida el resto del informe.",
                        "Repetir la extraccion antes de leer ningun hallazgo.")
         self.cubre("B1", "corrido", len(self.campos),
-                   f"servidor declara {declarados}")
+                   f"servidor declara {declarados}"
+                   + (f" · {len(self.excluidos_por_fer)} apartados por decision de FER "
+                      f"(no faltan: se traen y no se auditan)" if self.excluidos_por_fer else ""))
 
         # El mismo control sobre TODO lo que pagina. Ausencia no es prueba: un listado
         # corto puede ser "medido y vacio" o "no medido", y hay que distinguirlo.
@@ -461,11 +616,21 @@ class Auditoria:
         self.universo["asistentes"] = {k: len(v) for k, v in sorted(prefijos.items())}
         desconocidos = [p for p in prefijos if p not in PREFIJOS_CONOCIDOS]
         if "(sin prefijo)" in prefijos:
+            # 🔴 SIN CLASIFICAR NO ES "CONFIGURACION". Hasta el 2026-09-08 la configuracion
+            # se definia POR EXCLUSION -- existia campos-de-producto.json y todo lo demas se
+            # asumia configuracion -- asi que un campo que nadie habia clasificado entraba
+            # como config sin que nadie lo decidiera, y "auditar la configuracion" no tenia
+            # denominador. Ahora se DECLARA como lo que es: sin clasificar.
             self.falla("B3", "DUDA",
-                       f"{len(prefijos['(sin prefijo)'])} campos no pertenecen a ningun asistente",
+                       f"{len(prefijos['(sin prefijo)'])} campos SIN CLASIFICAR: no estan en "
+                       f"campos-de-configuracion.json ni en campos-de-producto.json",
                        f"{sorted(prefijos['(sin prefijo)'])}",
-                       "Quedan fuera de los controles por asistente: no se sabe quien los lee.",
-                       "Clasificarlos o declararlos fuera de alcance.")
+                       "NO se asumen configuracion: un campo que nadie clasifico no es config "
+                       "por defecto. Quedan fuera de los controles por asistente porque no se "
+                       "sabe quien los lee, y eso se dice en vez de callarlo.",
+                       "Clasificarlos en assets/campos-de-configuracion.json (si son del "
+                       "negocio) o en campos-de-producto.json (si son contenido), o declararlos "
+                       "fuera de alcance con su motivo.")
         if desconocidos:
             self.falla("B3", "DUDA",
                        "Hay asistentes o versiones que esta skill todavia no sabe auditar",
@@ -473,6 +638,36 @@ class Auditoria:
                        "Sus campos quedan fuera de los controles especificos.",
                        "Anadirlos al catalogo o declararlos fuera de alcance en el informe.")
         self.cubre("B3", "corrido", len(prefijos))
+
+        # B8 · el MISMO asistente escrito de dos formas. El catalogo PREFIJOS_CONOCIDOS
+        # absorbio las variantes ([Logistico] con y sin tilde, [WhatsApp IA] con y sin
+        # mayuscula) y al catalogarlas las volvio invisibles: B3 solo mira lo que NO esta
+        # en el catalogo. Medido el 2026-09-05 sobre los dos unicos espacios auditados
+        # hasta entonces, de dos paises distintos: LOS DOS las traen. Diez
+        # versiones de esta skill pasaron por encima sin verlo.
+        def _plano(p):
+            d = unicodedata.normalize("NFD", p)
+            return "".join(c for c in d if unicodedata.category(c) != "Mn").lower()
+
+        familias = {}
+        for p in prefijos:
+            familias.setdefault(_plano(p), []).append(p)
+        for _, variantes in sorted(familias.items()):
+            if len(variantes) < 2:
+                continue
+            variantes = sorted(variantes, key=lambda v: (-len(prefijos[v]), v))
+            mayor, menores = variantes[0], variantes[1:]
+            self.falla("B8", "DUDA",
+                       "El mismo asistente aparece escrito de dos formas",
+                       " · ".join(f"`{v}` en {len(prefijos[v])} campos" for v in variantes),
+                       "Todo control que agrupa por prefijo los cuenta como asistentes "
+                       "distintos: el inventario miente y los campos de la variante rara "
+                       "quedan fuera de su familia.",
+                       f"Confirmar en el panel que ningun flujo referencie el nombre viejo y "
+                       f"renombrar los campos de {', '.join(menores)} a {mayor}.",
+                       objetivo=mayor)
+        self.cubre("B8", "corrido", len(familias),
+                   "prefijos normalizados sin tildes ni mayusculas")
 
         # B6 · lo que FALTA, no solo lo que hay. Detectar prefijos presentes nunca puede
         # contestar "esta completa la instalacion": para eso hace falta la lista de esperados.
@@ -495,10 +690,18 @@ class Auditoria:
             self._productos()
             return
         esperados = json.loads(ruta_esp.read_text())
+        # Un asistente sacado del ecosistema por FER no es "esperado", y uno `opcional` no se
+        # reporta cuando falta. Ninguno de los dos cuenta en el denominador: "4 de 5" con uno
+        # opcional ausente lee como una instalacion incompleta que no lo es.
+        evaluados = {n: f for n, f in esperados["asistentes"].items()
+                     if not (not self.incluir_excluidos
+                             and all(es_excluido_por_fer(c) for c in f["campos_firma"]))}
         faltan = []
-        for nombre, firma in esperados["asistentes"].items():
+        for nombre, firma in evaluados.items():
             presentes = [f for f in firma["campos_firma"] if f in self.campos]
             if not presentes:
+                if firma.get("opcional"):
+                    continue
                 faltan.append((nombre, firma["campos_firma"]))
             elif len(presentes) < len(firma["campos_firma"]):
                 self.falla("B6", "DUDA",
@@ -516,10 +719,14 @@ class Auditoria:
                        "declararlo fuera de alcance.",
                        "Instalarlo o declararlo fuera de alcance en el informe.",
                        objetivo=f"falta-{nombre}")
+        obligatorios = [n for n, f in evaluados.items() if not f.get("opcional")]
+        fuera = sorted(set(esperados["asistentes"]) - set(evaluados))
         self.universo["asistentes_esperados"] = (
-            f"{len(esperados['asistentes']) - len(faltan)} de {len(esperados['asistentes'])} presentes")
-        self.cubre("B6", "corrido", len(esperados["asistentes"]),
-                   f"{len(faltan)} sin instalar")
+            f"{len(obligatorios) - len(faltan)} de {len(obligatorios)} presentes"
+            + (f" · no se esperan por decision de FER: {', '.join(fuera)}" if fuera else ""))
+        self.cubre("B6", "corrido", len(evaluados),
+                   f"{len(faltan)} sin instalar"
+                   + (f" · {len(fuera)} fuera por decision de FER" if fuera else ""))
 
         contados = 0
         for clave in ENDPOINTS_B4:
@@ -735,20 +942,33 @@ class Auditoria:
                                    "arranca nunca.",
                                    "Quitar el emoji del disparador.")
 
-            # D3 · entradas que apuntan al vacio
+            # D3 · entradas que apuntan a un campo que NO EXISTE
+            # 🔴 EL DENOMINADOR ES DEL MISMO UNIVERSO QUE EL NUMERADOR. Medido el 2026-09-17
+            # en el espacio de un cliente: decia "29 de 71 ACTIVAS", con 29 activas-al-vacio
+            # sobre un total de 71 entradas de las que solo 55 estaban activas. El numerador
+            # contaba activas y el denominador contaba todas: dos universos en una sola frase,
+            # que es la puerta de cobertura falsa de la casa. Lo correcto es 29 de 55.
+            # Y la PALABRA tambien estaba mal: esos campos no estan "vacios", NO EXISTEN. Un
+            # campo vacio se arregla llenandolo; uno inexistente hay que crearlo o repuntar la
+            # entrada. Nombrar mal el defecto manda al dueno a la pantalla equivocada.
+            todas = list(registrados)
+            act_todas = [n for n in todas if self.activa(registrados[n])]
+            inact_todas = [n for n in todas if not self.activa(registrados[n])]
             al_vacio = sorted(set(registrados) - cargados, key=self.orden_ranura)
             vivas = [n for n in al_vacio if self.activa(registrados[n])]
             apagadas = [n for n in al_vacio if not self.activa(registrados[n])]
             if vivas:
                 self.falla("D3", "MUERTO",
-                           f"`{nombre_disp}`: {len(vivas)} de {len(registrados)} entradas "
-                           "ACTIVAS apuntan a un campo vacio o inexistente",
+                           f"`{nombre_disp}`: {len(vivas)} de {len(act_todas)} entradas "
+                           f"ACTIVAS apuntan a un campo que NO EXISTE "
+                           f"(el disparador trae {len(todas)} entradas en total)",
                            f"{vivas}",
                            "El disparo entra y no encuentra producto.")
             if apagadas:
                 self.falla("D3", "DUDA",
-                           f"`{nombre_disp}`: {len(apagadas)} de {len(registrados)} entradas "
-                           "INACTIVAS apuntan a un campo vacio o inexistente",
+                           f"`{nombre_disp}`: {len(apagadas)} de {len(inact_todas)} entradas "
+                           f"INACTIVAS apuntan a un campo que NO EXISTE "
+                           f"(el disparador trae {len(todas)} entradas en total)",
                            f"{apagadas}",
                            "Estan apagadas, asi que hoy no disparan ni cuestan nada. Es "
                            "basura de configuracion: limpieza, no urgencia.",
@@ -1208,13 +1428,36 @@ class Auditoria:
         audita o se declara, nunca se queda en tierra de nadie."""
         zonas = {"agentes IA": self.d.get("_agentes_detalle") or {},
                  "tareas IA": self.d.get("_tareas_detalle") or {}}
+        # Los agentes de un asistente que FER saco del ecosistema tampoco se auditan aqui
+        # (el verificador del 24-sep sembro "¿" en el "Agente de Remarketing" y F13 lo grito).
+        # El detalle viene por ns; el nombre, de /flow/ai-agents y /flow/ai-tasks.
+        if not self.incluir_excluidos:
+            fuera = set()
+            for lista in ("/flow/ai-agents", "/flow/ai-tasks"):
+                for x in self.d.get(lista) or []:
+                    if isinstance(x, dict) and es_agente_excluido_por_fer(x.get("name")):
+                        fuera.update(v for k, v in x.items() if k.endswith("_ns") and k != "flow_ns"
+                                     and isinstance(v, str))
+            if fuera:
+                zonas = {e: ({ns: c for ns, c in z.items() if ns not in fuera}
+                             if isinstance(z, dict) else z) for e, z in zonas.items()}
+                self.universo["agentes_ia_excluidos_por_fer"] = sorted(fuera)
         objetos = cadenas = 0
+        # 🔴 EL DENOMINADOR NO ES "objetos": es "objetos QUE TRAIAN TEXTO". Un agente o una
+        # tarea que el extractor baja `locked` llega sin una sola cadena, asi que ningun
+        # control lo mira -- y aun asi engordaba el numero que F13 declaraba como cobertura.
+        # Medido por el verificador el 2026-09-08 sobre Dolce: 72 objetos declarados, 40 sin
+        # texto. Eso es cobertura FALSA, la clase de mentira que este auditor existe para no
+        # cometer: "N de N revisados" donde 40 nunca se revisaron porque no habia que ver.
+        # Se cuentan aparte y se declaran; no se esconden ni se suman.
+        vacios = []
         moji, apert, marcas = [], [], []
         for etiqueta, zona in zonas.items():
             if not isinstance(zona, dict):
                 continue
             for ns, cuerpo in zona.items():
                 objetos += 1
+                antes = cadenas
                 for ruta, hoja in self.caminar(cuerpo):
                     if not isinstance(hoja, str) or not hoja:
                         continue
@@ -1229,7 +1472,11 @@ class Auditoria:
                             marcas.append(f"{donde}: {ph!r}")
                     for m in HUECO_DE_EDITOR.finditer(hoja):
                         marcas.append(f"{donde}: {m.group(0)[:90]!r}")
-        self.universo["zona_ia"] = {"objetos": objetos, "cadenas": cadenas}
+                if cadenas == antes:
+                    vacios.append(f"{etiqueta} {ns}")
+        con_texto = objetos - len(vacios)
+        self.universo["zona_ia"] = {"objetos": objetos, "cadenas": cadenas,
+                                    "con_texto": con_texto, "sin_texto": len(vacios)}
         if moji:
             self.falla("F13", "FUGA",
                        f"{len(moji)} textos de agentes o tareas de IA con la codificacion rota",
@@ -1245,8 +1492,118 @@ class Auditoria:
                        "\n     ".join(marcas[:10]),
                        "Contrastar contra un espacio virgen antes de tocar: si no aparece "
                        "alli, no es default de fabrica.")
-        self.cubre("F13", "corrido", objetos,
-                   f"{cadenas} cadenas de agentes y tareas de IA")
+        if vacios:
+            # No es un defecto del espacio: es un limite de la LECTURA. Un objeto sin texto
+            # puede estar vacio de verdad o puede que el extractor no pudiera abrirlo. Lo
+            # que no se puede es contarlo como revisado.
+            self.falla("F13", "DUDA",
+                       f"{len(vacios)} de {objetos} agentes o tareas de IA llegaron SIN "
+                       f"una sola cadena: no se pudieron auditar",
+                       "\n     ".join(vacios[:10]),
+                       "Mirarlos en el panel. Si tienen texto alli, el extractor no los "
+                       "esta bajando y la cobertura de esta zona es menor de lo que parece.")
+        self.cubre("F13",
+                   "corrido" if con_texto else "sin_datos",
+                   con_texto,
+                   f"{cadenas} cadenas de agentes y tareas de IA · "
+                   f"{len(vacios)} de {objetos} objetos llegaron sin texto y NO se auditaron")
+
+    # ------------------------------------- F14 · la PLANTILLA DE FABRICA de la plataforma
+    def bloque_fabrica(self):
+        """F14 — el hueco mas grande que tenia este auditor, y se cerro el 2026-09-07.
+
+        Los 13 controles anteriores buscaban DOS cosas: huecos sin llenar (F3: '{{', 'TU_',
+        marcadores) y fugas de OTRA cuenta (F4). **El contenido de fabrica no es ninguna de las
+        dos**: es de Chatea, no de otro cliente, y no parece un marcador -- parece configuracion.
+        Medido el 2026-09-06 contra la API en dos espacios recien creados: **61 de 61 campos
+        identicos byte a byte** entre uno nacido en Colombia y otro creado eligiendo Mexico. La
+        plataforma nace colombiana elijas el pais que elijas.
+
+        Con los 13 controles, un espacio ENTERO sin tocar salia sano en esta dimension: el bot le
+        entrega a un cliente de verdad un telefono que no es de nadie, un asesor llamado Santiago
+        y la ley colombiana en la garantia, y en el panel todo se ve bien.
+
+        LA BANDERA is_template_field DE LA PLATAFORMA NO SIRVE: viene en falso en 9 de cada 10
+        campos. Se mide por el VALOR, contra la huella md5 de la plantilla medida.
+
+        COBERTURA DECLARADA: la huella vive en la hermana logistica y trae los 61 campos. Si el
+        asset no esta, F14 se declara NO CORRIDO -- no se calla ni se da por sano."""
+        import hashlib
+        ruta = os.path.expanduser(
+            "~/.claude/skills/golden-chatea-pro-config-logistico/assets/plantilla-fabrica.json")
+        if not os.path.exists(ruta):
+            self.cubre("F14", "NO CORRIDO", 0,
+                       "falta la huella de la plantilla de fabrica "
+                       "(golden-chatea-pro-config-logistico/assets/plantilla-fabrica.json): "
+                       "la contaminacion de fabrica NO se comprobo")
+            return
+        try:
+            with open(ruta, encoding="utf-8") as f:
+                huella = json.load(f)["huella_md5"]
+        except Exception as e:
+            self.cubre("F14", "NO CORRIDO", 0, f"no se pudo leer la huella: {e}")
+            return
+
+        de_fabrica, revisados = [], 0
+        for nombre, campo in self.campos.items():
+            if nombre not in huella:
+                continue
+            v = campo.get("value")
+            texto = v if isinstance(v, str) else json.dumps(v, ensure_ascii=False)
+            if not (texto or "").strip():
+                continue
+            revisados += 1
+            if hashlib.md5(texto.encode("utf-8")).hexdigest() == huella[nombre]["md5"]:
+                de_fabrica.append(nombre)
+
+        # 🔴 DOS SEVERIDADES, y la separacion vino de campo (chat de Dolce Incanto, 2026-09-08).
+        # La primera version de F14 metia los 32 hallazgos en un solo saco y todos pesaban igual.
+        # Medido en un espacio real: **27 de 32 eran interruptores, versiones o valores triviales**
+        # (false / true / 1 / 2.1.3) -- default legitimo que nadie tiene que tocar. Solo **5**
+        # llevaban texto que le LLEGA AL CLIENTE. Un informe donde lo urgente y lo irrelevante
+        # pesan igual obliga a filtrar a mano, y lo que se filtra a mano se acaba ignorando entero.
+        #
+        # El criterio NO es la longitud -- eso acusaria al idioma. Es la FORMA del valor: un
+        # booleano, un numero o una version no puede leerlos un cliente. Todo lo demas si puede,
+        # y por eso el placeholder "string" repetido en los huecos de plantilla cae en el lado
+        # que importa, aunque sea corto.
+        caliente = [n for n in de_fabrica if not _valor_trivial(self.campos[n].get("value"))]
+        trivial = [n for n in de_fabrica if n not in caliente]
+
+        if caliente:
+            self.falla("F14", "FUGA",
+                       f"{len(caliente)} campos de FABRICA con texto que LE LLEGA AL CLIENTE",
+                       "\n     ".join(caliente[:12]),
+                       "Un campo de fabrica NO se ve vacio: se ve configurado, y por eso ningun "
+                       # 🔴 ESTA CONSECUENCIA DESCRIBE LA CLASE, NUNCA UN CONTENIDO CONCRETO.
+                       # Medido el 2026-09-17 en el espacio de un cliente: aqui habia escrito
+                       # "un asesor llamado Santiago" y "5 anos en el logistico" como si fueran
+                       # datos de ESE espacio. No lo eran -- salian del espacio de referencia
+                       # donde se levanto la huella. El cliente auditado no tenia ningun
+                       # "Santiago" y su logistico decia "3 anos".
+                       # Un texto enlatado dentro de un hallazgo es una INFERENCIA con forma de
+                       # medida, y hereda la credibilidad del informe entero: es exactamente la
+                       # puerta de reference_inferencia_de_subagente_no_es_medida, esta vez
+                       # abierta por nuestro propio auditor. Lo concreto sale del DUMP (la
+                       # evidencia de arriba lo trae) o no sale.
+                       "control de huecos lo caza. Segun el campo, puede traer telefonos de "
+                       "relleno que no son de nadie, nombre y biografia de un asesor que no "
+                       "existe, cifras de trayectoria inventadas y contradictorias entre "
+                       "asistentes, y la ley de OTRO pais en la garantia. **Lo que trae ESTE "
+                       "espacio esta en la evidencia de arriba, leida de su propio dump.** "
+                       "Se limpian ANTES de dar el espacio por instalado.")
+        if trivial:
+            self.falla("F14", "DUDA",
+                       f"{len(trivial)} campos de fabrica TRIVIALES (interruptor, numero o version)",
+                       "\n     ".join(trivial[:8]),
+                       "Estos son el default de la plataforma y en su mayoria NO hay que tocarlos: "
+                       "un booleano o una version no los lee ningun cliente. Se listan para que el "
+                       "denominador sea honesto, no para que se limpien uno por uno. Miralos solo "
+                       "si un interruptor concreto deberia estar en el otro estado.")
+        self.cubre("F14", "corrido", revisados,
+                   f"{revisados} campos con valor comparados contra la huella de {len(huella)} "
+                   f"de la plantilla medida · {len(de_fabrica)} de fabrica "
+                   f"({len(caliente)} con texto al cliente · {len(trivial)} triviales)")
 
     # ------------------------------------------- I · cordura del propio auditor
     def bloque_i(self):
@@ -1301,8 +1658,11 @@ class Auditoria:
         dueno deja de leerlos. Con esto se puede preguntar lo unico que importa a diario:
         que se movio.
         """
+        # Los dos lados pasan por el MISMO filtro: si solo se filtra el nuevo, cada campo
+        # apartado sale como "BORRADO" sin haberse borrado (verificador, 24-sep: 9 falsos).
         viejos = {c["name"]: c for c in (anterior.get("/flow/bot-fields") or [])
-                  if isinstance(c, dict) and "name" in c}
+                  if isinstance(c, dict) and "name" in c
+                  and (self.incluir_excluidos or not es_excluido_por_fer(c["name"]))}
         nuevos = self.campos
         for n in sorted(set(nuevos) - set(viejos)):
             self.cambios.append(("NUEVO", n, f"campo creado ({nuevos[n].get('var_type')})"))
@@ -1331,8 +1691,427 @@ class Auditoria:
                            "El cambio que lo cruzo es el sospechoso inmediato.",
                            "Revertir o compactar ese cambio.", objetivo=f"cruce-techo-{n}")
         self.universo["cambios_desde_anterior"] = len(self.cambios)
+        # correr() ya dejo J1 declarado como NO_CORRIDO. Ahora SI se corrio, asi que esa
+        # linea se sustituye en vez de anadirse: dos entradas del mismo control en la tabla
+        # de cobertura dicen dos cosas distintas y el lector se queda con la que ve primero.
+        self.cobertura = [c for c in self.cobertura if c["control"] != "J1"]
         self.cubre("J1", "corrido", len(set(viejos) | set(nuevos)),
                    f"diff contra {anterior.get('_extraido', 'corrida anterior')}")
+
+    # ------------------------------- L · LA CONFIGURACION CONTRA EL ESQUEMA DE REFERENCIA
+    def bloque_esquema(self):
+        """L1/L2/L3 — 'a esta tienda le falta esto, esto y lo otro'.
+
+        ENCARGO DE FER, 2026-09-08, con sus palabras: *"Antes yo copiaba y pegaba mi espacio
+        al del cliente, era una copia identica y me tocaba cambiar a mano el nombre. Lo que
+        quiero ahora es que no sea un espejo: que se interprete lo que cada tienda es -si es
+        una marca o si es multinicho- y se adapten estos campos a la personalidad de cada
+        tienda. La MISMA ESTRUCTURA, pero con SU personalidad."*
+
+        De ahi salen exactamente TRES controles, y son tres porque hay tres formas distintas
+        de estar mal:
+
+        · **L1 · LA LLAVE NO ESTA.** El asistente lee ese trozo de su configuracion vacio y
+          se inventa el comportamiento. Es lo mas grave y es MUERTO.
+        · **L2 · LA LLAVE ESTA Y ESTA VACIA, o puesta de compromiso.** Existe pero no dice
+          nada. El umbral no es un minimo inventado: se compara contra el orden de magnitud
+          del patron, y solo se marca cuando la diferencia es de otra escala (menos del 15%
+          de lo que mide el mismo campo bien puesto). Es FUGA: llega al cliente.
+        · **L3 · LA LLAVE ES UN ESPEJO.** Identica byte a byte al patron en un campo que
+          DEBERIA llevar la personalidad de esa tienda. Es justo lo que FER quiere dejar de
+          hacer, y ningun otro control lo ve: F14 compara contra la plantilla de FABRICA, no
+          contra otro cliente. Un espejo se ve perfectamente configurado.
+
+        L2 y L3 son GEMELOS OPUESTOS y por eso van juntos: demasiado corto y demasiado igual.
+        Arreglar uno sin el otro deja la puerta abierta por el lado contrario -- la clase que
+        esta casa ya se ha comido dos veces.
+
+        COBERTURA DECLARADA: sin el asset, los tres se declaran NO CORRIDO. Y el esquema solo
+        cubre los asistentes que se han medido: lo que no esta en el, no se juzga.
+        """
+        ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                            "..", "assets", "esquema-configuracion.json")
+        if not os.path.exists(ruta):
+            for c in ("L1", "L2", "L3", "L5"):
+                self.cubre(c, "NO CORRIDO", 0, "falta assets/esquema-configuracion.json")
+            return
+        esquema = json.load(open(ruta, encoding="utf-8"))["asistentes"]
+
+        # Aplanar el esquema: nombre-de-campo-normalizado -> {llave: [tipo, medida]}
+        def _norm(s):
+            return re.sub(r"[^a-z0-9]", "", str(s).lower())
+        por_campo = {}
+        for asistente, campos in esquema.items():
+            for nombre, cuerpo in campos.items():
+                por_campo[_norm(nombre)] = (asistente, nombre, cuerpo["llaves"])
+
+        def _hojas(o, ruta=""):
+            """Las hojas del JSON de ESTE espacio, con su ruta de llave."""
+            if isinstance(o, dict):
+                for k, v in o.items():
+                    r = f"{ruta}.{k}" if ruta else k
+                    if isinstance(v, (dict, list)):
+                        yield from _hojas(v, r)
+                    else:
+                        yield r, v
+            elif isinstance(o, list):
+                yield (ruta or "(raiz)"), o
+                if o:
+                    yield from _hojas(o[0], (ruta or "") + "[]")
+
+        revisados = faltan = flojos = espejos = 0
+        sin_esquema = []
+        # self.campos es {nombre: campo}, no una lista. Lo aprendi rompiendome contra la
+        # autoprueba, que es justo para lo que esta.
+        for nombre, campo in self.campos.items():
+            clave = _norm(nombre)
+            if clave not in por_campo:
+                # L5 · NO se salta en silencio. Medido el 2026-09-22 contra las skills
+                # hermanas: de los 9 campos que configura el logistico, el esquema conoce 2.
+                # Los otros caian aqui, el bloque L seguia de largo y la cobertura solo
+                # decia cuantos reviso. Un campo que nadie juzga y que nadie declara es
+                # cobertura falsa -- el pecado que esta skill le persigue a las demas.
+                if not es_campo_de_producto(nombre):
+                    v = campo.get("value")
+                    if isinstance(v, str) and v.strip():
+                        try:
+                            cuerpo = json.loads(v)
+                        except Exception:                          # noqa: BLE001
+                            cuerpo = None
+                        if isinstance(cuerpo, dict) and cuerpo:
+                            sin_esquema.append((nombre, len(dict(_hojas(cuerpo)))))
+                continue
+            valor = campo.get("value")
+            if not isinstance(valor, str) or not valor.strip():
+                continue
+            try:
+                d = json.loads(valor)
+            except Exception:                                      # noqa: BLE001
+                continue   # C6 ya reporta el JSON roto; aqui no se duplica
+            revisados += 1
+            _, patron_nombre, llaves = por_campo[clave]
+            hojas = dict(_hojas(d))
+
+            ausentes = [k for k in llaves if k not in hojas]
+            if ausentes:
+                faltan += len(ausentes)
+                self.falla("L1", "MUERTO",
+                           f"`{nombre}`: {len(ausentes)} llaves de la configuracion NO EXISTEN",
+                           ", ".join(ausentes[:12]),
+                           "El asistente lee ese trozo vacio y se inventa el comportamiento. "
+                           "La ESTRUCTURA se exige aunque el contenido se adapte.",
+                           f"Anadirlas al JSON. El esquema esta en assets/esquema-configuracion.json",
+                           objetivo=f"llaves-ausentes-{nombre}")
+
+            cortos, iguales, comparables = [], [], 0
+            for k, meta in llaves.items():
+                if meta[0] != "texto" or len(meta) < 2:
+                    continue
+                v = hojas.get(k)
+                if not isinstance(v, str):
+                    continue
+                patron = meta[1]
+                # Solo se juzgan los campos que en el patron llevan CONTENIDO de verdad.
+                # Un campo que en el patron mide 2 caracteres ("si"/"no") no admite escalas.
+                if patron >= 120:
+                    comparables += 1
+                    if len(v) < patron * 0.15:
+                        cortos.append(f"{k} ({len(v)} contra ~{patron} del patron)")
+                    elif len(v) == patron:
+                        iguales.append(f"{k} ({len(v)} caracteres, identico de largo)")
+            if cortos:
+                flojos += len(cortos)
+                self.falla("L2", "FUGA",
+                           f"`{nombre}`: {len(cortos)} campos puestos de compromiso",
+                           "\n     ".join(cortos[:8]),
+                           "El largo del patron no es un objetivo ni un minimo: es el orden "
+                           "de magnitud de ese mismo campo bien puesto. Una decima parte no "
+                           "es 'adaptado'.",
+                           objetivo=f"campos-flojos-{nombre}")
+            # 🔴 UN ESPEJO SE RECONOCE POR EL CONJUNTO, NO POR UN CAMPO. La primera version
+            # disparaba campo a campo y era ruido: que UN texto largo coincida al caracter
+            # con el patron puede ser casualidad, y un hallazgo por cada campo entierra la
+            # senal. Lo que delata al espejo es la PROPORCION -- quien clona y solo cambia el
+            # nombre deja casi todos los campos intactos. Se exige mas de la mitad de los
+            # campos comparables y al menos dos, y la evidencia lleva el reparto: "8 de 10"
+            # convence, "1 campo coincide" no.
+            if len(iguales) >= 2 and comparables and len(iguales) / comparables > 0.5:
+                espejos += len(iguales)
+                self.falla("L3", "DUDA",
+                           f"`{nombre}`: {len(iguales)} de {comparables} campos largos miden "
+                           f"EXACTAMENTE lo mismo que el patron",
+                           "\n     ".join(iguales[:8]),
+                           "Esa proporcion es la firma de una configuracion CLONADA a la que "
+                           "solo se le cambio el nombre. Un campo coincidiendo es casualidad; "
+                           "la mayoria, no. Comparar el TEXTO antes de concluir: el largo "
+                           "igual es indicio, no prueba.",
+                           objetivo=f"posible-espejo-{nombre}")
+
+        if sin_esquema:
+            detalle = " · ".join(f"`{n}` ({k} llaves)" for n, k in sorted(sin_esquema))
+            self.falla("L5", "DUDA",
+                       f"{len(sin_esquema)} campos de configuracion que el esquema de "
+                       f"referencia NO cubre",
+                       detalle,
+                       "El bloque L no los juzga: L1, L2 y L3 solo miran lo que esta en el "
+                       "esquema. Que no salgan hallazgos de estos campos no significa que "
+                       "esten sanos, significa que nadie los miro.",
+                       "Medirlos en un espacio de referencia y anadirlos a "
+                       "assets/esquema-configuracion.json, o declararlos fuera de alcance "
+                       "con su motivo.",
+                       objetivo="campos-fuera-del-esquema")
+        self.cubre("L5", "corrido", len(self.campos),
+                   f"{len(sin_esquema)} campos de configuracion sin cubrir por el esquema")
+
+        if not revisados:
+            for c in ("L1", "L2", "L3"):
+                self.cubre(c, "sin_datos", 0,
+                           "ningun campo del espacio casa con los del esquema medido")
+            return
+        self.cubre("L1", "corrido", revisados, f"{faltan} llaves ausentes")
+        self.cubre("L2", "corrido", revisados, f"{flojos} campos por debajo de su escala")
+        self.cubre("L3", "corrido", revisados, f"{espejos} sospechas de espejo")
+
+    def bloque_pais(self):
+        """L4 · COHERENCIA DE PAIS COMPLETA — el control que FER pidio con su ejemplo.
+
+        Sus palabras, 2026-09-08: *"si esta en Guatemala y su validacion de direcciones es
+        de Colombia, pues hay que decir: no, eso esta mal, hay que corregirlo."*
+
+        Ningun control anterior lo veia, y no por descuido sino porque cada uno mira una
+        dimension distinta: F14 compara contra la plantilla de FABRICA (y la de fabrica es
+        colombiana SIEMPRE, elijas el pais que elijas, medido 61 de 61); L3 compara contra
+        otro CLIENTE; L1 exige que la llave exista; L2 que no este de compromiso. Una
+        configuracion puede pasar los cuatro y seguir diciendole a un guatemalteco que su
+        garantia se rige por el Estatuto del Consumidor colombiano.
+
+        Son DOS controles porque hay dos formas de que el pais este mal, y solo la primera
+        se ve mirando un campo:
+
+        · **L4 · LOS PAISES DECLARADOS NO COINCIDEN ENTRE SI.** El pais no vive en un sitio:
+          vive en uno por asistente (logistico, ventas, carritos y comentarios; el de
+          remarketing era el quinto y desde el 24-sep se aparta antes de llegar aqui), cada uno
+          con su propia llave y su propio nombre de llave. Un espacio
+          medio migrado tiene tres asistentes en un pais y dos en otro, y cada uno se
+          comporta segun el suyo. Severidad MUERTO. Un pais VACIO teniendo los demas puesto
+          es 🟠: no contradice, pero ese asistente decide sin dato.
+
+        · **L4b · EL CONTENIDO ES DE OTRO PAIS.** El pais declarado dice Guatemala y el texto
+          dice PROFECO, Servientrega o COP. Se mide contra `assets/lexico-por-pais.json`.
+
+        🔴 LAS DOS TRAMPAS QUE ESTE CONTROL PODIA TRAER, y como se cierran:
+
+        1. **El marcador ambiguo.** "Envia" es una transportadora colombiana Y el verbo mas
+           corriente de un texto de logistica. Un marcador asi no acusa poco: acusa SIEMPRE,
+           y a los tres informes el dueno deja de leer el control. Por eso el lexico se
+           genera con una regla de admision y guarda los rechazados a la vista.
+        2. **El lexico CADUCA.** Una transportadora nueva o una que cierra no da ningun error:
+           deja de verse. Por eso las familias se marcan, los hallazgos que salen SOLO de una
+           familia que caduca bajan a FUGA, y la cobertura imprime la fecha de medicion. Lo
+           que NO caduca -- la moneda y el organismo de consumo -- sostiene la severidad alta.
+
+        Y la cobertura es la de la casa: **un pais que no este en el lexico no se juzga y se
+        DECLARA**. El pais es parametro, no puerta: no tener su lexico jamas autoriza a decir
+        que su configuracion esta sana.
+        """
+        def _sin_tildes(s):
+            return "".join(c for c in unicodedata.normalize("NFD", str(s).lower())
+                           if unicodedata.category(c) != "Mn")
+
+        # 🔴 EL ALCANCE, y por que hubo que ponerlo: la primera version barria TODOS los
+        # campos y acuso a los DOCE productos del fixture por llevar moneda "COP" en un
+        # espacio ecuatoriano. El hallazgo no era falso -- era de OTRA auditoria. La moneda
+        # de un producto la mira F5, que es de productos; L4 y L4b son de CONFIGURACION, y
+        # un control que se sale de su alcance no descubre mas: entierra lo suyo bajo doce
+        # lineas que el dueno no puede accionar desde aqui. Se limita a los campos que estan
+        # en el esquema medido, y cuando el esquema no esta, se DECLARA que se barrio todo.
+        ruta_esq = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "..", "assets", "esquema-configuracion.json")
+        solo_config, nota_alcance = None, ""
+        if os.path.exists(ruta_esq):
+            _esq = json.load(open(ruta_esq, encoding="utf-8"))["asistentes"]
+            solo_config = {re.sub(r"[^a-z0-9]", "", n.lower())
+                           for campos in _esq.values() for n in campos}
+        else:
+            nota_alcance = (" · SIN esquema: se barrieron TODOS los campos, tambien los de "
+                            "producto, que son de otra auditoria")
+
+        # --------------------------------------------------------------- L4 · los cinco paises
+        declarados = {}          # nombre de campo -> (ruta de la llave, valor tal cual)
+        textos = {}              # nombre de campo -> [(ruta, texto)] para L4b
+        for nombre, campo in self.campos.items():
+            if solo_config is not None and \
+                    re.sub(r"[^a-z0-9]", "", nombre.lower()) not in solo_config:
+                continue
+            d = self.valor_json(campo)
+            if not isinstance(d, (dict, list)):
+                continue
+            for ruta, valor in self.caminar(d):
+                if not isinstance(valor, str):
+                    continue
+                ultima = ruta.rsplit(".", 1)[-1]
+                if ultima == "pais":
+                    declarados[f"{nombre} · {ruta}"] = valor.strip()
+                elif len(valor.strip()) >= 3:
+                    textos.setdefault(nombre, []).append((ruta, valor))
+
+        if not declarados:
+            self.cubre("L4", "sin_datos", 0,
+                       "ningun campo del espacio declara pais: no hay nada que cruzar")
+            self.cubre("L4b", "NO_CORRIDO", 0,
+                       "sin pais declarado no se puede juzgar si el contenido es de otro")
+            return
+
+        puestos = {k: v for k, v in declarados.items() if v}
+        vacios = [k for k, v in declarados.items() if not v]
+        distintos = sorted({_sin_tildes(v) for v in puestos.values()})
+        if len(distintos) > 1:
+            self.falla("L4", "MUERTO",
+                       f"el espacio declara {len(distintos)} PAISES DISTINTOS "
+                       f"en {len(puestos)} campos",
+                       "\n     ".join(f"{k} = {v!r}" for k, v in sorted(puestos.items())),
+                       "El pais no vive en un sitio: cada asistente lee el suyo y decide con "
+                       "el. Con dos paises puestos, dos asistentes del mismo espacio validan "
+                       "direcciones, calculan tiempos y citan leyes de paises distintos, y "
+                       "ninguno da error.",
+                       "Decidir cual es el pais del negocio y ponerlo IGUAL en los "
+                       f"{len(declarados)} sitios. Es un valor por asistente, no uno global.",
+                       objetivo="paises-en-desacuerdo")
+        if vacios and puestos:
+            self.falla("L4", "ANUNCIADA",
+                       f"{len(vacios)} de {len(declarados)} campos declaran el pais VACIO",
+                       "\n     ".join(sorted(vacios)),
+                       "No contradice a nadie, y por eso no se ve: ese asistente decide sin "
+                       "el dato y toma el criterio que traiga horneado, que en la plantilla "
+                       "de fabrica es el colombiano.",
+                       "Poner el pais tambien ahi. Un pais vacio se ve igual que uno "
+                       "configurado: solo se nota contando.",
+                       objetivo="paises-vacios")
+        self.cubre("L4", "corrido", len(declarados),
+                   f"{len(distintos)} pais(es) distinto(s) entre {len(puestos)} campos con "
+                   f"valor y {len(vacios)} vacios{nota_alcance}")
+
+        # --------------------------------------------------------------- L4b · el contenido
+        ruta_lex = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                                "..", "assets", "lexico-por-pais.json")
+        if not os.path.exists(ruta_lex):
+            self.cubre("L4b", "NO_CORRIDO", 0, "falta assets/lexico-por-pais.json")
+            return
+        lex = json.load(open(ruta_lex, encoding="utf-8"))
+        alias, marcadores = lex["alias_de_pais"], lex["marcadores"]
+        caduca = lex["familias_que_caducan"]
+
+        if not puestos:
+            self.cubre("L4b", "NO_CORRIDO", 0,
+                       "todos los campos declaran el pais vacio: no hay contra que comparar")
+            return
+        # Con dos paises en desacuerdo NO se elige uno: elegir seria inventarse cual es el
+        # bueno y acusar al otro de fuga. L4 ya grito; L4b se declara sin correr.
+        if len(distintos) > 1:
+            self.cubre("L4b", "NO_CORRIDO", 0,
+                       "el espacio declara mas de un pais (L4): no hay un pais de referencia "
+                       "contra el que juzgar el contenido, y elegir uno seria inventarlo")
+            return
+        crudo = distintos[0]
+        pais = next((p for p, formas in alias.items()
+                     if crudo in [_sin_tildes(f) for f in formas]), None)
+        if not pais:
+            self.cubre("L4b", "NO_CORRIDO", 0,
+                       f"el pais declarado ({crudo!r}) no esta en el lexico "
+                       f"({lex['_medido']}): NO se juzga y NO se da por sano")
+            return
+
+        # 🔴 LA TERCERA TRAMPA, y la descubrio un cliente REAL el 2026-09-17: LA ENUMERACION
+        # MULTI-PAIS INTENCIONAL. Un prompt decia "la normativa publicitaria de tu pais -- ej.:
+        # SIC en Colombia, PROFECO en Mexico, DIACO en Guatemala" en un espacio declarado
+        # COLOMBIA, y este control lo marco MUERTO por PROFECO y DIACO. No era contaminacion:
+        # era un texto escrito A PROPOSITO para varios paises, **que nombra el pais declarado y
+        # ademas lo pone primero**.
+        # La señal que lo distingue: si en la MISMA cadena aparece tambien un marcador del pais
+        # declarado, no es contenido heredado de otro espacio -- es una lista. El control no
+        # puede callarse (una lista asi tampoco es ideal para un espacio de un solo pais), pero
+        # acusar MUERTO es un falso positivo, y un control que acusa en falso se deja de leer a
+        # los tres informes. Baja a DUDA y se dice por que.
+        propios = {m for m, meta in marcadores.items() if pais in meta["paises"]}
+
+        def _nombra_su_pais(texto, plano):
+            for m in propios:
+                meta = marcadores[m]
+                if meta.get("sigla"):
+                    if re.search(rf"\b{re.escape(m)}\b", texto):
+                        return meta["literal"]
+                elif re.search(rf"\b{re.escape(m)}\b", plano):
+                    return meta["literal"]
+            # el nombre del pais escrito con todas sus letras tambien cuenta
+            for forma in alias.get(pais, []):
+                if re.search(rf"\b{re.escape(_sin_tildes(forma))}\b", plano):
+                    return forma
+            return None
+
+        ajenos, revisados = {}, 0
+        enumeraciones = {}
+        for nombre, hojas in textos.items():
+            for ruta, texto in hojas:
+                revisados += 1
+                plano = _sin_tildes(texto)
+                propio_en_texto = _nombra_su_pais(texto, plano)
+                for marca, meta in marcadores.items():
+                    if pais in meta["paises"]:
+                        continue                      # es del pais declarado: no acusa
+                    if meta.get("sigla"):
+                        # sensible a mayusculas y a proposito: "COP" suelto es inequivoco,
+                        # "cop" en minusculas seria ruido.
+                        if not re.search(rf"\b{re.escape(marca)}\b", texto):
+                            continue
+                    elif not re.search(rf"\b{re.escape(marca)}\b", plano):
+                        continue
+                    destino = enumeraciones if propio_en_texto else ajenos
+                    destino.setdefault(nombre, []).append(
+                        (ruta, meta["literal"], meta["familia"], meta["paises"],
+                         propio_en_texto))
+
+        # Enumeraciones multi-pais: se DICEN, con severidad baja y nombrando la señal que las
+        # separo de una contaminacion. No se callan: en un espacio de un solo pais, una lista
+        # de organismos ajenos sigue siendo texto que el cliente no necesita leer.
+        for nombre, lista in sorted(enumeraciones.items()):
+            propio = next((p for *_, p in lista if p), "el pais declarado")
+            self.falla("L4b", "DUDA",
+                       f"`{nombre}`: {len(lista)} marcas de otro pais, pero el MISMO texto "
+                       f"nombra tambien {propio!r}: parece una ENUMERACION a proposito, "
+                       f"no contenido heredado",
+                       "\n     ".join(f"{r} -> {lit!r} ({fam}, es de {'/'.join(ps)})"
+                                      for r, lit, fam, ps, _ in lista[:10]),
+                       f"No se acusa como contaminacion porque el texto SI menciona {pais}. "
+                       "Aun asi, en un espacio de un solo pais una lista de organismos o "
+                       "monedas ajenas es texto de mas: el cliente lee opciones que no le "
+                       "aplican. Se confirma con el dueno si la lista es intencional.",
+                       "Si es intencional, se deja y se anota. Si se copio de una plantilla "
+                       "multipais, se recorta al pais del espacio.")
+
+        for nombre, lista in sorted(ajenos.items()):
+            familias = {f for _, _, f, _, _ in lista}
+            # Si TODO lo encontrado sale de familias que caducan, la severidad baja: puede
+            # ser un lexico viejo antes que una configuracion mala.
+            solo_caduca = all(caduca.get(f, True) for f in familias)
+            sev = "FUGA" if solo_caduca else "MUERTO"
+            self.falla("L4b", sev,
+                       f"`{nombre}`: {len(lista)} marcas de OTRO PAIS en un espacio "
+                       f"declarado {pais}",
+                       "\n     ".join(f"{r} -> {lit!r} ({fam}, es de {'/'.join(ps)})"
+                                      for r, lit, fam, ps, _ in lista[:10]),
+                       f"El espacio dice {pais} y su texto habla del sistema de otro pais. "
+                       "Al cliente le llega una transportadora que no lo cubre, una moneda "
+                       "que no es la suya o una ley que no lo protege, y el asistente lo "
+                       "dice con toda seguridad porque para el es su configuracion.",
+                       "Reescribir esas llaves con los datos del pais real. Si alguna es "
+                       "correcta a proposito (una tienda que si envia a ese pais), va al "
+                       "libro de decisiones con su motivo.",
+                       objetivo=f"marcas-de-otro-pais-{nombre}")
+        self.cubre("L4b", "corrido", revisados,
+                   f"{sum(len(v) for v in ajenos.values())} marcas ajenas en "
+                   f"{len(ajenos)} campos · lexico de {lex['_medido']}, "
+                   f"{len(marcadores)} marcadores, {len(alias)} paises "
+                   f"(un pais fuera del lexico NO se juzga){nota_alcance}")
 
     # ------------------------------------------------------------------ correr
     def correr(self):
@@ -1349,7 +2128,19 @@ class Auditoria:
         self.bloque_ia()
         self.bloque_g()
         self.bloque_h()
+        self.bloque_fabrica()
         self.bloque_i()
+        self.bloque_esquema()
+        self.bloque_pais()
+        # 🔴 J1 · UN CONTROL QUE NO DECLARA ES UN CONTROL INVISIBLE. El diff contra la
+        # corrida anterior solo se ejecuta si hay dump anterior, y su `cubre` vivia DENTRO de
+        # `comparar()`: sin dump anterior, J1 no aparecia en la tabla de cobertura y su
+        # ausencia se leia como "no tenia nada que decir" en vez de "no se corrio". Es la
+        # misma cobertura falsa que F13, por otra puerta. Ahora se declara SIEMPRE, y
+        # `comparar()` sustituye esta linea cuando de verdad corre.
+        self.cubre("J1", "NO_CORRIDO", 0,
+                   "no habia dump anterior con el que comparar: esta corrida es una foto, "
+                   "no dice que se movio")
         # J2 · el libro de decisiones tambien se declara: si no aparece en la cobertura,
         # nadie sabe si esta corrida silencio hallazgos ni cuantos.
         self.cubre("J2", "corrido" if self.decisiones else "no_corrido",
@@ -1385,6 +2176,22 @@ def imprimir(a):
     activos = [h for h in a.hallazgos if h["severidad"] != "DECIDIDO"]
 
     orden = {"MUERTO": 0, "ANUNCIADA": 1, "FUGA": 2, "DUDA": 3}
+    if a.alcance != "todo":
+        que = ("la CONFIGURACION de los asistentes" if a.alcance == "config"
+               else "el CONTENIDO DE PRODUCTO")
+        print(f"\nALCANCE · esta corrida juzga {que}.")
+        if a.fuera_de_alcance:
+            # 🔴 CONTEO Y NADA MAS. Aqui se imprimia ademas el reparto por severidad
+            # ("2 muerto · 3 fuga"), y eso era la misma contradiccion que la ley traia en
+            # prosa: un conteo se obtiene sin mirar, pero **una severidad exige haber
+            # juzgado** -- justo lo que esta corrida tenia prohibido. Decir "3 fuga" sobre
+            # productos ES auditar productos, aunque no se nombre el campo. La ley se
+            # corrigio el 2026-09-08; el codigo la seguia contradiciendo.
+            print(f"  {len(a.fuera_de_alcance)} hallazgos quedaron FUERA DE ALCANCE. No se "
+                  f"juzgan aqui y NO estan resueltos: se ven con `--alcance todo`. Aqui no "
+                  f"se dice de que son ni como de graves son, porque eso ya seria juzgarlos.")
+        else:
+            print("  0 hallazgos quedaron fuera de alcance.")
     print(f"\nHALLAZGOS ({len(activos)} sin resolver"
           + (f" · {len(decididos)} ya decididos por el dueno)" if decididos else ")"))
     if not a.hallazgos:
@@ -1453,7 +2260,7 @@ def escribir_handoff(a, destino):
     Esta skill no escribe en Chatea a proposito, pero dejar el arreglo en prosa obliga al
     siguiente chat a reconstruir el contexto entero. Aqui sale ya masticado.
     """
-    porskill, preguntas = {}, []
+    porskill, preguntas, sin_accion = {}, [], []
     for h in a.hallazgos:
         if h["severidad"] == "DECIDIDO":
             continue
@@ -1462,10 +2269,18 @@ def escribir_handoff(a, destino):
         # medido en Golden, 22 de 39 hallazgos abiertos se quedaron fuera del paquete, 5 de
         # ellos rojos de un solo disparador. Un 🔴 o 🟠 entra SIEMPRE, tenga o no `accion`
         # explicita: la severidad decide, no la presencia de ese campo.
-        if h["severidad"] in ("MUERTO", "ANUNCIADA"):
+        # 🔴 EL ARREGLO DE ARRIBA SE HIZO SOLO PARA MUERTO/ANUNCIADA Y NO SE BUSCO SU GEMELO.
+        # La rama de FUGA (🟡) conservaba el `if not h.get("accion"): continue` y seguia
+        # tirando hallazgos abiertos: medido por el verificador el 2026-09-08, se caian 11
+        # mas (F14, F2, G2, los 6 de G3 y los 2 de F13). Clase conocida de esta casa: al
+        # tocar una regla de filtrado, buscar sus HERMANAS antes de sellar.
+        # Ahora la regla es una sola: **la severidad decide, no la presencia de `accion`.**
+        # Solo las DUDAS sin accion concreta se quedan fuera, y hasta esas se cuentan abajo.
+        if h["severidad"] in ("MUERTO", "ANUNCIADA", "FUGA"):
             porskill.setdefault(h.get("skill_duena") or "(por determinar)", []).append(h)
             continue
         if not h.get("accion"):
+            sin_accion.append(h)
             continue
         if h["severidad"] == "DUDA":
             # Una duda con accion concreta no es basura: es una pregunta que hay que
@@ -1485,6 +2300,27 @@ def escribir_handoff(a, destino):
               "releer del servidor y comparar, porque un `200 ok` puede haber guardado el "
               "contenido cortado.",
               ""]
+
+    # 🔴 CABECERA DE ALCANCE. El paquete se leia como si fuera TODO lo encontrado, y no lo
+    # era: lo apartado por alcance no viajaba y nadie lo sabia. Se declara el CONTEO Y NADA
+    # MAS -- ni severidad ni control ni campo. Una severidad exige haber JUZGADO el campo, y
+    # juzgar productos dentro de una auditoria de configuracion es justo lo prohibido
+    # (orden de FER, reincidente). Contar no obliga a mirar; describir, si.
+    fuera = getattr(a, "fuera_de_alcance", None) or []
+    if fuera or sin_accion:
+        lineas.append("## Lo que NO viaja en este paquete")
+        lineas.append("")
+        if fuera:
+            lineas.append(f"- **{len(fuera)} apartados por ALCANCE** (`--alcance "
+                          f"{a.alcance}`). Conteo y nada mas: describirlos seria juzgar "
+                          "campos que esta corrida tenia prohibido juzgar. Para verlos, "
+                          "otra corrida con el alcance que corresponda.")
+        if sin_accion:
+            lineas.append(f"- **{len(sin_accion)} dudas (🔵) sin accion concreta.** No son "
+                          "defectos: son campos sobre los que la herramienta no puede "
+                          "decidir sola. Estan en el informe, no en el paquete.")
+        lineas.append("")
+
     if preguntas:
         lineas.append("## Antes de tocar nada · preguntas que hay que contestar")
         lineas.append("")
@@ -1521,8 +2357,15 @@ def main():
         return (Path(sys.argv[sys.argv.index(bandera) + 1])
                 if bandera in sys.argv else None)
 
+    alcance = "config"
+    if "--alcance" in sys.argv:
+        alcance = sys.argv[sys.argv.index("--alcance") + 1]
+        if alcance not in Auditoria.ALCANCES:
+            sys.exit(f"--alcance acepta {' | '.join(Auditoria.ALCANCES)}, no {alcance!r}")
     dump = json.loads(Path(sys.argv[1]).read_text())
-    a = Auditoria(dump)
+    a = Auditoria(dump, alcance=alcance)
+    # opt-in: solo cuando FER pide auditar un asistente que saco del ecosistema, en un espacio
+    a.incluir_excluidos = "--incluir-excluidos" in sys.argv
 
     ruta_dec = opcion("--decisiones")
     if ruta_dec and ruta_dec.exists():
@@ -1561,7 +2404,8 @@ def main():
     destino = opcion("--json")
     if destino:
         destino.write_text(json.dumps(
-            {"universo": a.universo, "hallazgos": a.hallazgos, "cobertura": a.cobertura,
+            {"universo": a.universo, "alcance": a.alcance, "hallazgos": a.hallazgos,
+             "fuera_de_alcance": a.fuera_de_alcance, "cobertura": a.cobertura,
              "cambios": a.cambios},
             ensure_ascii=False, indent=1))
         print(f"\nHallazgos en {destino}")

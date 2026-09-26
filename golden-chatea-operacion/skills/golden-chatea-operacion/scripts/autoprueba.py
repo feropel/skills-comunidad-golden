@@ -34,6 +34,7 @@ from clasificar import (                                          # noqa: E402
     direccion, contenido_real, redactar_texto, imprimir, es_nota_pixel,
     plantillas_de, MIN_PERSONAS_FORMA, _parsear_argv,
     extraer_atributos, es_resumen_final_r6,
+    resolver_zona_horas_por_pais, PAISES_ZONA_HORAS,
 )
 from secretos import PATRONES_SECRETO, redactar_texto as redactar_texto_compartida  # noqa: E402
 import extraer as _extraer_modulo                                 # noqa: E402
@@ -1485,6 +1486,56 @@ def test_fecha_de_no_revienta_con_epoch():
           f"respaldo: {usa_respaldo} (resultados: {resultados})")
 
 
+def test_pais_resuelve_offset_estandar():
+    """Agregado 2026-09-05: `--pais` debe resolver el offset ESTANDAR PUBLICO de la tabla
+    (no una medicion de Chatea) y traer el aviso que lo aclara, sin importar mayusculas/tildes.
+    Los paises con DST (chile, paraguay) y el pais ambiguo (mexico) deben traer su aviso
+    especifico ademas del generico."""
+    off_co, av_co = resolver_zona_horas_por_pais("Colombia")
+    off_mx, av_mx = resolver_zona_horas_por_pais("méxico")
+    off_cl, av_cl = resolver_zona_horas_por_pais("CHILE")
+    paso = (off_co == -5 and "NO confirmado contra Chatea" in av_co
+            and off_mx == -6 and "mas de una zona horaria" in av_mx
+            and off_cl == -3 and "horario de verano" in av_cl)
+    marcar("PAIS-RESUELVE-OFFSET", paso,
+          f"colombia={off_co} (debe -5, sin aviso extra) · mexico={off_mx} (debe -6, con "
+          f"aviso de ambiguedad) · chile={off_cl} (debe -3, con aviso de DST) · avisos "
+          f"generados: co={bool(av_co)} mx={bool(av_mx)} cl={bool(av_cl)}")
+
+
+def test_pais_desconocido_no_inventa_offset():
+    """Un pais fuera de la tabla NO debe devolver un offset a ciegas -- debe devolver
+    (None, aviso_con_la_lista_valida) para que el llamador aborte en vez de adivinar."""
+    offset, aviso = resolver_zona_horas_por_pais("Marte")
+    paso = offset is None and "no esta en la tabla" in aviso and "colombia" in aviso
+    marcar("PAIS-DESCONOCIDO-NO-INVENTA", paso,
+          f"offset={offset} (debe ser None) · aviso trae la lista valida: "
+          f"{'colombia' in aviso}")
+
+
+def test_pais_y_zona_horas_excluyentes_por_cli():
+    """`_parsear_argv` debe abortar si se pasan --pais y --zona-horas a la vez (ambiguo cual
+    manda) en vez de que uno silenciosamente gane sobre el otro."""
+    abortado = False
+    try:
+        _parsear_argv(["archivo.json", "--pais", "mexico", "--zona-horas", "-6"])
+    except SystemExit:
+        abortado = True
+    marcar("PAIS-ZONA-HORAS-EXCLUYENTES", abortado,
+          f"--pais y --zona-horas juntos abortan: {abortado} (deben ser excluyentes)")
+
+
+def test_pais_resuelve_zona_horas_en_cli_real():
+    """El camino REAL de `_parsear_argv` con solo --pais debe terminar en el zona_horas
+    correcto (no solo la funcion suelta) -- prueba el cableado completo, no solo la pieza."""
+    ruta, modo, json_salida, zona_horas = _parsear_argv(
+        ["archivo.json", "--pais", "colombia", "--modo", "cod"])
+    paso = zona_horas == -5 and ruta == "archivo.json" and modo == "cod"
+    marcar("PAIS-CLI-CABLEADO-REAL", paso,
+          f"zona_horas resuelta desde --pais colombia via _parsear_argv: {zona_horas} "
+          f"(debe ser -5) · ruta={ruta!r} modo={modo!r}")
+
+
 TRAMPAS_DEL_ENCARGO = ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11",
                       "P12", "P13"]
 EXTRA_CALIDAD = ["R1", "R2", "R3", "R4", "Q4"]
@@ -1522,6 +1573,12 @@ FIXES_REAUDITORIA_2 = ["COBERTURA-SIEMPRE-DECLARA", "EMPATE-TS-NO-INVIERTE",
                        "EMPATE-TS-SIN-R1-FALSO", "DIRECCION-BOOLEANO-TEXTO",
                        "AVISOS-DE-HILO-SE-REPORTAN", "REDACTAR-NO-STR-BAJO-LLAVE-SENSIBLE",
                        "FECHA-DE-NO-REVIENTA-EPOCH"]
+# Agregado 2026-09-05: mejora sin datos nuevos (--pais, ver PAISES_ZONA_HORAS en clasificar.py)
+# a raiz de la correccion CdM 2026-08-29 del conteo de paises (7->10) -- reduce la friccion
+# de calcular el offset a mano, pero NO cierra el pendiente de zona horaria (declarado en
+# SKILL.md): sigue sin confirmarse si Chatea reporta la hora local de cada espacio.
+FIXES_PAIS_2026_09_05 = ["PAIS-RESUELVE-OFFSET", "PAIS-DESCONOCIDO-NO-INVENTA",
+                         "PAIS-ZONA-HORAS-EXCLUYENTES", "PAIS-CLI-CABLEADO-REAL"]
 
 
 def main():
@@ -1589,6 +1646,11 @@ def main():
     test_avisos_de_hilo_se_reportan()
     test_redactar_cubre_valores_no_str_bajo_llave_sensible()
     test_fecha_de_no_revienta_con_epoch()
+
+    test_pais_resuelve_offset_estandar()
+    test_pais_desconocido_no_inventa_offset()
+    test_pais_y_zona_horas_excluyentes_por_cli()
+    test_pais_resuelve_zona_horas_en_cli_real()
 
     print("Las 13 trampas del encargo (ENCARGO-golden-chatea-operacion.md):")
     fallidas = []
@@ -1698,9 +1760,19 @@ def main():
         if not paso:
             fallidas_reaud2.append(codigo)
 
+    print("\nFixes agregados el 2026-09-05 (--pais, mejora sin datos nuevos sobre el pendiente "
+         "de zona horaria -- ver PAISES_ZONA_HORAS en clasificar.py):")
+    fallidas_pais = []
+    for codigo in FIXES_PAIS_2026_09_05:
+        paso, detalle = RESULTADOS.get(codigo, (False, "no se corrio ninguna prueba"))
+        marca = "OK   " if paso else "FALLA"
+        print(f"  {marca} {codigo:30} {detalle}")
+        if not paso:
+            fallidas_pais.append(codigo)
+
     if (fallidas or fallidas_extra or fallidas_fixes or fallidas_ronda2 or fallidas_r6 or
             fallidas_r6_verif or fallidas_gco14 or fallidas_gco14_r2 or fallidas_gco14_r3 or
-            fallidas_reaud2):
+            fallidas_reaud2 or fallidas_pais):
         print(f"\nAUTOPRUEBA FALLIDA. Trampas del encargo sin detectar: {fallidas or 'ninguna'}. "
              f"Controles de calidad sin detectar: {fallidas_extra or 'ninguno'}. "
              f"Fixes adversariales (ronda 1) sin confirmar: {fallidas_fixes or 'ninguno'}. "
@@ -1710,21 +1782,23 @@ def main():
              f"Fixes GCO1.4 sin confirmar: {fallidas_gco14 or 'ninguno'}. "
              f"Fixes GCO1.4 (ronda 2) sin confirmar: {fallidas_gco14_r2 or 'ninguno'}. "
              f"Fixes GCO1.4 (ronda 3) sin confirmar: {fallidas_gco14_r3 or 'ninguno'}. "
-             f"Fixes re-auditoria 2 sin confirmar: {fallidas_reaud2 or 'ninguno'}.")
+             f"Fixes re-auditoria 2 sin confirmar: {fallidas_reaud2 or 'ninguno'}. "
+             f"Fixes --pais sin confirmar: {fallidas_pais or 'ninguno'}.")
         print("El clasificador esta roto. No se corre contra un DUMP real hasta arreglarlo.")
         return 1
 
     total_controles = (len(TRAMPAS_DEL_ENCARGO) + len(EXTRA_CALIDAD) +
                        len(FIXES_ADVERSARIALES) + len(FIXES_RONDA_2) + len(CONTROL_R6) +
                        len(FIXES_R6_VERIFICACION) + len(FIXES_GCO14) + len(FIXES_GCO14_RONDA2) +
-                       len(FIXES_GCO14_RONDA3) + len(FIXES_REAUDITORIA_2))
+                       len(FIXES_GCO14_RONDA3) + len(FIXES_REAUDITORIA_2) +
+                       len(FIXES_PAIS_2026_09_05))
     print(f"\n  {total_controles} de {total_controles} controles confirmados en total "
          f"({len(TRAMPAS_DEL_ENCARGO)} trampas del encargo + {len(EXTRA_CALIDAD)} calidad + "
          f"{len(FIXES_ADVERSARIALES)} fixes ronda 1 + {len(FIXES_RONDA_2)} fixes ronda 2 + "
          f"{len(CONTROL_R6)} control R6 + {len(FIXES_R6_VERIFICACION)} fixes verificacion R6 + "
          f"{len(FIXES_GCO14)} fixes GCO1.4 + {len(FIXES_GCO14_RONDA2)} fixes GCO1.4 ronda 2 + "
          f"{len(FIXES_GCO14_RONDA3)} fixes GCO1.4 ronda 3 + {len(FIXES_REAUDITORIA_2)} fixes "
-         "re-auditoria 2)")
+         f"re-auditoria 2 + {len(FIXES_PAIS_2026_09_05)} fixes --pais)")
     print("\nAutoprueba pasada. Esto valida el DETECTOR contra casos que se SABEN rotos, no "
          "valida ningun dia real.")
     return 0

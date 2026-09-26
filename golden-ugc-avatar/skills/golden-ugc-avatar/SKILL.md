@@ -1,34 +1,24 @@
 ---
 name: golden-ugc-avatar
 description: >-
-  End-to-end UGC avatar creation pipeline on the Higgsfield MCP. Generates hyperrealistic AI
-  avatar images with Higgsfield Soul 2.0 (or Nano Banana Pro), then animates them into
-  talking-head UGC videos with Seedance 2.0, through structured prompt frameworks that lock
-  character identity and enforce voice and body coherence, with reusable identity via Soul
-  training and Reference Elements so one avatar stays the same person across videos. Use
-  this skill whenever the user mentions UGC avatars, AI avatars, avatar generation, creating
-  UGC content, AI talking-head videos, the Higgsfield workflow, Soul characters, Nano Banana
-  avatar, Seedance UGC, the avatar pipeline, or anything about creating AI-generated people
-  for social media content, ads, or brand videos. Also trigger when the user asks to "make a
-  person", "create a character for video", "generate a talking-head", "haz un avatar", "crea
-  un UGC", "hazme un video hablando", or "un avatar para mi marca". Runs either stage alone
-  when needed.
+  Golden Group — Fabrica de AVATARES UGC: crea una persona hiperrealista con Higgsfield Soul 2.0 o
+  Nano Banana Pro y la anima como talking-head con Seedance 2.0, con marcos de prompt que bloquean
+  la identidad y exigen coherencia entre voz y cuerpo; la identidad se reutiliza con Soul
+  entrenado o Reference Elements para que el mismo rostro vuelva en decenas de videos. Incluye la
+  ruta VERIFICADA de Google Vids: avatar desde una foto propia, cero creditos. Usala SIEMPRE que
+  el usuario quiera avatares UGC, avatares de IA, contenido UGC, un video de alguien hablando a
+  camara, un vocero para su marca, o diga "haz un avatar", "crea un UGC", "hazme un video
+  hablando", "un avatar para mi marca", "una persona que presente esto", "un talking head", o
+  mencione Higgsfield, Soul, Nano Banana, Seedance o Google Vids. Dispara aunque no diga avatar:
+  basta con querer una persona generada por IA hablando para redes, anuncios o comunidad. Corre
+  cualquiera de las dos etapas por separado.
 ---
-<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
-     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 998 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
-     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
-     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
-     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
-     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
-# Golden UGC Avatar — Higgsfield Pipeline
-<!-- skill v1.12 · 2026-08-31 (CdM) · COMPUERTA de la congelacion de Higgsfield (estandar de FER 30-ago repartido por el CdM): banner de bloqueo arriba, Step 3 (Seedance video) EN PAUSA — hoy solo el avatar en IMAGEN; costo-antes-con-aprobacion para toda generacion. Reversible al levantar la congelacion. memoria: feedback_higgsfield_solo_imagenes_y_costo_antes. -->
-<!-- skill v1.11 · 2026-08-24: registrada la RUTA ALTERNA Google Vids (Workspace) como forma de generar avatares sin gastar creditos de Higgsfield — con su frontera declarada (Vids para corporativo/formacion horizontal; Higgsfield para UGC vertical y ads, que es donde manda el look selfie y el control fino de identidad y coherencia voz-cuerpo) y marcada como NO verificada en vivo (no hay MCP de Vids; se opera a mano). Dato aportado por FER. -->
-<!-- skill v1.10.1 · 2026-08-24 (centro de mando, remediación del verificador de cierre): línea de RUTA del cerebro en el Paso 0 (las lectoras ordenaban LÉELO PRIMERO sin decir dónde — un chat limpio no podía ejecutar la orden) + bump que las ediciones del 23-24 dejaron sin subir. -->
-<!-- skill v1.10 · 2026-08-24 (golden-skill-auditor, auditoria fresca): resuelta la COLISION de dos pasos "0" (el cerebro de marca pasa a "Paso previo"; Step 0 sigue siendo el de toolchain, asi no se renumera nada ya referenciado); el cerebro de marca ENTRA al diagrama de pipeline (era obligatorio y no aparecia en el mapa); Step 4 sube de H3 a H2 (era un paso par de 0-3 escondido dentro de Step 3, invisible al escanear encabezados pese a salir en el diagrama); y la regla de COMPLIANCE de la adenda 2026-08-23 baja del comentario HTML al CUERPO — seccion propia en Step 3 + quinto item en la compuerta de QA del Step 4 (una instruccion que solo vive en un comentario no es una instruccion). Blindaje real: chflags uchg Y chmod 0444 (doble; reponer ambos). Cambios relevantes reportados a GOLDEN - CENTRO DE MANDO. -->
-<!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leian el cerebro de marca — esta entra a la familia que SI lo lee. Bloque identico en las 6 del CdM + fila a la fabrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
-<!-- adenda 2026-08-23 (centro de mando, alineación de espejo de compliance tras auditoría de ecom-magic v2.2): la LISTA NEGRA de claims inventados (Ley 6 de golden-ecom-magic, espejada en golden-imagen-arena) aplica TAMBIÉN a los guiones del avatar — un claim médico/curativo inventado dicho por un avatar es el mismo riesgo de cuenta que impreso en una imagen. Antes de aprobar un guion: contrastar claims contra la lista negra del espejo. -->
-<!-- v1.9 — Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 
+**Fábrica:** chat «✅ SKILL golden-ugc-avatar»
+
+# Golden UGC Avatar — Higgsfield Pipeline
+<!-- skill v1.17 · 2026-09-06 · auditoria golden-skill-auditor: cuerpo recortado bajo 500 lineas (techo desde v1.14) quitando del H2 "Version & changelog" el bullet v1.13, ya duplicado palabra por palabra en references/changelog.md — nada se borro, se dejo de repetir. Resto verificado en su techo: 0 rotas/huerfanos/secretos, blindaje doble intacto, validador 0/0/0. -->
+<!-- skill v1.16 · 2026-09-05 · sello mudado a references/changelog.md (fila del CdM); blindaje y validacion ahora son procedimiento vivo en el cuerpo; lista negra probada en los DOS sentidos. -->
 
 ## Paso previo · Cerebro de marca (obligatorio antes de generar)
 
@@ -37,21 +27,6 @@ competidores.md, anuncios-ganadores.md, cambios-recientes.md), LÉELO PRIMERO y 
 — jamás re-preguntar lo que el cerebro ya sabe. Si NO existe, ofrece crearlo con `golden-brand-brain`
 antes de continuar; si el usuario pide seguir sin cerebro, se declara en la entrega que el contenido
 se generó sin voz de marca cargada.
-
-
-<!-- skill v1.8 · 2026-08-21 (golden-skill-auditor, reparación): description now states explicit
-disambiguation (NOT for product-only images/page/ads/editing, with the correct hermana for each);
-fixed the "hyperframes" handoff to point at golden-video-editor (the actual cut/caption/assembly
-skill); removed the residual "(Moko)" from the seedance_prompt_system.md H1 (stale legacy name the
-v1.3 changelog claimed was already removed); de-duplicated the voice/body coherence table in
-SKILL.md — it now points to the single source of truth in seedance_prompt_system.md §8 instead of
-repeating a shorter, driftable copy; added Step 4 (self-check: identity match, voice-body coherence,
-vertical rules, negative-prompt present) with an explicit "done" definition, since the pipeline had
-no QA gate before handoff. Blindaje: chflags uchg (desbloquear con `chflags -R nouchg`, reponer con
-`chflags -R uchg`) — mechanism now documented here per estandares-golden.md §6. -->
-<!-- skill v1.7 · 2026-08-10 (loop del arsenal, semana 2 · producción): before/after cut BY VERTICAL added to the Step 2 health block. The 2026-08-07 norm banned before/after for dental only; Meta 2026 also bans it for anti-aging/wrinkles/firming and weight loss, and allows it for general cosmetics with an 18+ audience. Two cross-vertical bans added to the negative prompt: second person pointing at the viewer's condition, and timeframe-plus-result headlines (Meta judges implied meaning). Mirrored in golden-ecom-magic and golden-imagen-arena -->
-<!-- skill v1.6 · 2026-08-07 (centro de mando, cosecha del chat ESTUDIO 360 DENTAL un producto de cliente Chile) · reglas de arte para verticales de SALUD (dental y afines) en el Step 2, aplicables a prompts de imagen Y video: prohibido bocas con lesiones, antes/después de dentadura, delantal/estetoscopio/sillón dental, porcentajes en pantalla y preguntas que señalen condición del espectador; permitido macro del gotario, textura, corte de esmalte ilustrado y lifestyle de baño -->
-<!-- skill v1.4 · pipeline foto→video UGC sobre Higgsfield MCP · imagen soul_2/nano_banana_pro + video seedance_2_0 (fallback seedance_2_0_mini en plan starter) · verificado en vivo el camino imagen+talking-head; Soul reutilizable documentado, aún sin correr end-to-end · changelog completo al pie -->
 
 > ## 🔴 CONGELACIÓN VIGENTE (FER, 2026-08-30) — LEE ESTO ANTES DE GENERAR
 > Memoria canónica: `feedback_higgsfield_solo_imagenes_y_costo_antes`. Dos reglas de la casa:
@@ -183,41 +158,13 @@ The image prompt follows a **5-block architecture**, each block with a different
 **Flatten** the filled blocks into one continuous 150–400-word paragraph in block order, then pass
 it as the `prompt`. Specificity drives consistency.
 
-### Art rules for HEALTH verticals (dental and similar) — Centro de Mando norm, 2026-08-07
-Field-proven in the Dental un producto de cliente study (Chile). When the product's vertical is oral
-health or any sensitive health claim (supplements, skin, hair), apply these to every image AND
-video prompt (they also feed the negative prompt in Step 3):
-
-**FORBIDDEN in the frame:**
-- Mouths with visible lesions (cavities, stains, inflamed gums).
-- Before/after shots of teeth.
-- White coat, stethoscope, dental chair — anything that reads as medical endorsement.
-- Result percentages on screen ("95% effective").
-- Questions that point at a viewer's condition ("do you have cavities?").
-
-**ALLOWED and proven to convert:**
-- Macro of the dropper/applicator.
-- Product texture.
-- ILLUSTRATED enamel cross-section (stylized diagram, never clinical photography).
-- Bathroom lifestyle (daily routine, clean setting).
-
-### Before/after: the cut by vertical (Meta 2026 — account risk)
-The block above bans before/after for dental only. Meta bans it in more verticals, so the
-real cut is this (verified 2026-08-10) and it applies to image AND video prompts:
-
-- **FORBIDDEN** in anti-aging / wrinkles / firming / lifting, in weight loss, and in oral
-  health or any sensitive health claim. Applies even if the brief asks for it: change the
-  piece, do not deliver the split.
-- **Allowed** in general cosmetics (nail, hair, localized spot) with an 18+ audience, the
-  SAME area, no faces, and nothing that induces negative self-perception.
-
-Across every vertical, and always into the negative prompt: no second person pointing at the
-viewer's condition ("your wrinkles"), and no timeframe-plus-result headline ("results in 7
-days"). Since 2026 Meta judges IMPLIED meaning — a timeframe next to a before/after split
-reads as a misleading transformation claim even without the word "guaranteed".
-
-**What replaces it and still converts:** texture macro, how-to-use, illustrated mechanism,
-ingredients, lifestyle.
+### Verticales sensibles (salud, estética, pérdida de peso) — riesgo de CUENTA
+Si el producto toca salud, dental, anti-edad, arrugas, firmeza o pérdida de peso, **lee
+`references/verticales_sensibles.md` ANTES de escribir el prompt** (imagen y video). Ahí están las
+prohibiciones medidas de Meta 2026 y el corte de antes/después por vertical. Regla que no espera a
+esa lectura: **nunca entregues un antes/después** en esas verticales aunque el brief lo pida, y
+nunca uses segunda persona señalando la condición del espectador ("tus arrugas") ni titulares de
+plazo-más-resultado ("resultados en 7 días") — Meta juzga el significado implícito.
 
 ### Image models & settings *(verify with `models_explore action=get` before relying on these)*
 
@@ -230,6 +177,29 @@ ingredients, lifestyle.
 
 For vertical UGC use `aspect_ratio: "9:16"`. Pass a reference via `medias: [{ role: "image",
 value: "<media_id or job_id>" }]` — never a raw URL (import URLs first with `media_import_url`).
+
+### 🔴 Compuerta de IDENTIDAD — mirar la imagen antes de gastar (medido: costó 135 créditos)
+
+Un `media_id` es un UUID: no se parece a nada y no avisa cuando es el equivocado. En un chat donde
+conviven varios clientes es trivial pasar la foto de otra persona como referencia — y el modelo no
+falla, **obedece**: entrega un desconocido y el gasto ya está hecho.
+
+**Caso medido (2026-08-29):** se generó el video de presentación del dueño pasando el `media_id` de
+la foto de OTRA clienta del mismo chat. Salió un hombre genérico que no era él. **135 créditos
+perdidos**, y el primer diagnóstico fue equivocado (se culpó al prompt) hasta que se extrajo el
+fotograma 0 y se miró.
+
+**Regla dura, cuesta 0 créditos.** Antes de cualquier generación que lleve `medias`:
+1. Toma el `url` del media (lo devuelve `job_display` o la respuesta del upload).
+2. `curl -s -o <archivo> <url>` y **ábrela con la herramienta de lectura de imágenes**.
+3. Di en la respuesta de quién es esa cara ANTES de llamar a `generate_*`.
+
+Con dos o más personas en juego, escribe el mapa `nombre → media_id` en la respuesta y trabaja
+contra ese mapa, nunca contra el id que recuerdas.
+
+**La clase, no el caso:** aplica a todo identificador opaco que dispare gasto o escritura
+(`media_id`, `soul_id`, `preset_id`, `ad_account_id`, id de producto). El UUID no se autovalida —
+se comprueba mirando el objeto antes de gastar.
 
 ### Image call sequence
 1. *(If using a reference)* get a `media_id`: local file → `media_upload_widget` (user picks) or
@@ -266,14 +236,40 @@ Assemble using the `【Avatar】【Scene】【Emotional/Physical State】【Voic
 description over **verbatim** and add "Maintain exact appearance throughout, consistent character,
 no deformation." Keep direction tight: 50–200 words of actual direction.
 
-### Claims in the script — compliance mirror (account risk)
-A fabricated medical or curative claim **spoken by an avatar** carries the same account risk as one
-printed on an image, so the blacklist of invented claims (Ley 6 of `golden-ecom-magic`, mirrored in
-`golden-imagen-arena`) applies to dialogue too. Before approving any script, contrast every claim in
-it against that list: no cure/heal promise, no invented percentage, no timeframe-plus-result, no
-medical authority the brand does not hold. If the brief hands you a claim, ask for its source; with
-no source, rewrite the line around a benefit the product can actually stand behind — never invent
-one to fill the beat. (Centro de Mando, 2026-08-23.)
+### 🔴 Lista negra de compliance — claims Y lo que sale EN CÁMARA (riesgo de CUENTA)
+Un claim inventado **dicho o mostrado** por un avatar es el mismo riesgo de cuenta que impreso en una
+imagen, así que la lista negra de `golden-ecom-magic` (Ley 6, espejada en `golden-imagen-arena`)
+aplica al guion Y al encuadre. Cinco prohibiciones, las cuatro últimas medidas en material real
+(Centro de Mando, 2026-09-04):
+
+1. **Claim inventado en el guion:** nada de curar, tratar, eliminar o regenerar; ningún porcentaje
+   inventado; ningún plazo-más-resultado. Si el brief trae un claim, se pide su fuente; sin fuente se
+   reescribe la línea sobre un beneficio que el producto sí sostiene.
+2. **Aval médico falso:** prohibido bata, estetoscopio, consultorio o cualquier persona presentada
+   como profesional de salud diciendo "mis pacientes". Prohibido "avalado por la ciencia" y las
+   puntuaciones de autoridad tipo "4.9/5 de expertos". **Se caza en video igual que en imagen fija.**
+3. **El producto que sale en cámara debe ser el que se despacha.** Dos de seis videos de proveedor
+   mostraban un frasco distinto al real. En contra entrega eso termina en rechazo en la puerta, y el
+   costo lo paga la empresa.
+4. **El ingrediente falso también entra dibujado.** Cuatro piezas llevaban raíz de jengibre y el
+   producto no la lleva: nadie lo escribió, lo puso el creativo. Revisa lo que la imagen INSINÚA, no
+   solo lo que el texto afirma.
+5. **Prohibido el parche verbal.** Si la pieza insinúa algo falso, NO se corrige agregando palabras:
+   la pieza se rehace.
+
+**Cómo se verifica (no es opinable):** el video se mira **fotograma a fotograma**. La transcripción
+no ve el envase, ni la bata, ni el ingrediente dibujado — por eso auditar por transcripción deja
+pasar justo estas cuatro. Extrae fotogramas y míralos.
+
+**Se prueba en los DOS sentidos.** Una lista comprobada solo contra el caso malo no distingue: acusa
+a la forma, no al defecto. Debe **morder el malo Y callar ante los buenos**, y el lado bueno lleva
+**dos** casos, porque la prosa inocente casi nunca activa un detector mal hecho — lo que lo activa es
+el texto que **se parece** al dato. **Criterio: si marca un caso bueno, la lista está mal escrita, no
+la pieza; se corrige la lista.**
+
+Los tres casos de prueba (bueno limpio, bueno **disfrazado** con el vocabulario de las cinco
+prohibiciones, y malo que debe dispararlas todas) viven en **`references/compliance_casos.md`**.
+Córrelos mentalmente contra tu pieza antes de aprobarla.
 
 ### The coherence guarantee — voice must match the body
 Non-negotiable: whatever the body is doing in Layer 3, the voice in Layers 4–5 must carry the
@@ -332,7 +328,10 @@ coherence, not taste:
    frame contains none of the forbidden elements and no before/after was used where it's banned.
 4. **Negative prompt was included** — Step 3 always ships a `【Negative Prompts】` block; missing it
    is the top cause of uncanny output (see `references/seedance_prompt_system.md` §9).
-5. **Claims cleared** — every claim spoken in the dialogue passed the compliance mirror above: none
+5. **Fotogramas mirados** — el video se revisó **fotograma a fotograma** contra la lista negra de
+   arriba: sin bata ni estetoscopio, el envase que sale es el que se despacha, y no aparece ningún
+   ingrediente que el producto no lleve. La transcripción no basta.
+6. **Claims cleared** — every claim spoken in the dialogue passed the compliance mirror above: none
    invented, no unbacked medical or curative promise, no timeframe-plus-result. One fabricated claim
    can cost the ad account, which is far more expensive than a re-generation.
 
@@ -404,7 +403,7 @@ product images — it connects to the skills that do. Keep the handoffs clear so
 - `golden-investigacion-mercado` / `golden-copywriting` → the **angle, hook, or script**. If the
   user has no script, delegate the copy to `golden-copywriting` and turn it into breathed dialogue
   (Layer 5). Never invent product claims — ask for them.
-- `golden-productos-ganadores` → the **product/niche** that defines which avatar and message.
+- `golden-dropkiller-productos-ganadores` → the **product/niche** that defines which avatar and message.
 
 **Hands off to (outputs):**
 - `golden-ads` → the **UGC .mp4 as a paid-ad creative** (Meta/TikTok). The #1 consumer of this
@@ -423,110 +422,78 @@ product images — it connects to the skills that do. Keep the handoffs clear so
 Golden rule: this skill's job ends when it delivers the **asset** (image and/or .mp4). Publishing,
 running ads, laying out a page, or editing belongs to the destination skill.
 
-## Alternative route — Google Vids (Workspace)
+## Ruta alterna VERIFICADA: Google Vids (0 créditos)
 
-Higgsfield is not the only way to put a talking avatar on screen: **Google Vids** (part of Google
-Workspace, which Golden already pays for) also generates avatars that read a script. Keep it on the
-table so nobody pays credits for a job the subscription already covers.
+Google Vids (incluido en Workspace) **sí crea un avatar a partir de una foto propia** y lo hace
+hablar. Verificado el 2026-08-29 **hasta el lanzamiento del render**: avatar creado desde la foto, asignado, guion aceptado, vista previa generada (se vio el avatar con la cara correcta y 0:20 de duración) y `Generar` corriendo al 5%. **El MP4 terminado NO fue observado** — la extensión del navegador se desconectó antes. Las 5 trampas de abajo sí están medidas: son justo lo que bloqueaba y desbloqueaba el flujo. **Mientras la congelación de Higgsfield siga
+vigente, esta es LA ruta para un talking-head**: HyperFrames no hace una persona fotorrealista
+hablando y Seedance está en pausa.
 
-**When Vids is the better call:** corporate / training / internal-comms pieces, announcements, and
-anything horizontal that lives inside Workspace — the avatar reads a script, the file stays in
-Drive, and it does not spend Higgsfield credits.
+El procedimiento exacto — las 5 trampas medidas incluidas (el file input oculto, el tope de 800
+caracteres por escena, el guion de solo lectura, y los DOS botones en secuencia) — vive en
+**`references/google_vids.md`**. Léelo antes de operar Vids: sin esas 5, el flujo se traba.
 
-**When this skill's Higgsfield route still wins:** vertical UGC and paid-ad creative. The whole
-point here is the *unpolished iPhone-selfie* read plus fine control of identity lock and
-voice-body coherence through the Seedance prompt — that is what makes an ad stop the scroll, and
-it is not what a clean corporate avatar tool is built for.
+El oficio de guion de esta skill es model-agnostic y aplica igual a un guion pegado en Vids.
 
-**What transfers either way:** the script craft in this skill is model-agnostic. The 5-layer stack,
-the A–E avatar profiles with their vocabulary DNA, the voice-body coherence table
-(`references/seedance_prompt_system.md` §8) and the compliance mirror above apply exactly the same
-to a script you paste into Vids. Write the script here, render it wherever fits the job.
-
-**Status — not verified live by this skill.** There is no Google Vids MCP, so it is operated by
-hand in the Workspace UI; this skill has not measured its avatar catalog, limits, languages, or
-export specs. Before promising it to a client, check those in the product itself and report back so
-this section can be upgraded from "route exists" to "route verified". (Ruta señalada por FER,
-2026-08-24.)
-
-## Cost reality check (why we stay on Higgsfield)
-
-Pay-per-use aggregators (self-hosted frontends over MuAPI-style gateways) look "free" because the
-repo is free — **the generations are not**. Verified market prices (mayo 2026), useful both to pick
-the right model per job and to sanity-check any "free alternative":
-
-| Model | What it is | ~Cost per generation | Best for |
-|---|---|---|---|
-| Flux Schnell | fast image | ~$0.03 | iterating ideas |
-| Flux Pro | pro image | ~$0.10 | final deliverables |
-| Midjourney v7 | stylised image | ~$0.15 | brand/aesthetic shots |
-| Kling 2.5 | ~5s realistic video | ~$0.50 | reels, product motion |
-| Sora 2 | ~10s cinematic video | ~$2.00 | hero shots |
-| Veo 3 | ~8s video with audio | ~$3.00 | ads with sound |
-
-**The break-even that nobody does:** under ~30 generations/month, pay-per-use is cheaper (saves
-~$19/mo). At ~60-100/month it is a tie. **Above ~200/month you pay 3-5x more** than a flat
-subscription. Golden operates well above the tie point (UGC + product images + ads), so the
-**Higgsfield subscription stays** — and any "install this free repo instead" claim gets checked
-against this table before switching. Rule: iterate with the cheap model, spend on the final only.
+## Costos y elección de motor
+Tarifas medidas por generación y el punto de equilibrio pay-per-use vs suscripción están en
+**`references/costos_motores.md`**. Lo que no se delega a esa lectura: **iterar con el modelo
+barato y gastar solo en la pieza final**, porque lo caro medido no es generar, es repetir.
 
 ## Reference files
 - `references/image_framework.json` — The 5-block avatar prompt template, every field, enumerated options, a worked example, and the live-verified model/settings notes. Read when building or reusing an avatar identity.
 - `references/seedance_prompt_system.md` — The full Seedance 2.0 system: 5 avatar profiles with vocabulary DNA, the layer formulas, the negative-prompt library, full worked templates, and live-verified Seedance params + media flow. Read when writing the video prompt.
+- `references/compliance_casos.md` — Banco de casos de la lista negra en los dos sentidos: bueno limpio, bueno disfrazado y malo. Léelo al aprobar una pieza con personas.
+- `references/google_vids.md` — Ruta Google Vids verificada en vivo: avatar desde foto propia, las 5 trampas medidas y el orden real de botones. Léelo antes de operar Vids.
+- `references/verticales_sensibles.md` — Reglas de arte y compliance para salud/estética/pérdida de peso, con el corte de antes/después por vertical (Meta 2026). Léelo cuando la vertical sea sensible.
+- `references/costos_motores.md` — Tarifas medidas por generación y break-even suscripción vs pay-per-use.
 - `references/seedance_advanced.md` — Advanced Seedance techniques beyond the single talking head: multi-reference role mapping (@image/@video/@audio), beat-budgeting by duration, multi-shot transitions, camera/audio vocabulary, prompt hygiene, and character-sheet identity locking (incl. photoreal identity sheets). Read for multi-reference/multi-shot work or when identity drifts.
 
 ---
 
+## Operación de la propia skill (blindaje y validación)
+
+Esta skill se guarda **blindada**. Para editarla y volver a cerrarla, el orden importa:
+
+**Abrir:** `chflags -R nouchg <skill>` y después `chmod -R u+w <skill>`.
+**Cerrar:** `chmod -R a-w <skill>` **primero**, y `chflags -R uchg <skill>` **después** — al revés el
+chmod falla porque el flag ya bloqueó el inodo. El **directorio** lleva su propio `uchg` y `555`.
+Son **dos** mecanismos a la vez (flag y permisos): reponer solo uno deja la skill medio abierta.
+
+**Validar antes de darla por buena** (salida 0 = en norma), siempre con **ruta ABSOLUTA**, porque
+con `.` da un falso fallo:
+
+    python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py ~/.claude/skills/golden-ugc-avatar
+
+**Estándar 9:** los cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO.
+
+**Al cerrar cada versión se registra el sello en el changelog.** La receta canónica del árbol NO se
+reinventa aquí: la declara `golden-skill-auditor` en su **Fase 5**, con sus limitaciones escritas; si
+algo discrepa, manda la Fase 5. Se acompaña SIEMPRE del sello POR ARTEFACTO nombrando el archivo
+(`md5 -q <ruta>/SKILL.md`, antes y después), que es el que un tercero puede correr para verificar el
+par, y se deja el respaldo en disco: un hash sin decir qué se hasheó, o sin el archivo con el que
+compararlo, es un rito y no una comprobación.
+
+El historial completo de versiones y las actas del Centro de Mando viven en
+`references/changelog.md`. No se borran: se mudan, y se comprueba que llegaron antes de quitarlas.
+
 ## Version & changelog
-- **v1.12** (2026-08-31) — Compuerta de la CONGELACIÓN de Higgsfield (estándar de FER 30-ago): banner de bloqueo; Step 3 Seedance EN PAUSA (solo avatar en imagen); costo-antes-con-aprobación. Reversible.
-- **v1.11** — Registrada la **ruta alterna Google Vids** (Workspace) para generar avatares sin
-  gastar créditos de Higgsfield, con su frontera explícita: Vids para piezas corporativas/formación
-  y horizontal dentro de Workspace; Higgsfield para UGC vertical y creativos de pauta, donde mandan
-  el look de selfie sin pulir y el control fino de identidad y coherencia voz-cuerpo. Se deja dicho
-  que el oficio de guion de esta skill (5 capas, perfiles A-E, tabla voz-cuerpo, espejo de
-  compliance) es model-agnostic y sirve igual para un guion que se pega en Vids. Marcada como **no
-  verificada en vivo** (no hay MCP de Vids; se opera a mano en la UI de Workspace) para no prometerle
-  a un cliente capacidades no medidas. Dato aportado por FER.
-- **v1.10** — Auditoría fresca (golden-skill-auditor): resuelta la colisión de dos pasos "0" — el
-  bloque del cerebro de marca pasa a **Paso previo** y Step 0 sigue siendo el de toolchain, así no
-  se renumera nada ya referenciado; el cerebro de marca **entra al diagrama** de pipeline (estaba
-  declarado obligatorio pero no aparecía en el mapa del flujo); **Step 4 sube de H3 a H2** (era un
-  paso par de 0-3 escondido dentro de Step 3, invisible al escanear encabezados aunque sí salía en
-  el diagrama); y la regla de **compliance de la adenda 2026-08-23 baja al cuerpo** — sección propia
-  en Step 3 (contrastar cada claim del guion contra la lista negra) más un quinto ítem en la
-  compuerta de QA del Step 4, porque una instrucción que solo vive en un comentario HTML no la
-  ejecuta nadie. Blindaje real documentado: doble (chflags uchg **y** chmod 0444).
-- **v1.9** — Estándar 9 (Centro de Mando): declarado explícitamente que los cambios relevantes de
-  esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR (regla de FER, 2026-08-22,
-  `estandares-golden.md` §9). Tarea liviana, sin auditoría completa.
-- **v1.8** — Reparación (golden-skill-auditor): description ahora declara desambiguación explícita
-  (no usar para imágenes de producto, página, ads o edición — remite a la skill correcta en cada
-  caso); corregido el handoff de edición para apuntar a `golden-video-editor` en vez de
-  `hyperframes` (el motor real de corte/subtítulos/ensamblaje que consume esta skill); quitado el
-  residuo "(Moko)" del H1 de `seedance_prompt_system.md` (el changelog v1.3 decía que ya se había
-  quitado y no era cierto); des-duplicada la tabla de coherencia voz-cuerpo en SKILL.md — ahora
-  apunta a la tabla completa de `references/seedance_prompt_system.md` §8 en vez de repetir una
-  copia corta que podía desincronizarse; agregado el Paso 4 (auto-chequeo: identidad, coherencia
-  voz-cuerpo, reglas de vertical, negative prompt presente) con definición explícita de
-  "terminado", ya que el pipeline no tenía compuerta de QA antes de la entrega. Blindaje:
-  `chflags uchg` (documentado aquí por primera vez, según estandares-golden.md §6).
-- **v1.7** — Before/after cut BY VERTICAL agregado al bloque de salud del Step 2 (2026-08-10, loop
-  del arsenal semana 2). La norma del 2026-08-07 prohibía antes/después solo para dental; Meta 2026
-  también lo prohíbe en anti-edad/arrugas/firmeza y pérdida de peso, y lo permite en cosmética
-  general con audiencia 18+. Dos prohibiciones cross-vertical agregadas al negative prompt: segunda
-  persona señalando la condición del espectador, y titulares de plazo-más-resultado (Meta juzga el
-  significado implícito). Reflejado en `golden-ecom-magic` y `golden-imagen-arena`.
-- **v1.6** — Art rules for HEALTH verticals (dental and similar) baked into Step 2, applying to image and video prompts. Harvest of the "ESTUDIO 360 DENTAL un producto de cliente (Chile)" chat, assigned by the Centro de Mando (2026-08-07): forbidden — visible lesions, teeth before/after, medical-endorsement props (white coat, stethoscope, dental chair), on-screen result percentages, condition-pointing questions; allowed and field-proven — dropper macro, product texture, illustrated enamel cross-section, bathroom lifestyle.
-- **v1.5** — Added the **Cost reality check** section: verified per-generation prices (Flux Schnell $0.03 → Veo 3 $3.00) and the pay-per-use vs subscription break-even (~30/mo saves, ~60-100 ties, >200 costs 3-5x more). Conclusion baked in: Golden stays on the Higgsfield subscription; "free repo" alternatives get checked against this table first. Rule: iterate cheap, spend on the final only. Destilado de una guía pública de Open-Generative-AI/MuAPI (mayo 2026), sin instalar nada.
-- **v1.4** — Added `references/seedance_advanced.md` (destilado original, sin copiar terceros): multi-reference role mapping (image/video/audio, up to ~9/3/3), beat-budgeting by duration, multi-shot transition language, film-verb camera vocabulary, audio-as-first-class, prompt hygiene (keep settings out of prose), and **character-sheet identity locking** incl. photoreal identity sheets — the fix for one-off-invented drift. Wired into Step 1 (identity), Step 3 (video) and the reference list. Enriquece con lo mejor de la skill `video-prompting` (Seedance 2.0 + hojas de personaje) sin depender de ella.
-- **v1.3** — Polish for community sharing: unified to English throughout, removed the legacy "Moko" trigger, flagged the Reference Element path as not-yet-verified-live. Core image+video path is live-proven; the Soul (trained reusable identity) path remains documented but unverified end-to-end.
-- **v1.2** — Live-verified against the Higgsfield MCP end-to-end (image `soul_2` + video `seedance_2_0_mini`). Baked in: plan gating + `seedance_2_0_mini` fallback, `credits_exact` reporting, real presets are viral-effect (not UGC) clips, cross-skill handoffs, troubleshooting table. Privacy-audited for community sharing (no personal data in package).
-- **v1.1** — Rewrote all operational wiring against the real model catalog (correct model IDs, params, media flow, no `job_status`, `get_cost` preflight, Soul/Element identity strategy).
-- **v1.0** — Initial two-stage pipeline (image framework + Seedance system) with reference files.
+- **v1.15** — Encargo del Centro de Mando (mandato v2 de FER). **(1) La description pasa a español**:
+  es el disparador y FER escribe en español; medida contra el tope duro de 1024 uniendo el escalar
+  plegado como hace YAML. **(2) La lista negra de compliance se amplía de 1 a 5 prohibiciones** con
+  las leyes medidas del 2026-09-04: aval médico falso (bata, estetoscopio, "mis pacientes", "avalado
+  por la ciencia", "4.9/5 de expertos"), el producto que sale en cámara debe ser el que se despacha,
+  el ingrediente falso que entra DIBUJADO y no escrito, y la prohibición del parche verbal (la pieza
+  se rehace, no se le agregan palabras). **(3) Se añade el método de verificación**: el video se mira
+  fotograma a fotograma, porque la transcripción no ve el envase ni la bata — auditar por
+  transcripción deja pasar justo esas cuatro. **(4) Caso malo conocido** incluido para comprobar que
+  la regla muerde, y sexto ítem en la compuerta de QA del Step 4.
+Historial completo en `references/changelog.md` (incluye v1.13 y v1.12 palabra por palabra). Aquí
+solo la última anterior a v1.15, para mantener el cuerpo bajo 500 líneas:
 
-## Fronteras y desambiguacion
-
-Descripcion completa anterior (se conserva para no perder ningun matiz de frontera):
-
-> End-to-end UGC avatar creation pipeline on the Higgsfield MCP. Generates hyperrealistic AI avatar images with Higgsfield Soul 2.0 (or Nano Banana Pro), then animates them into talking-head UGC videos with Seedance 2.0 — through structured prompt frameworks that lock character identity and enforce voice/body coherence, with reusable identity via Soul training and Reference Elements so one avatar stays the same person across videos. Use this skill whenever the user mentions UGC avatars, AI avatars, avatar generation, creating UGC content, AI talking-head videos, the Higgsfield workflow, Soul characters, Nano Banana avatar, Seedance UGC, the avatar pipeline, or anything about creating AI-generated people for social media content, ads, or brand videos. Also trigger when the user asks to "make a person," "create a character for video," "generate a talking-head," "haz un avatar," "crea un UGC," "hazme un video hablando," or "un avatar para mi marca." Runs either stage alone when needed. Do NOT use for product-only images (packshots, infographics, product listing photos) — that is `golden-imagen-arena`. Do NOT use to build the product page, run ads, or edit/caption the final clip — those are `golden-shopify`, `golden-ads`, and `golden-video-editor` respectively.
-
+- **v1.14** — Divulgación progresiva: el cuerpo bajó de 582 a menos de 500 líneas moviendo a
+  referencias tres bloques que solo se necesitan en casos concretos (procedimiento de Google Vids,
+  reglas de verticales sensibles, tabla de costos). En el cuerpo queda la **decisión** — cuándo ir a
+  cada ruta y las prohibiciones que no pueden esperar a una lectura — y el **detalle** se carga solo
+  cuando hace falta. Motivo: el validador oficial avisaba que un cuerpo largo encarece la activación
+  en cada disparo, y un cuerpo que nadie termina de leer protege menos que uno corto y apuntado.

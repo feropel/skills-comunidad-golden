@@ -1,0 +1,31 @@
+{
+  "_fuente": "Topes REALES del asistente de CARRITOS de Chatea Pro. Leidos del contador del panel el 2026-09-08 (capturas de FER) y cruzados contra el campo real del espacio de referencia. Los scripts leen de aqui: no se repiten numeros en el codigo.",
+  "_DOS_TECHOS": "Hay que respetar los DOS. (A) BOT FIELD: el JSON completo, medido ESCAPADO con len(json.dumps(valor)[1:-1]). El panel avisa 'menos de 20000 caracteres'. (B) CAMPO NATIVO: cada texto contra el tope de su casilla del formulario, o el panel LO CORTA al guardar sin decir nada.",
+  "bot_field": {
+    "medir": "ESCAPADO con los valores por defecto: len(json.dumps(valor)[1:-1]) — cada tilde ocupa 6 y cada emoji astral 12. Es la unica vara; validar_config.escapado() la usa.",
+    "seguro_escapado": 19000,
+    "legacy_json_escapado": 20000,
+    "longtext_escapado": 500000
+  },
+  "nombre_campo": 50,
+  "_nombre_campo": "Tope del NOMBRE del bot field, no de su valor. Medido: '[Carritos] Configuracion' marca 24/50. El flujo lee las claves POR NOMBRE: un nombre cortado deja al bot sin encontrar su campo.",
+  "capa_nativa": {
+    "nombre_asesor": 50,
+    "adaptacion_lenguaje": 2000,
+    "metodo_anticancelacion": 2000,
+    "nombre_tienda": 80,
+    "ubicacion_tienda": 200,
+    "mensaje_descuento": 200,
+    "tiempos_envio": 150,
+    "datos_pago_anticipado": 300,
+    "transportadoras_disponibles": 100,
+    "asunto": 80,
+    "contenido": 500,
+    "mensaje_agradecimiento": 300
+  },
+  "_🔴_DATOS_PAGO_ANTICIPADO_ES_DATO_PERSONAL": "Lleva medio de pago, NOMBRE y TELEFONO de quien recibe el dinero. Clonar este campo entre espacios manda el dinero de un cliente a la cuenta de otro. Es la fuga mas cara de todo el asistente y no da ningun error. NUNCA se hereda: se pide al dueño del espacio que se esta configurando.",
+  "_recordatorios": "El panel muestra DOS pares (tiempo, plantilla): Recordatorio 1 y Recordatorio 2, ademas del mensaje de recuperacion con imagen (visto 18-sep). El JSON trae ademas tiempo_recordatorio_3, una llave SIN casilla en el panel: si tiene valor, se deja vacia.",
+  "_plantillas_meta": "Las plantillas NO son configuracion (FER, 18-sep): vienen al instalar o las diseña el dueño. Solo se revisa su ESTADO (que existan y esten APPROVED). name y namespace son de cada cuenta: nunca se derivan ni se copian entre espacios.",
+  "_medir": "Los topes se comparan en UTF-16, como el contador del panel: cada emoji astral vale 2. Estar cerca del tope NO es defecto (1.999/2.000 pasa): solo pasarse bloquea. Nunca se recorta contenido util para ganar margen.",
+  "_🔴_TRANSPORTADORAS_ES_EL_QUE_SE_PASA": "Medido dos veces en el espacio de referencia (132 y 116 con tope 100), las dos porque alguien escribio el nombre del campo adentro. Al guardar desde el panel se corta en el 100 y se pierde el final, que es justo la transportadora prohibida. REGLA: la prohibida va primero, el nombre del campo no va adentro, y se respeta el tope del panel tambien por API (escribir_config.py aborta si se pasa)."
+}

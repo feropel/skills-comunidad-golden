@@ -379,7 +379,6 @@
   };
 
   /* 5 · RETICULA — malla que se hunde bajo el cursor. Tecnologia, datos, panel. */
-  ATM.retabla = null;
   ATM.reticula = function () {
     return montar2D(function (ctx, w, h, t, pt, A, B, st) {
       var paso = (w < 900 * DPR ? 34 : 46) * DPR;

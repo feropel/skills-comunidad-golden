@@ -1,3 +1,4 @@
+import sys
 #!/usr/bin/env python3
 """
 GOLDEN PDF · visuales.py — los componentes que hacen que un documento se MIRE.
@@ -226,6 +227,21 @@ def _pares(lineas, sep="|"):
     return out
 
 
+
+# v6.2 · UN COMPONENTE QUE NO ENTIENDE SU CUERPO GRITA, NO DIBUJA.
+# Medido mirando un PDF construido a mano: con la sintaxis equivocada, `escala`
+# caia a los valores por defecto de un `.get` (actual=0, meta=1) y dibujaba una
+# barra vacia que decia "0 de 1 - faltan 1". Salio APROBADO del auditor, paso las
+# 24 pruebas y se veia creible. Un grafico falso que llega a la comunidad es peor
+# que una construccion que se niega: el error silencioso viaja, el ruidoso no.
+def _grita(nombre, motivo, ejemplo):
+    sys.stderr.write("\n\u26a0\ufe0f  BLOQUE ::: %s SIN DIBUJAR: %s\n   Sintaxis:\n%s\n\n"
+                     % (nombre, motivo, ejemplo))
+    return ('<div class="bloque error"><strong>Bloque ::: %s no se pudo dibujar</strong>'
+            '<br>%s. Revisa la sintaxis en references/content-format.md.</div>'
+            % (nombre, motivo))
+
+
 def render_bloque(nombre, titulo, cuerpo):
     """Convierte un bloque ::: <nombre> ... ::: en su componente.
     Devuelve None si el nombre no es un visual (para que el llamador lo trate
@@ -243,14 +259,21 @@ def render_bloque(nombre, titulo, cuerpo):
         return kpi(items)
 
     if n in ("barras", "grafico", "gráfico"):
-        filas, unidad = [], ""
+        filas, unidad, descartadas = [], "", []
         for p in _pares(lineas):
             if p[0].lower() in ("unidad", "unidades") and len(p) > 1:
                 unidad = p[1]; continue
             try:
                 filas.append((p[0], float(str(p[1]).replace(",", "."))))
             except (ValueError, IndexError):
-                continue
+                descartadas.append(p[0][:30])
+        if not filas:
+            return _grita("barras", "ninguna fila trae un numero legible",
+                          "    ::: barras Entregas al primer intento\n    unidad | %\n"
+                          "    Envia | 92\n    Coordinadora | 71\n    :::")
+        if descartadas:
+            sys.stderr.write("\u26a0\ufe0f  ::: barras: %d fila(s) sin numero, fuera del "
+                             "grafico: %s\n" % (len(descartadas), ", ".join(descartadas)))
         return barras(filas, unidad, titulo)
 
     if n in ("escala", "medidor", "meta"):
@@ -258,11 +281,17 @@ def render_bloque(nombre, titulo, cuerpo):
         for p in _pares(lineas, ":"):
             if len(p) > 1:
                 d[p[0].lower()] = p[1]
+        faltan = [k for k in ("actual", "meta") if k not in d]
+        if faltan:
+            return _grita("escala", "falta " + " y ".join(faltan),
+                          "    ::: escala Meta trimestral\n    actual: 4820\n"
+                          "    meta: 6000\n    unidad: pedidos\n    :::")
         try:
-            return escala(float(d.get("actual", 0)), float(d.get("meta", 1)),
+            return escala(float(d["actual"]), float(d["meta"]),
                           titulo, d.get("unidad", ""))
         except ValueError:
-            return None
+            return _grita("escala", "actual o meta no son numeros",
+                          "    actual: 4820\n    meta: 6000")
 
     if n in ("comparativa", "antesdespues", "antes-despues"):
         filas, unidad = [], ""

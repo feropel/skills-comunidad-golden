@@ -12,14 +12,12 @@ description: >
   no porras. NO es para auditar skills (golden-skill-auditor) ni seguridad de código (cyber-neo):
   esto critica DECISIONES Y PLANES de negocio.
 ---
-
 # Golden Crítico — el abogado del diablo
 
-<!-- skill v1.2 (GC1.2) · 2026-08-23 (Estándar 9, golden-skill-auditor) · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
+<!-- skill vGC1.3 · 2026-09-06 · auditoría golden-skill-auditor: completada la mudanza de historia (v1.2 solo movió 1 de 4 actas), version stamp al patrón de la casa (comentario bajo el H1, no negrita antes del H1), y el Loop de autocrítica reescrito porque hablaba de "lote de variantes" y "modelo de pago" — vocabulario de otra skill, ajeno a este dominio de crítica de decisiones. Historial completo: references/changelog.md. El cuerpo se paga en cada activación; el acta no. -->
 
-**Versión:** `GC1.2` · Fábrica: chat centro de mando.
-Manual de criterio escrito por Fable 5: los pasos que el mejor modelo seguiría para criticar
-un plan de verdad. Cualquier modelo que lea esto debe seguirlos igual.
+Fábrica: chat centro de mando. Manual de criterio escrito por Fable 5: los pasos que el mejor
+modelo seguiría para criticar un plan de verdad. Cualquier modelo que lea esto debe seguirlos igual.
 
 ## La regla que manda
 **Complacer es traicionar.** Si el análisis termina en "me encanta, solo pulir detalles",
@@ -160,36 +158,28 @@ datos reales del caso que entra.)*
 ## 🔁 Loop de autocrítica antes de entregar (obligatorio)
 
 Una sola pasada entrega lo primero que salió, que casi nunca es lo mejor que podías. **Antes de
-mostrar nada, critica tu propio trabajo N veces** — 3 pasadas mínimo, 5 si la pieza va a producción:
+mostrar nada, critica tu propia crítica N veces** — 3 pasadas mínimo, 5 si la crítica va a
+condicionar una inversión real (pauta, inventario, compra de herramienta):
 
-1. **Pasada 1 · el encargo.** Cumple lo que pidieron, o cumple lo que era más cómodo escribir?
-2. **Pasada 2 · lo flojo.** Señala tú mismo la variante más débil del lote y di por qué. Si no
-   encuentras ninguna, no buscaste: siempre hay una que solo está para llenar.
-3. **Pasada 3 · las reglas de la casa.** Sin signos de apertura, sin líneas de rayas, compliance,
-   modelo de pago correcto, y el posicionamiento del producto respetado.
-4. **Pasadas 4-5 (si va a producción).** Léelo como lo leería el cliente, no como quien lo escribió.
+1. **Pasada 1 · el encargo.** Atacaste el plan que trajeron, o el que era más cómodo criticar?
+   Revisa que los 6 frentes de riesgo estén cubiertos, no solo el más obvio.
+2. **Pasada 2 · lo flojo.** Señala tú mismo cuál sección de la Plantilla de salida quedó genérica
+   ("revisar números" en vez de "el margen no aguanta una devolución del 25%") y reescríbela. Si
+   no encuentras ninguna floja, no buscaste: siempre hay una que salió a relleno.
+3. **Pasada 3 · las reglas de la casa.** Sin signos de apertura, sin crueldad performática, cada
+   riesgo con su arreglo propuesto (nunca solo la señal), y los supuestos con evidencia real o
+   declarados explícitamente como intuición — nunca inventados.
+4. **Pasadas 4-5 (si condiciona una inversión real).** Léelo como lo leería quien va a poner la
+   plata, no como quien lo escribió: sostiene el veredicto ante la pregunta obvia que ese lector
+   va a hacer?
 
-**Entrega solo lo que sobrevive**, y di qué descartaste y por qué. Un lote de 5 donde 2 son relleno
-vale menos que uno de 3 donde los 3 pelean — porque el relleno se cuela a producción cuando nadie
-lo señala.
-
-## Changelog
-- **GC1.2** (2026-08-23) — Estándar 9 (Centro de Mando, golden-skill-auditor): comentario HTML
-  bajo el H1 declarando que los cambios relevantes de esta skill se reportan a
-  🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. Cambio puntual, sin tocar el resto del contenido.
-- **GC1.1** (2026-08-21) — Auditoría golden-skill-auditor: añadida sección "Qué recibe y qué
-  entrega" (intake único al inicio, degradación elegante sin brand-brain/datos/skills hermanas),
-  Plantilla de salida con esqueleto exacto de markdown, y ejemplo corto entrada→salida ilustrativo
-  (no fosiliza cifras de un producto real). Blindaje: `chflags uchg` (quitar con
-  `chflags -R nouchg`, reponer con `chflags -R uchg`) — mecanismo documentado aquí por primera vez.
-- **GC1.0** (2026-07-11) — Creación. Método Fable de 5 pasos: objetivo real → supuestos →
-  6 frentes de riesgo → pre-mortem → veredicto (matar/pivotar/seguir con condiciones) + top 3.
+**Entrega solo la versión que sobrevivió al loop**, y si descartaste un ángulo de crítica por
+débil, dilo en una línea — omitirlo es la misma complacencia que esta skill existe para apagar.
 
 ## 🔄 AUTO-MEJORA (mandato global — autorización permanente de FER)
 Al cerrar cada corrida real: 1) **auto-califícate** (1–1000, honesto, con evidencia) contra el
 criterio de calidad de esta skill; 2) toda lección que sea de SISTEMA se **hornea aquí** con el
 ritual (backup → desbloquear → arreglar → changelog+sello → re-blindar); 3) si detectas un hueco
 propio, **arréglalo sin esperar que lo pidan** e informa; 4) pasa `golden-skill-auditor`
-periódicamente. Nunca borres conocimiento: reorganiza y añade.
-
-- **2026-08-02** — LOOP DEL ARSENAL (semana 1, skills de negocio): se hornea la sección **AUTO-MEJORA** (mandato global de FER, autorización permanente). Sin esta sección la skill no se auto-calificaba al cerrar corrida. Contenido operativo intacto. Backup: `_backups/2026-08-02-loop-arsenal-s1/`.
+periódicamente. Nunca borres conocimiento: reorganiza y añade. Historial completo de versiones y
+de este ritual: `references/changelog.md`.

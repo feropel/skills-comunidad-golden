@@ -16,7 +16,7 @@ Ejecuta en paralelo donde se pueda. Cada hallazgo se guarda **con su fuente** (R
 
 ## 1.3 Mercado y demanda
 - Tamaño/tendencia (Google Trends, volumen de búsqueda). Estacionalidad.
-- Está validado como ganador? Cruza con `golden-productos-ganadores` (Ad Library + TikTok).
+- Está validado como ganador? Cruza con `golden-dropkiller-productos-ganadores` (Ad Library + TikTok).
 - Nivel de saturación del nicho (cuántos anunciantes activos, hace cuánto).
 
 ## 1.4 Competidores (3–7)
@@ -138,7 +138,14 @@ Todo con fuente (URL del video/hilo) y volcado a la voz del cliente (1.5) y al d
 ## 1.7 Anuncios activos del nicho (inteligencia competitiva)
 - **Meta Ad Library**: `https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=<PAÍS>&q=<producto>`
   → mensajes, ofertas, formatos, **cuánto llevan activos** (los que no se apagan, convierten).
+- **Google · Centro de Transparencia** (la tercera biblioteca, y la que casi nadie mira):
+  se lee por su RPC interno, **gratis y sin llave**, y el país es un número, así que **barre país
+  por país**. Receta exacta en `scraping-firecrawl.md` §Bibliotecas de anuncios. Medido: 40 anuncios
+  activos de un dominio en Colombia en una sola petición.
 - **TikTok Creative Center**: top ads/hooks del nicho, sonidos en tendencia, formatos nativos.
+  ⚠️ **La Ad Library de TikTok (`library.tiktok.com`) NO cubre LatAm** — solo 32 países europeos, por
+  ley del DSA. Un cero ahí significa *el dato no existe*, no *está bloqueado*: no se reporta como
+  fallo ni se insiste. Para LatAm, Creative Center **con sesión iniciada** (sin login se ve recortado).
 - **✅ Receta PROBADA con el MCP de Meta (estudio Chile, 2026-08-07 — la vía más rápida):**
   1) `ads_library_search` con `countries:["<PAÍS>"]` + `ad_active_status:"ACTIVE"` + término del
      nicho → devuelve conteo de anuncios activos y las páginas que los corren;
@@ -167,6 +174,10 @@ Con los datos duros recogidos, construye el **dossier psicológico** (`dossier-p
 de promesa, mecanismo, dolores/miedos/anhelos, disparadores, criterios, objeciones, nivel de consciencia,
 insights y públicos múltiples. **Ancla cada capa en las fuentes de arriba** (reseñas/competidores/redes);
 lo que no tenga fuente, márcalo `(inferencia)`. Esta es la capa que más alimenta copy, ads y página.
+
+> **SIGUE LA FASE 3** (`03-mercado-en-vivo.md`): con los datos duros y el dossier en la mano, ahí se
+> levanta el mapa país por país, la matriz de combos, la autopsia de las páginas que ya venden y el
+> inventario de creativos — y de ahí salen LOS HUECOS, que es lo que se convierte en oferta propia.
 
 > PUERTA: no avanzas a la página ni a las campañas sin datos duros + dossier (buyer persona, ángulos,
 > objeciones, disparadores, públicos) listos.

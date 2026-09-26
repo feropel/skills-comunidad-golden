@@ -72,6 +72,62 @@ DOC_CONTEXT = re.compile(
     re.I,
 )
 
+# Prefijos que estampa el EMISOR del servicio, no quien escribe un ejemplo.
+# Un valor que los lleva Y alcanza la longitud del patron es una credencial de verdad:
+# nadie necesita 80 caracteres validos para ilustrar un formato. Sobre estos valores la
+# exencion documental NO aplica — se concede al archivo que la justifica, jamas al
+# formato .md, que es justo lo que son TODAS las skills de este repo PUBLICO.
+# Medido 2026-09-05: sin esta guarda, 12 de 12 credenciales vivas sembradas en un .md
+# quedaban silenciadas por una etiqueta <div>, unos puntos suspensivos o la palabra
+# "detecta" en los 250 caracteres previos. Banco: scripts/autoprueba_falsos_positivos.py
+PREFIJO_EMITIDO = re.compile(
+    r"^(?:shp(?:at|pa|ca)_|sk_live_|rk_live_|ghp_|github_pat_|sk-ant-|sk-|"
+    r"AKIA|xox[baprs]-|AIza|EAA)"
+)
+
+# Un JWT no lleva prefijo de emisor, pero SI lleva forma: tres segmentos y una FIRMA.
+# Un ejemplo de documentacion trunca la firma; un JWT vivo la trae entera (HS256 son 43
+# caracteres en base64url). La firma larga es lo que separa el ejemplo del secreto — y
+# hace falta distinguirlo porque un `service_role` de Supabase ES un JWT: salta RLS y da
+# acceso total a la base. Medido 2026-09-05 por el verificador adversarial.
+JWT_CON_FIRMA = re.compile(r"^eyJ[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{10,}\.[A-Za-z0-9_-]{27,}$")
+
+# Marcadores que declaran el valor como relleno de forma INEQUIVOCA. Se comprueban
+# sobre el valor para decidir si la guarda aplica. "TEST" NO esta aqui a proposito: un
+# token vivo puede llevar "test" dentro por azar, y `sk_test_`/`pk_test_` de Stripe ya
+# se tratan aparte por prefijo completo.
+RELLENO_INEQUIVOCO = re.compile(
+    r"(.)\1{6,}|TU_|YOUR_|XXXX|EXAMPLE|SAMPLE|FAKE|DUMMY|PLACEHOLDER|"
+    r"1234567890|ABCDEFGH", re.I)
+STRIPE_PRUEBA = re.compile(r"^[sp]k_test_")
+
+
+def es_credencial_emitida(valor):
+    """True si el valor es una credencial de verdad, por prefijo del emisor o por forma.
+
+    Sobre estas, NINGUNA exencion de contexto aplica: el prefijo lo estampa el servicio
+    y la firma la calcula el emisor. Ni una etiqueta HTML cerca, ni un enlace a una
+    imagen, ni la palabra "detecta" cambian ese hecho.
+    """
+    if STRIPE_PRUEBA.match(valor):
+        return False
+    if RELLENO_INEQUIVOCO.search(valor):
+        return False
+    return bool(PREFIJO_EMITIDO.match(valor) or JWT_CON_FIRMA.match(valor))
+
+
+# PRUEBA DURA de dato binario: el valor vive DENTRO de un blob base64 o data-uri, o sea
+# que entre el marcador y el valor no hay mas que caracteres de base64. Esto SI prueba
+# que el "token" es un trozo de PNG.
+#
+# Antes esto se resolvia con FALSE_POSITIVE_CONTEXT sobre 250 caracteres, y ese patron
+# incluye `\.png`, `\.jpg`, `\.woff` y `@font-face`. Medido por el verificador
+# adversarial el 2026-09-05: un simple `![logo](assets/logo.png)` dos lineas mas arriba
+# silenciaba los 13 patrones, la guarda incluida — porque corria DESPUES. 45 de los 599
+# .md del arsenal ya traen ese contexto hoy. Una MENCION de imagen no prueba nada; un
+# blob base64 pegado al valor, si.
+EN_BLOB_BASE64 = re.compile(r"(?:data:[a-z]+/[a-z0-9.+-]+;)?base64,[A-Za-z0-9+/=\s]*$", re.I)
+
 # Cadenas que son claramente relleno, no una credencial real.
 PLACEHOLDER = re.compile(
     r"(.)\1{6,}|EXAMPLE|SAMPLE|XXXX|1234567890|ABCDEFGH|TU_|YOUR_|FAKE|DUMMY|TEST",
@@ -92,7 +148,9 @@ def uchg_arbol(carpeta, exentos=frozenset()):
     (SIGUIENDO symlinks) llevan UF_IMMUTABLE — salvo los declarados en `exentos` (rutas
     relativas de escribibles POR DISENO, ej. un baseline que el propio script actualiza).
     Falla CERRADO: inexistente o vacia = NO blindada. Stat por archivo (sin find -flags).
-    CUERPO BYTE-IDENTICO en censo-ligero.py y chequeo.py — una sola semantica (R3/R4)."""
+    UNICA IMPLEMENTACION (GB1.10): este docstring citaba un "cuerpo gemelo" en
+    censo-ligero.py que NUNCA existio en disco — GB1.9 ya retiro esa promesa de
+    SKILL.md pero dejo este comentario de codigo sin tocar. Corregido aqui."""
     import stat as _st
     if not os.path.isdir(carpeta):
         return False
@@ -129,11 +187,24 @@ def es_falso_positivo(texto, match, path):
     despues = texto[fin:fin + 120]
     valor = match.group()
 
+    # 1 · Prueba DURA: el valor esta DENTRO de un blob base64 (es un trozo de imagen o
+    #     de fuente, no un token). Unica cosa que precede a la guarda.
+    if EN_BLOB_BASE64.search(antes):
+        return True
+    # 2 · GUARDA: credencial emitida (prefijo del servicio, o forma de JWT con firma
+    #     entera). Va en SEGUNDO lugar y solo detras de una prueba dura, nunca detras de
+    #     un filtro de contexto: una guarda que corre despues de un filtro de contexto
+    #     se apaga con ese filtro, y eso es exactamente lo que paso (F1, 2026-09-05).
+    if es_credencial_emitida(valor):
+        return False
+    # 3 · A partir de aqui, todo lo demas: relleno declarado y señales debiles.
     if FALSE_POSITIVE_CONTEXT.search(antes):
         return True
     if PLACEHOLDER.search(valor):
         return True
-    # Documentación: la referencia de una skill que habla de secretos.
+    # Documentación: la referencia de una skill que habla de secretos. Ya solo alcanza a
+    # los patrones SIN prefijo de emisor (JWT y familia), que son los que de verdad
+    # aparecen como ejemplo en material didactico.
     if "/references/" in path or path.endswith(".md"):
         if DOC_CONTEXT.search(antes) or DOC_CONTEXT.search(despues):
             return True

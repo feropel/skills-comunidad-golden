@@ -4,27 +4,19 @@ description: >-
   Golden Group — WEB CINEMATOGRÁFICA 3D nivel awwwards. Construye páginas con escenas 3D
   reales (partículas que ondulan, objetos cromados, nubes que siguen el cursor, cabezas de
   puntos, orbes de vidrio), preloader con contador y cortina de revelado, fondo de video
-  pre-renderizado y movimiento lento de cine. Motor: Three.js por importmap en HTML de un
-  archivo, o React Three Fiber si el proyecto es Next. Método: TOKENS NUMÉRICOS EXACTOS
+  pre-renderizado y movimiento lento de cine. Método: TOKENS NUMÉRICOS EXACTOS
   (milisegundos, grados, radios, hex), jamás adjetivos. Úsala SIEMPRE que el usuario pida:
   una página "espectacular", "como las de awwwards", "con 3D", "futurista", "robótica",
   "cinematográfica", "que se vea cara", "con partículas", "con un objeto que gire", "que se
-  mueva sola", "tipo Apple", "que la gente pregunte qué agencia la hizo"; o cuando muestre
+  mueva sola", "tipo Apple", "que la gente pregunte qué agencia la hizo", una página que se
+  lea haciendo scroll por escenas; o cuando muestre
   de referencia un sitio con escena 3D, fondo animado o preloader. Dispara también para el
-  HERO de una web que ya existe si el encargo es "súbele el nivel visual".
+  HERO de una web que ya existe si el encargo es "súbele el nivel visual". No sirve para
+  producto Shopify COD ni sitio corporativo simple.
 ---
-<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
-     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 952 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
-     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
-     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
-     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
-     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
-<!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leian el cerebro de marca — esta entra a la familia que SI lo lee. Bloque identico en las 6 del CdM + fila a la fabrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
+<!-- Historial completo de esta skill: references/changelog.md. El cuerpo se paga en cada activación; el acta no. -->
 
 # Golden Cinemática — el salto de "página" a "experiencia"
-<!-- skill GC1.4.3 · 2026-08-26 (chat FILTRO, autoridad de FER) · puntero a golden-web/references/estandar-movimiento.md, destilado de review-animations (skill instalada que ninguna Golden nombraba). Esta skill tenia el EFECTO pero no los NUMEROS: medido, 0 menciones de ease-out, scale(0, transform-origin, @starting-style y springs. Solo se anadio el puntero: nada mas tocado. -->
-<!-- skill GC1.4.2 · 2026-08-26 (chat FILTRO, autoridad de FER; golden-cinematica es del CENTRO DE MANDO por REGISTRO-FABRICAS) · references/vocabulario.md: +1 fila, HORIZONTAL SCROLL (seccion con overflow hidden + pista movida por translateX() atada a ScrollTrigger). ORIGEN: carrusel de gowtham_techie con 6 efectos de scroll. MEDIDO antes de tocar: 5 de los 6 ya estaban cubiertos entre esta skill y golden-web (scroll trigger 5/5, pin 13/7, parallax 1/7, scroll progress 0/2, scroll-linked 3/4) y el stack completo tambien (gsap 14, scrolltrigger 10, lenis 5, three 54). El unico en CERO era horizontal scroll. Aporte real del carrusel: 1 de 6, no 6 de 6. Nada mas tocado. -->
-<!-- skill GC1.4.1 · 2026-08-24 (centro de mando, remediación del verificador de cierre): línea de RUTA del cerebro en el Paso 0 (las lectoras ordenaban LÉELO PRIMERO sin decir dónde — un chat limpio no podía ejecutar la orden) + bump que las ediciones del 23-24 dejaron sin subir. -->
 
 ## Paso 0 · Cerebro de marca (obligatorio antes de generar)
 
@@ -35,13 +27,7 @@ antes de continuar; si el usuario pide seguir sin cerebro, se declara en la entr
 se generó sin voz de marca cargada.
 
 
-<!-- skill GC1.4 (2026-08-23) · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR -->
-<!-- skill GC1.3 (2026-08-21) · auditoría golden-skill-auditor: (1) desambigua la cita a `references/estilo-agencia-premium.md` — vive en golden-web, no localmente, se escribía sin dueño y se leía como archivo propio; (2) suma sección "Cuando algo falla o falta" con plan de degradación explícito (CDN caído, sin render de fondo, 60fps no alcanzado en móvil, tokens no entregados por el usuario) — antes no había manejo de error declarado; (3) TOC en references/recetas.md (309 líneas, pasaba el umbral de 300 sin índice). Blindaje: chflags uchg (quitar con chflags -R nouchg, reponer con chflags -R uchg) — mecanismo documentado aquí por primera vez -->
-<!-- skill GC1.2 (2026-08-02) · filtro de 2 reels de efectos (code.xr OTP v5 · code_and_chill MENISCUS): dos familias NUEVAS que el vocabulario no tenia — ESTADOS (success state animado, carga en el boton, validacion en vivo, progreso por segmentos) con la nota de que en contra entrega la confirmacion NO es decoracion sino la venta (el cliente dio sus datos sin pagar y la duda reaparece como cancelacion al confirmar por WhatsApp), y NAVEGACION (morphing dock por path SVG y tangentes, sticky compacto, desplazamiento por vecindad). Ninguno de los 2 reels publica el codigo (piden comentar), asi que se documenta el PATRON, no la receta -->
-<!-- skill GC1.1 (2026-07-27) · filtro de 9 reels: 5 términos nuevos al vocabulario de entrada y revelado (pixel/entrance reveal por grid, smooth loader con máscara, stacked sticky sections, fondo ligado al scroll) con la nota de que se hacen a mano en CSS/JS y no hace falta Framer -->
-<!-- skill GC1.0 (2026-07-25) · nace de un diagnóstico de FER: "las páginas que me has hecho son 10 de 100". Destilado del análisis frame a frame de 6 sitios de Textura Agency (@textura.eu / getlayers.ai), donde se capturó el PROMPT REAL con sus tokens numéricos. El hallazgo central: la diferencia entre 10/100 y 100/100 no es la librería, es que el encargo lleva milisegundos, grados, radios y hex exactos en vez de adjetivos -->
-
-**Versión:** `GC1.4.3` · Fábrica: chat centro de mando.
+**Versión:** `GC1.5.1` · Fábrica: chat centro de mando.
 
 Esta skill existe por una razón concreta: las páginas Golden nombraban las librerías
 correctas y aun así salían genéricas. El diagnóstico fue que **conocer el nombre de la
@@ -98,6 +84,7 @@ Verificados frame a frame en sitios que sí lo logran. Una página cinematográf
 | **Un HTML publicado en Vercel** (lo normal en Golden) | **Three.js por importmap** | Un solo archivo, sin build, sin npm. Ver `references/recetas.md` |
 | Un proyecto Next/React ya existente | **React Three Fiber + drei** | `@react-three/fiber`, `@react-three/drei`, `@react-three/postprocessing` |
 | El cliente no toca código y quiere editar la escena | **Spline** | Escena en spline.design embebida con `<spline-viewer>` |
+| **Página por escenas** (se lee haciendo scroll: propuesta, marca, presentación larga) | **Sin librerías** | CSS `sticky` + canvas 2D en un HTML. 12 piezas y 5 reglas en `references/piezas-pagina-por-escenas.md` |
 
 **Error histórico que esta skill corrige:** recomendar React Three Fiber cuando el
 entregable real es un archivo HTML. R3F necesita build de React — si vas a publicar un
@@ -138,16 +125,31 @@ completa abajo.
 - **Texto legible sobre la escena:** contraste AA real, no "se alcanza a leer"
 - **El CTA se ve sin hacer scroll** y no compite con la animación
 - Modelos comprimidos (draco/meshopt), texturas ≤ 2k, video de fondo ≤ 3 MB y `muted loop playsinline`
+- **Cero letras montadas:** `scripts/barrido_encimes.js` corrido a 390 y a 1280, con la pantalla
+  visible, y su lista de encimes vacía. Una captura no lo demuestra
+- **`overflow-x:clip` en html y body, nunca `hidden`**: `hidden` rompe el `sticky` en Safari iOS
+- **Verificado en un navegador VISIBLE**, con accesos de prueba en `window`: en un panel oculto no
+  corren `requestAnimationFrame` ni `IntersectionObserver`, y las capturas mienten
+- **Toda cifra en pantalla con su fuente consultada y fechada**, enlazada en la página
+- **Todo video lleva póster**
 
 ## Referencias de esta skill
 - `references/vocabulario.md` — **cómo pedir cada efecto por su nombre.** 25 términos en
   español con su equivalente técnico. Empieza SIEMPRE aquí cuando el encargo venga vago
 - `references/recetas.md` — código real y probado: preloader con cortina, partículas que
   ondulan, cromado con reflejos, cursor con inercia, wireframe, scroll cinemático
+- `references/piezas-pagina-por-escenas.md` — la página por escenas sin librerías: 12 piezas con sus
+  números medidos y las 5 reglas. Es una caja de piezas, no una plantilla: cada página elige las suyas
+- `scripts/barrido_encimes.js` — detecta textos montados, escena por escena (contrato en su cabecera)
+- `scripts/puntos_globo.py` — genera los puntos de tierra del globo desde Natural Earth
+  (requisito: Pillow, `pip install pillow`; el TopoJSON se descarga, no viaja en la skill)
+- `scripts/referencia/vidrio_templado.js` — entrada de vidrio que se quiebra. Es de REFERENCIA:
+  su cabecera trae el contrato completo (11 nombres que la página provee) y la advertencia de que
+  un nombre faltante no revienta, se salta la entrada en silencio: tras adaptarla, mirar la consola
 
 ## Encadena con
 - `golden-web` → estructura y blueprints por perfil, con su propia
-  `references/estilo-agencia-premium.md` (tipografía display + springs + aire). Esta skill
+  `golden-web/references/estilo-agencia-premium.md` (tipografía display + springs + aire). Esta skill
   es su capa 3D
 - `golden-web/references/estandar-movimiento.md` → **el estándar NUMÉRICO de cómo se mueve todo**:
   curva por tipo de movimiento, duración de UI bajo 300 ms, nunca `scale(0)`, origen en el disparador,
@@ -180,6 +182,25 @@ completa abajo.
 
 ## Changelog
 
+- **GC1.5.1** (2026-09-24) — Dos fallas del golden-verificador sobre GC1.5. El barrido buscaba
+  textos solo dentro de `<main>`: en una página sin `<main>` daba 0 textos y "sin encimes", un
+  verde falso. Ahora barre el body y se niega si no encuentra textos. La referencia del vidrio
+  declaraba 6 de los 11 nombres que usa ("seg is not defined") y traía vocabulario de la página de
+  origen. Contrato completo medido con un barrido de identificadores libres, nombres genéricos y
+  prueba en Chromium: con el contrato la entrada corre, y sin `seg` se salta en silencio.
+- **GC1.5** (2026-09-24) — Página por escenas como estándar (decisión del CdM del 24-sep: el método
+  de la página por escenas vive aquí, no en golden-presenta). Nuevos `references/piezas-pagina-por-escenas.md`
+  (12 piezas y 5 reglas) y tres scripts. Al entrar se generalizaron dos que venían cableados a su
+  página: `barrido_encimes.js` llamaba a cuatro funciones por nombre fijo y fallaba en cualquier otra
+  página, y `puntos_globo.py` escribía en una carpeta `../sitio` que aquí no existe. El barrido se colgaba
+  sin avisar con la pantalla oculta (innerHeight 0); ahora se niega. Probados los dos en los dos
+  sentidos. Description: sale la frase del motor y entra el disparador de la página por escenas.
+- **GC1.4.4** (2026-09-13) — Auditoría golden-skill-auditor: la description no declaraba
+  frontera explícita ("NO usar para") pese a que el cuerpo sí la tiene en "Fronteras y
+  desambiguacion" — dimensión Activación de la rúbrica lo exige en el frontmatter, que es
+  el único mecanismo de disparo. Se añadió "No sirve para producto Shopify COD ni sitio
+  corporativo simple." al final de la description (952→1016 caracteres, dentro del tope
+  duro de 1024). Verificado con `validar_arsenal.py`: exit 0.
 - **GC1.4.1** (2026-08-24): bump de las ediciones del 24 (verificador de cierre R2: la version vive en 4 caras — sello, linea Version, Changelog y REGISTRO — y el bump anterior toco solo el sello).
 - **GC1.4** (2026-08-23) — Adenda del Centro de Mando: entra a la familia que lee el CEREBRO DE
   MARCA (`golden-brand-brain`) — bloque "Paso 0 · Cerebro de marca" bajo el H1, idéntico en las
@@ -201,3 +222,29 @@ completa abajo.
 ## Fronteras y desambiguacion
 
 NO usar para: página de producto Shopify COD (golden-shopify), sitio funcional sencillo o corporativo estándar (golden-web), ni imágenes sueltas de producto (golden-imagen-arena).
+
+Con `golden-presenta`: las presentaciones tipo diapositivas (láminas, modo presentador, cámara que
+viaja por un lienzo) son de ella. **Las páginas que se leen haciendo scroll por escenas vienen aquí**,
+aunque el encargo diga "propuesta para un cliente".
+
+## Operación de esta skill
+
+Comprobar que está en norma. **Ruta ABSOLUTA siempre: con `.` da fallo falso.**
+```bash
+agentskills validate ~/.claude/skills/golden-cinematica
+python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py ~/.claude/skills/golden-cinematica
+```
+Salida 0 = en norma. Se corre **DESPUÉS** de tocar la `description`, no solo antes.
+Los dos techos NO son el mismo: **1024 VALIDA (duro) · ~1536 TRUNCA en runtime.**
+
+Blindaje. `chflags uchg` y `chmod` conviven en el mismo árbol y **el orden importa**:
+- abrir: `chflags nouchg <ruta>` **primero**, luego `chmod 644`
+- cerrar: `chmod 444` **primero**, luego `chflags uchg`
+- el **directorio** lleva su propio `uchg` + `555`, y hay que abrirlo para crear ficheros
+
+Al revés, el `chmod` choca contra el flag ya puesto y la skill queda de solo lectura pero
+borrable.
+
+Antes de publicar, **el repo de skills es PÚBLICO**: `~/.golden/bin/golden-barrido-publicacion ~/.claude/skills/golden-cinematica`
+
+Historial completo en `references/changelog.md`.

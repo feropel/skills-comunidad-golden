@@ -14,6 +14,7 @@ description: >-
   Para página de producto dropshipping COD usa golden-shopify. Para el portal de la
   comunidad Golden con login/recursos, ese es su propio proyecto.
 ---
+<!-- Historial completo de esta skill: references/changelog.md (2 actas, mudadas el 2026-09-05). El cuerpo se paga en cada activación; el acta no. -->
 
 # Golden Group — Web por Perfil
 
@@ -26,10 +27,36 @@ antes de continuar; si el usuario pide seguir sin cerebro, se declara en la entr
 se generó sin voz de marca cargada.
 
 
-**Versión:** `GW2.9` · Fábrica: este chat.
-<!-- skill GW2.5 · 2026-08-24 (centro de mando, remediación del verificador de cierre): bump que faltó por las ediciones del 24; ESPÉCIMEN cirílico sustituido a nivel de carácter — el sello anterior conservaba dentro las letras que decía haber cazado (un sello que guarda el bicho re-dispara la clase); línea de RUTA del cerebro añadida al Paso 0. -->
-<!-- adenda 2026-08-24 (centro de mando, barrido D + fila del 23-ago; fábrica GW sin sesión activa en toda la semana — ley del chat vivo: ejecuta el CdM y la fábrica revisa al despertar): (1) cazadas letras CIRÍLICAS incrustadas en 'aurora' (línea ~188, u y r cirílicas — invisibles al ojo, rompían todo grep por 'aurora'; barrido unicodedata del archivo completo: 0 residuos); (2) instalado el Paso 0 · Cerebro de marca BAJO el H1, el bloque idéntico de las 6 hermanas — golden-web era la única de las 7 skills de contenido sin él. -->
+**Versión:** `GW2.12` · **Fábrica:** chat «✅ SKILL golden-web» · Blindada con `chflags uchg` (desbloquear con
+`chflags -R nouchg`, reponer con `chflags -R uchg` al cerrar cualquier reparación).
 
+_GW2.12 (2026-09-24) — fila del chat FILTRO aprobada por FER: **Uiverse como fuente de
+componentes**, con licencia MIT y 5 reglas, en `references/estandar-movimiento.md` (sección final). Va
+ahí y no en el catálogo de estilos porque sus reglas son de movimiento. Misma fecha: la fábrica quedó
+declarada como el chat «✅ SKILL golden-web» (antes decía "este chat", sin referente). Corregida la
+regla 3 el mismo día por el golden-verificador: remitía a "curvas de la tabla de duraciones" (la tabla
+no trae curvas) y a un tope de 300 ms que la misma tabla supera en modal y cajón; y no decía qué pasa
+con un loader. Licencia MIT confirmada también en el repositorio de Uiverse en GitHub (su web da 403
+a herramientas automáticas)._
+
+_GW2.11 (2026-09-20) — sub-auditoría golden-skill-auditor (940/1000 antes, sin crítico): único
+hallazgo real con evidencia — `references/estandar-movimiento.md:14` traía el signo de
+interrogación de apertura en el encabezado "debe animarse?", prohibido por el estándar de la casa
+(`estandares-golden.md`, sección 2: cero signos de apertura en todo texto que la skill genere o
+contenga). Corregido: se retira el signo de apertura y queda solo el de cierre. `node --check` de
+`generator_template.js` sigue sin poder
+correr en este Mac (binario ausente, límite de entorno ya declarado en GW2.10, no es hallazgo
+nuevo). Re-verificado con inventario.sh y validar_arsenal.py: exit 0, sin rotas/huérfanos nuevos.
+940 → 955/1000._
+_GW2.10 (2026-09-06) — auditoría golden-skill-auditor (940/1000 antes, sin crítico): (1)
+`references/arte-generativo-templates/generator_template.js` estaba **100% en inglés** —
+contradecía la propia nota de `arte-generativo-golden.md` ("ambos se rescataron... y llevan
+la paleta y el idioma adaptados a Golden") y `viewer.html` sí estaba traducido; traducidos
+todos los comentarios al español manteniendo el código intacto; (2) la skill no tenía
+blindaje pese a estar madura (27 versiones, sin pendientes con dueño) — blindada con
+`chflags -R uchg`, estándar de la casa; (3) `node --check` no verificable en este entorno
+(binario ausente) — declarado como límite del entorno, sintaxis revisada a mano línea por
+línea, sin cambios de lógica._
 _GW2.9 (2026-08-30) — CdM (fila getlayers, filtrada por el FILTRO): **criterio QUÉ VE EL ROBOT**
 para la ruta React/Next (SSR/SSG obligatorio, texto jamás dentro del componente ssr:false,
 PageSpeed 80-90 como criterio) — hueco medido: server-side rendering y PageSpeed en 0 en todo
@@ -387,6 +414,9 @@ resultado de una herramienta que no corrió.
       el popover nace en su disparador, y **solo se animan `transform` y `opacity`** (el 74% del
       tráfico compra en móvil: una animación que salta frames abarata la ficha justo antes de pedir
       la dirección).
+- [ ] Si se usó un componente de **Uiverse**: conserva su comentario de autor y licencia MIT, es
+      sobrio, pasa el estándar de movimiento y no es un loader de pantalla completa en una página de
+      venta (reglas en `references/estandar-movimiento.md`, sección final).
 - [ ] `cyber-neo` corrió si había login/formularios/datos, sin Critical/High abiertos.
 - [ ] Publicado con URL real (no solo localhost) y esa URL se abrió y revisó — el gotcha de Golden Secuencia (frames que no viajan al repo) se verifica siempre en producción, no en local.
 - [ ] Sección GEO/AEO (robots.txt con bots de citación, JSON-LD FAQ/LocalBusiness) presente si el sitio es de negocio real.

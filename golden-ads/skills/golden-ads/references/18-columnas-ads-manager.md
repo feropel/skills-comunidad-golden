@@ -19,8 +19,12 @@ seguir el dinero desde que se muestra el anuncio hasta la venta. Así se ve **d�
 > A pedido ("dame las columnas que debe tener la cuenta") → genera un **documento** con estos 3 sets.
 
 ## ⭐ SET MAESTRO GOLDEN (absorbido del preset real del usuario 09.2025 + mejoras)
-Estas son las **26 columnas personalizadas reales de Golden** (preset "Métricas Personalizadas") +
-**6 mejoras** que faltaban (marcadas ➕). Es el set autoritativo; los 3 sets de abajo son el "por qué".
+Estas son las columnas del preset real de Golden ("Métricas Personalizadas", 09.2025) **más las
+mejoras marcadas ➕**. Es el set autoritativo; los 3 sets de abajo son el "por qué".
+> 📏 CONTEO MEDIDO 2026-09-05 — la lista de abajo tiene **36 entradas, 8 de ellas ➕**. El texto
+> decía "26 + 6" heredado del PDF original y **ya no cuadra con la lista**: la lista creció y el
+> encabezado no. Manda LA LISTA, no la cifra. (Además algunas entradas valen más de una columna
+> en Ads Manager: ThruPlay + costo, ATC + costo, y las 3 clasificaciones de subasta.)
 Ordenado por embudo. Nombre → fórmula/config.
 
 **Entrega/costo:** Entrega · Presupuesto · Importe gastado · **CPM** · **Frecuencia**
@@ -42,7 +46,7 @@ en la cuenta real del usuario (preset FER 2026); es de las métricas pro más va
 **Diagnóstico subasta:** ➕ **Clasificación de calidad / interacción / conversión**
 **Ident:** Identificador del anuncio
 
-> Las 6 ➕ son mi recomendación experta sobre el preset del usuario: hook/hold rate (tenía el 3s/100%
+> Las ➕ son mi recomendación experta sobre el preset del usuario: hook/hold rate (tenía el 3s/100%
 > crudos, no las tasas), costo por conversación WhatsApp (tenía la tasa, no el costo), ATC (escalón
 > faltante), clasificaciones (subasta) y ROAS pagado COD. Al aplicar: es preset de UI → se guarda a
 > mano en Ads Manager (el MCP no fija la vista); por MCP se sacan los datos ya en este orden.

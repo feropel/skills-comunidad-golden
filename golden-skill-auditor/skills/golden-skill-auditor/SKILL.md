@@ -15,6 +15,8 @@ description: >-
   "auditar": basta con que pida diagnóstico o mejora de una skill existente.
 ---
 
+**Fábrica:** chat «✅ SKILL golden-skill-auditor»
+
 ## 🔴 MANDATO DE FER · 2026-09-03 · ESTO NO PUEDE VOLVER A PASAR NUNCA
 
 **Palabras de FER:** *"Tenemos un auditor de skills. Ese auditor tenía que haberse dado cuenta y no se dio cuenta. Dale la instrucción para que esto no vuelva a pasar nunca jamás: que mire y evalúe siempre TODAS las skills. Tiene que auditar cada una de las skills, que esté bien redactado, que esté bien conectado, que no se pase de los topes, todo, todo, todo. Que las estructuras tengan absolutamente todo. Y que esa skill también se autoevalúe."*
@@ -31,14 +33,19 @@ python3 scripts/validar_arsenal.py <ruta-de-la-skill>      # una skill
 python3 scripts/validar_arsenal.py --casa                  # las 39 de la casa
 python3 scripts/validar_arsenal.py                         # el arsenal entero
 ```
-Salida `0` limpio · `1` hay fallos · `2` no se pudo leer. **Si sale 1, la skill no pasa de 700/1000**, por perfecta que sea en las 7 dimensiones. La compuerta está escrita en `references/rubrica.md`.
+Salida `0` limpio · `1` hay fallos · `2` no se pudo leer. **Si sale 1, la skill no pasa de 700/1000**, por perfecta que sea en las 7 dimensiones. La compuerta está escrita en `references/rubrica.md`. `validar_arsenal.py` importa internamente `scripts/conexiones.py` (chequeo de CONEXIONES, encargo de FER 2026-09-03: rutas internas rotas + nombres golden-* huérfanos, resueltos contra skills/agentes/memoria/familias de prefijo) — no se corre suelto, siempre a través del validador.
 
-**2. AUTOEVALUARSE PRIMERO, ANTES DE JUZGAR A NADIE.** Al dispararse, esta skill se audita a sí misma antes que a cualquier otra:
+**2. AUTOEVALUARSE PRIMERO, ANTES DE JUZGAR A NADIE — Y AUTOREPARARSE SI HACE FALTA.** Al dispararse, para CUALQUIER tarea (auditar otra skill, o que te llamen sin nombrar ninguna), esta skill se audita a sí misma antes que a cualquier otra, SIEMPRE, sin excepción:
 ```
+bash scripts/inventario.sh ~/.claude/skills/golden-skill-auditor
 python3 scripts/autoprueba_arsenal.py     # 23 casos, en las dos direcciones
 python3 scripts/validar_arsenal.py ~/.claude/skills/golden-skill-auditor
 ```
-**Si la autoprueba no pasa, el validador NO SE USA para juzgar a nadie**, y se dice en el informe. Un auditor que no se puede auditar a sí mismo no tiene autoridad para calificar a otro. Y si esta skill se cae en su propia validación, eso va **primero** en el informe, antes que el hallazgo de la skill que se venía a revisar.
+Mandato de FER (2026-09-05): "de ti depende que todas [las skills] estén siempre al 100% funcionales" — por eso esta skill no se conforma con REPORTAR su propio hallazgo, se AUTORREPARA en el acto: si `inventario.sh` marca algo real (🔴, o un DUDOSO que al mirarlo a mano resulta ser un hallazgo genuino), corrígelo tú mismo aquí y ahora (backup en `~/.claude/skill-backups/`, arregla, re-verifica con el mismo script, re-blinda) ANTES de seguir con la tarea que te pidieron — no lo dejes anotado para "otra vez". Esto es la misma disciplina que ya aplicas a cualquier skill golden-*, aplicada primero a ti mismo: no le exigirías a otra skill que reporte un 🔴 y siga como si nada, así que tú tampoco.
+
+**Si la autoprueba del arsenal no pasa** (los 23 casos de `autoprueba_arsenal.py`), eso SÍ no se autorrepara a ciegas — es el propio criterio de juicio el que falló, y corregirlo mal podría dejarlo sordo a una clase entera de fallos reales. El validador NO SE USA para juzgar a nadie hasta que se arregle con evidencia y se re-corra la autoprueba completa, y eso va **primero** en el informe, antes que el hallazgo de la skill que se venía a revisar.
+
+**Definición de "sigo siendo mil":** 0 referencias rotas propias, 0 huérfanos confirmados, autoprueba del arsenal en verde, validador en exit 0 contra sí misma. Si algo de eso falla y se repara en el acto, informa brevemente qué se arregló (una línea basta) — no hace falta re-narrar todo el proceso cada vez, pero tampoco callarlo.
 
 **3. TODO, TODO, TODO — las cuatro caras que hay que mirar en cada skill:**
 - **Que no se pase de los topes.** `name` 1-64 minúsculas con guiones simples y **coincidiendo con la carpeta** (si no coincide, la skill NO CARGA) · `description` **1-1024 DURO** · `compatibility` 1-500 · YAML válido y sin campos ajenos al frontmatter. Cuerpo de más de 500 líneas es **aviso, no falla**.
@@ -56,6 +63,11 @@ python3 scripts/validar_arsenal.py ~/.claude/skills/golden-skill-auditor
 
 # Golden Skill Auditor — auditoría y reparación de skills mil de mil
 
+<!-- skill v1.21 — 2026-09-26 — Centro de Mando, auditoría del ecosistema. (1) `validar_arsenal.py` revisaba SOLO la primera ruta: con `~/.claude/skills/golden-*` el shell le entrega 41 y el informe decía "UNIVERSO: 1 · 1 de 1 sanas" con salida 0. Un verde sobre un universo que nadie eligió. Ahora recorre todas, sin duplicar, y se niega en voz alta ante una ruta que no existe. Caso nuevo en `autoprueba_arsenal.py` con la mala SEGUNDA a propósito (31 de 31), y un mutante que mira solo la primera la hace fallar; el mutante entra por la variable VALIDAR_ARSENAL_MUTANTE. Corrido sobre el arsenal: 41 de 41, 38 sanas, 3 con aviso, 0 fallos, igual que una por una. (2) Dos credenciales FALSAS de `autoprueba_inventario.sh` se arman partidas, para que el repositorio público no las muestre de corrido (la compuerta de publicación las acusaba). El archivo sembrado queda idéntico: 194 de 194, mismas líneas antes y después. Reportado a la fábrica. -->
+<!-- skill v1.20 — 2026-09-05 — el VERIFICADOR ADVERSARIAL tumbo cuatro cosas de la v1.19 el mismo dia, y las cuatro eran la clase que la v1.19 decia cerrar. (F6) `DECLARA_INEXISTENCIA` era ella misma una alfombra: un `any(w in frase)` sin ninguna comprobacion, asi que bastaba escribir "planeado" para tapar una cita muerta real — y el caso peligroso pasaba igual ("la skill `X` aun no la usamos, PERO ES LA QUE CORRE EL CIERRE" quedaba exenta). Se borra la lista entera: la existencia de una skill se comprueba con os.path.exists, no leyendo un adjetivo. (F9) Al ir a cubrir `EXCUSAS_CONDICIONALES` con un caso de banco se descubrio que su justificacion escrita era FALSA: RX_NOMBRE solo captura tokens `golden*` y `fer*`, o sea que el detector nunca pudo ver un `ripgrep`. La lista llevaba versiones apagando avisos del universo que esta skill SI controla, bajo una coartada que no correspondia a nada. Tambien se borra, con su cortador de frases, que quedo sin llamadores. (F8) La puerta CSS miraba el DOCUMENTO entero: bastaba declarar `--golden-x` en cualquier punto para tapar una cita real a `golden-x` en otro; ahora se exige que TODAS las apariciones vayan precedidas de `--`. (F7) El corte de frase no reconocia vinetas, asi que una lista sin puntuacion final era UNA frase y una excusa en el ultimo item silenciaba los de arriba. Banco de 11 a 19 casos: 9 fallas antes, 0 despues, y cada pieza con sabotaje aislado que la hace morder. Sobre las 189 skills: 30 referencias rotas y 3 avisos, los tres VERDADEROS. -->
+<!-- skill v1.19 — 2026-09-05 — barrido de LISTAS DE EXCEPCION del arsenal (encargo del Centro de Mando, misma clase que el B8 de golden-chatea-auditoria). conexiones.py traia una lista de excusas en prosa ("si el equipo", "si lo tiene", "opcional", "atajo", "si existe") que apagaba el aviso de cita muerta si alguna aparecia en +-120 caracteres alrededor del token. DOS defectos medidos con banco: (1) CONTAGIO POR PROXIMIDAD — la palabra "atajo" de una frase anterior, sin relacion, silenciaba una cita limpia; la ventana ademas se calculaba con prosa.find(), la PRIMERA aparicion del token en todo el documento y no la que se juzgaba. (2) La excusa se aplicaba tambien al ARSENAL PROPIO: una skill golden-* citada y ausente quedaba callada por decir "opcional" — pero "opcional" habla de si se USA, no de si EXISTE. Arreglado: la excusa se mide sobre la FRASE (corte por fin de frase y por parrafo, no por salto de linea simple: en Markdown el texto va envuelto y cortar por \n partia la frase en dos), y sobre golden-* no aplica en absoluto. Se exime solo la SINTAXIS (--golden-gold es variable CSS, se distingue por el guion doble, no por una lista de nombres) y la declaracion explicita de INEXISTENCIA ("planeado, no construido todavia", "nombre de trabajo") — que ya reporta el hallazgo, a diferencia de la de OPCIONALIDAD, que lo tapa. Nace scripts/autoprueba_conexiones.py (11 casos): 4 fallas antes del arreglo, 0 despues. Corrido sobre las 189 skills instaladas: 30 referencias rotas y 2 avisos. Se decidio NO eximir "por ejemplo" pese a dejar 1 aviso vivo en golden-video-editor: 2 avisos en 189 skills es senal, y ensanchar la lista para bajar a 1 es la pendiente que este mismo barrido combate. -->
+<!-- skill v1.18 — 2026-09-05 — mandato de FER: "de ti depende que todas [las skills] estén siempre al 100% funcionales", así que el punto 2 (autoevaluarse primero) deja de ser solo un chequeo que se REPORTA — ahora se AUTORREPARA en el acto si inventario.sh encuentra algo real, cada vez que esta skill se dispara, para cualquier tarea. El validador de arsenal (autoprueba de 23 casos) sigue aparte: si ESE falla, no se autorrepara a ciegas, porque es el propio criterio de juicio el que está en duda. Nueva "definición de sigo siendo mil" explícita al final del punto 2. -->
+<!-- skill v1.17 — 2026-09-05 — auto-auditoría pidió el mil de mil (FER). Dos hallazgos reales en el propio inventario.sh: (1) scripts/conexiones.py (import interno de validar_arsenal.py, encargo de FER 2026-09-03) solo estaba cubierto por el glob amplio scripts/* → DUDOSO; se agregó cita explícita en la sección del validador de arsenal. (2) un ejemplo ilustrativo dentro de un comentario de conexiones.py ("scripts/x.json...") se leía como cita real y salía 🔴 rota — reescrito sin el patrón de ruta literal. Re-verificado con inventario.sh: 0 rotas, 0 dudosos nuevos. -->
 <!-- skill v1.16 — 2026-08-22 — Fase 7 nueva: "Conectar con el Centro de Mando", SIEMPRE, sin excepción — al cerrar cualquier auditoría (con o sin reparación) se reporta a 🧠 GOLDEN - CENTRO DE MANDO vía mcp__ccd_session_mgmt__send_message, y al reparar cualquier skill golden-* se verifica/instala que su changelog declare esa conexión. Nuevo estándar 9 en estandares-golden.md (dimensión 6 de la rúbrica) para que esto se propague a TODAS las auditorías futuras, no solo a esta skill. Regla de FER: el Centro de Mando debe saber TODO — cambios, mejoras, y también cuando no hubo nada que mejorar — para que el ecosistema funcione como un solo sistema conectado, no skills sueltas. -->
 <!-- skill v1.15 — 2026-08-22 — Regla nueva en Modos de operación: cada invocación es una auditoría FRESCA, siempre — nunca se abrevia ni se omite por "ya se auditó" (ni por el propio auditor un segundo antes). Instrucción de FER: aunque hayan pasado segundos entre una reparación y el siguiente pedido de auditoría, corre el protocolo completo de nuevo leyendo el archivo tal como está en ese momento, sin reciclar el veredicto anterior de memoria. -->
 <!-- skill v1.14 — 2026-08-22 — Fase 0 punto 0 nuevo: "no nombró skill" ya NO dispara pregunta genérica. Hallazgo real de campo: en el chat ✅ SKILL golden-chatea-operacion, invocar el auditor sin nombre disparó la pregunta "sobre cuál corro la auditoría" pese a que el chat entero trataba de esa skill — el dato ya estaba en el contexto y no se leyó (misma fuga que feedback_datos_reales_antes_de_generar en otros dominios). Regla de FER: cada chat de Golden vive alrededor de UNA skill; sin nombre explícito, el objetivo se infiere del tema del chat, se informa cuál se dedujo, y solo se pregunta si el chat mismo es genuinamente ambiguo (dos skills en juego, o un chat sin skill propia como el Centro de Mando). Autonomía Golden actualizada para reflejarlo. -->
@@ -75,6 +87,52 @@ python3 scripts/validar_arsenal.py ~/.claude/skills/golden-skill-auditor
 <!-- v1.0 · rúbrica 1000 pts / 7 dimensiones · inventario por script · protocolo de reparación con blindaje -->
 
 Esta skill convierte cualquier skill instalada en una skill de nivel comunidad: la lee entera, la mide contra una rúbrica fija de 1000 puntos, entrega un informe accionable y aplica los arreglos. El estándar de salida es el mismo que ya alcanzaron golden-investigacion-mercado y golden-pdf-check: lista para usarse mil veces sin supervisión.
+
+## Las listas de excepción de esta skill (y de cualquier validador)
+
+Todo validador acumula excepciones para no gritar en falso, y **una lista blanca que
+crece para silenciar hallazgos deja de ser catálogo y pasa a ser alfombra**. Esta skill
+juzga a las demás, así que hoy **no tiene ninguna lista de excusas en prosa**: tuvo dos
+y las dos cayeron el mismo día, ante el verificador adversarial.
+
+- `EXCUSAS_CONDICIONALES` se justificaba como "usa `ripgrep` si lo tiene en el PATH".
+  **Esa justificación era falsa:** `RX_NOMBRE` solo captura tokens `golden*` y `fer*`, o
+  sea que el detector nunca pudo ver una herramienta de terceros. La lista llevaba
+  versiones apagando avisos del universo que esta skill *sí* controla, bajo una coartada
+  que no correspondía a nada.
+- `DECLARA_INEXISTENCIA` se justificaba como "'planeado, no construido' ya reporta el
+  hallazgo". Bastaba una palabra, sin comprobación alguna, y tapaba incluso la frase que
+  decía que la skill **se usa**.
+
+**La regla que queda: la existencia se comprueba con `os.path.exists`, no leyendo un
+adjetivo.** Ninguna declaración en prosa, del signo que sea, sustituye a esa comprobación.
+Los 3 avisos que esto deja en 189 skills son verdaderos, y por eso se quedan.
+
+Si alguna vez vuelve a hacer falta una excepción, se somete a estas reglas duras:
+
+1. **La excusa alcanza a su FRASE, nunca a sus vecinos.** Una ventana de ±N caracteres
+   no respeta frases: medido el 2026-09-05, la palabra "atajo" escrita para otra cosa
+   silenciaba una cita limpia a 60 caracteres de distancia. El corte es por fin de frase
+   y por párrafo — nunca por salto de línea simple, porque en Markdown el texto va
+   envuelto y eso parte una frase en dos.
+2. **Ninguna excusa exime al universo que la skill SÍ controla.** Una skill `golden-*`
+   existe o no existe en `~/.claude/skills`, y eso se comprueba. "Opcional" describe si
+   se **usa**, no si **existe**. Las excusas condicionales quedan para herramientas de
+   terceros (`ripgrep`, `jq`, `fd`), que sí pueden faltar.
+3. **Se exime una declaración de INEXISTENCIA, jamás una de OPCIONALIDAD.** "Planeado,
+   no construido todavía" ya reporta el hallazgo — el autor lo dijo. "Opcional" no dice
+   nada sobre si existe: tapa. Esa es la línea entera entre un control y una alfombra.
+
+Lo que no es una cita se distingue por **sintaxis**, no por una lista de nombres
+permitidos: `--golden-gold` lleva guion doble porque es una variable CSS.
+
+Banco de regresión: `python3 scripts/autoprueba_conexiones.py` (19 casos, salida 0 =
+pasa). **Se corre después de tocar `RX_ARSENAL_PROPIO` o `_solo_como_variable_css`.**
+**Y debe MORDER ante el sabotaje aislado de cada pieza**: un banco que solo prueba el
+efecto combinado no protege ninguna de las partes. Antes de añadir una entrada a cualquiera de esas listas, la
+pregunta obligatoria es la del mandato: *¿esta entrada entró para que el validador
+dejara de gritar sobre algo que sí es una anomalía?* Si la respuesta es sí, no es una
+excepción: es un hallazgo enterrado, y sale a un control propio.
 
 **Principio rector:** una skill se audita como se auditaría un empleado nuevo — no por lo que dice que hace, sino por lo que un modelo que la lea por primera vez lograría hacer con ella. Cada hallazgo debe responder: "si Claude ejecuta esta skill mañana en un chat limpio, dónde se tropieza".
 

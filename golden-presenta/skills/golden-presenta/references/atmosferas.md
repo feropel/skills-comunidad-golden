@@ -15,7 +15,7 @@ Se elige atmósfera, paleta y tipografía por el asunto del que se habla, no por
 5. Por qué WebGL puro y no Three.js
 6. Rendimiento y degradación
 
-## 1 · Las 9 atmósferas
+## 1 · Los 8 fondos vivos y la opción `ninguna`
 
 Todas se tiñen solas con los tokens de marca del deck (`--accent`, `--accent-2`, `--bg`).
 Cambiar la paleta cambia el fondo: no hay un solo color escrito en el motor.
@@ -111,7 +111,7 @@ Decisión medida, no preferencia:
 - **Hallazgo registrado en el Centro de Mando:** un fragment shader de ~1 KB, interactivo
   al puntero, sostiene el framerate en móvil donde una escena Three.js no. En tráfico móvil
   de Golden eso no es un detalle.
-- **Coste real medido:** las 8 atmósferas juntas ocupan 17 KB dentro del archivo. Three.js
+- **Coste real medido:** los 8 fondos vivos juntos ocupan 21 KB dentro del archivo (medido: `ls -l assets/atmosferas.js`). Three.js
   solo, minificado, ronda los 600 KB.
 
 `golden-cinematica` sigue siendo la skill cuando el encargo necesita una escena 3D de

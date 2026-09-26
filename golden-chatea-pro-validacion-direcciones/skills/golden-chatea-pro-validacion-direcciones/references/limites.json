@@ -1,0 +1,348 @@
+{
+  "_meta": {
+    "que_es": "DATO DURO de esta skill. El criterio de codigo postal, el dato rey de ultima milla y el contrato de salida viven AQUI, no en la prosa del cuerpo. scripts/validar_pack.py los EJERCE contra cada pack: si un pack contradice este archivo, falla.",
+    "por_que_existe": "La familia de skills de Chatea ya se rompio dos veces por la misma clase de defecto: (1) Mexico heredo de Colombia un 'NUNCA exijas codigo postal' que en Mexico es FALSO, y (2) una hermana prometia 10 paises en la description con 7 en el JSON. Un criterio que solo vive en prosa se clona mal y nadie lo nota. Un criterio que vive en un dato que el codigo lee, no.",
+    "regla": "El pais es PARAMETRO, no PUERTA (FER 2026-09-06). Que un pais NO este en esta lista no lo prohibe: significa pack pendiente. Se investiga, se genera igual y se anade aqui.",
+    "actualizado": "2026-09-08",
+    "fuentes_cp": "Formatos verificados 2026-09-08 contra la tabla de formatos postales de Wikipedia (List of postal codes). Costa Rica verificado ademas contra prensa y fuentes culturales por su sistema de referencias.",
+    "universo": 23
+  },
+  "contrato_salida": {
+    "senal_positiva": "direccion correcta",
+    "senal_positiva_literal": "dirección correcta",
+    "critico": "La senal POSITIVA es literal y NO se traduce en ningun pais, ni siquiera en Brasil o en Europa. El flujo del logistico la lee como senal de maquina para avanzar; traducida, el flujo no la reconoce y el pedido se queda parado.",
+    "senal_negativa_produccion": "falta que proporcione [dato]",
+    "senal_negativa_patron_oro": "Para completar su envío, nos regala [el dato que falta]?",
+    "divergencia_declarada": "El JSON de produccion de Golden usa 'falta que proporcione'; los packs usan una formula cordial. La description de la skill trae la de produccion. NO se ha podido verificar si el flujo hace match por texto sobre la senal NEGATIVA: eso exige entrar a un espacio vivo. El validador exige literal solo la POSITIVA, que es la unica verificablemente critica, y no toca la negativa.",
+    "prohibido_en_la_linea": [
+      "saludo",
+      "explicacion",
+      "emoji",
+      "mas de una linea"
+    ],
+    "formas_negativas_medidas": {
+      "total": 17,
+      "de_23_packs": 23,
+      "medido": "2026-09-08, contando la linea '• Falta info →' de los 23 packs. Este dato decia '2 formas' y era FALSO: lo corrigio una verificacion adversarial.",
+      "legitimas": "12 son traducciones, una por cada pack no hispanohablante. Que la peticion al cliente vaya en su idioma es el diseno.",
+      "🔴 deriva": "En ESPANOL hay 6 variantes entre paises hermanos sin ninguna regla que lo explique: 'nos comparte' (5 packs), 'nos regala' (3), 'nos pasas' (Argentina, voseo justificado), 'nos indicas' (Chile), 'nos puedes indicar' (Espana), 'nos compartes' con emoji (Mexico). El voseo argentino y el tuteo espanol responden al registro del pais; el resto es deriva de haberse copiado en momentos distintos. No rompe nada hoy, pero es una inconsistencia real y esta sin decidir.",
+      "emoji_en_la_negativa": "Solo Mexico, que declara emojis por diseno. La negativa no es senal de maquina, asi que no se toca; la POSITIVa de Mexico si se limpio el 2026-09-08 (llevaba '✅ direccion correcta')."
+    }
+  },
+  "topes": {
+    "campo_nativo": 8000,
+    "campo_nativo_ruta": "Configuracion Asistente Logistico > CONFIRMACIONES > Analisis de direccion > Prompt de analisis de direccion",
+    "campo_nativo_medido": "2026-09-08, video del panel grabado por FER: el contador marcaba 7.833/8.000 en el espacio de referencia.",
+    "margen_recomendado": 600,
+    "bot_field_escapado": 19000,
+    "bot_field_nombre": "[Logistico] Confirmaciones",
+    "bot_field_llave": "analisis_direccion.prompt_analisis",
+    "caduca": "El 'el logistico no tiene tope' fue VERDAD en agosto (TOPES-NATIVOS-POR-CAMPO.md, 07-ago) y FALSO en septiembre. Este 8.000 es la ultima medida, no una garantia: se mira el contador del panel antes de escribir.",
+    "al_pasarse": "No da error. Se guarda CORTADO y el panel se ve normal. Un prompt de validacion cortado valida peor y deja pasar direcciones malas, que es justo lo que esta skill existe para evitar."
+  },
+  "paises": {
+    "COLOMBIA": {
+      "nombre": "Colombia",
+      "iso2": "CO",
+      "region": "LATAM",
+      "idioma": "es",
+      "cp_requerido": false,
+      "cp_formato": "NNNNNN",
+      "cp_nota": "Existe pero la ultima milla no lo usa: mandan barrio y referencias.",
+      "dato_rey": "barrio + nomenclatura via/numeros",
+      "registro": "usted",
+      "pack": "colombia.md",
+      "patron_oro": true
+    },
+    "MEXICO": {
+      "nombre": "Mexico",
+      "iso2": "MX",
+      "region": "LATAM",
+      "idioma": "es",
+      "cp_requerido": true,
+      "cp_formato": "NNNNN",
+      "cp_nota": "REQUERIDO: define la zona de reparto de la paqueteria. Es la trampa historica de esta familia.",
+      "dato_rey": "colonia + codigo postal",
+      "registro": "usted",
+      "pack": "mexico.md"
+    },
+    "CHILE": {
+      "nombre": "Chile",
+      "iso2": "CL",
+      "region": "LATAM",
+      "idioma": "es",
+      "cp_requerido": false,
+      "cp_formato": "NNNNNNN",
+      "cp_nota": "El consumidor no maneja su CP; el despacho se asigna por COMUNA.",
+      "dato_rey": "comuna",
+      "registro": "usted",
+      "pack": "chile.md"
+    },
+    "ECUADOR": {
+      "nombre": "Ecuador",
+      "iso2": "EC",
+      "region": "LATAM",
+      "idioma": "es",
+      "cp_requerido": false,
+      "cp_formato": "NNNNNN",
+      "cp_nota": "Casi no se usa en ultima milla; mandan interseccion, ciudadela y referencia.",
+      "dato_rey": "interseccion de calles + ciudadela",
+      "registro": "usted",
+      "pack": "ecuador.md"
+    },
+    "PANAMA": {
+      "nombre": "Panama",
+      "iso2": "PA",
+      "region": "LATAM",
+      "idioma": "es",
+      "cp_requerido": false,
+      "cp_formato": "NNNN",
+      "cp_nota": "No se usa en ultima milla.",
+      "dato_rey": "corregimiento + barriada",
+      "registro": "usted",
+      "pack": "panama.md"
+    },
+    "PERU": {
+      "nombre": "Peru",
+      "iso2": "PE",
+      "region": "LATAM",
+      "idioma": "es",
+      "cp_requerido": false,
+      "cp_formato": "NNNNN",
+      "cp_nota": "La ultima milla se ordena por DISTRITO, no por CP.",
+      "dato_rey": "distrito",
+      "registro": "usted",
+      "pack": "peru.md"
+    },
+    "PARAGUAY": {
+      "nombre": "Paraguay",
+      "iso2": "PY",
+      "region": "LATAM",
+      "idioma": "es",
+      "cp_requerido": false,
+      "cp_formato": "NNNN",
+      "cp_nota": "No se usa en ultima milla.",
+      "dato_rey": "barrio + esquina (c/ y e/)",
+      "registro": "usted",
+      "pack": "paraguay.md"
+    },
+    "GUATEMALA": {
+      "nombre": "Guatemala",
+      "iso2": "GT",
+      "region": "LATAM",
+      "idioma": "es",
+      "cp_requerido": false,
+      "cp_formato": "NNNNN",
+      "cp_nota": "El CP existe pero manda la ZONA, que es el dato estructural del pais.",
+      "dato_rey": "zona",
+      "registro": "usted",
+      "pack": "guatemala.md"
+    },
+    "ARGENTINA": {
+      "nombre": "Argentina",
+      "iso2": "AR",
+      "region": "LATAM",
+      "idioma": "es",
+      "cp_requerido": true,
+      "cp_formato": "ANNNNAAA (CPA) o NNNN legacy",
+      "cp_nota": "REQUERIDO: el CPA se usa de verdad en e-commerce. Se acepta el de 4 digitos, que sigue siendo comun.",
+      "dato_rey": "calle + altura + localidad/partido + CP",
+      "registro": "vos",
+      "pack": "argentina.md"
+    },
+    "BRASIL": {
+      "nombre": "Brasil",
+      "iso2": "BR",
+      "region": "LATAM",
+      "idioma": "pt",
+      "cp_requerido": true,
+      "cp_formato": "NNNNN-NNN (CEP)",
+      "cp_nota": "REQUERIDO y es EL dato rey del pais: toda la logistica brasilena se ordena por CEP. Sin CEP no hay envio.",
+      "dato_rey": "CEP + numero + complemento",
+      "registro": "voce",
+      "pack": "brasil.md"
+    },
+    "VENEZUELA": {
+      "nombre": "Venezuela",
+      "iso2": "VE",
+      "region": "LATAM",
+      "idioma": "es",
+      "cp_requerido": false,
+      "cp_formato": "NNNN o NNNN-A",
+      "cp_nota": "Existe pero la ultima milla no lo pide; mandan urbanizacion y referencias.",
+      "dato_rey": "urbanizacion + referencia",
+      "registro": "usted",
+      "pack": "venezuela.md"
+    },
+    "COSTA_RICA": {
+      "nombre": "Costa Rica",
+      "iso2": "CR",
+      "region": "LATAM",
+      "idioma": "es",
+      "cp_requerido": false,
+      "cp_formato": "NNNNN",
+      "cp_nota": "El CP existe desde 2007 pero NADIE lo usa. Costa Rica no direcciona por calles: direcciona por REFERENCIAS, metros y puntos cardinales. Es el pais mas distinto de todos y clonar cualquier otro pack aqui lo rompe entero.",
+      "dato_rey": "punto de referencia + metros + rumbo cardinal",
+      "registro": "usted",
+      "pack": "costa-rica.md"
+    },
+    "ESPANA": {
+      "nombre": "Espana",
+      "iso2": "ES",
+      "region": "EUROPA",
+      "idioma": "es",
+      "cp_requerido": true,
+      "cp_formato": "NNNNN",
+      "cp_nota": "REQUERIDO en toda Europa. Los dos primeros digitos son la provincia.",
+      "dato_rey": "calle + numero + piso/puerta + CP",
+      "registro": "tu",
+      "pack": "espana.md"
+    },
+    "PORTUGAL": {
+      "nombre": "Portugal",
+      "iso2": "PT",
+      "region": "EUROPA",
+      "idioma": "pt",
+      "cp_requerido": true,
+      "cp_formato": "NNNN-NNN",
+      "cp_nota": "REQUERIDO. Los 3 digitos tras el guion afinan la calle: sin ellos la entrega se degrada.",
+      "dato_rey": "rua + numero de policia + andar + CP",
+      "registro": "voce",
+      "pack": "portugal.md"
+    },
+    "RUMANIA": {
+      "nombre": "Rumania",
+      "iso2": "RO",
+      "region": "EUROPA",
+      "idioma": "ro",
+      "cp_requerido": true,
+      "cp_formato": "NNNNNN",
+      "cp_nota": "REQUERIDO, 6 digitos.",
+      "dato_rey": "strada + numar + bloc/scara/apartament + CP",
+      "registro": "formal",
+      "pack": "rumania.md"
+    },
+    "POLONIA": {
+      "nombre": "Polonia",
+      "iso2": "PL",
+      "region": "EUROPA",
+      "idioma": "pl",
+      "cp_requerido": true,
+      "cp_formato": "NN-NNN",
+      "cp_nota": "REQUERIDO, con guion obligatorio.",
+      "dato_rey": "ulica + numer domu/mieszkania + CP",
+      "registro": "formal",
+      "pack": "polonia.md"
+    },
+    "HUNGRIA": {
+      "nombre": "Hungria",
+      "iso2": "HU",
+      "region": "EUROPA",
+      "idioma": "hu",
+      "cp_requerido": true,
+      "cp_formato": "NNNN",
+      "cp_nota": "REQUERIDO, 4 digitos. El orden hungaro es INVERSO: primero la ciudad, luego la calle.",
+      "dato_rey": "iranyitoszam + utca + hazszam + emelet/ajto",
+      "registro": "formal",
+      "pack": "hungria.md"
+    },
+    "ESLOVENIA": {
+      "nombre": "Eslovenia",
+      "iso2": "SI",
+      "region": "EUROPA",
+      "idioma": "sl",
+      "cp_requerido": true,
+      "cp_formato": "NNNN",
+      "cp_nota": "REQUERIDO, 4 digitos.",
+      "dato_rey": "ulica + hisna stevilka + CP",
+      "registro": "formal",
+      "pack": "eslovenia.md"
+    },
+    "ESLOVAQUIA": {
+      "nombre": "Eslovaquia",
+      "iso2": "SK",
+      "region": "EUROPA",
+      "idioma": "sk",
+      "cp_requerido": true,
+      "cp_formato": "NNN NN",
+      "cp_nota": "REQUERIDO, con espacio en medio.",
+      "dato_rey": "ulica + supisne/orientacne cislo + CP",
+      "registro": "formal",
+      "pack": "eslovaquia.md"
+    },
+    "CROACIA": {
+      "nombre": "Croacia",
+      "iso2": "HR",
+      "region": "EUROPA",
+      "idioma": "hr",
+      "cp_requerido": true,
+      "cp_formato": "NNNNN",
+      "cp_nota": "REQUERIDO, 5 digitos.",
+      "dato_rey": "ulica + kucni broj + CP",
+      "registro": "formal",
+      "pack": "croacia.md"
+    },
+    "GRECIA": {
+      "nombre": "Grecia",
+      "iso2": "GR",
+      "region": "EUROPA",
+      "idioma": "el",
+      "cp_requerido": true,
+      "cp_formato": "NNN NN",
+      "cp_nota": "REQUERIDO, con espacio en medio. Las direcciones suelen ir en alfabeto griego y tambien transliteradas.",
+      "dato_rey": "odos + arithmos + orofos + CP",
+      "registro": "formal",
+      "pack": "grecia.md"
+    },
+    "BULGARIA": {
+      "nombre": "Bulgaria",
+      "iso2": "BG",
+      "region": "EUROPA",
+      "idioma": "bg",
+      "cp_requerido": true,
+      "cp_formato": "NNNN",
+      "cp_nota": "REQUERIDO, 4 digitos. Direcciones en cirilico y transliteradas.",
+      "dato_rey": "ulitsa + nomer + blok/vhod/etazh + CP",
+      "registro": "formal",
+      "pack": "bulgaria.md"
+    },
+    "CHEQUIA": {
+      "nombre": "Republica Checa",
+      "iso2": "CZ",
+      "region": "EUROPA",
+      "idioma": "cs",
+      "cp_requerido": true,
+      "cp_formato": "NNN NN",
+      "cp_nota": "REQUERIDO, con espacio en medio.",
+      "dato_rey": "ulice + cislo popisne/orientacni + CP",
+      "registro": "formal",
+      "pack": "chequia.md"
+    }
+  },
+  "clase_de_defecto_que_este_archivo_mata": {
+    "nombre": "criterio de pais heredado de la plantilla de otro pais",
+    "sintoma": "Un pack dice 'NUNCA pides codigo postal' porque lo copio de Colombia, en un pais donde el CP es obligatorio.",
+    "impacto_medido": "En los 11 paises de Europa y en Brasil el CP es OBLIGATORIO. Clonar el criterio de Colombia a Europa rompe 12 paises de una sola vez.",
+    "como_se_mata": "scripts/validar_pack.py compara la frase del pack contra cp_requerido de este archivo. Un pack que diga 'NUNCA pides codigo postal' en un pais con cp_requerido=true falla, y falla ruidosamente."
+  },
+  "estado_de_verificacion": {
+    "_por_que": "Un pack no verificado que no se declara como tal se lee como verificado. Aqui esta lo que respalda cada bloque, con su nombre.",
+    "fuente_autoritativa_del_dominio": "UPU, estandar S42 y plantillas SAFD por pais. Es la especificacion del sistema. Empezar SIEMPRE por ahi.",
+    "packs_latam_originales": {
+      "paises": "Colombia, Mexico, Chile, Ecuador, Panama, Peru, Paraguay, Guatemala",
+      "nivel": "EN USO. Colombia viene de un prompt que corre en produccion; los demas pasaron revision anti-clon el 2026-08-07 y remedicion el 08-29."
+    },
+    "packs_latam_nuevos": {
+      "paises": "Argentina, Brasil, Venezuela, Costa Rica",
+      "nivel": "CONOCIMIENTO GENERAL + 1-2 fuentes. Formatos postales verificados contra la tabla de codigos postales de Wikipedia (2026-09-08). Costa Rica ademas contra prensa (La Nacion) y fuentes culturales por su sistema de referencias.",
+      "no_verificado": "La jerga y las referencias de campo no estan contrastadas a tres fuentes por pais. Ningun pack ha sido revisado por alguien que opere alli."
+    },
+    "packs_europa": {
+      "paises": "Espana, Portugal, Rumania, Polonia, Hungria, Eslovenia, Eslovaquia, Croacia, Grecia, Bulgaria, Chequia",
+      "nivel": "CONOCIMIENTO GENERAL + 2 fuentes para lo estructural. Formatos de codigo postal verificados contra Wikipedia (2026-09-08); el orden inverso hungaro reverificado contra guias de formato de direccion independientes.",
+      "🔴 no_verificado": "NO llegan al liston de tres fuentes independientes por pais que pide el protocolo, y NINGUNO ha sido revisado por un hablante nativo ni por alguien que reparta alli. Lo estructural (formato de CP, orden de los campos, identificador de vivienda) esta contrastado; la jerga fina y las formas de referencia locales NO. Antes de usar uno en un cliente real de ese pais, contrastarlo con la SAFD de la UPU y con la web de una transportadora local.",
+      "plantillas_al_cliente": "Las frases que ve el cliente van en el idioma local y NO han sido revisadas por nativo. Es lo primero que hay que hacer revisar: una frase torpe se nota en el primer mensaje."
+    },
+    "sin_ejecutar": "NINGUN pack se ha probado contra el modelo real en una conversacion de WhatsApp. El banco de casos comprueba que la REGLA esta escrita, no que el modelo la aplique bien. Eso exige una corrida en un espacio vivo."
+  }
+}

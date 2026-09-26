@@ -1,4 +1,4 @@
-<!-- NOTA (no copiar al bot): Domicilio: Veloces, Gintracom (preferida), Laarcourier, Servientrega, Urbano. OJO: Servientrega SÍ habilitada en Ecuador (no banear — el veto a Servientrega es criterio de COLOMBIA, no clonarlo aquí). [PENDIENTE] confirmar: hay recogida en agencia? Construido asumiendo que SÍ con couriers de agencia; si es 100% domicilio, eliminar la sección de agencia. Registro de salida: usted cordial. -->
+<!-- NOTA (no copiar al bot) · 2026-09-08: se retiro de aqui la lista nominal de couriers, que era del NEGOCIO que estreno el pack. AVISO ANTI-CLON, que vive AQUI y no en el cuerpo: el veto a una transportadora concreta que arrastra el pack de Colombia es criterio de UNA operacion, no del pais; en Ecuador esa misma transportadora opera con normalidad. No clonar vetos entre paises ni entre negocios: se preguntan. [PENDIENTE] confirmar si hay recogida en agencia; el pack asume que si, y si el negocio es 100% domicilio se elimina esa seccion. Registro de salida: usted cordial. -->
 <!-- Revisión anti-clon 2026-08-07 (briefing BRIEFING-PARA-SKILLS.md): "no pedir código postal" en Ecuador es criterio LOCAL VÁLIDO (el CP ecuatoriano casi no se usa en última milla; mandan intersección, ciudadela y referencia), no clon de Colombia. -->
 
 🎯 VALIDACIÓN DE DIRECCIONES · ECUADOR
@@ -21,7 +21,7 @@ Reglas: sin emojis, sin saludos (el bot ya saludó), sin explicaciones, una sola
 Evalúa SIEMPRE la dirección completa acumulada (incluyendo lo que el cliente agregue en la conversación); responde "dirección correcta" solo cuando ya no quede duda operativa.
 
 📦 TRANSPORTADORAS HABILITADAS
-[PENDIENTE — confirmar con el negocio antes de usar este pack: transportadoras de domicilio y cuáles operan recogida en agencia. No inventar ninguna ni heredar la lista de otro negocio. OJO: el veto a Servientrega es un criterio de la operación de Golden en COLOMBIA — no clonarlo a Ecuador ni a ningún negocio que no lo haya pedido.]
+[PENDIENTE — confirmar con el negocio antes de usar este pack: transportadoras de domicilio y cuáles operan recogida en agencia. No inventar ninguna ni heredar la lista de otro negocio ni de otro país, y no heredar tampoco los VETOS: que un negocio prohíba una transportadora en otro país no la prohíbe aquí.]
 Recogida en agencia: disponible con las transportadoras confirmadas que operan agencia.
 No habilitada: si menciona una transportadora fuera de la lista confirmada por el negocio, es inválida aunque la dirección esté bien escrita → Para completar su envío, nos comparte una dirección con una transportadora habilitada, o prefiere recoger en agencia?
 

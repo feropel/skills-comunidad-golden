@@ -23,7 +23,7 @@ y verifica los DOS techos contra assets/limites.json:
 Con --registro además valida la entrada del Disparador de productos Extendido y
 hace el chequeo D1: la palabra clave del producto y la del registro deben ser
 IDENTICAS BYTE A BYTE (si difieren, aunque sea en la posicion del slot, el
-producto no arranca — incidente Kingo Shop 2026-08-23). SIN --registro ese cruce
+producto no arranca — incidente de campo del 2026-08-23). SIN --registro ese cruce
 NO se hace y el validador lo avisa.
 
 Uso:
@@ -104,6 +104,70 @@ def check_cuatro_bytes(nombre, texto):
             f"{nombre} tiene {len(malos)} caracter(es) de 4 bytes (emoji: {' '.join(malos)}) — "
             "el trigger no los admite y el bot no arranca. Quítalos de la palabra clave."
         )
+
+
+def entrada_del_registro(reg, kw_producto, nombre_producto):
+    """Devuelve la entrada del Disparador que corresponde a ESTE producto.
+
+    El Disparador de productos Extendido es un ARRAY de entradas (ver
+    assets/template-registro-disparador.json), asi que pegar el campo real del
+    workspace traia una lista y el script reventaba con un AttributeError crudo
+    — la misma clase de traceback que v4.4 declaro cerrada, con este gemelo vivo:
+    el usuario que hace lo correcto (pegar el campo entero) era el que se estrellaba.
+    Ademas el chequeo D1 nunca llegaba a correr.
+    """
+    if isinstance(reg, dict):
+        if "entrada_nueva" in reg:
+            return reg["entrada_nueva"]
+        if isinstance(reg.get("value"), list):   # respuesta cruda de la API
+            reg = reg["value"]
+        else:
+            return reg
+    if not isinstance(reg, list):
+        sys.exit("ERROR: el registro (--registro) no es ni un objeto de entrada ni un "
+                 f"array de entradas, es {type(reg).__name__}. Se espera el contenido "
+                 "del campo '[Ventas Wp] Disparador de productos Extendido' (un array) "
+                 "o una sola entrada.")
+    entradas = [e for e in reg if isinstance(e, dict)]
+    if not entradas:
+        sys.exit("ERROR: el registro (--registro) es un array VACIO (o sin objetos). "
+                 "Se esperaba al menos la entrada de este producto.")
+    if kw_producto:
+        exactas = [e for e in entradas if e.get("keyW") == kw_producto]
+        if len(exactas) == 1:
+            return exactas[0]
+        if len(exactas) > 1:
+            sys.exit(f"ERROR: el registro tiene {len(exactas)} entradas con la MISMA "
+                     f"palabra clave {kw_producto!r}. Duplicado en el Disparador: el bot "
+                     "no sabe cual disparar. Deja una sola.")
+    if nombre_producto:
+        por_nombre = [e for e in entradas if e.get("producto") == nombre_producto]
+        if len(por_nombre) == 1:
+            return por_nombre[0]
+    if len(entradas) == 1:
+        return entradas[0]
+    sys.exit(f"ERROR: no encuentro la entrada de este producto en el registro "
+             f"({len(entradas)} entradas). Se busco por palabra clave "
+             f"{kw_producto!r} y por nombre {nombre_producto!r}, sin coincidencia exacta. "
+             "Si la palabra clave del producto y la del Disparador no son identicas byte "
+             "a byte, eso YA es el fallo D1 que rompe el arranque: corrigelo en el "
+             "Disparador antes de seguir.")
+
+
+def precio_en_texto(precio, texto):
+    """El precio va en el campo como DIGITOS ("74900") pero un prompt bien escrito lo cita
+    como lo dice la gente: "$74.900", "74,900" o "74 900". Buscar solo los digitos crudos daba
+    un falso positivo en 12 de 12 productos de un catalogo real (medido el 2026-09-18): una
+    advertencia que salta siempre en un catalogo correcto ensena a ignorar todas las demas."""
+    digitos = "".join(c for c in str(precio) if c.isdigit())
+    if not digitos:
+        return True
+    variantes = {digitos}
+    if len(digitos) > 3:
+        con_coma = f"{int(digitos):,}"
+        variantes |= {con_coma, con_coma.replace(",", "."), con_coma.replace(",", " "),
+                      con_coma.replace(",", "\u00a0"), con_coma.replace(",", "\u202f")}
+    return any(v in texto for v in variantes)
 
 
 def cargar_json(ruta, etiqueta):
@@ -190,13 +254,17 @@ def main():
         check_len(f"recordatorio mensaje_{i}", rec.get(f"mensaje_{i}"), lim["recordatorio"])
         check_len(f"remarketing prompt_{i}", rem.get(f"prompt_{i}"), lim["instruccion_remarketing"])
 
-    # Upsells: si una tarjeta está activa, valida sus límites de la UI
+    # Upsells: si una tarjeta está activa, valida sus límites de la UI Y sus ¿¡ (hallazgo
+    # golden-skill-auditor 2026-09-22: el título/descripción/botón los VE el cliente en la
+    # tarjeta tras la compra, y hasta hoy check_apertura no los revisaba)
     for n in ("1", "2"):
         u = ups.get(n, {}) if isinstance(ups, dict) else {}
         if str(u.get("activo", "no")).lower() == "si":
             check_len(f"upsell {n} titulo", u.get("titulo"), lim["upsell_titulo"])
             check_len(f"upsell {n} descripcion", u.get("descripcion"), lim["upsell_descripcion"])
             check_len(f"upsell {n} boton", u.get("boton"), lim["upsell_boton"])
+            for campo_ups in ("titulo", "descripcion", "boton"):
+                check_apertura(f"upsell {n} {campo_ups}", u.get(campo_ups))
             if not str(u.get("id_dropi") or "").isdigit():
                 errores.append(f"upsell {n}: id_dropi debe ser numérico si la tarjeta está activa")
 
@@ -216,7 +284,7 @@ def main():
         errores.append(f"El bot field escapado ({esc}) supera el máximo de LONG JSON ({BOT['longtext_escapado']})")
 
     precio = str(info.get("precio") or "")
-    if precio and precio not in (prompt.get("prompt_libre") or ""):
+    if precio and not precio_en_texto(precio, prompt.get("prompt_libre") or ""):
         avisos.append("El precio no aparece dentro del prompt_libre — la IA no lo va a citar bien")
 
     check_slots("palabras_clave", act.get("palabras_clave"))
@@ -224,36 +292,63 @@ def main():
     # El trigger (palabra clave) no admite emojis de 4 bytes: corrompen el activador
     check_cuatro_bytes("palabras_clave", act.get("palabras_clave"))
 
+    # Hallazgo golden-skill-auditor 2026-09-22: remarketing.prompt_1/2 son la MISMA clase
+    # de "prompt-instrucción para la IA" que los recordatorios (ver la nota del propio
+    # template: "prompt_N = rol de la IA por fase"), y dta_prompt es la descripción que ve
+    # el cliente — ninguno pasaba por check_apertura pese a que el docstring de este script
+    # promete cubrir "textos que ve el cliente" sin excepción.
     for nombre, texto in [
         ("mensaje_inicial", emb.get("mensaje_inicial")),
         ("pregunta_de_entrada", emb.get("pregunta_de_entrada")),
         ("prompt_libre", prompt.get("prompt_libre")),
         ("recordatorio mensaje_1", rec.get("mensaje_1")),
         ("recordatorio mensaje_2", rec.get("mensaje_2")),
+        ("remarketing prompt_1", rem.get("prompt_1")),
+        ("remarketing prompt_2", rem.get("prompt_2")),
+        ("dta_prompt (descripción)", info.get("dta_prompt")),
     ]:
         check_apertura(nombre, texto)
 
     if a.registro:
         reg = sin_meta(cargar_json(a.registro, "registro (--registro)"))
-        reg = reg.get("entrada_nueva", reg)
+        reg = entrada_del_registro(reg, act.get("palabras_clave") or "",
+                                   info.get("nombre") or "")
         print("\nEntrada del Disparador Extendido:")
         for clave in ("producto", "name", "keyW", "idAd", "estado"):
             if not reg.get(clave) and clave != "idAd":
                 errores.append(f"registro: falta '{clave}'")
         if reg.get("producto") and reg.get("producto") != info.get("nombre"):
             avisos.append("registro.producto no coincide con informacion_de_producto.nombre")
-        # D1 (incidente Kingo Shop 2026-08-23): la palabra clave del producto y la
+        # D1 (incidente de campo del 2026-08-23): la palabra clave del producto y la
         # entrada del Disparador deben coincidir BYTE A BYTE. El .strip(",") anterior
         # enmascaraba diferencias reales de POSICION de slot ("A,,,,,," vs ",A,,,,,"
         # comparaban iguales) — probado: pasaba como valido. Ahora comparacion exacta.
         kw_prod = act.get("palabras_clave") or ""
         kw_reg = reg.get("keyW") or ""
         if kw_prod and kw_reg and kw_prod != kw_reg:
+            # 🔴 Un fallo cuyo mensaje no distingue la causa se lee como un fallo del
+            # instrumento. Medido (CdM, 2026-09-06): con una tilde escrita en NFD por un
+            # lado y en NFC por el otro, este error imprimia DOS LINEAS VISUALMENTE
+            # IDENTICAS diciendo que no coincidian. Quien lo lee cree que el validador
+            # esta roto y va a buscar el fallo donde no esta. Se declara la causa.
+            import unicodedata as _u
+            pista = ""
+            if _u.normalize("NFC", kw_prod) == _u.normalize("NFC", kw_reg):
+                pista = (
+                    "\n       ⚠️ SE VEN IGUALES Y NO LO SON: difieren en la CODIFICACION del "
+                    "acento (NFC vs NFD).\n"
+                    "          Pasa al copiar entre el panel, el portapapeles de macOS y un "
+                    "fichero. El disparador\n"
+                    "          es byte a byte, asi que en produccion NO arranca. Arreglo: "
+                    "escribe la palabra clave\n"
+                    "          UNA vez y pegala en los dos sitios desde la MISMA fuente, o "
+                    "normaliza a NFC antes de pegar."
+                )
             errores.append(
                 "D1 ROTO: la palabra clave del producto y la del registro NO son identicas "
                 "byte a byte — el producto NO va a arrancar.\n"
                 f"       producto.palabras_clave -> {kw_prod!r}\n"
-                f"       registro.keyW           -> {kw_reg!r}"
+                f"       registro.keyW           -> {kw_reg!r}" + pista
             )
         elif kw_prod and kw_reg:
             print("  D1: palabra clave identica byte a byte producto<->registro  OK")

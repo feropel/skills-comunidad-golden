@@ -5,7 +5,15 @@
 # No modifica nada: solo reporta.
 set -u
 R="${1:?ruta raíz}"
+# Normaliza la ruta: quita las barras finales. `for U in "$R"/*/` — la forma
+# canonica de recorrer productos — SIEMPRE entrega barra final, y sin esto
+# "$R/archivo" no se puede recortar contra "$R", asi que el script
+# devolvia 0 SIN error (medido 2026-09-05: 1 pieza sin barra, 0 con barra).
+while [ "$R" != "/" ] && [ "${R%/}" != "$R" ]; do R="${R%/}"; done
 # Array y no string: sin comillas el shell puede glob-expandir los patrones antes de que find los vea
+# La raiz misma no tiene nada que recortar: sin esto sale su ruta ABSOLUTA
+# en medio de un informe de rutas relativas y no se puede leer de un vistazo.
+rel_de(){ [ "$1" = "$R" ] && printf "(raiz)" || printf "%s" "${1#$R/}"; }
 EXCL=(! -path '*/node_modules/*' ! -path '*/.git/*' ! -path '*/.next/*' ! -path '*/dist/*')
 
 echo "📋 AUDITORÍA: $R"
@@ -17,7 +25,7 @@ while IFS= read -r d; do
   f=$(find "$d" -maxdepth 1 -type f ! -name '.*' 2>/dev/null | wc -l | tr -d ' ')
   s=$(find "$d" -maxdepth 1 -mindepth 1 -type d 2>/dev/null | wc -l | tr -d ' ')
   if [ "$f" -gt 0 ] && [ "$s" -gt 0 ]; then
-    echo "   [$f archivos + $s carpetas] ${d#$R/}"; mix=$((mix+1))
+    echo "   [$f archivos + $s carpetas] $(rel_de "$d")"; mix=$((mix+1))
   fi
 done < <(find "$R" -type d "${EXCL[@]}" 2>/dev/null)
 [ "$mix" -eq 0 ] && echo "   ✅ ninguna"
@@ -55,7 +63,7 @@ while IFS= read -r d; do
   w=$(find "$d" -maxdepth 1 -iname '*.webp' 2>/dev/null | wc -l | tr -d ' ')
   h=$(find "$d" -maxdepth 1 \( -iname '*.png' -o -iname '*.jpg' -o -iname '*.jpeg' \) 2>/dev/null | wc -l | tr -d ' ')
   if [ "$w" -gt 0 ] && [ "$h" -gt 0 ]; then
-    echo "   [web:$w + master:$h] ${d#$R/}"; mz=$((mz+1))
+    echo "   [web:$w + master:$h] $(rel_de "$d")"; mz=$((mz+1))
   fi
 done < <(find "$R" -type d "${EXCL[@]}" 2>/dev/null)
 [ "$mz" -eq 0 ] && echo "   ✅ ninguna"

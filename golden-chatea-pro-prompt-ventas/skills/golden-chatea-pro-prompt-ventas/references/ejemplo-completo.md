@@ -1,6 +1,6 @@
 # Ejemplo completo HORNEADO (referencia de calidad)
 
-Producto de muestra ficticio para mostrar el estándar de salida. NO copies los datos; copia el NIVEL de detalle y el formato. Este ejemplo cumple de verdad lo que la skill exige — 10.989 caracteres (objetivo 9.000-11.000), con TODOS los bloques obligatorios (memoria del pedido, URLs blindadas, intención de compra, compuerta del resumen, regla de plantilla, entrega personalizada por ciudad): si tu salida no los tiene, no ha alcanzado la vara. Cada build real debe alcanzar una nota sobresaliente (piso 90) en la evaluación holística del PASO 3.
+Producto de muestra ficticio para mostrar el estándar de salida. NO copies los datos; copia el NIVEL de detalle y el formato. Este ejemplo cumple de verdad lo que la skill exige — 10.989 caracteres (objetivo 9.000-11.800), con TODOS los bloques obligatorios (memoria del pedido, URLs blindadas, intención de compra, compuerta del resumen, regla de plantilla, entrega personalizada por ciudad): si tu salida no los tiene, no ha alcanzado la vara. Cada build real debe alcanzar una nota sobresaliente (piso 90) en la evaluación holística del PASO 3.
 
 > **Producto de ejemplo:** "FreshKlin" — desodorante íntimo en crema, Colombia, COD + anticipado (Nequi).
 > Asesora: **Valentina** · Transportadora: **Coordinadora** · Envío gratis siempre (PRIORITARIO desde 2 unidades).
@@ -18,7 +18,7 @@ Producto de muestra ficticio para mostrar el estándar de salida. NO copies los 
 ## 3) Pregunta de entrada (va en "Pregunta de entrada")
 "Para recomendarte bien y no ofrecerte lo que no necesitas: qué fue lo que te hizo buscar algo para esto? 😊"
 
-## 4) Prompt de venta (va en el campo "Prompt" — 11763 caracteres, dentro del objetivo 9.000-11.000; techo 12.000. Medido con `scripts/validar.sh`)
+## 4) Prompt de venta (va en el campo "Prompt" — 11763 caracteres, dentro del objetivo 9.000-11.800; techo 12.000. Medido con `scripts/validar.sh`)
 ```
 FreshKlin · Colombia · [Compañía]
 
@@ -241,7 +241,7 @@ Hola 👋 soy Valentina de FreshKlin. +8.000 mujeres ya lo usan y repiten ✨ Te
 REMARKETING 1 — Instrucción IA:
 [Retoma con calidez sin reiniciar. Refuerza con la prueba social. Si dudó por precio, ancla el valor. Lleva a cerrar. Máximo 1 intento, sin presionar.]
 
-REMARKETING 2 — BODY (6h):
+REMARKETING 2 — BODY (8h):
 Hola 😊 paso una última vez. Sigo por aquí si quieres retomarlo, sin compromiso 💛
 REMARKETING 2 — Instrucción IA:
 [Último intento. Retoma cálido, ancla el valor y lleva a cerrar hoy. No insistas más de una vez. Si no responde, cierra cordial.]

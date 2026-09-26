@@ -1,0 +1,484 @@
+{
+  "_que_es": "QUE ES CONFIGURACION, campo por campo y asistente por asistente. Es la lista que faltaba: hasta el 2026-09-08 la configuracion se definia POR EXCLUSION -- solo existia campos-de-producto.json (4 patrones) y todo lo demas se asumia configuracion. Con eso, 'auditar la configuracion' no tenia denominador, y un campo nuevo que Chatea anadiera manana entraba como configuracion sin que nadie lo decidiera.",
+  "_de_donde_sale": "Capturas del PANEL VIVO que FER entrego el 2026-09-08, pantalla por pantalla del asistente de Ventas WhatsApp (espacio GOLDEN GROUP 236245), mas los dos bot fields JSON abiertos en el editor. NO es una lista deducida: es lo que se ve y lo que se puede editar. · LOGISTICO (2026-09-08): del VIDEO del panel que grabo FER, 98 s, las 4 pestanas y sus 18 secciones, leido fotograma a fotograma. Los topes salen del contador que pinta el propio panel, no de deducirlos. · CARRITOS (2026-09-08): capturas del panel de FER, 7 secciones, CRUZADAS contra el JSON real leido por API el mismo dia. · COMENTARIOS (2026-09-08): capturas del panel, CRUZADAS contra el JSON por API -- 7 de 8 contadores cuadran al caracter.",
+  "_definicion_de_FER": "Palabras suyas, 2026-09-08: 'esos campos JSON que llenamos con la informacion de nuestra tienda, la informacion basica de numero telefonico, de como se llama el asistente, cuales son los dias de entrega, cual es el prompt del pais, cual es la identidad de la tienda. Esa es la configuracion. NO la logica: la logica interna de Chatea viene con sus asistentes; lo que si podemos cambiar nosotros es lo que se ve en el panel.'",
+  "_la_frontera_que_cerro_dos_reincidencias": "Un control de configuracion que APUNTA a un campo de producto mira el CABLEADO del campo, JAMAS su CONTENIDO. Cableado: si la ranura esta registrada en el disparador, si su palabra clave coincide byte a byte entre los dos sitios, si esta activa, cuanto ocupa, si lleva una credencial. Contenido: que producto es, su marca, su precio, sus imagenes, si sus anuncios viven. El nombre de la ranura se puede nombrar; lo que hay dentro, no.",
+  "asistentes": {
+    "ventas_whatsapp": {
+      "_estado": "COMPLETO — mapeado contra las capturas del panel del 2026-09-08",
+      "_bot_fields": [
+        "[Ventas Wp] Configuracion general",
+        "[Ventas Wp] Configuracion general 2"
+      ],
+      "_nota_de_la_UI": "El panel lo presenta en 5 secciones bajo Asistentes -> Configuracion. Las 5 caben en esos DOS campos JSON: eso es todo lo que se puede cambiar. Lo demas de la pantalla es logica de Chatea y no se toca.",
+      "secciones": {
+        "Conexion con Dropi": {
+          "llave_json": "conexion_con_dropi",
+          "campos": [
+            "conectar (si/no)",
+            "pais (desplegable)"
+          ],
+          "visto": "Colombia · conectar = Si"
+        },
+        "Modelo de la IA": {
+          "llave_json": "(no viaja en estos dos campos: se elige en el panel)",
+          "campos": [
+            "proveedor de IA",
+            "modelo del LLM"
+          ],
+          "visto": "OpenAI · gpt-4o-mini",
+          "_ojo": "Se configura en el panel pero NO aparece en los dos bot fields medidos. Si un control lo necesita, se lee del espacio, no del JSON."
+        },
+        "Acciones especiales": {
+          "llave_json": "acciones_especiales",
+          "campos": [
+            "subida_automatica a Dropi (si/no)",
+            "validaciones_orden.validar_entregas (si/no)",
+            "validaciones_orden.cantidad_minima_ordenes",
+            "validaciones_orden.porcentaje_minimo_entregas",
+            "validaciones_orden.validar_flete (si/no)",
+            "validaciones_orden.flete_minimo",
+            "validaciones_orden.moneda"
+          ],
+          "visto": "subir si · validar entregas si · min 3 ordenes · 60% · validar flete si · 25000 COP"
+        },
+        "Notificaciones": {
+          "llave_json": "notificaciones",
+          "campos": [
+            "activa (si/no)",
+            "evento",
+            "whatsapp que recibe",
+            "mensaje",
+            "plantilla de Meta"
+          ],
+          "visto": "1 de 9 configuradas · Venta Realizada · plantilla golden2_venta_asistente_wp",
+          "_ojo": "El WhatsApp que recibe es DATO DEL NEGOCIO: al clonar entre espacios es la fuga mas facil (medido: un telefono de Golden recibiendo las ventas de otra empresa)."
+        },
+        "Comportamiento de la IA": {
+          "llave_json": "comportamiento_ia",
+          "campos": [
+            "division.cantidad (uno/varios)",
+            "division.limite (max mensajes)",
+            "rol (descripcion del rol del agente, tope 2000)",
+            "restricciones (tope 2000)",
+            "analizar_palabra.activar (si/no)",
+            "analizar_palabra.prompt (tope 2000)"
+          ],
+          "visto": "varios · limite 2 · rol 1974/2000 · restricciones 1970/2000 · analizar si · prompt 1996/2000",
+          "_ojo": "Los tres textos rozan el tope de 2000. Un control de techo (C1-C3) sobre ellos es CONFIGURACION y debe reportarse siempre."
+        },
+        "Producto en Segundos": {
+          "llave_json": "producto_segundos",
+          "campos": [
+            "prompt_datos (estructura obligatoria, tope 4000)",
+            "prompt_prompt (plantilla maestra del prompt de venta)"
+          ],
+          "_ojo": "Es configuracion aunque hable de productos: es la PLANTILLA con la que se generan, no un producto."
+        }
+      }
+    },
+    "comentarios": {
+      "_estado": "COMPLETO — panel mapeado de las capturas de FER del 2026-09-08 y CRUZADO campo por campo contra el JSON real leido por API. 4 secciones, 15 llaves.",
+      "_bot_fields": [
+        "[Comentarios] Configuracion General"
+      ],
+      "_carpeta_en_el_panel": "Agente de comentarios",
+      "_dos_pestanas": "El panel abre con DOS pestanas: 'Comentarios' (la operacion del dia a dia) y 'Configuracion'. Solo la segunda es esta skill.",
+      "_la_verificacion_cruzada": "7 de 8 contadores del panel cuadran AL CARACTER con el valor descargado por API. El unico que difiere es `respuesta_publica.prompt`: el panel dice 1.470 y la API devuelve 1.467. Tres caracteres. No se sabe cual manda -- puede ser un salto de linea final que el panel cuenta y el JSON no. **Se declara en vez de elegir uno**: con margenes de 1.500 no cambia nada, pero si alguna vez un campo esta a 3 del tope, esa diferencia decide si entra o se corta.",
+      "_🔴_EL_CAMPO_MAS_AL_FILO_DE_TODO_EL_ECOSISTEMA": "`comentarios_negativos.ej_a_no_eliminar` esta en **995 de 1.000** y el propio panel avisa: *'Te quedan 5 caracteres'*. Confirmado por las dos fuentes. Y no es un campo cualquiera: es donde se escribe QUE COMENTARIOS NO SE DEBEN BORRAR. Si se corta, el bot empieza a eliminar lo que deberia conservar -- y el primer ejemplo de la lista es *'preguntas de precio o valor'*, que son clientes preguntando cuanto vale. **Un corte ahi no da error, no se ve en el panel y cuesta ventas en silencio.** Antes de anadir una sola palabra a ese campo hay que quitar otra.",
+      "secciones": {
+        "Informacion del negocio": {
+          "llaves": {
+            "informacion_del_negocio.pais": "desplegable · PARAMETRO, nunca puerta",
+            "informacion_del_negocio.contacto": "tope 200 · el panel lo llama 'Pagina o numero de contacto'",
+            "informacion_del_negocio.t_envio": "tope 200 · 'Tiempo de envio'",
+            "informacion_del_negocio.info_extra": "'Informacion adicional del negocio' · tope NO MEDIDO (el contador no se vio)"
+          },
+          "_ojo": "🔴 `contacto` lleva un NUMERO DE TELEFONO del negocio. Clonado entre espacios, los clientes de una tienda escriben al WhatsApp de otra. Y `info_extra` cita la ley del pais (garantia, derecho de retracto): copiado a otro pais promete una ley que alli no aplica."
+        },
+        "Comentarios negativos": {
+          "llaves": {
+            "comentarios_negativos.habilitar": "si/no",
+            "comentarios_negativos.prompt_general": "tope 10.000 · 'Prompt de eliminacion de comentarios'",
+            "comentarios_negativos.ej_a_eliminar": "tope 1.000 · 'Ejemplos de comentarios a eliminar'",
+            "comentarios_negativos.ej_a_no_eliminar": "tope 1.000 · 🔴 a 5 caracteres del tope"
+          },
+          "_ojo": "Los dos campos de ejemplos son los que de verdad deciden: el prompt general da el criterio y los ejemplos lo anclan. El de NO eliminar es el que protege las ventas, y es justo el que esta lleno."
+        },
+        "Respuesta publica": {
+          "llaves": {
+            "respuesta_publica.habilitar": "si/no",
+            "respuesta_publica.prompt": "tope 3.000 · lo que el bot responde EN PUBLICO bajo el post",
+            "respuesta_publica.aut_link_pub": "si/no · 'Deseas que se envie el ENLACE en la respuesta publica'",
+            "respuesta_publica.aut_precio_pub": "si/no · 'Deseas que se envie el PRECIO en la respuesta publica'"
+          },
+          "_ojo": "Estas dos autorizaciones son decision de NEGOCIO, no de configuracion tecnica: publicar el precio bajo un anuncio se lo entrega tambien a la competencia. Un espacio clonado hereda la decision del anterior sin que nadie la haya tomado para esta tienda."
+        },
+        "Venta conversacional (respuestas internas)": {
+          "llaves": {
+            "venta_conversacional.habilitar": "si/no",
+            "venta_conversacional.prompt": "tope 8.000 · el prompt de venta por mensaje privado",
+            "venta_conversacional.datos_req": "tope 200 · 'Datos que la IA deberia solicitar al cliente para completar la compra'"
+          },
+          "_ojo": "`datos_req` es la lista de datos que se le piden al cliente para cerrar, y depende del PAIS: lo que pide una direccion en Colombia no es lo que pide una en Mexico. Es lo que se INVESTIGA, no lo que se pregunta ni se clona. El prompt usa marcadores {NOMBRE_PRODUCTO} y {DESCRIPCION_PRODUCTO}: **los productos no se configuran aqui**, entran por su propio campo."
+        }
+      },
+      "_lo_que_NO_se_vio": [
+        "el tope de `info_extra` (Informacion adicional del negocio)",
+        "la pestana 'Comentarios', que es operacion diaria y no configuracion",
+        "el texto COMPLETO de los prompts largos: las capturas muestran las primeras lineas"
+      ]
+    },
+    "logistico": {
+      "_estado": "COMPLETO — mapeado del PANEL VIVO el 2026-09-08, pantalla por pantalla, sobre el video que FER grabo del asistente logistico. 4 pestanas, 18 secciones.",
+      "_bot_fields": [
+        "[Logistico] Configuracion General",
+        "[Logistico] Confirmaciones"
+      ],
+      "_la_regla_de_FER": "Palabras suyas, 2026-09-08: 'La skill que configura los asistentes lo unico que hace es entrar a esos JSON y llenarlos. No hay que hacer nada mas. Esa es la unica configuracion que se hace. Pero llenarlos ANALIZANDO lo que esa tienda maneja en determinado nicho. No tienen que quedar igualitos todos: si es Colombia se supone que queda muy parecido, pero no necesariamente identico, porque una tienda de un nicho especifico puede que su identidad cambie y varie.'",
+      "_que_audita_entonces_la_auditoria": "Que esos campos esten bien organizados, tengan COHERENCIA entre si, y esten OPTIMIZADOS para ese pais, esa tienda y su nicho. No que coincidan con una plantilla. Dos tiendas colombianas bien configuradas se parecen y NO son identicas; dos identicas byte a byte son sospechosas de clon sin adaptar, que es el defecto F14 (plantilla de fabrica) por otra puerta.",
+      "_ojo_del_panel_vs_el_json": "El panel es la vista; los dos bot fields son el dato. Lo que se ve en las 4 pestanas cabe en esos dos campos. Un control que apunte a algo del panel tiene que poder senalar su llave en el JSON: si no puede, no es configuracion de esta skill.",
+      "pestanas": {
+        "CONFIGURACION GENERAL": {
+          "Datos de la tienda": {
+            "campos": [
+              "pais (desplegable) — PARAMETRO, nunca puerta",
+              "nombre_de_la_tienda (tope 250)",
+              "enlace_de_la_tienda (tope 250)",
+              "ubicacion_de_la_tienda (tope 2000)",
+              "politicas_de_garantia (tope 2000)",
+              "origen_de_los_datos_del_pedido (desplegable; visto: shopify)"
+            ],
+            "_lo_que_se_audita": "Que la ubicacion y la garantia hablen de ESTA tienda y de ESTE pais: la ley que se cita en la garantia, la moneda, la ciudad. Un texto de garantia con ley colombiana en una tienda que no es colombiana es fuga de plantilla de fabrica, no un detalle de estilo."
+          },
+          "Capacidades del experto": {
+            "campos": [
+              "envio_plantillas.confirmacion (si/no)",
+              "envio_plantillas.seguimiento (si/no)",
+              "envio_plantillas.novedad (si/no)",
+              "respuestas_ia.confirmacion (si/no)",
+              "respuestas_ia.seguimiento (si/no)",
+              "respuestas_ia.novedad (si/no)"
+            ],
+            "_lo_que_se_audita": "Coherencia entre los dos bloques. Apagar las respuestas con IA de un estado manda esa conversacion a 'Hablar con asesor': si el negocio no tiene asesor humano en esa franja, ese interruptor apagado es un cliente esperando a nadie."
+          },
+          "Modelo de la IA": {
+            "campos": [
+              "proveedor_de_ia (visto: OpenAI)",
+              "modelo_del_llm (visto: gpt-4o-mini)"
+            ],
+            "_ojo": "El propio panel avisa de que sin la clave API en Integraciones el asistente NO responde. La clave NO vive aqui: vive en Integraciones. Un control sobre el modelo mira que este elegido, no la clave."
+          },
+          "Comportamiento de la IA": {
+            "campos": [
+              "envio_de_la_informacion.tipo_de_envio (un solo mensaje / varios mensajes)",
+              "adaptacion_del_lenguaje (tope 2000)",
+              "mensaje_de_saludo_del_asesor (tope 2000)",
+              "metodo_para_evitar_la_cancelacion_del_pedido (tope 2000)",
+              "limitaciones_generales.restricciones (tope 2000, NO MEDIDO: la seccion se vio, el contador no)"
+            ],
+            "_lo_que_se_audita": "Aqui vive la PERSONALIDAD, que es lo que FER quiere que varie por nicho. Y los techos: medido en el espacio de referencia, adaptacion 1.786/2000 y metodo anticancelacion 1.954/2000 — a 46 caracteres del tope. Un texto al filo no avisa cuando se pasa: se corta."
+          },
+          "Audios con IA": {
+            "campos": [
+              "configuracion_de_voz.api_key (ElevenLabs, tope 250)",
+              "configuracion_de_voz.tipo_de_voz",
+              "configuracion_de_voz.id_de_voz (tope 250)",
+              "parametros_de_voz.estabilidad · similaridad · estilo · speaker_boost",
+              "reglas_de_envio.responder_audio_con_audio (si/no)",
+              "reglas_de_envio.cantidad_maxima_de_audio",
+              "texto_de_prueba"
+            ],
+            "_ojo": "🔴 CREDENCIAL. La api_key de ElevenLabs y el id_de_voz viajan DENTRO de la configuracion. Un espacio clonado hereda la voz y la clave de otro cliente: es el control E3 y es FUGA, no detalle."
+          },
+          "Ubicaciones": {
+            "campos": [
+              "activar_manejo_de_ubicacion (si/no)",
+              "activar_analisis_de_direccion (si/no)",
+              "activar_imagen_del_punto_de_entrega (si/no)",
+              "(la seccion sigue por debajo · NO MEDIDO: el video no bajo hasta el final)"
+            ]
+          },
+          "Reinstalacion de mensajes": {
+            "_estado": "NO VISTO. La entrada existe en el menu y el video no la abrio. No se asume que este vacia ni que sea trivial: se declara sin ver."
+          }
+        },
+        "CONFIRMACIONES": {
+          "Mensajes de confirmacion": {
+            "campos": [
+              "1_mensajes_de_recuperacion.confirmacion_con_imagen {posicion_imagen, plantilla de Meta}",
+              "1_mensajes_de_recuperacion.confirmacion_sin_imagen {plantilla de Meta}",
+              "2_recordatorios.recordatorio_N {tiempo (numero + unidad), plantilla de Meta}",
+              "3_mensaje_de_agradecimiento (tope 2000)"
+            ],
+            "_ojo": "Las plantillas son de META y llevan estado APROBADA. Una plantilla no aprobada no sale, y el panel se ve igual. El propio panel recomienda 24 h entre recordatorio 1 y 2 para no disparar envio masivo; el espacio de referencia tiene 1 h y 2 h, o sea CONTRA la recomendacion de la plataforma."
+          },
+          "Tiempos de envio": {
+            "campos": [
+              "tiempos_de_entrega (tope 2000)"
+            ],
+            "_lo_que_se_audita": "Que los tiempos correspondan a la geografia REAL del pais, no a la del pais de la plantilla. 'Ciudad principal / intermedia / zonas rurales' es un reparto colombiano; en otro pais las categorias de la transportadora son otras."
+          },
+          "Analisis de direccion": {
+            "campos": [
+              "evaluar_direccion_con_ia (si/no)",
+              "prompt_de_analisis_de_direccion (🔴 tope 8000, MEDIDO: 7.833/8000 en el espacio de referencia)"
+            ],
+            "_ojo": "Es el prompt que construye `golden-chatea-pro-validacion-direcciones`, y su tope es 8000, no 2000. Ese prompt es 100% dependiente del pais: nomenclatura urbana, direcciones rurales, comportamiento de transportadoras. Clonarlo entre paises es el error mas caro de esta pestana."
+          },
+          "Validaciones de la orden": {
+            "campos": [
+              "confirmacion_automatica (si/no)",
+              "validacion_de_entregas.activa (si/no)",
+              "validacion_de_entregas.porcentaje_minimo_de_entregas_exitosas (%)",
+              "validacion_de_entregas.minimo_de_ordenes_para_validacion",
+              "validacion_de_flete.activa (si/no)",
+              "validacion_de_flete.valor_de_flete_maximo (en la moneda del pais)"
+            ],
+            "_ojo": "🔴 El flete maximo va en la MONEDA DEL PAIS y sin unidad a la vista. Un valor colombiano copiado a un espacio de otro pais no da error: acepta o rechaza pedidos con un umbral absurdo y en silencio. Se cruza contra la LEY DEL FLETE COD y contra el piso por pedido."
+          },
+          "Mensajes Personalizados": {
+            "campos": [
+              "notificacion[] {id_de_producto_dropi (tope 15), plantilla_de_mensaje}"
+            ],
+            "_ojo": "🔴 FRONTERA. Aqui la configuracion NOMBRA un producto por su id de Dropi. Se audita el CABLEADO —que la ranura tenga plantilla, que el id no este vacio— y JAMAS el contenido del producto. Es la misma linea que el disparador."
+          },
+          "Pago Anticipado": {
+            "_estado": "BETA. Presente en el menu, no abierto en el video. NO VISTO."
+          }
+        },
+        "SEGUIMIENTO": {
+          "Mensajes de seguimiento": {
+            "campos": [
+              "plantilla_guia_generada",
+              "plantilla_en_camino (PROXIMAMENTE, no disponible)",
+              "plantilla_reparto",
+              "plantilla_entregado"
+            ]
+          },
+          "Tiempos de envio": {
+            "_estado": "NO VISTO (la entrada existe en el menu de esta pestana)"
+          },
+          "Pedidos en oficina": {
+            "campos": [
+              "plantilla_mensaje_de_oficina",
+              "plantilla_mensaje_recordatorio_de_oficina",
+              "recordatorios_de_oficina.activos (si/no)",
+              "recordatorios_de_oficina.cantidad_de_dias",
+              "recordatorios_de_oficina.hora (HH:MM)",
+              "mensajes_de_recordatorio_personalizados.recordatorio_1..N (tope 250 cada uno)"
+            ],
+            "_ojo": "Los recordatorios personalizados estaban escritos y el interruptor que los enciende en NO. Texto configurado que no sale nunca: es el patron 'ANUNCIADA' del auditor."
+          },
+          "Ganchos de venta": {
+            "campos": [
+              "gancho_en_guia_generada (🔴 tope 3000, medido 2.202)",
+              "gancho_en_reparto (tope 3000, medido 1.635)",
+              "gancho_para_pedido_en_oficina (tope 3000)"
+            ],
+            "_ojo": "Son PROMPTS, no mensajes: llevan ROL DEL PROM e INSTRUCCIONES. Aqui es donde se cuelan los nombres de producto y de paqueteria de otra cuenta, porque son ejemplos que la IA imita (control F4). Y llevan horneada la regla de FER: 'NUNCA uses signos de apertura de interrogacion ni de admiracion. Solo los de cierre.'"
+          },
+          "Mensajes Personalizados": {
+            "campos": [
+              "notificacion[] {estado, id_de_producto_dropi (tope 15), plantilla}"
+            ],
+            "estados_disponibles": [
+              "Guia Generada",
+              "Reparto",
+              "Oficina",
+              "Entregado"
+            ]
+          }
+        },
+        "NOVEDADES": {
+          "Mensajes de novedad": {
+            "campos": [
+              "plantilla_mensaje_de_novedad",
+              "plantilla_mensaje_de_entrega_en_oficina",
+              "recordatorio_de_novedad.tiempo (numero + unidad)",
+              "recordatorio_de_novedad.plantilla"
+            ]
+          },
+          "Dias de ofrecimiento": {
+            "campos": [
+              "dia_minimo_de_ofrecimiento (dias habiles)",
+              "dia_maximo_de_ofrecimiento (NO MEDIDO: el video no bajo hasta el)"
+            ],
+            "_lo_que_se_audita": "Que el rango sea creible para la transportadora de ESE pais. La IA le promete al cliente una ventana de reintento con estos dos numeros: si estan heredados de otro pais, la promesa se incumple sola."
+          },
+          "Acciones especiales": {
+            "campos": [
+              "solucionar_novedad_automaticamente (si/no)"
+            ]
+          }
+        }
+      },
+      "_topes_medidos_2026_09_08": {
+        "_como_se_midieron": "Leidos del contador del propio panel en el video (formato 'usado/tope'). Es la fuente autoritativa: el numero lo pinta Chatea, no se dedujo.",
+        "250": [
+          "nombre_de_la_tienda",
+          "enlace_de_la_tienda",
+          "id_de_voz",
+          "api_key_elevenlabs",
+          "recordatorios de oficina personalizados"
+        ],
+        "2000": [
+          "ubicacion_de_la_tienda",
+          "politicas_de_garantia",
+          "adaptacion_del_lenguaje",
+          "mensaje_de_saludo_del_asesor",
+          "metodo_anticancelacion",
+          "tiempos_de_entrega",
+          "mensaje_de_agradecimiento"
+        ],
+        "3000": [
+          "gancho_en_guia_generada",
+          "gancho_en_reparto",
+          "gancho_pedido_en_oficina"
+        ],
+        "8000": [
+          "prompt_de_analisis_de_direccion"
+        ],
+        "15": [
+          "id_de_producto_dropi en los dos bloques de Mensajes Personalizados"
+        ],
+        "_no_medido": "limitaciones_generales.restricciones — la seccion aparece en el video pero su contador no llego a verse. NO se asume 2000 por parecido."
+      },
+      "_lo_que_NO_se_vio": [
+        "Reinstalacion de mensajes (CONFIGURACION GENERAL)",
+        "Tiempos de envio (SEGUIMIENTO)",
+        "Pago Anticipado BETA (CONFIRMACIONES)",
+        "el pie de Ubicaciones, por debajo de 'Activar imagen del punto de entrega'",
+        "dia_maximo_de_ofrecimiento",
+        "el texto COMPLETO de cada campo largo: el video muestra las primeras lineas, no el contenido entero"
+      ]
+    },
+    "carritos": {
+      "_estado": "COMPLETO — panel mapeado de las capturas de FER del 2026-09-08, y cruzado contra el JSON real leido por API el mismo dia. 7 secciones, 38 llaves.",
+      "_bot_fields": [
+        "[Carritos] Configuracion"
+      ],
+      "_carpeta_en_el_panel": "Agente Carritos IA",
+      "_🔴_LA_PRUEBA_VIVA_DE_QUE_EL_JSON_ROMPE_EL_TOPE": "`datos_logisticos.transportadoras_disponibles` mide 132 caracteres y el panel dice que el tope es 100: lo pinta **132/100 EN ROJO**. Confirmado por DOS fuentes independientes el mismo dia -- el contador de la captura y el valor descargado por API. Ese campo se escribio por el JSON saltandose el formulario, que es exactamente lo que FER explico que se puede hacer. De los 10 campos con tope medido, es el UNICO pasado.",
+      "_el_riesgo_que_trae": "Si alguien abre esa seccion en el panel y pulsa 'Guardar configuracion', el formulario puede rechazarlo o CORTARLO a 100. El corte caeria alrededor de '...Domina y Jam' y se llevaria por delante 'No trabajamos con Servientrega', que es justo la mitad operativa de la frase. **Un campo escrito por JSON por encima del tope nativo NO se vuelve a tocar desde el panel.** Si hay que cambiarlo, se cambia por JSON.",
+      "_credencial_que_vive_aqui_pero_NO_en_el_JSON": "La seccion Acciones especiales muestra un **Webhook para Shopify** con forma `https://chateapro.app/api/iwh/<token>`. Quien tenga esa URL puede inyectar carritos en el espacio. **NO viaja en el campo JSON** (comprobado: `acciones_especiales` solo trae subida_automatica, imagenes_producto y origen_datos), asi que no se filtra por esta via -- pero no se pega en un chat, ni en una captura compartida, ni en una skill.",
+      "secciones": {
+        "Identidad del asistente": {
+          "llaves": {
+            "identidad_asistente.nombre_asesor": "tope 50",
+            "identidad_asistente.adaptacion_lenguaje": "tope 2000",
+            "identidad_asistente.metodo_anticancelacion": "tope 2000 · el panel lo llama 'Estilo de persuasion ante la cancelacion del pedido'"
+          },
+          "_lo_que_se_audita": "Aqui vive la personalidad y es lo que DEBE variar por nicho. El nombre del asesor es dato del negocio: clonado entre espacios es la fuga mas visible para el cliente final."
+        },
+        "Datos de la tienda": {
+          "llaves": {
+            "datos_tienda.nombre_tienda": "",
+            "datos_tienda.ubicacion_tienda": "tope 200",
+            "datos_tienda.pais": "desplegable · PARAMETRO, nunca puerta",
+            "datos_tienda.ofrecer_descuento": "si/no",
+            "datos_tienda.descuento_maximo": "porcentaje",
+            "datos_tienda.mensaje_descuento": "tope 200"
+          },
+          "_ojo": "El descuento cuesta dinero real: medido, un 10% puede irse hasta $8.467 por pedido generado. Un espacio clonado hereda el porcentaje del anterior. Si `ofrecer_descuento` esta en 'no', el `descuento_maximo` y su mensaje siguen escritos y NO salen: es configuracion muerta, no defecto, pero se declara."
+        },
+        "Datos logisticos": {
+          "llaves": {
+            "datos_logisticos.tiempos_envio": "tope 150",
+            "datos_logisticos.metodo_pago.contraentrega": "si/no",
+            "datos_logisticos.metodo_pago.anticipado": "si/no",
+            "datos_logisticos.metodo_pago.datos_pago_anticipado": "tope 300",
+            "datos_logisticos.transportadoras_disponibles": "tope 100 🔴 el campo real lo pasa"
+          },
+          "_ojo": "🔴 `datos_pago_anticipado` es DATO PERSONAL: lleva medio de pago, nombre y telefono de quien recibe. Clonar este campo entre espacios manda el dinero de un cliente a la cuenta de otro. Es la fuga mas cara de todo el asistente y no da ningun error."
+        },
+        "Mensajes de recuperacion": {
+          "llaves": {
+            "mensajes_recuperacion.posicion_imagen": "",
+            "mensajes_recuperacion.carritos.carritos_mensaje_1": "plantilla de Meta",
+            "mensajes_recuperacion.carritos.recordatorio_1": "plantilla de Meta",
+            "mensajes_recuperacion.carritos.recordatorio_2": "plantilla de Meta",
+            "mensajes_recuperacion.tiempo_recordatorio_1": "numero + unidad",
+            "mensajes_recuperacion.tiempo_recordatorio_2": "numero + unidad",
+            "mensajes_recuperacion.tiempo_recordatorio_3": "numero + unidad",
+            "mensajes_recuperacion.mensaje_agradecimiento": ""
+          },
+          "_ojo": "🔴 EL TERCER RECORDATORIO TIENE HORA Y NO TIENE MENSAJE. Medido: `tiempo_recordatorio_3` vale '5 horas' -- un valor puesto a mano, no un default vacio-- pero las plantillas son solo DOS (`recordatorio_1` y `recordatorio_2`), y el panel tampoco pinta un tercer bloque. Un recordatorio sin plantilla NO PUEDE SALIR: no hay nada que enviar. En el panel se ve una configuracion completa y en la practica el cliente recibe dos avisos, no tres. Es el patron ANUNCIADA del auditor: prometido en la configuracion y muerto en la ejecucion. Antes de 'arreglarlo' hay que decidir si se quiere el tercero (y se le crea plantilla en Meta) o no (y se borra la hora, para que la configuracion deje de mentir)."
+        },
+        "Envio de correos": {
+          "llaves": {
+            "envio_correos.activar_envio": "si/no",
+            "envio_correos.asunto": "tope 80",
+            "envio_correos.contenido": "tope 500"
+          }
+        },
+        "Acciones especiales": {
+          "llaves": {
+            "acciones_especiales.subida_automatica": "si/no",
+            "acciones_especiales.imagenes_producto": "si/no",
+            "acciones_especiales.origen_datos": "visto: shopify"
+          },
+          "_ojo": "El Webhook de Shopify se muestra en esta pantalla pero NO es una llave del JSON: lo genera la plataforma. **Los productos no se configuran aqui**: entran por ese webhook."
+        },
+        "Prueba tu asistente": {
+          "_estado": "🔵 'Funcionalidad en Desarrollo · Estara disponible proximamente'. La entrada existe en el menu y no hace nada todavia. No se cuenta como cobertura: no se puede probar el asistente desde el panel."
+        }
+      },
+      "_lo_que_NO_se_vio": [
+        "el pie de 'Datos de la tienda', por debajo de la seccion de Descuentos",
+        "el texto COMPLETO de los campos largos: las capturas muestran las primeras lineas"
+      ]
+    },
+    "remarketing_ia": {
+      "_estado": "COMPLETO — esquema por API + panel mapeado de las capturas de FER, ambos el 2026-09-08. 4 secciones, 14 llaves. La plataforma lo marca BETA.",
+      "_bot_fields": [
+        "[Remarketing IA] Configuracion general"
+      ],
+      "_carpeta_en_el_panel": "Agente de Remarketing",
+      "_dos_pestanas": "'Productos' y 'Configuracion'. Solo la segunda es esta skill.",
+      "_🔴_ESTA_INSTALADO_Y_SIN_CONFIGURAR_confirmado_por_dos_vias": "El panel y la API dicen lo mismo: `rol` VACIO (0/2000, el recuadro solo muestra el texto de ejemplo en gris), `restricciones` VACIO (0/2000, idem), `pais` sin elegir ('Selecciona un pais'), Dropi sin conectar, las dos validaciones de orden en 'No' con sus criterios en 0, y **0 de 9 notificaciones configuradas**. Todo el campo pesa 465 escapados contra los 13.494 del logistico. Lo unico puesto son los defaults de division de mensajes (varios / 2). **Un asistente instalado y vacio se ve en el panel igual que uno configurado: el formulario esta ahi, ordenado y sin un solo error.** Es justo lo que L1 y L2 existen para decir.",
+      "_lo_que_hay_que_decidir_antes_de_tocarlo": "No es 'arreglarlo'. O el asistente se quiere y hay que darle identidad, pais y criterios —y entonces es trabajo de configuracion como los otros cuatro—, o no se quiere y conviene saberlo, porque un agente vacio conectado a un flujo puede responder con la personalidad por defecto de la plataforma. **Decision de FER, no del auditor.**",
+      "secciones": {
+        "Conexion con Dropi": {
+          "llaves": {
+            "conexion_con_dropi.conectar": "si/no · visto: no",
+            "conexion_con_dropi.pais": "desplegable · VACIO en el patron · PARAMETRO, nunca puerta"
+          }
+        },
+        "Acciones especiales": {
+          "llaves": {
+            "acciones_especiales.validaciones_orden.subida_automatica": "si/no · 'Procesamiento de datos: subir el pedido automaticamente a Dropi'",
+            "acciones_especiales.validaciones_orden.validar_entregas.esta_activo": "si/no",
+            "acciones_especiales.validaciones_orden.validar_entregas.minimo_de_ordenes": "numero",
+            "acciones_especiales.validaciones_orden.validar_entregas.porcentaje_minimo": "porcentaje",
+            "acciones_especiales.validaciones_orden.validar_flete.esta_activo": "si/no",
+            "acciones_especiales.validaciones_orden.validar_flete.flete_minimo": "numero",
+            "acciones_especiales.validaciones_orden.validar_flete.moneda": "visto: COP"
+          },
+          "_ojo": "Es la MISMA estructura de validaciones que el asistente de ventas por WhatsApp, llave por llave. Dos asistentes distintos comparten el bloque, asi que un criterio de flete o de entregas puede quedar coherente en uno e incoherente en el otro sin que nada lo cruce. **La moneda viaja aparte del numero**: un flete copiado entre paises no da error, solo acepta o rechaza pedidos con un umbral absurdo."
+        },
+        "Notificaciones": {
+          "llaves": {
+            "notificaciones": "lista · VACIA en el patron · el panel dice '0 de 9 notificaciones configuradas'"
+          },
+          "_ojo": "El panel declara un maximo de NUEVE eventos notificables. Cada notificacion lleva el WhatsApp que la recibe, que es dato del negocio: clonarlas manda los avisos de una tienda al telefono de otra."
+        },
+        "Comportamiento de la IA": {
+          "llaves": {
+            "comportamiento_ia.division.cantidad": "un solo mensaje / varios mensajes · visto: varios",
+            "comportamiento_ia.division.limite": "cantidad maxima de mensajes · visto: 2",
+            "comportamiento_ia.rol": "tope 2000 · 'Rol General del agente' · 🔴 VACIO en el patron",
+            "comportamiento_ia.restricciones": "tope 2000 · 'Restricciones generales' · 🔴 VACIO en el patron"
+          },
+          "_ojo": "🔴 CUIDADO CON LOS PLACEHOLDERS DEL PANEL. Los dos recuadros muestran texto de ejemplo en gris —*'Eres un asesor de ventas profesional y amigable...'* y *'No ofrecer descuentos superiores al 20%. Solo procesar pedidos entre 9:00 AM y 6:00 PM. No realizar ventas a clientes fuera de Colombia'*— y el contador dice **0/2000**. Ese texto NO esta guardado: es una sugerencia de la plataforma. Leer la pantalla rapido y darlo por configurado es el error facil, y el ejemplo trae hasta un pais dentro."
+        }
+      },
+      "_lo_que_NO_se_vio": [
+        "la pestana 'Productos', que no es configuracion",
+        "el tutorial en video de la plataforma que FER compartio: NO se abrio, asi que lo que el asistente hace segun Chatea sigue sin verificar por esta via"
+      ]
+    }
+  },
+  "_como_se_usa": "Para responder 'esto que estoy mirando, es configuracion?'. Si el campo esta aqui, SI. Si esta en campos-de-producto.json, NO -- salvo que el control mire su CABLEADO. Si no esta en ninguno de los dos, es un campo que nadie ha clasificado: se DECLARA como tal en el informe, no se asume configuracion. Esa asuncion silenciosa es la que hizo que 'auditar la configuracion' no tuviera denominador.",
+  "_estado_del_mapa": "🟢 LOS CINCO ASISTENTES CON ESQUEMA (API) Y MAPA DE PANTALLA (video y capturas de FER), cerrado el 2026-09-08: ventas_whatsapp · logistico · carritos · comentarios · remarketing_ia. Ninguno queda a medias."
+}

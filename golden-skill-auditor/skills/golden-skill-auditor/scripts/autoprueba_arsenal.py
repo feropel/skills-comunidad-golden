@@ -13,7 +13,7 @@ Cada caso malo viene de un fallo REAL ya pagado por la casa.
 import os, re, sys, tempfile, shutil, subprocess
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
-VALIDADOR = os.path.join(AQUI, "validar_arsenal.py")
+VALIDADOR = os.environ.get("VALIDAR_ARSENAL_MUTANTE") or os.path.join(AQUI, "validar_arsenal.py")
 
 BUENA = ("Golden Group — hace una cosa concreta y util para la empresa. Usala cuando el usuario "
          "diga \"haz esto\", \"arma lo otro\" o pida el informe. Acentos correctos: operacion, "
@@ -29,7 +29,8 @@ def skill(tmp, nombre, desc, name=None, extra_fm="", cuerpo="cuerpo\n"):
 
 
 def corre(d):
-    r = subprocess.run([sys.executable, VALIDADOR, d], capture_output=True, text=True)
+    rutas = d if isinstance(d, list) else [d]
+    r = subprocess.run([sys.executable, VALIDADOR, *rutas], capture_output=True, text=True)
     return r.returncode, r.stdout
 
 
@@ -125,6 +126,12 @@ def main():
             "---\nname: anidada-mala\ndescription: >-\n  " + ("z" * 1200) + "\n---\n\ncuerpo\n")
         casos.append(("caza: skill ANIDADA con description de 1200 (barrido recursivo)",
                       _os.path.join(tmp, "plugin-x"), 1, "1200"))
+
+        # ---- VARIAS RUTAS: se revisan TODAS (26-sep). Con un glob el shell entrega N rutas
+        # y el validador miraba solo la primera: "1 de 1 sanas" sobre 41 skills. La mala va
+        # SEGUNDA a proposito: si solo se mira la primera, esta prueba sale en verde y falla.
+        casos.append(("caza: varias rutas, la mala va SEGUNDA",
+                      [_os.path.join(tmp, "sana"), _os.path.join(tmp, "larga")], 1, "UNIVERSO: 2"))
 
         # ---- LA SKILL SE VALIDA A SI MISMA COMO ARTEFACTO PUBLICABLE ----
         # Pregunta de la fabrica de golden-shopify (2026-09-03): "tu validador te

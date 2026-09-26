@@ -68,14 +68,20 @@ No se duplica aquí. Secuencia obligatoria de ese archivo:
    **DEPRECADAS**). Vía URL pública = Claude lo hace solo; archivo del Mac = lo elige el usuario.
 3. 🔴 **ANALIZAR el video viéndolo Y ESCUCHÁNDOLO** (transcripción local / `golden-video-teardown`).
    Copy escrito sin escuchar el video es copy inventado.
-4. **15 copys por pieza** (5 textos + 5 títulos + 5 descripciones · 125/40/25) con
-   `golden-copywriting`, y las **6 pruebas de coherencia** con ese creativo.
+4. **Copys por la COMPUERTA (`29-compuerta-de-copys.md`)** — `golden-copywriting` obligatorio,
+   emojis, hook en los primeros 40 caracteres, largos como TECHO no objetivo, inventariar lo que el
+   anuncio ya tiene, y el techo de carga MEDIDO por tipo de anuncio (5+5+1 en "Crear anuncio y
+   mensaje"). Se escriben las variantes (5 textos + 5 títulos + 5 descripciones · 125/40/25) con
+   `golden-copywriting`, y las **pruebas de coherencia** con ese creativo (la lista manda: `25-cuenta-sin-creativos.md`, PASO 4 — verificado 2026-09-05, son seis).
 5. **Montar y VERIFICAR con los ojos**: `ads_get_ad_preview` y entregar el `preview_url`.
 
-> ⚠️ **Por qué "no suben los 15 copys" (tope MEDIDO, no bug):** `ads_create_creative` expone
+> ⚠️ **Por qué "no suben todos los copys" (tope MEDIDO, no bug):** `ads_create_creative` expone
 > `message`, `headline` y `description` **en singular** — **no expone `asset_feed_spec`**. Por API
-> salen **1+1+1**. Los 15 se entregan igual en el chat/documento y **se cargan en el panel** como
-> opciones múltiples del anuncio. **Decirlo siempre en el reporte como pendiente, nunca callarlo
+> salen **1+1+1**. El resto se entrega igual en el chat/documento y **se carga en el panel** como
+> opciones múltiples del anuncio. Y el panel también tiene techo: en "Crear anuncio y mensaje" se
+> MIDIÓ **5 textos + 5 títulos + 1 descripción = 11** (la Descripción no tiene "Agregar opción").
+> Ese techo se midió en ESE tipo de anuncio: en otro objetivo **se vuelve a medir, no se supone**
+> (`29-compuerta-de-copys.md`). **Decirlo siempre en el reporte como pendiente, nunca callarlo
 > ni entregar solo 3 copys.**
 
 ---
@@ -89,6 +95,6 @@ No se duplica aquí. Secuencia obligatoria de ese archivo:
 - **Seguimiento** → `20-seguimiento.md`. **Activar solo con OK explícito** (REGLA 3).
 
 ## Qué se reporta al entregar (con evidencia, no con intención)
-IDs creados · **presupuesto RELEÍDO del servidor** · `preview_url` de cada anuncio · los 15 copys
-por creativo en bloques copiables (REGLA 15) · lo que quedó pendiente para el panel (los 15 en
+IDs creados · **presupuesto RELEÍDO del servidor** · `preview_url` de cada anuncio · los copys
+por creativo en bloques copiables (REGLA 15, tope medido 5+5+1) · lo que quedó pendiente para el panel (los copys en
 `asset_feed_spec`, UTM) · y el plan de seguimiento.

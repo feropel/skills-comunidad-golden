@@ -22,19 +22,49 @@ def huellas_recientes():
 def N(s):
     s=unicodedata.normalize('NFD',str(s) if s is not None else '')
     return ''.join(c for c in s if unicodedata.category(c)!='Mn').upper().strip()
-FL={(N(r['ciu']),N(r['dep'])):r for r in json.load(open(D('datos/FLETES-CALI.json')))['R']}
-EF={N(k):v for k,v in json.load(open(D('datos/EFECTIVIDAD-PLATAFORMA.json'))).items()}
-FACT={1:0.966,2:1.068,3:1.268,4:1.290}
-# costo real del retorno: fraccion medida por transportadora (datos/COSTO-RETORNO.json).
-# Trampa 5: solo se usa la fraccion con confianza alta o media; el resto asume 1.00 (conservador).
-# Un caso suelto en $0 NO es "no cobra retorno": ya produjo cuatro recomendaciones equivocadas.
-RET_DEF=1.00
 try:
-    _cr=json.load(open(D('datos/COSTO-RETORNO.json')))
-    _med=_cr[sorted(k for k in _cr if k.startswith('medido'))[-1]]
-    RET={N(k):v['fraccion'] for k,v in _med.items() if str(v.get('confianza','')).lower() in ('alta','media')}
+    FL={(N(r['ciu']),N(r['dep'])):r for r in json.load(open(D('datos/FLETES-CALI.json')))['R']}
 except Exception:
+    sys.exit('Falta datos/FLETES-CALI.json (tabla de fletes que sirve de prior). '
+             'Sin ella no hay con qué comparar mientras no haya cotización en vivo.')
+sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
+from efectividad import Efectividad, marca
+# La efectividad entra por UNA sola puerta, con procedencia declarada y cascada
+# municipio -> departamento -> nacional SIN umbral (orden de FER 2026-08-16).
+EFEC = Efectividad(D)
+for _a in EFEC.avisos:
+    print(_a, file=sys.stderr)
+if not EFEC.dep and not EFEC.ciu:
+    sys.exit('No hay NINGUNA fuente de efectividad con procedencia declarada en datos/.\n'
+             'Se necesita T90-DEPARTAMENTO.json (o EFECTIVIDAD-PLATAFORMA-CIUDAD.json) con _fuente.')
+FACT={1:0.966,2:1.068,3:1.268,4:1.290}
+# Costo del retorno: fraccion medida por transportadora.
+# LEY DE NO-HEREDAR: los parametros son de ESTA empresa, con SU mix de ciudades.
+# Se prefiere el archivo por negocio (COSTO-RETORNO-<NEGOCIO>.json, variable
+# DROPI_NEGOCIO) y solo se cae al generico si no existe, avisando cual se uso.
+# Trampa 5: solo entra la fraccion con confianza alta o media; el resto asume
+# 1.00 (conservador). Un caso suelto en $0 NO es "no cobra retorno": ya produjo
+# cuatro recomendaciones equivocadas.
+RET_DEF=1.00
+_neg=(os.environ.get('DROPI_NEGOCIO') or '').strip().upper()
+_cands=([ 'datos/COSTO-RETORNO-%s.json'%_neg ] if _neg else [])+['datos/COSTO-RETORNO.json']
+RET={}; FUENTE_RETORNO=None
+for _rel in _cands:
+    try:
+        _cr=json.load(open(D(_rel)))
+    except Exception:
+        continue
+    _k=[k for k in _cr if k.startswith('medido')]
+    if not _k: continue
+    _med=_cr[sorted(_k)[-1]]
+    RET={N(k):v['fraccion'] for k,v in _med.items()
+         if isinstance(v,dict) and str(v.get('confianza','')).lower() in ('alta','media')}
+    FUENTE_RETORNO=_rel.split('/')[-1]
+    break
+if FUENTE_RETORNO is None:
     RET={'INTERRAPIDISIMO':1.00,'ENVIA':0.72}   # ultimo medido conocido, por si falta el archivo
+    FUENTE_RETORNO='(sin archivo: ultimo medido conocido)'
+    print('AVISO: sin COSTO-RETORNO en datos/ — se usa el ultimo medido conocido.', file=sys.stderr)
 # rechazos reales de la empresa de fulfillment: mandan sobre la cotizacion de Dropi
 try:
     _R=json.load(open(D('datos/RECHAZOS-FULFILLMENT.json')))['rechazos']
@@ -58,50 +88,12 @@ except Exception:
     print('AVISO: sin TRANSPORTADORAS-OPERATIVAS.json — no se puede filtrar por bodega; verificar a mano', file=sys.stderr)
 def bodega_ok(car): return (not ESTADO_BODEGA) or ESTADO_BODEGA.get(car) in ('OPERATIVA','MARGINAL')
 
-def analiza_dir(d, ciudad):
-    """Devuelve (estado, detalle, transportadora_forzada)"""
-    t=N(d); orig=str(d or '')
-    # 1. recogida en oficina
-    if 'OFICINA' in t or 'RETIRA EN' in t or 'RECOGE EN' in t:
-        comp = t.replace(' ','').replace('.','')
-        if 'INTERRAPID' in comp or 'INTERRAPIS' in comp:
-            return ('OFICINA','retiro en oficina InterRapidisimo — la transportadora NO se puede cambiar','INTERRAPIDISIMO')
-        if 'COORDINADORA' in comp:
-            return ('OFICINA','retiro en oficina Coordinadora — la transportadora NO se puede cambiar','COORDINADORA')
-        if 'SERVIENTREGA' in comp:
-            return ('BLOQUEO','pide oficina Servientrega, que NO esta habilitada — hay que reconfirmar con el cliente',None)
-        return ('BLOQUEO','dice oficina pero no se identifica cual — confirmar transportadora y ciudad',None)
-    # 2. transportadora ajena mencionada en la direccion
-    for x in ['SERVIENTREGA','RAPIENTREGA','DEPRISA','SATURNO']:
-        if x in t: return ('REVISAR','la direccion menciona "%s"; si es punto de esa empresa no sirve — confirmar'%x.title(),None)
-    # 3. nomenclatura
-    # numero de puerta completo: "# 30 - 45", "#30A-45", "# 1 OESTE - 03"
-    puerta = bool(re.search(r'#\s*\d+\s*[A-Z]?\s*(OESTE|ESTE|SUR|NORTE|BIS)?\s*-\s*\d+', t)) or bool(re.search(r'\b\d+\s*[A-Z]?\s*-\s*\d+', t))
-    mzcs = bool(re.search(r'\b(MZ|MANZANA)\b.*\b(CS|CASA)\b', t))
-    tiene_num = puerta or mzcs
-    # dos direcciones en el mismo campo
-    if len(re.findall(r'#', t))>=2:
-        return ('REVISAR','la direccion trae DOS nomenclaturas distintas — confirmar cual es la buena',None)
-    if re.search(r'#\s*\d+\s*[A-Z]?\s*$', t) or (re.search(r'#\s*\d', t) and not puerta):
-        return ('INCOMPLETA','la nomenclatura queda cortada: falta el numero de puerta despues del guion',None)
-    tiene_via = bool(re.search(r'\b(CL|CLL|CALLE|KR|CRA|CR|CARRERA|AV|AVENIDA|DG|DIAGONAL|TV|TRANSVERSAL|AK|AC|MZ|MANZANA|VEREDA|KM)\b', t))
-    tres = len(re.findall(r'\d+', t))>=3
-    if not tiene_via and not tiene_num:
-        return ('INCOMPLETA','no hay nomenclatura: falta via y numeros (Calle/Carrera # __-__)',None)
-    if tiene_via and not tiene_num and not tres:
-        return ('INCOMPLETA','falta el numero de puerta: solo trae la via',None)
-    if not tiene_num and tres:
-        return ('REVISAR','numeracion sin formato # __-__; verificar que sea la puerta correcta',None)
-    # 4. vivienda colectiva sin numero interno
-    colect=re.search(r'\b(CONJUNTO|CONJ|UNIDAD|EDIFICIO|EDIFICO|ED|TORRE|TO|BLOQUE|BL)\b', t)
-    interno=re.search(r'\b(AP|APTO|APTM|APARTAMENTO|CASA|CS|INT|INTERIOR|PISO|PI|LOCAL|OF)\b\s*\.?\s*\d*', t)
-    if colect and not interno:
-        return ('INCOMPLETA','menciona %s pero no da torre/apartamento'%colect.group(1).lower(),None)
-    # 5. lugar publico / comercial sin punto
-    if re.search(r'\b(ESTACION DE POLICIA|HOTEL|TERMINAL|CENTRO DE NEGOCIOS|CC|CENTRO COMERCIAL)\b', t) and not interno:
-        return ('REVISAR','entrega en lugar publico o comercial sin oficina/local — confirmar a quien se entrega',None)
-    return ('OK','',None)
-
+# El analisis de direcciones entra por UNA sola puerta, con banco propio en los
+# dos sentidos (python3 direcciones.py --autoprueba). Medido sobre el export de
+# 895 direcciones: 12 estaban mal clasificadas por acusar el LENGUAJE y no el
+# defecto (la palabra 'oficina' en una oficina propia, las nomenclaturas de dos
+# letras tipo '# 100 AB - 03', y las veredas a las que se les pedia numero de puerta).
+from direcciones import analiza_dir
 def rutas_export():
     """Las 2 rutas de los export de Dropi. Por argumento, por variable de entorno, o
     el más reciente que encuentre. NUNCA una ruta fija: esto corre en la máquina de
@@ -149,13 +141,14 @@ for r in data:
         if ':' in tok:
             k,v=tok.split(':'); e,d=v.split('/'); cli[N(k)]=(int(e),int(d))
     tot=int(h.get('total') or 0); entP=float(h.get('entP') or 0); devP=float(h.get('devP') or 0)
-    fl=FL.get((ciu,dep)); ef=EF.get(dep,{})
+    fl=FL.get((ciu,dep))
     cands=[]
     for car,precio in (fl['m'].items() if fl else []):
         if car not in HABILITADAS: continue
         if not bodega_ok(car): continue
-        base=ef.get(car,{}).get('pct')
-        if base is None: continue
+        _e=EFEC.get(car,ciu,dep)
+        if _e is None: continue
+        base=_e['pct']
         if forzada and car!=forzada: continue
         if vetada(car,ciu,dep): continue
         p=base/100
@@ -173,6 +166,8 @@ for r in data:
         margen=ticket-costo-flete
         ev=p*margen-(1-p)*(flete+retorno)
         cands.append(dict(car=car,ev=round(ev),flete=flete,base=round(base,2),p=round(p*100,1),ret=round(retorno),
+                          muestra_envios=_e['muestra_envios'], fuente_efectividad=_e['fuente_efectividad'],
+                          marca_ef=marca(_e['fuente_efectividad'], _e['muestra_envios']),
                           marg=ESTADO_BODEGA.get(car)=='MARGINAL'))
     if prepago:   # prioridad precio, con piso de efectividad
         if cands:
@@ -195,3 +190,6 @@ for r in data:
         cands=cands,best=best,asigC=a,delta=(best['ev']-a['ev']) if (best and a and not prepago) else ((a['flete']-best['flete']) if (best and a and prepago) else None)))
 json.dump(out,open(D('salidas/salida-v3.json'),'w'),ensure_ascii=False,indent=1)
 print('analizados:',len(out))
+print('retorno:', FUENTE_RETORNO)
+print('efectividad:', EFEC.nivel_disponible()['fuente_municipio'] or 'sin municipio',
+      '|', EFEC.nivel_disponible()['fuente_departamento'] or 'sin departamento')

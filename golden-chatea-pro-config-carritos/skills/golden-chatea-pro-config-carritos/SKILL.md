@@ -1,179 +1,345 @@
 ---
 name: golden-chatea-pro-config-carritos
 description: >-
-  Golden Group — Configura el asistente de CARRITOS ABANDONADOS de Chatea Pro: recupera por
-  WhatsApp los checkouts/carritos que el cliente dejó a medias en la tienda, con una
-  secuencia de reactivación (recordatorio suave → resolver objeción → urgencia honesta →
-  último intento + incentivo) que reabre la conversación y cierra la venta o dispara el
-  flujo logístico. Entrega cada mensaje en bloque copy-paste + las plantillas de Meta que la
-  ventana de 24 h exige, todo alineado con la oferta, el tono y los datos de pago del
-  asistente de ventas del mismo workspace. Úsala SIEMPRE que el usuario quiera montar o
-  configurar el asistente de carritos / recuperación de carritos abandonados de Chatea Pro,
-  "recuperar carritos", "mensajes de carrito abandonado", "configurar carritos de chatea
-  pro", "reenganchar clientes que no terminaron la compra", "secuencia de recuperación".
+  Golden Group — Audita y configura el asistente de CARRITOS ABANDONADOS de Chatea Pro (el que
+  recupera por WhatsApp los checkouts que el cliente dejó a medias en la tienda online). Lee el
+  espacio por API, califica el campo [Carritos] Configuracion (29 casillas, 38 hojas de JSON) contra los topes del
+  panel medidos en UTF-16 y contra la doctrina de la casa, reescribe los textos (adaptación del
+  lenguaje, anticancelación, ubicación, tiempos, transportadoras, agradecimiento, correo, pago
+  anticipado), limpia el caché de productos y revisa el ESTADO de las plantillas de Meta. Entrega
+  cada campo en texto plano listo para pegar en el panel, o lo escribe por API y lo relee del
+  servidor. Úsala SIEMPRE que el usuario quiera montar, revisar, calificar o corregir el asistente
+  de carritos de Chatea Pro: "configura carritos", "revisa mi asistente de carritos", "recuperar
+  carritos abandonados", "califica carritos", "deja carritos en mil", "mensajes de carrito
+  abandonado", "arregla la configuración de carritos".
 ---
-<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
-     QUE SE LE HIZO A ESTA SKILL: (1) FRONTMATTER YAML INVALIDO, arreglado: la description estaba escrita como escalar PLANO en una linea y su texto contenia 'dos puntos + espacio', que YAML lee como una clave nueva. Un parser estricto NO podia leer esta skill. Pasa a bloque '>-', que es inmune. No se cambio una sola palabra: cambio la FORMA de escribirla · (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 870 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
-     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
-     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
-     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
-     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # Golden · Chatea Pro — Asistente de Carritos Abandonados
 
-**Versión:** v1.5.1 · 2026-08-26 · 981 ORO · blindada (chflags uchg)
+<!-- skill v3.2 · 2026-09-20 · auditoría golden-skill-auditor: scripts/chatea_api.py (la librería
+     común que importan auditar_carritos.py, escribir_config.py, limpiar_cache_productos.py y
+     validar_config.py) no aparecía mencionada en ninguna parte del cuerpo — inventario.sh la
+     marcaba "huérfana potencial" (solo vivía citada por nombre en references/changelog.md,
+     que es historia y no cuenta como cita viva). Se agregó una línea en la sección de
+     validar_config.py explicando qué es y quién la usa. Sin cambios de comportamiento. -->
+**Versión:** v3.5 · 2026-09-22 · blindada (chflags uchg + chmod 0444, estándar de la casa)
 **Fábrica:** chat ✅ SKILL golden-chatea-pro-config-carritos
+<!-- v3.0: la skill deja de ser "redactora de plantillas" y pasa a CONFIGURAR el espacio, con lo
+aprendido afinando carritos de Golden el 18-sep. Historial completo en references/changelog.md. -->
 
-<!-- skill v1.5.1 · 2026-08-26 (turno concedido por el CENTRO DE MANDO, LEY DEL CAMBIO ÚNICO de FER 2026-08-25) · alcance de UNA línea: se estampa la FÁBRICA en el propio SKILL.md. Motivo medido: REGISTRO-FABRICAS.md resolvía esta skill a "CENTRO DE MANDO (por ley: sin fábrica declarada)" porque `grep Fábrica` daba 0, mientras la memoria afirmaba que la fábrica era su chat — memoria y registro se contradecían, y con eso dos manos podían creerse dueñas a la vez (clase FILAS ABIERTAS: la memoria es buen índice, mal candado). El CdM arbitró a favor de la memoria (v1.1 y v1.5 salieron de ese chat) y concedió turno para sellarlo. Sin cambio de contenido funcional. Rige además la LEY DEL NÚMERO DE VERSIÓN: solo la fábrica numera, el resto entrega fila. -->
-<!-- skill v1.5 · 2026-08-23 (auditoría golden-skill-auditor 878 PLATA→ORO, corrida fresca) · CUATRO hallazgos con evidencia: (1) CONTRADICCIÓN DE TECHOS — la mecánica decía "Instrucción especial ≤1000 caracteres" mientras la sección de techos afirma, confirmado del código, que CartsPage NO tiene maxLength; quien seguía el ≤1000 recortaba mensajes sin necesidad. El ≤1000 queda marcado como supuesto heredado de prompt-ventas, no como límite del módulo. (2) ESTRUCTURA — las 52 líneas de la LEY de no heredar datos se cargaban en CADA invocación y empujaban hasta la línea 68 la explicación de qué hace la skill; la ley se movió verbatim a references/ley-datos-entre-espacios.md con puntero de cuándo leerla (aplica solo al clonar entre espacios). (3) QA CIEGO AL FALLO MÁS CARO — el checklist no verificaba el largo ESCAPADO ni el releer tras escribir, pese a que la propia skill documenta que pasarse devuelve 200 ok y mata el asistente en silencio; ambos entran al checklist y a la definición de terminado. (4) los ejemplos escribían preguntas sin ningún signo, contra la regla propia de "solo el de cierre". Además: conexión al Centro de Mando declarada (estándar 9). -->
-<!-- skill v1.4 · 2026-08-21 (auditoría golden-skill-auditor 934→ORO): hallazgo real — el paso "Resolver la objeción" recomendaba prueba social pero el intake nunca pedía ese dato, y el ejemplo de vara de calidad traía una cifra inventada ("Más de 12.000 clientas") sin marcarla como dato real requerido; eso fosilizaba la fabricación de una cifra de negocio, justo lo que la LEY de arriba prohíbe entre espacios y el estándar Golden "datos reales antes de generar" prohíbe siempre. Se añadió el punto 7 al intake (prueba social real, opcional), la regla explícita de nunca inventar cifras de negocio, el chequeo en el QA, y se corrigió el ejemplo para dejar la cifra marcada como dato real del intake, no como técnica libre. -->
-<!-- adenda 2026-08-20 (centro de mando, autoevalúo del ecosistema): completada la ley de DOS NIVELES del techo — el tope de 20.000 escapados aplica al bot field tipo JSON legacy; un campo creado o convertido a LONG JSON aguanta hasta 500.000 (medido y validado en las hermanas config-comentarios v1.4.1 y config-ventas-wp v3.0). La cifra de esta skill era incompleta, no falsa: sin la mención a LONG JSON, quien la siga se autolimita. -->
-<!-- skill v1.3.1 · 2026-08-08 (centro de mando, chat CHATEA un cliente COL 2026-08-08 (2ª ronda: 5ª categoría + prosa libre)) · QUINTA CATEGORÍA VETADA en la ley: claims y cifras de negocio (años en el mercado, clientes atendidos, porcentajes de entrega, premios) — no rompen nada técnico ni los caza un barrido de llaves, pero el bot termina mintiendo con datos de otra empresa (caso real: "Más de 100.000 clientes atendidos en Colombia" a punto de heredarse). Y regla operativa LA MARCA VIVE TAMBIÉN EN PROSA LIBRE: al barrido se añade grep -i por el nombre de la marca origen sobre todo el texto a escribir (cazó 10 menciones en 3 campos que el mapeo de llaves no vio). -->
-<!-- skill v1.3 · 2026-08-08 (centro de mando, chat CHATEA un cliente COL 2026-08-08) · horneada la LEY "NUNCA HEREDAR DATOS ENTRE ESPACIOS": al basarse en una cuenta guía se hereda estructura/prompts/config, JAMÁS datos (APIs, plantillas de WhatsApp, teléfonos, correos, dominios, marca, productos y disparadores); única excepción Le'côterra como producto-ejemplo; método de barrido obligatorio antes y después de escribir en espacio ajeno. Origen: incidente Golden → un cliente Incanto 2026-08-08 (se colaron llave ElevenLabs, teléfono, plantilla de notificación y firmas de la marca origen; revertido el mismo día). La ley entra como PREVENCIÓN, no reparación: línea base pre-horneado verificada por verificador externo — 8/8 skills sin credenciales (CRITICA=0); únicos hallazgos 3 teléfonos de relleno legítimos (+57 300 de ejemplo) que se conservan. ADEMÁS (chat CHATEA un cliente COL 2026-08-08, retractación pixel): regla CAMPOS [Meta] = VALORES CALIENTES — los eventos de pixel los mueve el flujo en vivo, prohibido diagnosticar con una lectura suelta. -->
-<!-- skill v1.2 · 2026-08-07 (centro de mando, briefing BRIEFING-PARA-SKILLS.md de CHATEA-PRO-ASISTENTES-MAPA, cosecha del chat CONFIG CHATEA KEVIN MX): confirmado desde el código de la app que el módulo Carritos (CartsPage) NO tiene topes nativos salvo los campos de correo — cierra parte del pendiente "verificar en vivo"; añadido el techo del bot field (20.000 ESCAPADOS ~ 17.000 crudos, corte silencioso con 200 ok); países limitados a los 7 que acepta la plataforma; higiene al clonar ([Carritos IA] Información de productos #N no se hereda) y regla de escribir y RELEER. -->
-<!-- skill v1.1 · auditada con golden-skill-auditor 893→ORO: corregida la regla real de la ventana de 24h (contacto frío = plantilla en el primer toque), etiquetas unificadas (REACTIVACIÓN N), paso de QA + checklist de "terminado", modelo de plataforma marcado "verificar en vivo", changelog añadido -->
+Este asistente recupera por WhatsApp a quien dejó el checkout a medias. **Configurarlo es
+llenar bien el campo `[Carritos] Configuracion`**: identidad, datos de la tienda, logística,
+mensajes fijos y correo. Los mensajes de recuperación son **plantillas de Meta** que ya vienen
+instaladas o que diseña el dueño: se seleccionan, no se redactan aquí.
 
-Configura el asistente que **recupera carritos/checkouts abandonados** por WhatsApp: el cliente empezó a comprar en la tienda (dejó producto, a veces nombre y teléfono) y no terminó. Este asistente lo reengancha con una secuencia corta, humana y con un ángulo distinto por mensaje, hasta cerrar la venta o agotar los intentos.
+## Lo que se aprendió y manda sobre todo lo demás (FER, 18-sep-2026)
 
-> **Regla de Chatea Pro:** 1 espacio de trabajo = 1 país. Usa el mismo país, oferta, tono y datos de pago que el **asistente de ventas** del workspace, para no contradecirlo. Si algo no coincide, manda lo que ya generó `golden-chatea-pro-config-ventas-wp`.
-> **La plataforma solo acepta 7 países** (campo `[Comentarios IA] País`, MAYÚSCULA y sin acentos): COLOMBIA, ECUADOR, CHILE, MEXICO, PANAMA, PERU, PARAGUAY.
+1. **El techo no es un defecto.** El tope del panel es una compuerta: pasarse bloquea, y 1.999
+   de 2.000 pasa. **Nunca se recorta contenido útil para ganar margen** ni se reporta "poco
+   margen" como problema. Cuando algo se pasa, se quita **lo que se repite, lo que se contradice
+   o lo que es falso**, no lo que sirve.
+2. **Se mide como mide el panel: UTF-16.** Cada emoji astral vale 2. Python `len()` da otro
+   número (medido: 248 contra los 249 del panel por un 🚛).
+3. **Las plantillas de Meta NO son configuración.** No se reescriben ni se califican por su
+   contenido. Solo se revisa su **ESTADO**: que cada casilla tenga una plantilla que exista y
+   esté APPROVED, porque una no aprobada hace fallar ese paso en silencio. Crear plantillas por
+   API se puede (`POST /whatsapp-template/create`, Meta las aprueba), **solo si el dueño lo pide**.
+   Guía para ese caso: `references/plantillas-meta-solo-si-lo-piden.md`.
+4. **El nombre del asesor es UNO por espacio.** Es el mismo en todos los asistentes. Se lee de
+   los hermanos (ventas, logístico) y no se vuelve a preguntar. Solo se pregunta si ninguno lo tiene.
+5. **El pago anticipado se decide POR ASISTENTE.** Carritos y logístico pueden tenerlo distinto.
+   Se le pregunta al cliente junto con el resto de la configuración, y sus datos (medio, titular,
+   número, llave) **solo los da el dueño**. El envío gratis sigue siendo la oferta: el anticipo es
+   una excepción, así que "envío gratis" no choca con él.
+6. **No se inventa nada.** Ni identidad (nombre del bot, tienda, URL), ni promesas comerciales.
+   La clase de error medida: frases que suenan bien y nadie confirmó ("despacho el mismo día
+   antes de las 2", "importador directo", "legalmente constituida", "lo procesamos hoy",
+   "reservado por tiempo limitado"). Sin dato real, se pide o se declara que falta.
+7. **La regla y el ejemplo dicen lo mismo.** El bot imita el ejemplo más que la regla. Si la
+   regla dice "sin ¿" y el ejemplo trae "¿", gana el ejemplo. Se lee cada ejemplo contra cada
+   regla, a mano.
 
-## Antes de clonar o escribir en un espacio ajeno
+## Doctrina de los textos (vigente en todos los asistentes del espacio)
 
-Si vas a basarte en una cuenta guía, clonar la configuración de un espacio a otro, o escribir en el
-workspace de un cliente distinto al de origen, **lee `references/ley-datos-entre-espacios.md`
-ANTES de escribir una sola línea**. Ahí vive la LEY de FER (2026-08-08): se hereda estructura,
-prompts y configuración — JAMÁS datos (APIs, plantillas de WhatsApp, teléfonos, correos, dominios,
-marca, productos, y claims o cifras de negocio), con el método de barrido obligatorio antes y
-después de escribir, y la regla de que los campos `[Meta]` son valores calientes que el flujo mueve
-en vivo. Nació de un incidente real que se revirtió el mismo día.
+Carritos no puede contradecir lo que ya dicen ventas y logístico:
 
-Si estás configurando carritos en un solo espacio desde cero, ese archivo no hace falta.
+- **Tono:** humano, profesional y cercano. Frases resolutivas ("claro, te explico", "te indico
+  el paso siguiente"). Nunca "estoy aquí para ayudarte". Breve para chat.
+- **Emojis:** **la IA no los genera** en sus respuestas. Los mensajes FIJOS (agradecimiento,
+  tiempos) sí pueden llevarlos, porque se envían tal cual.
+- **Signos:** sin signos de apertura ¿ ¡ en WhatsApp, solo los de cierre.
+- **No inventar** precios, promociones, tiempos, estados, stock ni urgencias. **No prometer**
+  entregas exactas ni respuestas inmediatas.
+- **Calma** aunque el cliente esté molesto. **No insistir** más de dos veces.
+- **Nunca volver a pedir un dato** que el cliente ya dio.
+- **Privacidad:** nada de otros clientes ni de procesos internos.
+- **Anticancelación:** primero entender el motivo; recordar el beneficio del pedido; la objeción
+  de precio se explica por las **promociones** (varias unidades, volumen, adicionales, condiciones
+  especiales); un solo intento; respetar la decisión final.
+- **Mensajes fijos que salen en TODO pedido** (el agradecimiento) **no asumen un medio de pago**:
+  si el anticipado está activo, "pagas en efectivo al recibir" le miente a quien ya pagó.
+- **Los datos de la empresa son UNO por espacio**, como el nombre del asesor: si ventas dice
+  "sede física" y carritos "100% virtual", o una cifra de clientes distinta, el cliente lo nota.
+  Se comparan con los hermanos y la contradicción se le lleva al dueño; no se elige una sola.
 
-## Techos de caracteres (confirmado desde el código de la app, 2026-08-07)
+**El único aviso de margen que existe es el del CAMPO ENTERO** (el JSON completo contra su tope
+de escapados), no el de una casilla: ahí pasarse guarda cortado con un `200 ok`. Para las casillas
+sigue mandando la regla del techo: cerca del tope pasa y no se recorta nada útil.
 
-- **Techo nativo del módulo Carritos (`CartsPage`): NO hay `maxLength`** en sus campos de texto. Solo los campos de **correo** (asunto y contenido) validan longitud, contra una tabla de un módulo compartido. Fuente: `TOPES-NATIVOS-POR-CAMPO.md` de CHATEA-PRO-ASISTENTES-MAPA.
-- **Techo del bot field: 20.000 ESCAPADOS, no crudos** (~17.000 crudos: cada tilde ocupa 6 caracteres y cada emoji 12). Pasarse NO da error — la API responde `200 ok`, guarda cortado y el asistente muere en silencio; el error solo aparece en Panel → Registros de errores. Medir: `len(json.dumps(valor)[1:-1])` bajo 19.000. Tras escribir por API, **releer y comparar** siempre. **Nivel B — LONG JSON:** el tope de 20.000 es del campo tipo JSON legacy; si el bot field se crea o convierte a **LONG JSON**, el techo sube a 500.000 escapados (ley de dos niveles medida en las hermanas config-comentarios y config-ventas-wp). Con configuraciones grandes, convertir el campo a LONG JSON antes de escribir.
-- **Al clonar un workspace a otro cliente:** vaciar `[Carritos IA] Información de productos #N` (son productos reales cacheados por el bot del dueño anterior) y jamás arrastrar `[Integraciones] Datos de integracion`.
+`scripts/validar_config.py` vigila estas reglas: signos de apertura, prompts que permiten emojis,
+promesas sin confirmar, agradecimiento que asume contra entrega. **Ninguna máquina reemplaza leer
+el texto completo**: el validador caza la clase conocida, no la siguiente.
 
-## Qué es esto y qué NO es (límite con Ventas)
+`scripts/catalogo_tienda.py` lee el catálogo público de la tienda (id → título, sin token) y es
+lo que le permite a la auditoría juzgar el CONTENIDO del caché y no solo su forma.
 
-No confundir dos reactivaciones distintas del universo Chatea Pro:
+`scripts/chatea_api.py` es la pieza común que hablan con la API: `auditar_carritos.py`,
+`escribir_config.py`, `limpiar_cache_productos.py` y `validar_config.py` la importan para leer y
+escribir bot fields, paginar plantillas y contar caracteres como el panel (UTF-16). No se invoca
+sola; es la librería compartida detrás de las demás.
 
-- **Carritos (esta skill):** el disparador es un **checkout abandonado en la tienda** (Shopify / la web). El cliente casi nunca escribió por WhatsApp; el módulo de Carritos abre el chat para rescatarlo.
-- **Recordatorios/Remarketing de Ventas (`golden-chatea-pro-prompt-ventas`):** el disparador es una **conversación de venta por WhatsApp que se enfrió** (escribió, no cerró). Va DENTRO del paquete del producto.
+## 🔴 COMPUERTA · sin el cable de la tienda no llega ni un carrito
 
-Comparten motor y estética (mensajes cortos, ventana de 24 h, plantillas de Meta), pero son campos y momentos distintos. Esta skill se ocupa solo del carrito.
+Los carritos entran por un **webhook de la plataforma de la tienda**. Se pueden dejar las 29
+llaves perfectas y no recuperar uno solo, sin ningún error. **Primero se pregunta en qué
+plataforma está la tienda**, y la compuerta depende de la respuesta:
 
-## La regla de la ventana de 24 h (lo que decide si un mensaje necesita plantilla)
+**Si es Shopify** (la única medida hasta hoy), tres comprobaciones:
+1. La integración de Shopify aparece **conectada** en el panel.
+2. El Access Token empieza por **`shpat_`** (el Secret es `shpss_`; los dos empiezan por `sh` y es
+   el error número uno).
+3. `acciones_especiales.origen_datos` es Shopify (el panel lo guarda con mayúscula; se compara sin
+   distinguir mayúsculas).
 
-Esto es de WhatsApp/Meta, no de Chatea Pro, así que es fijo y no se inventa:
+Si falta el cable: `references/integracion-shopify-paso-menos-uno.md` y los 24 permisos en
+`assets/permisos-shopify-24.txt`. Quien no es DUEÑO de la tienda no puede instalar la app: se
+pregunta antes de empezar.
 
-- El reloj de 24 h cuenta desde el **último mensaje del CLIENTE**, no desde el abandono del carrito.
-- **Un carrito abandonado suele ser un contacto FRÍO:** el cliente dejó el checkout en la tienda pero **nunca escribió a tu WhatsApp**. Entonces **no hay ventana abierta y el PRIMER mensaje de recuperación ya exige una plantilla de Meta aprobada.** No se puede abrir con texto libre.
-- **En cuanto el cliente responde**, se abre su ventana de 24 h y los mensajes siguientes pueden ir como **texto libre** (sin plantilla), mientras estés dentro de esas 24 h.
-- Si vuelve a pasar de 24 h desde su última respuesta, el siguiente mensaje **vuelve a necesitar plantilla**.
+**Si es otra plataforma** (Tienda Nube, WooCommerce u otra): lo primero es **confirmar que Chatea
+Pro recibe carritos abandonados desde esa plataforma**. Para Tienda Nube está **NO VERIFICADO**
+(18-sep: no se encontró integración nativa; no se da por negativo con una sola búsqueda; lo
+confirma un beta tester de Chatea). Mientras no se confirme:
+- **no se declara el asistente "mal instalado"**: se declara **"no aplica todavía en este
+  espacio"**, que es distinto;
+- la venta y el despacho pueden funcionar igual por otras vías (Dropi sí integra Tienda Nube);
+  lo que queda en duda es solo la recuperación de carritos;
+- si Chatea no recibe carritos de esa plataforma, **el asistente no sirve ahí** y se dice así, en
+  vez de configurar 29 casillas que nunca van a disparar.
 
-Excepción: si el carrito viene de alguien que **sí tenía una conversación activa** (abandonó a mitad de chat), su ventana ya está abierta y el primer toque puede ir sin plantilla. En la duda, trátalo como frío → plantilla.
+## PASO 0 · Auditar el espacio antes de preguntar nada
 
-## Mecánica del módulo Carritos (modelo por defecto — VERIFICAR EN VIVO)
+```bash
+python3 ~/.claude/skills/golden-chatea-pro-config-carritos/scripts/auditar_carritos.py \
+    --token-file <PROYECTO>/.secrets/<espacio>.token --guardar <respaldo.json>
+```
 
-Chatea Pro reutiliza su **motor de reactivación** en todo el producto, así que arrancamos con el modelo ya conocido de `golden-chatea-pro-prompt-ventas` en lugar de partir de cero. **Trátalo como hipótesis a confirmar, no como hecho:**
+Solo lectura. Revisa **7 frentes** y reporta cobertura (con `--dominio <tienda.com>` para el
+cruce contra el catálogo):
+1. el campo contra `validar_config.py` (29 casillas, topes UTF-16, doctrina);
+2. el **estado** de las plantillas seleccionadas (lista con `POST /whatsapp-template/list`; con GET
+   la API da 405);
+3. el nombre del asesor contra los hermanos;
+4. el **caché de productos** (`[Carritos IA] Información de productos #N`);
+5. la **búsqueda web** (`[Carritos IA] Habilitar búsqueda web`), que si está encendida vuelve a
+   llenar el caché con basura;
+6. el caché contra el **catálogo público de la tienda** (`/products.json`, sin token): entradas de
+   productos que ya no existen y entradas cuyo nombre no coincide con el título real;
+7. la **frescura** del caché: hace cuánto no entra un producto nuevo por el webhook. No prueba que
+   el cable esté mudo (un carrito de un producto ya cacheado no deja rastro), pero si se cayó, se
+   ve así.
 
-- Cada paso de reactivación suele exponer 3 campos: **Tiempo** (cuándo dispara), **Plantilla Mensaje** (desplegable: una plantilla de Meta aprobada o "No enviar plantilla") e **Instrucción especial** (el MENSAJE + la `[Instrucción IA]` juntos).
-- ⚠️ **El "≤1000 caracteres" NO es un límite del módulo Carritos.** Es el tope del campo equivalente en `golden-chatea-pro-prompt-ventas`, heredado aquí como supuesto. El código de la app confirma que **CartsPage no tiene `maxLength`** (ver la sección de techos): no recortes un mensaje por ese número. El límite que SÍ manda es el del bot field — 20.000 escapados, o 500.000 si el campo es LONG JSON. Mantener los mensajes cortos es criterio de conversión (≤35 palabras), no una restricción de la plataforma.
-- **Dato del carrito para personalizar:** producto, nombre y teléfono suelen venir; el link de pago/checkout a veces. No asumas que traes todos: escribe cada mensaje para que funcione aunque solo tengas el producto.
+Para saber qué es de FÁBRICA y qué tocó el negocio, el detector de la hermana logística:
+`python3 ~/.claude/skills/golden-chatea-pro-config-logistico/scripts/auditar_espacio.py --token-file <ruta>`.
+Lo de fábrica no se hereda; lo TOCADO es del negocio y manda. Si un script no corre, **se dice y
+se sigue a mano**, nunca se da por bueno.
 
-⚠️ **Pendiente que solo el dueño puede cerrar (verificar en vivo la 1.ª vez y guardar como nota):** los **nombres/etiquetas exactos del módulo Carritos**, **cuántos pasos** admite y **dónde vive** (en cuentas de referencia no aparece como ítem suelto del menú v1: revisar dentro del flujo del bot o en "Chatea PRO v2"). Si el módulo difiere de este modelo, ajústalo y **no inventes** campos ni límites. La regla de 24 h de arriba sí es fija.
+## LA PARTE DINÁMICA · lo único que cambia de un espacio a otro
 
-**Lo que YA quedó confirmado (2026-08-07, del código de la app):** el módulo existe como `CartsPage` y sus campos de texto **no tienen tope nativo** (solo los de correo validan longitud) — ver la sección de techos arriba. El pendiente que queda es el de etiquetas, pasos y ubicación en el menú.
+**Esto es lo que hace que la skill no se tenga que rehacer en cada instalación.** Todo lo demás
+—doctrina, topes, estructura de las 29 casillas, forma de los textos, orden de trabajo— es igual
+para todos los espacios y ya está resuelto aquí.
 
-## Intake del negocio (pregunta 1 a la vez)
+El molde está en `assets/datos-del-espacio.json`. Se llena una vez por cliente:
 
-Reusa lo que ya definió el asistente de ventas del workspace; solo pregunta lo que falte.
+| Qué | De dónde sale |
+|---|---|
+| País del espacio | Se lee del campo; si no está, se pregunta. Define jerga, transportadoras y pack de direcciones |
+| Plataforma de la tienda y su dominio | Se pregunta. Decide la compuerta y permite cruzar el caché con el catálogo |
+| Nombre de la empresa y su URL | Se lee del espacio |
+| Nombre del asesor | Se lee de los asistentes hermanos: es UNO por espacio |
+| Ciudad de despacho y frase de respaldo | Las da el dueño; nunca se inventan |
+| Tiempos por zona | Los da el dueño, tal cual |
+| Transportadoras: domicilio, oficina, prohibida | Las da el dueño. La prohibida va PRIMERO |
+| Contra entrega y anticipado, con sus datos y su monto | Los da el dueño. El anticipado se decide POR ASISTENTE |
+| Descuento e incentivo | Los decide el dueño. Default apagado |
+| Números del negocio (clientes, años) | Los da el dueño. Se usan tal como él los escribió |
 
-1. **País** del workspace.
-2. **Producto(s)** y su **oferta/precio** (debe coincidir exacto con el asistente de ventas).
-3. **Modelo de pago** (contra entrega / anticipado / ambos). Si hay anticipado, los datos de la cuenta (para blindarlos, nunca confirmar sin comprobante).
-4. **Incentivo de recuperación disponible** (envío gratis, descuento, regalo, bono) — si existe. Sin incentivo, el paso 4 cierra con valor/garantía, no con descuento.
-5. **Tiempos de entrega por zona** — el mismo dato que Ventas y Logístico, para no contradecir.
-6. **Nombre y tono del asistente** (el mismo del asistente de ventas).
-7. **Prueba social real (opcional)** — número de clientes/reseñas o calificación, SOLO si el negocio la tiene y la confirma. Se usa en REACTIVACIÓN 2 (resolver objeción). Sin este dato, ese mensaje se apoya en garantía y contra entrega, nunca en una cifra inventada.
+**Todo lo que no está en esa tabla no se pregunta y no se discute otra vez:** ya está decidido en
+esta skill, y cambiarlo es cambiar el estándar, no configurar un cliente.
 
-## Secuencia de recuperación (estructura ganadora)
+## Intake: preguntar lo mínimo
 
-Diseña **4 mensajes, cada uno con un ángulo distinto** — nunca repetir el mismo "no terminaste tu compra". Tiempos por defecto (ajústalos a lo que permita el módulo); el reloj de disparo arranca en el abandono del carrito. La columna "Plantilla Meta" aplica la regla de la ventana de 24 h de arriba:
+**Se LEE, no se pregunta** (del espacio y de los hermanos): nombre del asesor, tono, país,
+empresa, URL, ubicación, tiempos por zona, transportadoras, modelo de pago de ventas.
 
-| # (etiqueta) | Ángulo | Tiempo por defecto | Plantilla Meta |
+**Solo lo sabe el dueño, y se pregunta una cosa a la vez:**
+1. **Vía de entrega.** Default: **texto por campo para pegar en el panel**, con los topes del
+   panel. Por API solo en el espacio de FER, en VIP o cuando el dueño lo pide.
+2. **Pago anticipado en carritos: sí o no.** Si sí, **sus datos** (medio, titular, número, llave)
+   y el **monto del anticipo** (un valor fijo que decide el dueño). Si no da monto, se propone **un
+   flete completo**: con el cliente que rechaza se pierden casi dos fletes (ida y devolución), el
+   50% cubre una cuarta parte y deja de proteger.
+3. **Incentivo / descuento.** 🔴 Un 10% cuesta entre $4.234 y $8.467 por pedido GENERADO según el
+   PVP, contra un piso de $8.000. Antes de encenderlo se corre
+   `golden-dropkiller-productos-ganadores/scripts/viabilidad_cod.py`. Default recomendado: **apagado**.
+4. **Prueba social real** (clientes, años, reseñas), solo si el negocio la confirma. Nunca una
+   cifra inventada.
+
+El país es **parámetro, nunca como puerta**: decide jerga, transportadoras y pack de direcciones
+(`golden-chatea-pro-validacion-direcciones`). No tenerlo en ninguna lista nuestra jamás bloquea: se
+investiga lo que falte y se configura igual. El país en el JSON va en minúscula (`colombia`).
+
+## EL CAMPO · `[Carritos] Configuracion`, 29 casillas = 38 hojas
+
+Molde: `assets/template-botfield-configuracion.json`. Topes: `assets/limites.json`. **Las claves
+no se renombran**: el flujo las lee por nombre.
+
+**Por qué dos números.** Se configuran **29 casillas**, pero el JSON tiene **38 hojas**, porque
+cada plantilla de Meta ocupa cuatro (`name`, `lang`, `namespace`, `status`) y son tres plantillas:
+29 − 3 + 12 = 38. El validador cuenta hojas, que es lo que se escribe; el panel muestra casillas. **Los productos NO van aquí**: entran por el webhook.
+
+| Sección | Llave | Tope panel | Cómo se llena |
 |---|---|---|---|
-| REACTIVACIÓN 1 | **Recordatorio suave** | ~20-30 min | **Sí** si el contacto está frío (lo normal) · No si ya tenía ventana abierta |
-| REACTIVACIÓN 2 | **Resolver la objeción** | ~3-4 h | No si el cliente ya respondió (ventana abierta) · Sí si sigue frío |
-| REACTIVACIÓN 3 | **Urgencia / escasez honesta** | ~20-24 h | No dentro de ventana abierta · Sí si pasó de 24 h |
-| REACTIVACIÓN 4 | **Último intento + incentivo** | ~24-48 h | **Sí** (casi siempre fuera de las 24 h) |
+| identidad | nombre_asesor | 50 | El del espacio (hermanos) |
+| identidad | adaptacion_lenguaje | 2000 | Contexto de carrito + doctrina completa (este asistente no tiene campo de restricciones: van aquí) |
+| identidad | metodo_anticancelacion | 2000 | Causa → respuesta: desconfianza, precio (promociones), tiempo, duda, postergación |
+| tienda | nombre_tienda | 80 | Nombre de la empresa, real |
+| tienda | ubicacion_tienda | 200 | Texto del dueño; si el del logístico no cabe, se queda la frase que dice ciudad, envío y respaldo real |
+| tienda | pais | desplegable | Minúscula |
+| tienda | ofrecer_descuento · descuento_maximo · mensaje_descuento | — · — · 200 | Según la economía; apagado por defecto |
+| logística | tiempos_envio | 150 | El bloque estándar del dueño, tal cual |
+| logística | metodo_pago (contraentrega, anticipado, datos_pago_anticipado) | — · — · 300 | Datos SOLO del dueño; se cierran con "envía el comprobante" |
+| logística | transportadoras_disponibles | **100** | **La prohibida primero**, después las de domicilio y cuáles también entregan en oficina. **Sin repetir el nombre del campo adentro** |
+| recuperación | posicion_imagen · 3 plantillas · tiempos · mensaje_agradecimiento | — · — · — · **300** | Plantillas: solo estado. Agradecimiento: fijo, puede llevar emojis, sin asumir medio de pago |
+| correos | activar_envio · asunto · contenido | — · 80 · 500 | Quitar el riesgo (contra entrega, envío gratis) y decir cuándo llega. Sin urgencia inventada |
+| acciones | subida_automatica · imagenes_producto · origen_datos | — | La plataforma real de la tienda |
+| raíz | onboarding_completed | — | true |
 
-1. **Recordatorio suave** (temprano): retoma con calidez, sin presión. Recuerda el producto y ofrece terminar en segundos. Ej: "Vi que dejaste [producto] casi listo, te ayudo a cerrar el pedido en 1 minuto." (si el mensaje termina en pregunta, lleva su signo de cierre)
-2. **Resolver la objeción** (medio): ataca la razón típica de abandono — dudas de confianza, envío, forma de pago. Prueba social + garantía. **Contra entrega es el argumento fuerte:** "Pagas cuando lo recibes en tu casa, sin arriesgar nada."
-3. **Urgencia / escasez honesta** (más tarde): stock real que baja, cierre de promo, tiempos de entrega que corren. **Nunca inventes escasez falsa.**
-4. **Último intento + incentivo** (fuera de 24 h → plantilla Meta): el empujón final con el incentivo disponible (envío gratis / descuento / regalo). Tras este, **máximo 1-2 reactivaciones** y se suelta; sin desesperación ni acoso.
+**Campos auxiliares `[Carritos IA] *`** (búsqueda web, automatizar pago anticipado, automatizar
+creados manualmente, ofrecer descuento si se creó con uno, retraso de validación, tipo de
+actividad, versión): se leen y se reportan; **cuál manda sobre el anticipado del JSON no está
+medido**. No se tocan sin saberlo.
 
-### Reglas de oro de los mensajes
-- **Cortos** (≤35 palabras), **máx 2 emojis**, **UNA sola pregunta** por mensaje, tono humano local, nunca robótico, nunca "soy un bot".
-- **Sin signos de apertura de interrogación ni exclamación** (solo el de cierre). Más humano, menos robótico.
-- **Beneficio, no reproche:** reengancha por lo que **gana** el cliente, no por lo que "dejó a medias".
-- **Precio claro** si lo pregunta; **anticipado blindado** (nunca confirmar sin comprobante).
-- **Personaliza con lo que traiga el carrito** (nombre, producto) pero que el mensaje funcione aunque falte un dato.
-- **Nunca inventes cifras de negocio** (número de clientes, reseñas, porcentajes de entrega, años en el mercado) en ningún mensaje — es la misma prohibición de la LEY de arriba, aplicada dentro de un solo espacio, no solo al clonar entre espacios. Úsalas solo si el negocio las confirmó en el intake (punto 7); si no hay dato real, el mensaje de objeción se apoya en garantía y contra entrega.
-- Al cerrar, **dispara el flujo de venta/logístico** para tomar la dirección y confirmar el pedido (no reimplementes la validación de dirección aquí).
+**Recordatorios, visto en el panel el 18-sep:** hay **dos pares** (tiempo, plantilla),
+Recordatorio 1 y Recordatorio 2, más el mensaje de recuperación con imagen. El JSON trae además
+`tiempo_recordatorio_3`, **una llave sin casilla en el panel**: si tiene valor, se deja vacía.
+**Posición de la imagen:** tiene que existir y no ser GIF, o el envío falla.
 
-## Plantilla de Meta (para todo mensaje que caiga fuera de la ventana)
+### Los fallos que ya se midieron en espacios reales (todos silenciosos)
 
-Todo mensaje a un contacto frío o fuera de las 24 h necesita una **plantilla de Meta aprobada**. Entrégala completa y lista para crear/seleccionar:
+- **Transportadoras por encima de 100.** Medido dos veces en el espacio de referencia: 132 y 116, y las dos veces
+  porque alguien escribió "Transportadoras disponibles:" dentro del campo. Al guardar desde el
+  panel se corta en el 100 y se pierde el final: justo la transportadora prohibida.
+- **`datos_pago_anticipado` heredado de otro espacio.** Manda el dinero a otra persona. El
+  validador no pasa sin `--dueño-confirmo-datos-de-pago`.
+- **Caché de productos con basura.** 11 entradas de la búsqueda web, sin fecha y con ids en serie,
+  que describían la empresa con un giro que no era suyo; más entradas solo-URL, vacías o "No
+  disponible". Como el id ya existe, **el webhook nunca las reescribe**. Se limpian con
+  `scripts/limpiar_cache_productos.py` y la búsqueda web se deja apagada.
+- **Producto retirado que sigue en el caché.** Medido el 22-sep en un espacio real: 3 entradas de
+  productos que ya no se publican, que el bot seguía describiendo y vendiendo. **Se limpiaron ese
+  mismo día**, así que hoy ese espacio da cero: el hallazgo es la CLASE, no un estado vigente. El
+  cruce contra el catálogo las caza.
+- **Caché con forma correcta y contenido FALSO.** Entradas con fecha e id que describían un
+  producto capilar como "promueve el cultivo" y una recarga de fibra como "servicio de recarga
+  digital". **La forma no dice si es verdad:** la auditoría lista cada entrada y se lee a mano
+  contra el catálogo; las falsas se quitan con `--quitar id1,id2`. Precios guardados en el caché
+  también caducan: se revisan. El cruce automático (`scripts/catalogo_tienda.py`, con su autoprueba)
+  compara NOMBRE contra el título real: un nombre que calza no garantiza que el resto del texto
+  sea cierto, así que la lectura a mano sigue.
+- **Tercer tiempo de recordatorio sin casilla.** Ver arriba.
 
-- **Nombre:** en `minúsculas_con_guion_bajo` (ej. `carrito_ultimo_intento`).
-- **Categoría:** Marketing.
-- **Idioma:** español.
-- **Cuerpo:** con variable `{{1}}` = nombre del cliente. Ejemplo:
-  `Hola {{1}}, te guardamos tu [producto] con [incentivo]. Lo activamos hoy y te llega contra entrega. Lo cerramos?`
-- **Botón:** de respuesta rápida o CTA, mapeado como "botón de remarketing/carrito".
-- Junto a la plantilla, entrega también el texto del **campo Instrucción especial** (mensaje + `[Instrucción IA]`) por si el módulo lo pide aparte.
+## Techos y vías
+
+- **Instalación normal → topes del panel** (tabla de arriba). Es el default y no se pregunta.
+- **Espacio de FER y VIP → se puede escribir por API**, que aguanta 20.000 escapados en el campo
+  (500.000 si es LONG JSON). Aun así, **si el campo pasa su tope del panel, el día que alguien
+  guarde desde el panel se corta**: por eso lo recomendado es respetar el tope también por API.
+- **Cupo de la API: 1.000 peticiones por hora**; pasarse bloquea una hora. Cada escritura son
+  varias peticiones (lectura, escritura, relectura). Mirar `x-ratelimit-remaining`.
+- **Al clonar a otro cliente:** leer ANTES `references/ley-datos-entre-espacios.md`. Se hereda
+  estructura, jamás datos (pago, plantillas, teléfonos, marca, cifras). El caché de productos se
+  vacía.
+
+## Escribir por API (solo espacio de FER, VIP o a pedido)
+
+```bash
+python3 ~/.claude/skills/golden-chatea-pro-config-carritos/scripts/escribir_config.py \
+    --token-file <ruta> --tienda "<nombre_tienda exacto>" --propuesta propuesta.json \
+    --respaldo-dir <PROYECTO>/backup-config [--seco]
+```
+
+La propuesta es `{"seccion.llave": valor}`. El script lee en vivo, **aborta si la tienda no es
+la esperada**, respalda, cambia **solo** las llaves que difieren, mide UTF-16 contra el tope,
+escribe, **relee del servidor** y comprueba que el resto del campo no se movió (la API recorta el
+salto de línea final: se compara el JSON parseado). El token vive en `.secrets/` del proyecto,
+**nunca en el chat ni en la skill**.
+
+🔴 **Después de escribir, el dueño recarga la pestaña del panel antes de guardar ahí.** Si guarda
+con la vista vieja, pisa lo escrito.
 
 ## Entrega
 
-- Cada mensaje en un **bloque copy-paste separado**, con su **título fuera del bloque** (etiqueta LIMPIA y uniforme: `REACTIVACIÓN 1`, `REACTIVACIÓN 2`… — sin paréntesis ni ángulo dentro del título). Cuando confirmes los nombres reales de los campos del módulo, renombra las etiquetas para que calcen con el módulo.
-- El **ángulo** (recordatorio / objeción / urgencia / incentivo) y el **tiempo** (20 min / 3 h / 24 h) van en el texto del informe, **no dentro del bloque copiable**.
-- Para cada mensaje, marca claramente **si necesita plantilla de Meta** (contacto frío / fuera de 24 h) o va como texto libre. Para los que la necesitan, separa cada campo de la plantilla (nombre, cuerpo, botón, instrucción IA).
-- Cierra con un **resumen de configuración**: qué paso va en qué campo del módulo Carritos, su tiempo y si lleva plantilla.
-- Toma `references/ejemplo-completo.md` como vara de calidad de la salida.
+- **Cada campo completo, en texto plano, uno por uno, listo para pegar**, con su medida
+  `N/tope` y qué cambió y por qué fuera del bloque. Nunca "ya te lo di arriba".
+- Lo que **no se tocó y por qué** (decisiones del dueño pendientes).
+- **Casos duros** antes de dar algo por bueno: cliente molesto, dato ya dado, cancelación,
+  objeción de precio, desconfianza. Se declara si fue **simulación por lectura o corrida real**.
+- **Cobertura, no veredicto**: N de N campos revisados, qué se ejecutó, qué quedó sin verificar.
+  La prueba final es abandonar un carrito real y ver qué llega.
+- Vara de calidad: `references/ejemplo-completo.md`.
 
-### QA antes de entregar (autochequeo obligatorio)
-Antes de dar la secuencia por lista, verifica y corrige:
-- [ ] **Precio, oferta y datos de pago** idénticos a los del asistente de ventas (`golden-chatea-pro-config-ventas-wp`). Si no coinciden, manda Ventas.
-- [ ] **Tiempos de entrega** iguales a Ventas y Logístico.
-- [ ] Cada mensaje: ≤35 palabras, máx 2 emojis, 1 sola pregunta, sin signos de apertura, beneficio (no reproche).
-- [ ] **Sin cifras de negocio inventadas** (clientes, reseñas, porcentajes): si aparece una, viene del intake (punto 7) o se retira.
-- [ ] **4 ángulos distintos** (ningún mensaje repite el mismo gancho).
-- [ ] El **primer mensaje** trae plantilla de Meta si el contacto es frío (caso normal).
-- [ ] Cada mensaje fuera de la ventana tiene su **plantilla completa** (nombre, cuerpo con `{{1}}`, botón).
-- [ ] El cierre **dispara venta/logístico** para dirección y confirmación.
-- [ ] **Si se escribe por API:** el valor medido ESCAPADO (`len(json.dumps(valor)[1:-1])`) está bajo 19.000 — o el campo se convirtió a LONG JSON. Pasarse devuelve `200 ok` y mata el asistente en silencio; el error solo sale en Panel → Registros de errores.
-- [ ] **Releído del servidor y comparado** contra lo que se quiso escribir (es la única prueba de que no se cortó).
+### QA antes de entregar
 
-**Terminado =** los 4 bloques copy-paste + sus plantillas de Meta donde aplique + el resumen de configuración, con el checklist de arriba todo en verde. Si además se escribió por API, terminado exige el releído del servidor comparado y en verde — sin eso, no se declara listo. Lo único que puede quedar pendiente son los nombres/pasos reales del módulo Carritos si aún no se verificaron en vivo (se entrega igual, marcando ese pendiente).
+- [ ] Plataforma de la tienda preguntada. Si es Shopify, los tres puntos de la compuerta; si es otra, confirmado que Chatea recibe sus carritos o declarado "no aplica todavía".
+- [ ] `auditar_carritos.py` corrido: 0 críticas, y cada aviso explicado.
+- [ ] Cada texto medido en UTF-16 contra su tope. Cerca del tope **pasa**.
+- [ ] Ningún prompt le permite emojis a la IA; ningún texto de WhatsApp trae ¿ ¡.
+- [ ] Ninguna promesa comercial sin confirmar por el dueño; ninguna identidad inventada.
+- [ ] Ejemplos leídos contra reglas, a mano.
+- [ ] Nombre del asesor igual al de los hermanos.
+- [ ] Transportadoras: prohibida primero, oficina señalada, ≤ 100, sin el nombre del campo.
+- [ ] Agradecimiento sin asumir medio de pago si el anticipado está activo.
+- [ ] Datos de pago confirmados por el dueño de ESTE espacio.
+- [ ] Plantillas seleccionadas existen y están APPROVED (contenido: no se califica).
+- [ ] `tiempo_recordatorio_3` vacío. Caché sin basura de forma, **cruzado contra el catálogo**
+      (`--dominio`) **y leído a mano**. Búsqueda web apagada.
+- [ ] Frescura del caché revisada: si hace semanas que no entra un producto nuevo, se comprueba el
+      cable con un carrito de prueba antes de declarar nada.
+- [ ] Si fue por API: releído del servidor, resto intacto, y aviso al dueño de recargar el panel.
+- [ ] `bash ~/.claude/skills/golden-chatea-pro-config-carritos/scripts/verificar_pais_no_es_puerta.sh` en verde.
+- [ ] `python3 ~/.claude/skills/golden-chatea-pro-config-carritos/scripts/validar_config.py --autoprueba` en verde.
+- [ ] `python3 ~/.claude/skills/golden-chatea-pro-config-carritos/scripts/catalogo_tienda.py --autoprueba` en verde.
+- [ ] Las autopruebas se corren con `PYTHONDONTWRITEBYTECODE=1`, para no dejar `__pycache__` dentro de la skill.
 
-## Conexiones (skills hermanas)
-- 🛒 Asistente de ventas (misma oferta y datos de pago) → `golden-chatea-pro-config-ventas-wp`
-- 🎯 Prompt/promo + recordatorios/remarketing por producto → `golden-chatea-pro-prompt-ventas`
-- 📦 Asistente logístico (toma la dirección al cerrar) → `golden-chatea-pro-config-logistico`
-- 🎬 Coordinar los 4 asistentes → `golden-chatea-pro-full-configuracion`
+## Qué NO es (límite con Ventas)
 
-Si una hermana no está instalada, entrega igual la secuencia de carritos y avisa qué pieza queda por conectar (no bloquees el trabajo por una dependencia ausente).
+- **Carritos (esta skill):** el disparador es un checkout abandonado en la tienda. El contacto es
+  frío: no hay ventana de 24 h abierta, por eso todo toque de recuperación va por plantilla.
+- **Remarketing de una conversación de venta que se enfrió:** `golden-chatea-pro-prompt-ventas`.
 
-## Conexión con el ecosistema
+## Conexiones
 
-Los cambios relevantes de esta skill — hallazgos de campo, techos medidos, etiquetas reales del módulo cuando se verifiquen — se reportan a 🧠 GOLDEN - CENTRO DE MANDO, que decide si el aprendizaje se retransmite a las hermanas de la familia `golden-chatea-pro-*`. Así el ecosistema se entera una vez y no se repite el mismo error en otro asistente.
+- 🛒 Ventas WhatsApp (oferta, pago, nombre del asesor) → `golden-chatea-pro-config-ventas-wp`
+- 📦 Logístico (toma la dirección al cerrar; también decide su propio anticipo) → `golden-chatea-pro-config-logistico`
+- 🗺️ Jerga y direcciones por país → `golden-chatea-pro-validacion-direcciones`
+- 🎬 Los cuatro asistentes a la vez → `golden-chatea-pro-full-configuracion`
+
+Si una hermana no está instalada, se entrega igual y se avisa qué pieza queda por conectar.
+Los hallazgos de campo se reportan al 🧠 CENTRO DE MANDO, que decide si se retransmiten a las
+hermanas.
 
 ## Privacidad (skill compartible)
-Nunca hornees datos reales (producto, precios, cuentas de pago, tienda, nombres) en los archivos de la skill. Se preguntan en cada uso y viven solo en los mensajes entregados. Los ejemplos internos son ficticios.
 
-## Fronteras y desambiguacion
-
-Para el remarketing de UNA conversación de venta por WhatsApp que se enfrió (no un checkout abandonado en la tienda), eso lo hace golden-chatea-pro-prompt-ventas. Para configurar TODOS los asistentes a la vez, usa golden-chatea-pro-full-configuracion.
+Ningún dato real vive en esta skill: ni cuentas de pago, ni tiendas, ni nombres, ni tokens. Se
+leen o se preguntan en cada uso y viven solo en el espacio del cliente y en sus respaldos. Los
+ejemplos son ficticios.

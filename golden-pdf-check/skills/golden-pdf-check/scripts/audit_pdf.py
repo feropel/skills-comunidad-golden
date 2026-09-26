@@ -89,6 +89,18 @@ def audit_with_pdfplumber(path):
             # Excluir el pie (vive en la banda reservada bajo el área de contenido);
             # así no se confunde el número de página con un "bloque al borde".
             words = [w for w in all_words if w["bottom"] <= content_area_bottom + 2]
+            # v6.5 · UNA SOLA DECISION DE "QUE TEXTO SE MIRA", calculada aqui y
+            # usada por TODOS los consumidores. Hasta v6.4 la exclusion del pie
+            # solo se aplicaba a `words`; el analisis de color y las dos bandas
+            # de mono leian `page.chars` EN CRUDO, asi que nunca heredaron la
+            # correccion. Latente y peligroso: un tema con el pie en monoespaciada
+            # habria marcado mono_bottom en TODAS las paginas y disparado un
+            # mono_split falso en cada salto — que es justo el falso positivo que
+            # se arreglo en su dia... solo para `words`.
+            # Un arreglo comun aplicado consumidor por consumidor deja
+            # consumidores atras POR DISEÑO. Se calcula una vez y se hereda.
+            chars = [ch for ch in (page.chars or [])
+                     if ch["bottom"] <= content_area_bottom + 2]
             # Cabeceras de tarjeta: la banda dorada dice "PROMPT · COPIAR".
             # Si una página arranca con cabecera antes del mono, es una tarjeta
             # NUEVA, no la continuación de la anterior.
@@ -114,13 +126,13 @@ def audit_with_pdfplumber(path):
                         is_mono(ch.get("fontname"))
                         and ch["bottom"] >= content_area_bottom - BOTTOM_ALERT_PT
                         and ch["bottom"] <= content_area_bottom + 2
-                        for ch in (page.chars or []))
+                        for ch in chars)
                     findings["bottom_risk"].append(
                         {"page": pno, "mm_from_content_bottom": round(gap / PT_PER_MM, 1),
                          "mono": edge_mono})
             # colores de texto (por objeto; complementado con la pasada por píxeles)
             # y rastro de bloques monoespaciados en las bandas superior/inferior.
-            for ch in (page.chars or []):
+            for ch in chars:
                 hx = rgb_to_hex(ch.get("non_stroking_color"))
                 if hx and hx not in ALLOWED and not near(hx, ALLOWED):
                     foreign[hx] = foreign.get(hx, 0) + 1

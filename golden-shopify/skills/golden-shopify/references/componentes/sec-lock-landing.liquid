@@ -16,6 +16,22 @@
   Este bloque usa display:none: el DOM sigue existiendo, el tema inicializa su JS,
   y solo se oculta VISUALMENTE la navegación. Nada se rompe.
 
+  FAMILIAS VERIFICADAS EN TIENDA REAL (medido 2026-09-05, no supuesto)
+  ────────────────────────────────────────────────────────────────────
+  Se cargo la tienda demo oficial de cada tema, se midio el header VISIBLE (control),
+  se inyecto este CSS tal cual y se volvio a medir:
+    · Impulse 9.0.0   → OCULTA. Su header es `.site-header` y su footer `.site-footer`:
+      sin la ampliacion de G4.20 este candado NO habria ocultado NADA en Impulse.
+    · Prestige 11.4.0 → OCULTA. Usa `.shopify-section-group-header-group` (ya cubierto).
+    · Dawn 15.5.0     → OCULTA (tienda propia, verificado antes).
+  PARA EL 1000 ME FALTA: ejercer el candado en una tienda REAL con tema Debut, Booster o Ella.
+  Lo puede dar: FER (la URL de un VIP con uno de esos temas) o una corrida real en una tienda de
+  esa familia. No lo puedo cerrar yo: sus demos ya no se publican en el theme store.
+
+  SIN VERIFICAR, y se dice: **Debut, Booster y Ella** — sus demos ya no estan publicados en
+  el theme store (medido el mismo dia), asi que no habia tienda real donde ejercerlo. En esas
+  familias el candado va por lista, no por medicion: correr la comprobacion de abajo.
+
   VERIFICAR EN LA TIENDA REAL (obligatorio, no opcional)
   ─────────────────────────────────────────────────────
   Ninguna lista de selectores cubre todos los temas del mundo, y este bloque falla en

@@ -1,179 +1,80 @@
 ---
 name: golden-chatea-auditoria
-description: |
+description: >-
   Golden Group — AUDITORÍA DE SALUD DE UN ESPACIO DE CHATEA PRO. Entra por API al workspace,
-  inventaria TODO (bot fields, asistentes, disparadores, subflujos, interruptores, integraciones,
-  campos de usuario) y dictamina campo por campo y producto por producto qué está sano y qué está
-  roto o a punto de romperse en silencio. Entrega COBERTURA medida (N de N revisados) y las fallas
-  con evidencia, nunca un "quedó perfecto".
-  Úsala SIEMPRE que el usuario quiera auditar, revisar o diagnosticar Chatea Pro o un asistente:
-  "revisa mi chatea", "qué está mal en el bot", "el bot dejó de responder",
-  "por qué no arranca este producto", "revisa la instalación", "audita el espacio de X",
-  "está bien configurado", "revisa los prompts de los productos", "qué le falta a mi chatea",
-  "el asistente no dispara", "revisa que no se haya roto nada", o antes y después de tocar la
-  configuración de un espacio. Dispara aunque no diga "auditar": basta con sospechar que algo de
-  Chatea no funciona. Aplica a cualquier workspace y a los 7 países de la plataforma.
-  FRONTERAS: escribir la config = familia golden-chatea-pro-config-*; el prompt de venta =
-  golden-chatea-pro-prompt-ventas; las CONVERSACIONES del día = golden-chatea-operacion; pedidos y
-  novedades = golden-logistica-diaria. Esta skill audita LA INSTALACIÓN, no el día.
+  inventaria TODO (bot fields, asistentes, disparadores, subflujos, interruptores,
+  integraciones, campos de usuario) y dictamina campo por campo qué está sano y qué está roto o
+  a punto de romperse en silencio. Entrega COBERTURA medida (N de N revisados) y las fallas con
+  evidencia, nunca un "quedó perfecto". Úsala SIEMPRE que el usuario quiera auditar, revisar o
+  diagnosticar Chatea Pro o un asistente: "revisa mi chatea", "qué está mal en el bot", "el bot
+  dejó de responder", "revisa la instalación", "audita el espacio de X", "está bien
+  configurado", "qué le falta a mi chatea", "el asistente no dispara", "revisa que no se haya
+  roto nada", o antes y después de tocar la configuración de un espacio. Dispara aunque no diga
+  "auditar": basta con sospechar que algo de Chatea no funciona. Audita la CONFIGURACIÓN; los
+  productos solo si se piden. No mira conversaciones del día: eso es golden-chatea-operacion.
 ---
 
+**Fábrica:** chat «✅ SKILL golden-chatea-auditoria»
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 1013 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # golden-chatea-auditoria · la salud de un espacio de Chatea Pro
 
-<!-- skill v1.9 (GCA1.9) — 2026-09-02 — nueva seccion "Dos alcances, dos frases": FER pidio
-poder auditar SOLO la configuracion general sin que la corrida entre a leer los 12 productos
-(o al reves, solo productos), y no tener que reexplicarlo cada vez. No hacia falta una skill
-nueva: los bloques ya estaban separados en controles.md (bloque F = contenido de producto,
-el resto = estructura/config). Se documenta la convencion de dos frases disparadoras y que
-alcance de bloques activa cada una, con la cobertura declarando "fuera de alcance" en vez de
-omitir el bloque en silencio. Pendiente de implementar en auditar.py: hoy el recorte de
-alcance es una instruccion para quien ejecuta la skill (leer solo los bloques que tocan), no
-un flag del script -- --alcance config|productos en auditar.py queda como fila declarada. -->
-<!-- skill v1.8 (GCA1.8) — 2026-08-26 — SIMULACION DE DIAS en vez de esperar los dias.
-El ciclo de vigilancia (auditoria → decision → cambio → re-medicion) se iba a validar dejandolo
-correr unos dias reales; eso cuesta dias y descubre los fallos EN PRODUCCION. Se construyo
-`scripts/simular_dias.py`, que corre el ciclo sobre un espacio que EVOLUCIONA (alguien corta un
-campo desde el panel, un campo cruza el techo, se borra un campo, la API falla un dia, se
-enciende pauta). Encontro el fallo de fondo el primer intento: **`reabrir_si` era PROSA que
-nadie evaluaba** — solo se imprimia. La decision de los huerfanos dice "reabre si se les carga
-un id de anuncio" y el dia que se cargara habria seguido silenciada: la promesa de que el libro
-no es una alfombra no la sostenia nada. Arreglo: la decision guarda `evidencia_al_decidir`, la
-foto de la situacion ese dia, y **CADUCA sola cuando la evidencia cambia** — cubre el caso
-general (se cargo un anuncio, el campo crecio, aparecio otro producto) sin inventar un lenguaje
-de condiciones que nadie escribiria bien. Las decisiones sin esa foto se avisan: no pueden
-caducar. LECCION DEL PROPIO BANCO: el dia 7 pasaba con el arreglo SABOTEADO, porque registraba
-el producto y el hallazgo desaparecia — la comprobacion se auto-aprobaba por una via que no
-probaba nada. Se reescribio para que el hallazgo PERSISTA y solo cambie su evidencia. Medido:
-7 de 7 dias con el arreglo vivo, 6 de 7 con el sabotaje, y el que se cae es el de la caducidad. -->
-<!-- skill v1.7 (GCA1.7) — 2026-08-26 — auditoria fresca (el numero v1.6 ya
-lo habia tomado otro chat el mismo dia con sus propios cambios; esta entrada es POSTERIOR). Tres defectos, dos de ellos de la
-MISMA clase que la skill ya habia arreglado en otro sitio y cuyo GEMELO nadie busco.
-(1) 🔴 LA SEVERIDAD IGNORABA EL `estado` DE LA ENTRADA: 8 de los 14 hallazgos del bloque D
-gritaban sin mirarlo, 5 de ellos en rojo. Medido en Golden y reportado por la verificacion
-adversarial: 4 de las 5 entradas del disparador de Remarketing estan `inactivo` en el servidor y
-salieron en 🔴 igual — la evidencia hasta imprimia "estado 'inactivo'" y el codigo no lo leia. El
-cuadro real no era "el disparador entero roto" sino UNA entrada activa mal cableada y cinco
-apagadas de basura. Es el gemelo exacto de la regla que ya existia para los huerfanos (la
-severidad la decide el negocio, no la estructura). Helpers `activa` / `sev_segun_estado` /
-`nota_estado`, y las entradas al vacio se separan en ACTIVAS (rojo) e INACTIVAS (duda de
-limpieza). (2) 🔴 EL LIBRO DE DECISIONES SE ROMPIO HACIA ATRAS EN SILENCIO: la huella corta
-`::hash` que se anadio para que una decision no silenciara 5 hallazgos a la vez cambio la forma
-de la clave, y 4 de las 6 decisiones ya escritas dejaron de casar — sus hallazgos volvieron a
-gritar como si nadie los hubiera resuelto. Una clave que cambia de forma con una mejora del
-codigo no es una clave estable, y el libro entero vale por su estabilidad. Ahora se aceptan las
-DOS formas: FINA (`control|campo::huella`, silencia uno) y AMPLIA (`control|campo`, silencia
-todos los de ese campo), y el informe AVISA cuando una decision amplia silencia mas de uno.
-(3) 🟡 A4 leia mal su propio endpoint: `/workspace-settings/channels` dice que canales estan
-DISPONIBLES en el plan (1/0), no si estan conectados. `apple: 0` — un canal que el plan de
-Golden no incluye y que ningun asistente usa — salia en 🔴 MUERTO. Ahora solo dispara si falta
-un canal REQUERIDO (whatsapp, whatsapp_cloud, facebook, instagram) y declara que la conexion
-viva se mira en el panel, que es lo que ya dice A5. Autoprueba: 30 defectos + 12 pruebas de
-comportamiento (EST y LIB nuevas). -->
-<!-- skill v1.6 (GCA1.6) — 2026-08-25 — verificacion adversarial (golden-verificador) contra el
-espacio REAL de Golden Colombia (fXXXXXX): ocho hallazgos, los ocho con su caso malo sembrado
-en autoprueba.py ANTES de arreglar el codigo. (1) A4 no evaluaba NINGUN canal real: el endpoint
-real trae enteros anidados bajo `data` (`{"data":{"whatsapp":1,...}}`) y el codigo solo
-reconocia booleanos o strings "connected/active/ok" — lo unico que disparaba era el
-`status:"ok"` del SOBRE HTTP, no un canal. Corregido para leer la forma real, con el fixture
-reproduciendola. (2) E3 (credencial de voz heredada) NUNCA podia disparar contra un DUMP real:
-comparaba `api_key` contra el string YA REDACTADO por extraer.py (`<<REDACTADO...>>`), que
-siempre falla esa condicion — el fixture viejo probaba una forma en claro que el auditor real
-jamas recibe. Ahora el control juzga si HABIA algo que redactar, no si sigue en claro. (3) El
-paquete `--handoff` filtraba por "¿tiene `accion`?" ANTES de mirar la severidad: 22 de 39
-hallazgos abiertos no llegaban al paquete en la corrida real, 5 de ellos rojos de un solo
-disparador y 11 fugas de credenciales. Ahora todo 🔴 o 🟠 entra siempre, tenga o no `accion`.
-(4) La clave del libro de decisiones (`control|objetivo`) no era unica cuando un mismo campo
-acumulaba varios hallazgos distintos sin `objetivo` explicito (`D3|[Remarketing IA]...` cubria
-5 hallazgos de una sola vez; `F3|[Producto Ventas Wp] 8` mezclaba un rojo con un azul bajo la
-misma clave): una decision del dueno podia silenciar mas de uno sin que nadie lo notara. Se
-afina con una huella corta de la evidencia cuando no hay `objetivo` (los agregados deliberados,
-como `huerfanos-con-pauta`, siguen con su clave estable de siempre). (5) El diff (`--anterior`,
-J1) mostraba el largo crudo del JSON prominente y solo el DELTA como "escapados": un campo cerca
-del techo no tenia forma de leer su escapado absoluto real. Ahora muestra el escapado real
-primero (`ea → en escapados`) y el crudo aparte, marcado. (6) Varios controles se declaraban
-"corrido" sin denominador o sin ejecutar su medida real: B2 (el limite de campos de usuario no
-lo expone la API — ahora NO_VERIFICADO siempre, nunca "corrido"), A1 (sin denominador, ahora
-`1 endpoint`), B4 (contaba objetos sin declarar cuantos ni cuales, ahora lo declara), G2 (solo
-hacia una pregunta y se marcaba "corrido" como si hubiera verificado algo — ahora NO_VERIFICADO
-con la evidencia encontrada). Y F4/F12/I1 estaban en `A` en controles.md pero el codigo los
-reporta NO_VERIFICADO (lectura humana): sincronizados a `H`. (7) Cifras de la autoprueba
-desincronizadas entre SKILL.md y controles.md: quedan en **30 defectos + 11 pruebas de
-comportamiento** en los dos lugares (las 4 nuevas: J1b escapado real, CLV colision de claves,
-HO2 severidad en el handoff, I3B4 sincronia de la lista de endpoints auditados). (8) La lista
-`auditadas` de I3 (bloque_i) vivia hardcodeada y desincronizada de lo que B4 realmente audita:
-decia que subflows/tags/ai-agents/ai-tasks/inbound-webhooks/segments/agents no tenian control
-cuando B4 ya los contaba — 7 falsos positivos. Ahora ambas comparten la constante
-`ENDPOINTS_B4`, una sola lista para los dos lectores. -->
-<!-- skill v1.5 (GCA1.5) — 2026-08-22 — PRIMERA lectura profunda de los 12 prompts de
-producto en campo: los controles F4/F9/F10/F11/F12 estaban escritos desde el primer dia y NUNCA
-se habian ejercido. Encontraron un defecto REAL en produccion que el auditor no veia:
-`[Producto Ventas Wp] 8` (Tag Recede, ACTIVO y registrado en el disparador) llevaba
-`[AQUI VAN LOS DATOS DE PAGO ANTICIPADO: Nequi/Daviplata + titular]` en pleno paso de cobro. La
-lista de placeholders conocidos (`[NOMBRE`, `TU_TOKEN`...) no lo cazaba — el mismo modo de fallo
-que esta skill le prohibe a los demas: el detector solo mira donde le sembraron el defecto.
-Ahora F3 caza la CLASE, en DOS niveles de confianza MEDIDOS contra los 12 productos reales:
-verbo de encargo (AQUI VA, PONER, FALTA, COMPLETAR, REEMPLAZAR) = rojo si el producto esta
-activo; corchete en mayusculas sostenidas = DUDA, porque 3 de cada 4 eran plantilla viva del
-motor de Producto en Segundos ([CATEGORIA], [NOMBRE ASESORA]) y un auditor que acusa 3 falsos de
-4 le ensena al dueno a ignorarlo. El corchete de variable en minusculas ([total]) no dispara.
-F3 mira las HOJAS DE TEXTO, no el JSON crudo: aplicado al crudo, el `[` que abre un array
-fabricaba falsos positivos en los dos disparadores. Mismo criterio en la zona de agentes y
-tareas de IA. Autoprueba: 30 defectos + 7 pruebas de comportamiento.
-NOTA DE PROCESO: el turno que iba a escribir esta entrada se corto por un AbortError del canal
-de permisos, y la skill quedo con el codigo de GCA1.5 y el SKILL.md diciendo GCA1.4 — el censo
-diario no habria visto la edicion. Leccion: la version se escribe en el MISMO comando que el
-ultimo cambio de codigo, no en uno posterior. -->
-<!-- skill v1.4 (GCA1.4) — 2026-08-22 — auditoria golden-skill-auditor (850 PLATA), pasada
-fresca. Lo grave era del MISMO tipo que esta skill le prohibe a los demas: (1) B7 y J2 estaban
-declarados en el catalogo como controles automaticos y NO aparecian en la tabla de cobertura —
-invisibles en el informe, gemelo exacto del hallazgo I4 que arreglo el Centro de Mando en
-GCA1.1; ahora los dos se declaran, y J2 dice cuantos hallazgos silencio el libro. (2) La
-plantilla de references/informe.md estaba VIEJA respecto al codigo: no contemplaba las secciones
-"que cambio desde la corrida anterior" ni "ya decidido por el dueno", asi que quien la siguiera
-entregaba un informe sin el diff ni las decisiones. (3) El helper `escapado()` estaba muerto Y
-media DISTINTO que el codigo real (doble codificacion) — un helper que mide distinto es una
-trampa para el proximo editor, no una comodidad: borrado, con la formula unica documentada.
-(4) La cifra de la autoprueba decia 29 en SKILL.md y en controles.md y son 30 + 6. (5) El ns
-real del espacio de Golden salio de los ejemplos (estandar 5: nada de IDs de cuenta en una skill
-que se comparte) y la receta del libro de decisiones dejo de estar duplicada: vive solo en el
-bloque J. (6) Nueva seccion "Conexion con el ecosistema" (estandar 9): cada cierre se reporta al
-Centro de Mando, haya hallazgos o no, y se declaran las dependencias. (7) La cobertura se
-imprime ordenada por control, e `import subprocess` muerto fuera. -->
-<!-- skill v1.3 (GCA1.3) — 2026-08-21 — re-auditoria: los arreglos de GCA1.2 metieron sus
-propios defectos, encontrados probando la skill contra casos que se saben malos. (1) ROBUSTEZ:
-un endpoint que respondia con error (dict en vez de lista) tumbaba la auditoria entera con un
-traceback — un 500 puntual de la API costaba el informe completo; ahora se declara la zona como
-no medida y se sigue (control B7). (2) El asset de asistentes esperados ausente reventaba igual:
-ahora degrada. (3) La regla escrita "una decision sin motivo y sin fecha no se acepta" NO la
-aplicaba el codigo: se aceptaba en silencio y se imprimia "(sin motivo)". Ahora detiene la
-corrida, y avisa de las decisiones sin `reabrir_si`. (4) El handoff descartaba las dudas
-accionables: 5 hallazgos con accion concreta quedaban fuera del paquete; ahora abren el
-documento como "preguntas que hay que contestar antes de tocar", con su clave para el libro.
-Autoprueba: 30 defectos + 6 pruebas de comportamiento. -->
-<!-- skill v1.2 (GCA1.2) — 2026-08-21 — auditoria golden-skill-auditor (874/1000) mas
-simulacion de cliente: la skill diagnosticaba bien y COMUNICABA mal. Seis arreglos.
-(1) LIBRO DE DECISIONES `--decisiones`: cada hallazgo tiene clave estable control|objetivo y lo
-que el dueno ya resolvio sale aparte con motivo y fecha — antes cada corrida repetia los mismos
-40 hallazgos, incluido uno que FER ya habia descartado. (2) SEVERIDAD POR NEGOCIO: un producto
-huerfano CON anuncios es rojo y SIN anuncios es duda; era el criterio del dueno y no estaba en
-codigo. (3) DIFF `--anterior`: que se movio desde la corrida pasada, con alerta si un campo
-cruzo el techo. (4) B6 asistentes ESPERADOS contra instalados (assets/asistentes-esperados.json),
-que es lo unico que contesta "esta completa esta instalacion". (5) HANDOFF `--handoff`: paquete
-de correccion agrupado por la skill duena de cada campo. (6) Cerrada la contradiccion del techo
-entre SKILL.md, controles.md y el codigo — una sola verdad, con los dos umbrales medidos — y
-documentados los dos assets. Autoprueba de 29 a 30 defectos mas 4 pruebas de comportamiento
-(negocio, libro, diff). -->
-<!-- skill v1.1 (GCA1.1) — 2026-08-21 — auditoría golden-skill-auditor: I4 (controles.md:122,
-"ausencia no es prueba") estaba definido pero auditar.py nunca lo reportaba en la cobertura —
-quedaba invisible en el informe final, justo el modo de fallo que esta skill le prohíbe al
-bloque D. Se agregó self.cubre("I4", ...) en bloque_i. También se documentó B1b en
-controles.md (existía en el código sin entrada en el catálogo) y se reordenó F12/F13 a orden
-numérico. Ver detalle completo debajo. -->
-<!-- skill v1.0 (GCA1.0) — 2026-08-20 — versión inicial declarada por el Centro de Mando: la
-skill nació sin CHANGELOG y sin número, y sin versión el censo diario no puede ver que alguien
-la editó. -->
+<!-- skill v3.1 (GCA3.1) — 2026-09-24 — REMARKETING IA FUERA, Y LA BANDERA QUE NADIE LEIA.
+FER saco Remarketing IA del ecosistema el 21-sep y el 24-sep ordeno no configurarlo ni auditarlo.
+El 21 la fila llego al instalador (full-configuracion v1.12) y no a este auditor, que es hermano:
+por eso siguio gritando "Remarketing IA NO esta instalado" en un cliente. Y al medirlo salio lo peor:
+assets/asistentes-esperados.json YA lo marcaba `opcional: true` y auditar.py no leia esa bandera
+(0 usos). Regla escrita donde se lee y no donde se ejecuta. Arreglo: EXCLUIDOS_POR_FER en
+auditar.py aparta sus campos AL CARGAR el inventario (ningun control lo ve: ni B6, ni el pais de
+L4, ni topes, ni el disparador de D3/D5) y los declara contados en el universo; B6 respeta
+`opcional` y lo saca del denominador. Opt-in con --incluir-excluidos. Prueba EXCL nueva en los
+dos sentidos, con dos mutantes que la hacen fallar (vaciar la lista · quitar la lectura de
+`opcional`) y el control negativo (sin Carritos, B6 sigue mordiendo). El sabotaje de D3b que
+vivia en el disparador de Remarketing se mudo a uno de Ventas Wp para no perder su banco.
+NO se toco el remarketing POR PRODUCTO de Ventas WhatsApp (estandar-prompts.md): es otra cosa.
+Aplicado por el Centro de Mando. -->
 
-**Versión:** `GCA1.9`
+<!-- skill v3.0 (GCA3.0) — 2026-09-22 — LA COBERTURA DEL ESQUEMA, MEDIDA CONTRA LAS SKILLS
+HERMANAS. Encargo de FER: autoevaluarse sabiendo "cuales son los criterios para auditar un
+espacio segun las skills de los asistentes". Eso no se opina: se mide. Se comparo el esquema de
+referencia del auditor contra la plantilla de configuracion de CADA hermana. Resultado:
+comentarios 15 de 15, ventas WhatsApp 24 de 24 y carritos 38 de 38 cubiertos, cero huecos; y el
+LOGISTICO con 9 campos configurados de los que el esquema conoce 2. Los otros siete caian en un
+`continue` SILENCIOSO dentro del bloque L, y la cobertura solo informaba cuantos campos reviso,
+nunca cuantos se salto. Medido contra el espacio de referencia: 7 campos y 116 llaves que ningun
+control estaba mirando y que nadie declaraba. Eso es cobertura falsa, el pecado que esta skill le
+persigue a las demas. Arreglo: control L5, que los DECLARA por su nombre con su conteo de llaves
+y severidad DUDA (no se sabe si estan sanos: se sabe que nadie los miro). Ademas, el esquema
+conocia Remarketing IA y la lista de asistentes esperados no, asi que B6 era ciego justo para el
+asistente que el esquema mide vacio: anadido como opcional. Y el cuerpo del SKILL.md, que el
+validador marcaba con aviso por pasar de 500 lineas, baja moviendo dos entradas de historia al
+changelog. Tres instrumentos propios fallaron durante la medicion y se corrigieron antes de
+concluir: el primer comparador dio 283 llaves "sin cubrir" que eran metadatos, el segundo 207 por
+comparar rutas crudas contra rutas aplanadas, y el tercero conto 315 llaves en el esquema donde
+hay 156 porque contaba tambien los pares [tipo, largo]. Ninguna de esas tres cifras llego a un
+informe. Orden respetado: caso sembrado primero en autoprueba, comprobado que FALLA, control
+despues. Medido al cerrar: autoprueba 33 defectos + 27 pruebas, simulador 7 de 7, guardia de
+privacidad 0, validador sin fallos ni avisos, L5 disparando en campo. -->
+<!-- skill v2.9 — 2026-09-20 — auditoria golden-skill-auditor (AUDITA+ARREGLA). Tres hallazgos
+reales, sin tocar ningun control ni la logica de auditar.py:
+(1) la seccion "Fronteras y desambiguacion" prometia contenido "abajo, en una sola version que
+se mantiene" y el archivo terminaba ahi mismo -- promesa colgada, cero lineas de frontera real
+debajo. Reescrita: apunta a donde la frontera YA vive (la tabla del inicio y "Lo que esta skill
+NO hace") y resume las tres fronteras mas buscadas en tres lineas, sin duplicar la tabla entera.
+(2) la description no nombraba a que skill hermana ir si el pedido es sobre conversaciones del
+dia -- que es la confusion mas facil con esta skill ("revisa mi chatea" sirve para las dos).
+Agregada una frase de 64 caracteres: "No mira conversaciones del dia: eso es
+golden-chatea-operacion." Description queda en 998/1024, con margen.
+(3) references/changelog.md tiene 499 lineas y cero tabla de contenido (regla de la casa: toda
+reference >300 lineas la lleva). Agregado un indice de 12 filas al inicio del archivo; el
+contenido de las entradas no se toco.
+Reportado a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
+
+**Versión:** `GCA3.1`  ·  historia completa en `references/changelog.md`
 
 Auditar aquí significa **medir el estado real del servidor contra el estándar**, no leer la
 configuración y opinar. Nada se da por bueno sin haberlo contado, y el informe se entrega en
@@ -187,28 +88,183 @@ cobertura (universo, revisados, fallas), jamás en veredicto.
 | Audita | No audita |
 |---|---|
 | La INSTALACIÓN: campos, asistentes, disparadores, interruptores, integraciones | Las conversaciones del día (eso es `golden-chatea-operacion`) |
-| El CONTENIDO de cada prompt de producto, su ortografía y su coherencia | Escribir o corregir la config (eso es la familia `golden-chatea-pro-config-*`) |
+| El CONTENIDO de un prompt de producto **solo con `--alcance productos` o `todo`** | Escribir o corregir la config (eso es la familia `golden-chatea-pro-config-*`) |
 | Lo que la config DICE que va a pasar | Lo que el bot respondió de verdad ayer |
 
-## Dos alcances, dos frases (FER, 2026-09-02)
+## El alcance: esta skill es de CONFIGURACIÓN (ley de FER, 2026-09-05)
 
-Por defecto esta skill corre TODOS los bloques, productos incluidos. Cuando FER pida uno de los
-dos alcances de abajo, se recorta la corrida — no hace falta otra skill, los bloques ya están
-separados en `references/controles.md`:
+Palabras de FER: *"esta skill es exclusivamente para analizar configuración, configuración de
+asistentes, no vemos productos"*. Por eso **el alcance por defecto de `auditar.py` es `config`**
+y el de producto hay que pedirlo.
 
-- **"Audítame solo la configuración" / "sin entrar en productos"** → bloques A, B, D, E, G, H,
-  I, J, K, y el bloque C **solo** sobre los 2 campos generales (`[Ventas Wp] Configuracion
-  general` y `general 2`, o el equivalente de Comentarios/Logístico/Carritos). **Se salta el
-  bloque F entero**: no se lee ni un prompt de producto, no corre `valida_producto.py`, no se
-  abre ninguno de los `[Producto Ventas Wp] N`. El informe lo declara así en el encabezado:
-  "alcance: solo configuración — productos NO revisados, N de 12 fuera de esta corrida".
-- **"Audítame los productos" / "los prompts"** → bloque F completo (los N prompts leídos
-  enteros, uno por uno, contra `estandar-prompts.md`) + bloque C aplicado a cada producto + D1
-  (cruce byte a byte disparador↔producto). No se toca la configuración general.
-- **Sin ninguna de las dos frases** → alcance completo, como siempre.
+| bandera | qué juzga |
+|---|---|
+| *(nada)* = `--alcance config` | la **configuración de los asistentes**: estructura, techos de los campos generales, disparadores y su cableado, interruptores, integraciones, agentes y tareas de IA, credenciales |
+| `--alcance productos` | **solo** el contenido de los campos de producto |
+| `--alcance todo` | el catálogo entero, que es lo que ejercita la autoprueba |
 
-El paquete de corrección y la cobertura declaran igual: un control que no corrió por el recorte
-de alcance sale como `no_corrido: fuera de alcance de esta corrida`, nunca en silencio.
+**Qué cuenta como campo de producto lo declara `assets/campos-de-producto.json`**, no el
+criterio del momento: `[Producto Ventas Wp] N`, `[Comentarios] Productos*`, los TOON de
+Comentarios y `[Carritos IA] Información de productos`. **El disparador NO entra ahí**: nombra
+productos, pero es cableado del asistente, o sea configuración — que fue justo la distinción
+que se aplicó en el paquete del 28-ago.
+
+**Lo que el alcance aparta se DECLARA, con su severidad y su conteo, en la cabecera del
+informe** ("N hallazgos quedaron FUERA DE ALCANCE · no se juzgan aquí y NO están resueltos").
+Recortar es legítimo; esconder es lo que convierte un auditor en adorno. Un 🔴 de producto sigue
+siendo un 🔴: sale contado, y se lee entero con `--alcance todo`.
+
+El filtro se aplica **sobre el hallazgo, no sobre la lectura de los campos**: todos los
+controles siguen corriendo sobre el universo completo, así que los conteos del inventario y de
+la cobertura no cambian con el alcance. Si el recorte se hiciera al leer, el informe diría que
+el espacio tiene 78 campos cuando tiene 95, y eso ya sería una mentira medida.
+
+## 🔴 QUÉ ES CONFIGURACIÓN, y hasta dónde puede mirar un control
+
+**La ley de FER:** esta skill es **exclusivamente de configuración de asistentes**. Los productos
+solo con `--alcance productos`, y eso lo pide él, no el operador.
+
+**Dónde está escrito qué es cada cosa:**
+· `assets/campos-de-configuracion.json` — **qué SÍ es configuración**, asistente por asistente,
+  mapeado contra las capturas del panel vivo que FER entregó el 2026-09-08. Ventas WhatsApp está
+  completo; los otros tres esperan sus capturas.
+· `assets/campos-de-producto.json` — qué es contenido de producto.
+· **Un campo que no esté en ninguno de los dos NO se asume configuración: se DECLARA como sin
+  clasificar.** Hasta el 08-sep la configuración se definía por exclusión —solo existía la lista
+  de producto— y por eso "auditar la configuración" no tenía denominador.
+
+🔴 **LA FRONTERA, que es donde se cae todo el mundo** (dos chats el mismo día, 2026-09-08):
+
+> **Un control de configuración que APUNTA a un campo de producto mira el CABLEADO del campo,
+> JAMÁS su CONTENIDO.**
+
+· **CABLEADO (sí se juzga, y se nombra la RANURA):** si `[Producto Ventas Wp] N` está registrada
+  en el disparador, si su palabra clave coincide **byte a byte** entre los dos sitios, si está
+  activa, cuánto ocupa el campo, si lleva una credencial dentro.
+· **CONTENIDO (no se abre):** qué producto es, su marca, su precio, sus imágenes, si sus anuncios
+  viven o están borrados. **Abrir el JSON del producto para "confirmar" un hallazgo de
+  configuración es exactamente donde se cae** — y no hace falta: D3 se resuelve mirando el
+  disparador.
+
+**El filtro lo aplica el código por CONTROL, no por nombre de campo** (`CABLEADO` en
+`auditar.py`). Hasta el 08-sep casaba el nombre, y con eso **le ocultaba a FER parte de su propia
+configuración**: medido en el banco, **8 de 12 hallazgos apartados eran cableado suyo**, incluido
+un desajuste de palabra clave que deja un producto sin arrancar.
+
+**Lo apartado se declara con CONTEO Y NADA MÁS** — cuántos son y que existe `--alcance productos`.
+Sin severidades, sin nombres, sin desarrollo, por grave que parezca. Para decir "hay un 🔴
+apartado" habría que haberlo juzgado, que es justo lo prohibido.
+
+## 🔴 CUPO DE LA API: 1.000 peticiones por hora, y una auditoría cuesta 137
+
+**Medido el 2026-09-07 contra la API viva**, no leído en una documentación:
+
+    x-ratelimit-limit: 1000
+    x-ratelimit-remaining: <las que quedan>
+
+En inglés se llaman **X-RateLimit-Limit** y **X-RateLimit-Remaining**. Pasarse **bloquea una hora
+entera**.
+
+🔴 **Una extracción completa cuesta 137 peticiones** (medido contra un espacio de referencia casi
+vacío: 61 bot fields, 6 agentes IA, 45 tareas IA). Un espacio de cliente con más productos y
+suscriptores **cuesta más**. Con 1.000 por hora **caben unas 7 auditorías, no más** — y si alguien
+corre la octava, se queda sin API una hora, incluidas las instalaciones que estén en curso.
+
+**Lo que hace el extractor ahora:**
+· **Comprueba ANTES de arrancar** (1 petición) y **se niega** si no caben las 137: empezar sin
+  cupo deja el DUMP incompleto Y gasta lo que quedaba.
+· Lee el contador de cada respuesta —viaja gratis en la cabecera que ya llegó— y **dice cuánto
+  queda al terminar**, con cuántas auditorías más caben.
+· Ante un **429 no reintenta** (reintentar sobre un bloqueo lo alarga) y marca el DUMP como
+  incompleto: *"no lo audites como si fuera todo"*.
+
+**Para saber el cupo sin correr nada:** `golden-chatea-cupo [token] [--necesito N]`.
+
+**El reset: cada hora** (dato del desarrollador de Chatea, vía FER). Observado por nuestro lado:
+dentro de la misma hora el contador **solo baja** — no gotea crédito, se repone de golpe.
+
+🔴 **La trampa está en el CUÁNDO.** La respuesta **no trae `x-ratelimit-reset`**, así que el
+servidor **no dice a qué minuto empezó la ventana**. Por eso: si te bloqueaste, espera una **hora
+completa desde ese momento** —suponer que "ya casi" es como se pierde la siguiente tanda—; y para
+saber si ya se repuso **mira el contador** (1 petición con `golden-chatea-cupo`), no lo calcules.
+Planifica dentro de la hora **que ya empezó**: si quedan 300, cuenta con 300.
+
+## Qué NO vive en esta skill (ley de FER, 2026-09-05)
+
+Palabras de FER: *"en esta skill no puede haber información de ningún VIP, ningún miembro ni
+mío... aquí no debería haber información de alumnos ni de nada que corrió. Eso es en cada
+chat."*
+
+**Aquí vive el ESTÁNDAR**: cómo se instala cada asistente, qué campos firma tiene, cuáles son
+los dos techos, qué controles se corren y cómo se ve una auditoría completa. **La identidad de
+quien se auditó no vive aquí**: ni el `user_ns` del espacio, ni el dominio de la tienda, ni
+correos, teléfonos o credenciales, ni el nombre del cliente, del alumno o de la marca — tampoco
+los del propio dueño de la skill. Eso vive en el chat de ese cliente y en el Centro de Mando.
+
+Cuando un hallazgo real enseñe algo que valga para todos, **entra la lección y sale la
+identidad**: "un espacio en producción traía el mismo asistente escrito de dos formas", no
+"el espacio de tal cliente, con su identificador".
+
+**Lo comprueba un instrumento, no la buena voluntad** — una regla sin instrumento es decoración:
+
+```bash
+python3 $S/sin_datos_de_cliente.py              # 0 = limpia
+python3 $S/sin_datos_de_cliente.py --autoprueba # el guardia contra casos malos
+```
+
+Corre además dentro de `autoprueba.py` (prueba **PRIV**), así que un dato de cliente que entre
+por descuido rompe el banco antes de que la skill se dé por buena. **Lo que el código NO puede
+cazar son los NOMBRES** de personas, marcas o negocios: un nombre propio no tiene forma
+reconocible. Eso queda como lectura humana declarada, no como cobertura.
+
+## Lo que NO está verificado en esta skill (al 2026-09-08)
+
+Esta sección vive **dentro de la skill** a propósito. Una reserva escrita en el informe de un
+chat es un recuerdo: se pierde cuando el chat se cierra, y quien active la skill mañana no la
+lee. Aquí la lee siempre.
+
+**Y cada reserva nombra QUIÉN la cierra**, idea de la fábrica de
+`golden-imagen-arena`: una reserva que no puede nombrar a su cerrador o ya está cerrada y sobra,
+o nadie la ha pensado. Además hace que la sección **no se pueda vaciar en silencio** — vaciarla
+obliga a borrar cerradores concretos, no a ablandar un adjetivo. Si algún día esto dice "todo
+revisado" sin nombrar instrumento, está mintiendo.
+
+**🔴 EL ESQUEMA SALE DE UN SOLO ESPACIO, Y L1 DEPENDE DE ÉL.** · **La cierra:** la primera
+lectura por API de un SEGUNDO espacio bien configurado. Las 156 llaves de
+`assets/esquema-configuracion.json` se leyeron del espacio de referencia y **de ninguno más**.
+No está comprobado que otro espacio bien configurado tenga esas mismas llaves. Si Chatea versiona
+la configuración —si un espacio instalado en otra fecha, o con otros asistentes, trae un JSON con
+otra forma— **L1 marcaría en rojo decenas de llaves "ausentes" que en realidad nunca existieron
+en ese espacio**. Ese es el modo de falla que hay que vigilar en la primera corrida contra un
+cliente: si L1 dispara con números grandes en un espacio que se ve sano, sospechar del esquema
+antes que del espacio. La cura, cuando haya un segundo espacio bien configurado: leerlo y quedarse
+con la INTERSECCIÓN como obligatorio y la diferencia como opcional.
+
+**Nada de lo cerrado el 08-sep se ha corrido contra un espacio real.** · **La cierra:** una
+corrida completa contra un espacio de cliente, con su cupo reservado (~200 peticiones). Los tres controles nuevos
+(L1, L2, L3) y las cuatro reparaciones de ese día (el paquete que escondía hallazgos, la cabecera
+de lo apartado, la cobertura de la zona IA y la declaración de J1) están probados **contra el
+banco**, con contraprueba una por una. Eso valida el detector, no valida ningún espacio.
+
+**El umbral del 15% de L2 es una elección, no una medición.** · **La cierra:** contar los
+falsos positivos de L2 en esa primera corrida real y mover el umbral con ese número. Se escogió para que solo salte lo
+que es de otra escala. No hay medida de cuántos falsos positivos produce en un espacio real.
+
+**L3 compara LARGOS, no textos.** · **La cierra:** nadie por ahora, y es a propósito —
+confirmar un espejo exige leer el texto, y eso lo hace una persona, no el script. Detecta la firma de un clon —muchos campos midiendo exactamente
+lo mismo— y por eso es DUDA y no defecto. Confirmarlo exige comparar el texto, y eso no lo hace
+el script.
+
+**F14 depende de un asset que vive en otra skill** · **La cierra:** el control CAT el día que
+cruce también los assets externos, no solo los controles. **Hoy no lo hace.** · (`golden-chatea-pro-config-logistico/assets/
+plantilla-fabrica.json`). Si esa skill se mueve o se renombra, F14 se declara NO CORRIDO — no se
+calla, pero deja de cubrir.
+
+**Los topes nativos del panel caducan solos.** · **La cierra:** nadie de forma permanente; se
+re-mide en el panel en cada configuración. Es vigilancia, no una tarea que se termine. Los que esta skill conoce se midieron el 08-sep
+contra el contador que pinta Chatea. Chatea se actualiza sin avisar: en agosto se midió "el
+logístico no tiene tope" contra el código de la app y en septiembre era falso. Se mira el
+contador, no se cree este documento.
 
 ## Regla de oro de esta skill
 
@@ -276,7 +332,8 @@ Ningún hallazgo se publica con una sola fuente:
 
 ```bash
 S=~/.claude/skills/golden-chatea-auditoria/scripts   # scripts/autoprueba.py y scripts/auditar.py
-python3 $S/autoprueba.py                      # primero SIEMPRE
+python3 $S/autoprueba.py                      # primero SIEMPRE · ella dice cuantas corre
+python3 $S/simular_dias.py                    # y el ciclo sobre 7 dias que cambian
 python3 $S/auditar.py <DUMP.json> \
     --decisiones <espacio>-decisiones.json \  # lo ya resuelto no se vuelve a gritar
     --anterior   <DUMP-de-la-corrida-pasada.json> \
@@ -284,18 +341,20 @@ python3 $S/auditar.py <DUMP.json> \
     --json       hallazgos.json
 ```
 
-Las cuatro banderas son opcionales y ninguna es decorativa:
+Las cinco banderas son opcionales y ninguna es decorativa:
 
 | Bandera | Para qué |
 |---|---|
+| `--incluir-excluidos` | Audita también lo que **FER sacó del ecosistema** (hoy: Remarketing IA, sus campos y su agente de IA). Sin ella, eso se aparta al cargar y el informe lo declara contado en el universo, con el motivo. Se usa solo cuando FER pide revisar ese asistente en un espacio concreto, y eso no lo vuelve esperado para los demás. |
 | `--decisiones` | El **libro de decisiones**. Lo que ya resolviste sale aparte, con su motivo y su fecha, y no vuelve a contarse entre lo pendiente. Sin esto, la corrida número tres son los mismos 40 hallazgos y dejas de leerla. |
 | `--anterior` | **Qué se movió** desde la última auditoría: campos creados, borrados y editados con su delta. Es lo que convierte la foto en vigilancia. |
 | `--handoff` | El **paquete de corrección** agrupado por la skill dueña de cada campo, listo para pasarlo al chat que sí escribe. |
 | `--json` | Todo en crudo, para encadenar con otra herramienta. |
 
-**La autoprueba va primero y no se salta.** Fabrica un espacio que se SABE roto (**30 defectos
-sembrados más 11 pruebas de comportamiento**, entre ellos los falsos negativos que dos
-verificaciones adversariales encontraron) y exige que el auditor los encuentre todos. Un auditor que sale en verde contra un
+**La autoprueba va primero y no se salta.** Fabrica un espacio que se SABE roto (**los defectos sembrados
+más las pruebas de comportamiento** — ella misma imprime cuántos de cada uno al terminar, para
+que la cifra no viva a mano en un documento y desincronice el día que se añade una prueba;
+entre ellas, los falsos negativos que dos verificaciones adversariales encontraron) y exige que el auditor los encuentre todos. Un auditor que sale en verde contra un
 espacio sano no prueba nada: prueba que no mira. Si la autoprueba falla, el auditor está roto y
 no se corre contra datos reales.
 
@@ -308,6 +367,11 @@ Además, lo que el código no puede juzgar se ejecuta a mano:
 - **Las URLs de multimedia se piden** (HTTP 200 o el hallazgo dice qué devolvió).
 - **Todo lo que entra al DUMP se audita o se declara.** Un endpoint extraído sin control es una
   zona sobre la que el informe no puede decir nada, y su silencio parece salud.
+- 🔴 **Lo que FER sacó del ecosistema NO se lee a mano tampoco.** Hoy es **Remarketing IA**
+  (sus campos `[Remarketing IA] …` y el "Agente de Remarketing"): el código los aparta y los
+  declara, y la lectura manual no los reabre por la puerta de atrás. Se declara en el informe
+  ("N campos apartados por decisión de FER") y se sigue. Distinto es el **remarketing de cada
+  producto** de Ventas WhatsApp (`remarketing.prompt_1/2`), que sí se lee y se audita.
 - **La simulación de disparo**: para cada producto activo, se compara byte a byte la palabra
   clave de sus dos sitios. Si difieren, ese producto no arranca, y eso es una falla de severidad
   máxima aunque el prompt sea impecable.
@@ -389,3 +453,18 @@ desincronicen. Lo que hay que retener aquí:
   detiene: un libro ajeno silenciaría fallas reales.
 
 El archivo se llama `<espacio>-decisiones.json` y vive junto a los DUMP de ese espacio.
+
+## Fronteras y desambiguacion
+
+🔴 **Aquí NO se guarda una copia de la `description`.** Había una, con el rótulo de
+conservarla "para no perder ningún matiz". Esa clase de copia **envejece y acaba
+contradiciendo a la description viva** — es como se coló el dato falso de "7 países" en una
+hermana de esta familia, y es el mismo defecto que se encontró el mismo día en
+`golden-chatea-pro-producto-comentarios`. Por eso la frontera **no se repite aquí**: vive en
+una sola versión, arriba, en la tabla `Lo que esta skill audita, y lo que no` y en la sección
+`Lo que esta skill NO hace`. Resumen para quien solo lee este párrafo:
+
+- **Conversaciones del día** (qué respondió el bot ayer) → `golden-chatea-operacion`, no esta.
+- **Escribir o corregir la configuración** → la familia `golden-chatea-pro-config-*`, no esta.
+- **Contenido de producto** → solo con `--alcance productos` o `todo`, nunca por defecto.
+

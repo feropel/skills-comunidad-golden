@@ -11,7 +11,7 @@ Lo único que ya estaba fuerte era `prefers-reduced-motion` (7): eso queda como 
 Este archivo sigue la misma ley que `golden-cinematica`: **tokens numéricos exactos, jamás
 adjetivos**. "Suave" no es una instrucción; `cubic-bezier(0.23, 1, 0.32, 1)` sí.
 
-## 1. Antes de animar: ¿debe animarse?
+## 1. Antes de animar: debe animarse?
 
 | Con qué frecuencia lo ve el usuario | Decisión |
 |---|---|
@@ -148,3 +148,25 @@ movimiento en su sistema debe recibir menos movimiento, y eso manda sobre todo l
   desde dónde nace y por qué no salta frames.
 - Auditar una animación ya escrita: la skill `review-animations` (está instalada, no se dispara
   sola, hay que llamarla por nombre).
+
+## Fuente de componentes: Uiverse
+
+**Uiverse** (uiverse.io) es una galería de código abierto con botones, interruptores, loaders,
+tarjetas y campos, en CSS y Tailwind. **Licencia MIT**, verificada en su página el 24-sep-2026 por el
+chat FILTRO: se permite el uso comercial conservando el aviso de autor y licencia. Aprobada por FER el
+mismo día.
+
+**Reglas para usarla:**
+1. **Solo diseños sobrios.** Nada de confeti, burbujas ni neón saturado: la ley de FER prohíbe los
+   diseños infantiles.
+2. **Conservar siempre** el comentario con autor y licencia MIT dentro del CSS.
+3. Todo componente **pasa el estándar de este archivo**: la curva que le toca según la sección 2
+   (nunca `ease-in` en interfaz), la duración de su fila en la tabla de la sección 3 (un botón, 100 a
+   160 ms; un modal o cajón puede llegar a 500) y respeto a `prefers-reduced-motion`. Un **loader** es
+   movimiento constante: va en `linear` y su ciclo no se mide contra esa tabla, pero se detiene en
+   cuanto hay contenido y con `prefers-reduced-motion` queda quieto. Un componente de Uiverse que no
+   cumpla se ajusta antes de usarse; no se exceptúa por venir de fuera.
+4. **En páginas de venta, nunca un loader de pantalla completa.** Medido el 24-sep sobre el demo de un
+   reel: a los 4 s la pantalla seguía negra y el contenido apareció hacia los 10 s. (El preloader con
+   cortina es de `golden-cinematica`, para experiencias de marca, no para fichas contra entrega.)
+5. **Probar en celular antes de dar por bueno** (el dato del 74% móvil está más arriba).

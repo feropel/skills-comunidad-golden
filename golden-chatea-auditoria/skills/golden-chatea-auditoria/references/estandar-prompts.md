@@ -82,8 +82,11 @@ de **Comentarios** es un objeto de **5 llaves exactas** — `img`, `name`, `desc
 
 ## Por país
 
-La plataforma solo acepta **7**: COLOMBIA, ECUADOR, CHILE, MEXICO, PANAMA, PERU, PARAGUAY, en
-mayúscula y sin acentos.
+La plataforma acepta **10** (remedido 2026-08-29, mismo censo que
+`golden-chatea-pro-validacion-direcciones`): COLOMBIA, ECUADOR, CHILE, MEXICO, PANAMA, PERU,
+PARAGUAY, GUATEMALA, ARGENTINA, BRASIL, en mayúscula y sin acentos. El control A3 (país vs
+moneda de `auditar.py`) cubre las 10 monedas; Guatemala, Argentina y Brasil no tenían mapeo y
+el control simplemente no se aplicaba para esos 3 países — reparado 2026-09-06.
 
 | | México | Colombia |
 |---|---|---|

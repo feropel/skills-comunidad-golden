@@ -1,134 +1,134 @@
 /**
  * ═══════════════════════════════════════════════════════════════════════════
- *                  P5.JS GENERATIVE ART - BEST PRACTICES
+ *              P5.JS ARTE GENERATIVO - BUENAS PRÁCTICAS
  * ═══════════════════════════════════════════════════════════════════════════
  *
- * This file shows STRUCTURE and PRINCIPLES for p5.js generative art.
- * It does NOT prescribe what art you should create.
+ * Este archivo muestra ESTRUCTURA y PRINCIPIOS para arte generativo con p5.js.
+ * NO prescribe qué arte debes crear.
  *
- * Your algorithmic philosophy should guide what you build.
- * These are just best practices for how to structure your code.
+ * Tu filosofía algorítmica debe guiar lo que construyes.
+ * Esto son solo buenas prácticas de cómo estructurar el código.
  *
  * ═══════════════════════════════════════════════════════════════════════════
  */
 
 // ============================================================================
-// 1. PARAMETER ORGANIZATION
+// 1. ORGANIZACIÓN DE PARÁMETROS
 // ============================================================================
-// Keep all tunable parameters in one object
-// This makes it easy to:
-// - Connect to UI controls
-// - Reset to defaults
-// - Serialize/save configurations
+// Guarda todos los parámetros ajustables en un solo objeto.
+// Esto facilita:
+// - Conectarlos a controles de UI
+// - Restaurar valores por defecto
+// - Serializar/guardar configuraciones
 
 let params = {
-    // Define parameters that match YOUR algorithm
-    // Examples (customize for your art):
-    // - Counts: how many elements (particles, circles, branches, etc.)
-    // - Scales: size, speed, spacing
-    // - Probabilities: likelihood of events
-    // - Angles: rotation, direction
-    // - Colors: palette arrays
+    // Define los parámetros que correspondan a TU algoritmo
+    // Ejemplos (personaliza para tu pieza):
+    // - Cantidades: cuántos elementos (partículas, círculos, ramas, etc.)
+    // - Escalas: tamaño, velocidad, espaciado
+    // - Probabilidades: qué tan seguido ocurre un evento
+    // - Ángulos: rotación, dirección
+    // - Colores: arreglos de paleta
 
     seed: 12345,
-    // define colorPalette as an array -- choose whatever colors you'd like ['#e8b84b', '#f7e3a1', '#b8860b', '#b0aea5']
-    // Add YOUR parameters here based on your algorithm
+    // define colorPalette como un arreglo -- elige los colores que quieras ['#e8b84b', '#f7e3a1', '#b8860b', '#b0aea5']
+    // Agrega TUS parámetros aquí según tu algoritmo
 };
 
 // ============================================================================
-// 2. SEEDED RANDOMNESS (Critical for reproducibility)
+// 2. ALEATORIEDAD CON SEMILLA (crítico para la reproducibilidad)
 // ============================================================================
-// ALWAYS use seeded random for Art Blocks-style reproducible output
+// SIEMPRE usa aleatoriedad con semilla para salida reproducible estilo Art Blocks
 
 function initializeSeed(seed) {
     randomSeed(seed);
     noiseSeed(seed);
-    // Now all random() and noise() calls will be deterministic
+    // A partir de aquí, todas las llamadas a random() y noise() son deterministas
 }
 
 // ============================================================================
-// 3. P5.JS LIFECYCLE
+// 3. CICLO DE VIDA DE P5.JS
 // ============================================================================
 
 function setup() {
     createCanvas(800, 800);
 
-    // Initialize seed first
+    // Inicializa la semilla primero
     initializeSeed(params.seed);
 
-    // Set up your generative system
-    // This is where you initialize:
-    // - Arrays of objects
-    // - Grid structures
-    // - Initial positions
-    // - Starting states
+    // Configura tu sistema generativo aquí.
+    // Es donde inicializas:
+    // - Arreglos de objetos
+    // - Estructuras de grilla
+    // - Posiciones iniciales
+    // - Estados de partida
 
-    // For static art: call noLoop() at the end of setup
-    // For animated art: let draw() keep running
+    // Para arte estático: llama noLoop() al final de setup()
+    // Para arte animado: deja que draw() siga corriendo
 }
 
 function draw() {
-    // Option 1: Static generation (runs once, then stops)
-    // - Generate everything in setup()
-    // - Call noLoop() in setup()
-    // - draw() doesn't do much or can be empty
+    // Opción 1: Generación estática (corre una vez y se detiene)
+    // - Genera todo en setup()
+    // - Llama noLoop() en setup()
+    // - draw() casi no hace nada o puede quedar vacío
 
-    // Option 2: Animated generation (continuous)
-    // - Update your system each frame
-    // - Common patterns: particle movement, growth, evolution
-    // - Can optionally call noLoop() after N frames
+    // Opción 2: Generación animada (continua)
+    // - Actualiza tu sistema en cada frame
+    // - Patrones comunes: movimiento de partículas, crecimiento, evolución
+    // - Opcionalmente llama noLoop() después de N frames
 
-    // Option 3: User-triggered regeneration
-    // - Use noLoop() by default
-    // - Call redraw() when parameters change
+    // Opción 3: Regeneración disparada por el usuario
+    // - Usa noLoop() por defecto
+    // - Llama redraw() cuando cambien los parámetros
 }
 
 // ============================================================================
-// 4. CLASS STRUCTURE (When you need objects)
+// 4. ESTRUCTURA DE CLASES (cuando necesitas objetos)
 // ============================================================================
-// Use classes when your algorithm involves multiple entities
-// Examples: particles, agents, cells, nodes, etc.
+// Usa clases cuando tu algoritmo involucra múltiples entidades.
+// Ejemplos: partículas, agentes, células, nodos, etc.
 
 class Entity {
     constructor() {
-        // Initialize entity properties
-        // Use random() here - it will be seeded
+        // Inicializa las propiedades de la entidad
+        // Usa random() aquí — ya va con la semilla puesta
     }
 
     update() {
-        // Update entity state
-        // This might involve:
-        // - Physics calculations
-        // - Behavioral rules
-        // - Interactions with neighbors
+        // Actualiza el estado de la entidad
+        // Esto puede incluir:
+        // - Cálculos de física
+        // - Reglas de comportamiento
+        // - Interacciones con vecinos
     }
 
     display() {
-        // Render the entity
-        // Keep rendering logic separate from update logic
+        // Dibuja la entidad
+        // Mantén la lógica de render separada de la de actualización
     }
 }
 
 // ============================================================================
-// 5. PERFORMANCE CONSIDERATIONS
+// 5. CONSIDERACIONES DE RENDIMIENTO
 // ============================================================================
 
-// For large numbers of elements:
-// - Pre-calculate what you can
-// - Use simple collision detection (spatial hashing if needed)
-// - Limit expensive operations (sqrt, trig) when possible
-// - Consider using p5 vectors efficiently
+// Para grandes cantidades de elementos:
+// - Precalcula todo lo que puedas
+// - Usa detección de colisión simple (spatial hashing si hace falta)
+// - Limita operaciones costosas (sqrt, trig) cuando sea posible
+// - Usa los vectores de p5 de forma eficiente
 
-// For smooth animation:
-// - Aim for 60fps
-// - Profile if things are slow
-// - Consider reducing particle counts or simplifying calculations
+// Para animación fluida:
+// - Apunta a 60fps
+// - Perfila si algo va lento
+// - Considera reducir el número de partículas o simplificar cálculos
 
 // ============================================================================
-// 6. UTILITY FUNCTIONS
+// 6. FUNCIONES UTILITARIAS
 // ============================================================================
 
-// Color utilities
+// Utilidades de color
 function hexToRgb(hex) {
     const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
     return result ? {
@@ -142,7 +142,7 @@ function colorFromPalette(index) {
     return params.colorPalette[index % params.colorPalette.length];
 }
 
-// Mapping and easing
+// Mapeo y easing
 function mapRange(value, inMin, inMax, outMin, outMax) {
     return outMin + (outMax - outMin) * ((value - inMin) / (inMax - inMin));
 }
@@ -151,7 +151,7 @@ function easeInOutCubic(t) {
     return t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2;
 }
 
-// Constrain to bounds
+// Restringir a un rango
 function wrapAround(value, max) {
     if (value < 0) return max;
     if (value > max) return 0;
@@ -159,45 +159,45 @@ function wrapAround(value, max) {
 }
 
 // ============================================================================
-// 7. PARAMETER UPDATES (Connect to UI)
+// 7. ACTUALIZACIÓN DE PARÁMETROS (conectar a la UI)
 // ============================================================================
 
 function updateParameter(paramName, value) {
     params[paramName] = value;
-    // Decide if you need to regenerate or just update
-    // Some params can update in real-time, others need full regeneration
+    // Decide si hace falta regenerar o solo actualizar
+    // Algunos parámetros se actualizan en vivo, otros necesitan regenerar todo
 }
 
 function regenerate() {
-    // Reinitialize your generative system
-    // Useful when parameters change significantly
+    // Reinicializa tu sistema generativo
+    // Útil cuando los parámetros cambian de forma significativa
     initializeSeed(params.seed);
-    // Then regenerate your system
+    // Luego regenera tu sistema
 }
 
 // ============================================================================
-// 8. COMMON P5.JS PATTERNS
+// 8. PATRONES COMUNES DE P5.JS
 // ============================================================================
 
-// Drawing with transparency for trails/fading
+// Dibujar con transparencia para estelas/desvanecidos
 function fadeBackground(opacity) {
     fill(250, 249, 245, opacity); // Golden light con alpha
     noStroke();
     rect(0, 0, width, height);
 }
 
-// Using noise for organic variation
+// Usar ruido para variación orgánica
 function getNoiseValue(x, y, scale = 0.01) {
     return noise(x * scale, y * scale);
 }
 
-// Creating vectors from angles
+// Crear vectores a partir de ángulos
 function vectorFromAngle(angle, magnitude = 1) {
     return createVector(cos(angle), sin(angle)).mult(magnitude);
 }
 
 // ============================================================================
-// 9. EXPORT FUNCTIONS
+// 9. FUNCIONES DE EXPORTACIÓN
 // ============================================================================
 
 function exportImage() {
@@ -205,19 +205,19 @@ function exportImage() {
 }
 
 // ============================================================================
-// REMEMBER
+// RECORDATORIO
 // ============================================================================
 //
-// These are TOOLS and PRINCIPLES, not a recipe.
-// Your algorithmic philosophy should guide WHAT you create.
-// This structure helps you create it WELL.
+// Esto son HERRAMIENTAS y PRINCIPIOS, no una receta.
+// Tu filosofía algorítmica debe guiar QUÉ creas.
+// Esta estructura te ayuda a crearlo BIEN.
 //
-// Focus on:
-// - Clean, readable code
-// - Parameterized for exploration
-// - Seeded for reproducibility
-// - Performant execution
+// Enfócate en:
+// - Código limpio y legible
+// - Parametrizado para explorar variaciones
+// - Con semilla para reproducibilidad
+// - Ejecución performante
 //
-// The art itself is entirely up to you!
+// El arte en sí depende enteramente de ti!
 //
 // ============================================================================

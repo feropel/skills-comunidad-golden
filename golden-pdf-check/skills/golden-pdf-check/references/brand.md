@@ -78,3 +78,10 @@ tinta. El dorado se mantiene como acento premium.
 - Página A4, márgenes 15mm, pie reservado 16mm.
 - Radio de tarjetas 14–16px.
 - Numeración en el pie: "Comunidad Golden … Página X de Y".
+
+---
+
+**Contraste:** los dorados de marca NO pasan WCAG para texto (#d4af37 = 2.00:1,
+#b8912a = 2.80:1 sobre el fondo). Para TEXTO existe `--gold-text` (#8a6d1f,
+4.65:1); el dorado de marca queda intacto en todo uso GRÁFICO. La prueba 16 lo
+calcula y falla por debajo de 4.5:1, así que la regla es ejecutable, no declarativa.

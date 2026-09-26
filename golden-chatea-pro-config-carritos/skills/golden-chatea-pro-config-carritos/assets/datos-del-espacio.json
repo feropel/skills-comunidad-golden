@@ -1,0 +1,45 @@
+{
+  "_uso": "LA PARTE DINAMICA. Todo lo que cambia de un espacio de trabajo a otro. Se llena una vez por cliente y con eso se configura carritos entero. Lo que NO esta aqui (doctrina, topes, estructura, textos base) es igual para todos y no se vuelve a discutir en cada instalacion.",
+  "_como_se_llena": "Lo que ya este escrito en el espacio o en los asistentes hermanos SE LEE, no se pregunta (auditar_carritos.py lo muestra). Solo se le pregunta al dueño lo que nadie puede saber por el.",
+
+  "espacio": {
+    "nombre_tienda": "{{NOMBRE EXACTO DE LA EMPRESA}}",
+    "url_tienda": "{{https://dominio}}",
+    "dominio_catalogo": "{{dominio sin https, para cruzar el cache con el catalogo publico}}",
+    "plataforma": "{{shopify | tiendanube | woocommerce | otra}}",
+    "pais": "{{en minuscula: colombia, mexico, chile...}}",
+    "ciudad_despacho": "{{ciudad desde donde sale la mercancia}}"
+  },
+
+  "identidad": {
+    "nombre_asesor": "{{SE LEE de los asistentes hermanos: es UNO por espacio}}",
+    "frase_de_respaldo": "{{lo que la empresa puede decir de si misma y es cierto: años, clientes, cobertura}}"
+  },
+
+  "logistica": {
+    "tiempos_por_zona": "{{bloque de tiempos tal como lo da el dueño}}",
+    "transportadoras_domicilio": ["{{...}}"],
+    "transportadoras_oficina": ["{{las que ademas entregan en oficina}}"],
+    "transportadora_prohibida": "{{va PRIMERO en el campo, que es lo que el corte se come}}",
+    "envio": "{{gratis | con costo: cual}}"
+  },
+
+  "pago": {
+    "contraentrega": "{{si | no}}",
+    "anticipado": "{{si | no — se decide POR ASISTENTE, no se copia del logistico}}",
+    "datos_pago_anticipado": "{{SOLO los da el dueño: medio, titular, numero, llave}}",
+    "monto_anticipo": "{{valor fijo; si el dueño no lo da, se propone UN FLETE completo}}",
+    "anticipo_se_descuenta": "{{si | no — cambia como se le explica al cliente}}"
+  },
+
+  "comercial": {
+    "ofrecer_descuento": "{{si | no — default NO: correr viabilidad_cod.py antes de encenderlo}}",
+    "descuento_maximo": "{{numero}}",
+    "incentivo": "{{envio gratis | regalo | ninguno}}",
+    "prueba_social": "{{cifra REAL del dueño, o vacio}}"
+  },
+
+  "correo": {
+    "activar_envio": "{{si | no}}"
+  }
+}

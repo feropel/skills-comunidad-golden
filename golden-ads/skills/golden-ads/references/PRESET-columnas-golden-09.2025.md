@@ -1,6 +1,6 @@
 # Preset real de columnas — Golden Group (09.2025)
 
-Absorbido de "Metricas Golden.pdf" que compartió el usuario. Son sus 26 columnas personalizadas
+Absorbido de "Metricas Golden.pdf" que compartió el usuario. Son sus columnas personalizadas
 reales en Meta Ads. El "Set Maestro Golden" de `18-columnas-ads-manager.md` = esto + 6 mejoras.
 (Nota: el MCP no puede leer/fijar la vista de columnas guardada; esto vino del PDF del usuario.)
 

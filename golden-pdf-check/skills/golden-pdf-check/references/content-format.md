@@ -210,3 +210,25 @@ que use.
   antes de renderizar, con la tarjeta y la línea exactas — el arreglo correcto
   es reescribir el contenido con saltos de línea propios, nunca confiar en el
   envoltorio del render.
+
+---
+
+## Norma de FER · una tarjeta por copy
+
+Cuando el contenido trae VARIOS elementos copiables de la misma familia (5 copys de
+anuncio, 5 titulares, varios prompts de imagen, guiones), la maquetación obligatoria es:
+
+- **Cada texto principal = SU PROPIA tarjeta numerada** con título en el fence
+  (` ``` Texto principal 1 `, ` ``` Texto principal 2 `…), uno abajo del otro.
+- Elementos de una línea (titulares, descripciones) SÍ pueden ir juntos en UNA
+  tarjeta, pero **uno por línea, numerados**, jamás en párrafo corrido.
+- **PROHIBIDO** el párrafo que une varios copys con "· 1. … 2. … 3. …": mata el
+  copy-paste, ahoga los números y da pereza leerlo. Si el autor lo trae así, la
+  skill lo reestructura en tarjetas (es maquetación, no cambio de texto — el
+  contenido queda idéntico).
+- Marcadores tipo `[PENDIENTE …]` en texto corrido van en **negrita**, no en
+  backticks: el monoespaciado en línea puede cruzar de página y el auditor lo marca
+  como prompt cortado.
+- Ojo autor: la skill garantiza tarjetas atómicas, pero QUÉ es tarjeta lo decide
+  quien escribe el Markdown-Golden. Ante una lista de copys, la decisión correcta es
+  SIEMPRE una tarjeta por copy.

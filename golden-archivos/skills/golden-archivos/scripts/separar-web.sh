@@ -18,6 +18,11 @@ set -u
 UNIT="${1:?Uso: separar-web.sh \"<carpeta-unidad>\" \"<movimientos.log>\" [APLICAR]}"
 LOG="${2:-}"
 MODE="${3:-}"
+# Normaliza la ruta: quita las barras finales. `for U in "$R"/*/` — la forma
+# canonica de recorrer productos — SIEMPRE entrega barra final, y sin esto
+# "$UNIT/archivo" no se puede recortar contra "$UNIT", asi que el script
+# devolvia 0 SIN error (medido 2026-09-05: 1 pieza sin barra, 0 con barra).
+while [ "$UNIT" != "/" ] && [ "${UNIT%/}" != "$UNIT" ]; do UNIT="${UNIT%/}"; done
 [ -d "$UNIT" ] || { echo "  (no existe: $UNIT)"; exit 0; }
 
 # Carpetas-librería genéricas: donde el material se acumula sin criterio y

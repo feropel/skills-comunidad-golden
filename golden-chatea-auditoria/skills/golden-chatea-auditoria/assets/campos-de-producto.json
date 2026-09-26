@@ -1,0 +1,10 @@
+{
+  "_que_es": "Que campos guardan CONTENIDO DE PRODUCTO y no configuracion del asistente. Ley de FER 2026-09-05: golden-chatea-auditoria es de CONFIGURACION; el contenido de los productos no se juzga salvo que se pida con --alcance. La lista sale del universo medido el 2026-08-28 en Golden CO: 95 campos, 78 de configuracion y 17 de producto.",
+  "_como_se_usa": "Se casa contra el NOMBRE del campo al que apunta el hallazgo. El disparador NO entra aqui: es cableado del asistente, o sea configuracion, aunque nombre productos.",
+  "patrones": [
+    "^\\[Producto Ventas Wp\\] \\d+$",
+    "^\\[Comentarios\\] Productos",
+    "^\\[Comentarios\\] .*TOON",
+    "^\\[Carritos IA\\] Informaci[oó]n de productos"
+  ]
+}

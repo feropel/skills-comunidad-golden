@@ -20,12 +20,34 @@ Salida:
 
 import sys
 import os
+import io
 import re
 import json
 
 # ----------------------------------------------------------------------
 # Utilidades de color WCAG
 # ----------------------------------------------------------------------
+
+def atmosferas_del_motor():
+    """Lee los nombres validos de `Atmosfera.lista` en assets/atmosferas.js.
+
+    Devuelve la lista del motor. Si el archivo no esta o no se puede leer,
+    NO se inventa un respaldo silencioso: se devuelve None y quien llama debe
+    declarar la comprobacion como NO VERIFICADA. Un respaldo a mano seria
+    justo la trampa que este cambio viene a cerrar.
+    """
+    ruta = os.path.join(os.path.dirname(os.path.abspath(__file__)),
+                        '..', 'assets', 'atmosferas.js')
+    try:
+        js = io.open(ruta, encoding='utf-8').read()
+    except (IOError, OSError):
+        return None
+    m = re.search(r'lista\s*:\s*\[(.*?)\]', js, re.S)
+    if not m:
+        return None
+    nombres = re.findall(r"'([a-z]+)'", m.group(1))
+    return nombres or None
+
 
 def hex_a_rgb(h):
     h = h.strip().lstrip('#')
@@ -361,15 +383,27 @@ def auditar(ruta):
     # ------------------------------------------------------------------
     # 6b · Atmosfera: la que se declara tiene que existir en el motor
     # ------------------------------------------------------------------
-    ATMOSFERAS = ['nebulosa', 'candela', 'aurora', 'pulso', 'enjambre',
-                  'reticula', 'duna', 'viaje', 'ninguna']
+    # La lista NO se clava aqui. Se deriva de `Atmosfera.lista` en
+    # assets/atmosferas.js, que es el motor y por tanto la fuente autoritativa.
+    # Motivo medido (2026-09-05): SKILL.md documentaba una atmosfera `retabla`
+    # que el motor no implementaba, y ni el verificador ni el validador lo
+    # vieron porque cada uno tenia SU PROPIA copia de la lista a mano. Una
+    # cifra o una lista escrita a mano envejece sola: se deriva o se cita.
+    ATMOSFERAS = atmosferas_del_motor()
     matm = re.search(r'<body[^>]*data-atmosfera=["\']([^"\']*)', visible, re.I)
     if matm:
         nombre_atm = matm.group(1).strip()
-        a.check('La atmosfera declarada existe', nombre_atm in ATMOSFERAS,
-                'El body declara data-atmosfera="%s", que no es ninguna de las 8 del motor '
-                '(%s). El deck saldria con fondo muerto.'
-                % (nombre_atm, ', '.join(ATMOSFERAS)))
+        if ATMOSFERAS is None:
+            # Sin motor a la vista no se inventa una lista de respaldo: se
+            # declara NO VERIFICADO, que es lo que manda el protocolo.
+            a.sin_verificar('si la atmosfera declarada existe',
+                            'No pude leer `Atmosfera.lista` en assets/atmosferas.js, '
+                            'asi que no tengo contra que comparar "%s".' % nombre_atm)
+        else:
+            a.check('La atmosfera declarada existe', nombre_atm in ATMOSFERAS,
+                    'El body declara data-atmosfera="%s", que no es ninguna de las %d que '
+                    'implementa el motor (%s). El deck saldria con fondo muerto.'
+                    % (nombre_atm, len(ATMOSFERAS), ', '.join(ATMOSFERAS)))
         tiene_motor = 'window.Atmosfera' in visible or 'global.Atmosfera' in visible
         a.check('El motor de atmosferas esta incrustado',
                 nombre_atm == 'ninguna' or tiene_motor,

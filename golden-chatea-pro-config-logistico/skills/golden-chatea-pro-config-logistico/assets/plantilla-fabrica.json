@@ -1,0 +1,326 @@
+{
+ "_que_es": "Plantilla de FABRICA de Chatea Pro. Es lo que la plataforma escribe sola al instalar los asistentes, ANTES de que nadie toque nada.",
+ "_como_se_midio": "2026-09-06. Dos espacios recien creados y sin tocar, con los cuatro asistentes: uno nacido en una cuenta de Colombia y otro eligiendo MEXICO en la encuesta de bienvenida. 61 campos cada uno, IDENTICOS byte a byte. Se verifico que fueran espacios distintos (prefijo var_ns) antes de dar el cero por bueno.",
+ "_para_que_sirve": "Para clasificar cada campo del espacio auditado en FABRICA / TOCADO / VACIO comparando el md5 del valor. La bandera is_template_field de la plataforma NO sirve: viene en falso en 9 de cada 10 campos.",
+ "_ojo": "La plantilla es COLOMBIANA siempre: pais=colombia, telefono +57, tienda .co, Estatuto del Consumidor y tiempos con jerga colombiana, aunque el espacio se cree para otro pais. Limpiarla es el paso obligatorio de toda optimizacion.",
+ "_sin_datos_de_cliente": true,
+ "campos": 61,
+ "huella_md5": {
+  "[Comentarios] Productos": {
+   "md5": "d41d8cd98f00b204e9800998ecf8427e",
+   "chars": 0,
+   "tipo": "array"
+  },
+  "[Comentarios] Configuracion General": {
+   "md5": "94eb87c84d06156f80c97704220e17ce",
+   "chars": 8599,
+   "tipo": "array"
+  },
+  "[Comentarios IA] Tipo de actividad": {
+   "md5": "c4ca4238a0b923820dcc509a6f75849b",
+   "chars": 1,
+   "tipo": "text"
+  },
+  "[Comentarios] TOON Productos": {
+   "md5": "d41d8cd98f00b204e9800998ecf8427e",
+   "chars": 0,
+   "tipo": "longtext"
+  },
+  "[Comentarios] Productos extendido": {
+   "md5": "d41d8cd98f00b204e9800998ecf8427e",
+   "chars": 0,
+   "tipo": "longtext"
+  },
+  "[Comentarios] Versión": {
+   "md5": "9562870d7e8245d03c2ac6055dff735f",
+   "chars": 5,
+   "tipo": "text"
+  },
+  "[Carritos IA] Ofrecer descuento si se creo con uno": {
+   "md5": "68934a3e9455fa72420237eb05902327",
+   "chars": 5,
+   "tipo": "boolean"
+  },
+  "[Carritos IA] Automatizar Creados Manualmente": {
+   "md5": "b326b5062b2f0e69046810717534cb09",
+   "chars": 4,
+   "tipo": "boolean"
+  },
+  "[Carritos IA] Automatizar Pago Anticipado": {
+   "md5": "b326b5062b2f0e69046810717534cb09",
+   "chars": 4,
+   "tipo": "boolean"
+  },
+  "[Integraciones] Token CP": {
+   "md5": "2601628079aff679ba9df4f6e3f1328c",
+   "chars": 60,
+   "tipo": "text"
+  },
+  "[Carritos] Configuracion": {
+   "md5": "ae92f8f6a90ecfd6a343a5bb2e743dba",
+   "chars": 2317,
+   "tipo": "array"
+  },
+  "[Carritos IA] Tipo de actividad": {
+   "md5": "c4ca4238a0b923820dcc509a6f75849b",
+   "chars": 1,
+   "tipo": "text"
+  },
+  "Tipo de referencia": {
+   "md5": "8295f968e1676d62158d33a57b26963b",
+   "chars": 12,
+   "tipo": "text"
+  },
+  "[Carritos IA] Retraso validación de pedido": {
+   "md5": "d3d9446802a44259755d38e6d163e820",
+   "chars": 2,
+   "tipo": "number"
+  },
+  "[Carritos IA] Versión de bot": {
+   "md5": "6c1f97d67fec3e255c0cb2279cc943de",
+   "chars": 5,
+   "tipo": "text"
+  },
+  "[Carritos IA] Habilitar búsqueda web": {
+   "md5": "b326b5062b2f0e69046810717534cb09",
+   "chars": 4,
+   "tipo": "boolean"
+  },
+  "[Carritos IA] Información de productos #1": {
+   "md5": "d41d8cd98f00b204e9800998ecf8427e",
+   "chars": 0,
+   "tipo": "array"
+  },
+  "[Logistico] Plantillas de mensaje": {
+   "md5": "d20c2f1920a772f95956d124f902c89f",
+   "chars": 911,
+   "tipo": "array"
+  },
+  "[Novedades] Mensajes por tipo de novedad": {
+   "md5": "007f68f532d05c6a0a8bdc184ccf83eb",
+   "chars": 2259,
+   "tipo": "array"
+  },
+  "[Logistico] Novedad": {
+   "md5": "f14dccaa05c8eac61e1d95447cd4a010",
+   "chars": 391,
+   "tipo": "array"
+  },
+  "[Logistico] Seguimiento": {
+   "md5": "6d69481001f235cb3b5a61e7b8624401",
+   "chars": 7966,
+   "tipo": "array"
+  },
+  "[Logistico] Confirmaciones": {
+   "md5": "cfec14ae615214830c86baee2b6ef950",
+   "chars": 6683,
+   "tipo": "array"
+  },
+  "[Logistico] Configuracion General": {
+   "md5": "c0da43886eba0065c8de021400c0b2be",
+   "chars": 2583,
+   "tipo": "array"
+  },
+  "[Logistico] Extraer nombre de Shopify o Dropi?": {
+   "md5": "b326b5062b2f0e69046810717534cb09",
+   "chars": 4,
+   "tipo": "boolean"
+  },
+  "[Logístico] Versión de bot": {
+   "md5": "76e2eb891493cbbff7c3901345faabb5",
+   "chars": 8,
+   "tipo": "text"
+  },
+  "[Logistico] Desactivar modificación con anulación": {
+   "md5": "68934a3e9455fa72420237eb05902327",
+   "chars": 5,
+   "tipo": "boolean"
+  },
+  "[Minimax] Activador": {
+   "md5": "68934a3e9455fa72420237eb05902327",
+   "chars": 5,
+   "tipo": "boolean"
+  },
+  "[Minimax] Api key": {
+   "md5": "d41d8cd98f00b204e9800998ecf8427e",
+   "chars": 0,
+   "tipo": "text"
+  },
+  "[Meta] Iniciar Pago": {
+   "md5": "cfcd208495d565ef66e7dff9f98764da",
+   "chars": 1,
+   "tipo": "number"
+  },
+  "[Meta] Comprar": {
+   "md5": "cfcd208495d565ef66e7dff9f98764da",
+   "chars": 1,
+   "tipo": "number"
+  },
+  "[Meta] Ver Contenido": {
+   "md5": "cfcd208495d565ef66e7dff9f98764da",
+   "chars": 1,
+   "tipo": "number"
+  },
+  "[Meta] Agregar al carrito": {
+   "md5": "cfcd208495d565ef66e7dff9f98764da",
+   "chars": 1,
+   "tipo": "number"
+  },
+  "[Ventas Wp] Configuracion general 2": {
+   "md5": "9896378362066f38d94d6c42f993dcbf",
+   "chars": 1877,
+   "tipo": "array"
+  },
+  "[WhatsApp IA] Pedidos de hoy": {
+   "md5": "d41d8cd98f00b204e9800998ecf8427e",
+   "chars": 0,
+   "tipo": "text"
+  },
+  "[Ventas Wp] Intento de cancelación ⁉️": {
+   "md5": "b326b5062b2f0e69046810717534cb09",
+   "chars": 4,
+   "tipo": "boolean"
+  },
+  "[Ventas Wp] Pedido programado ⏱️": {
+   "md5": "b326b5062b2f0e69046810717534cb09",
+   "chars": 4,
+   "tipo": "boolean"
+  },
+  "[Ventas Wp] Oficina 📦": {
+   "md5": "b326b5062b2f0e69046810717534cb09",
+   "chars": 4,
+   "tipo": "boolean"
+  },
+  "[Ventas Wp] Disparador de productos": {
+   "md5": "e1f71100a07045c486e25961565323e0",
+   "chars": 57,
+   "tipo": "array"
+  },
+  "[Ventas Wp] Configuracion general": {
+   "md5": "2bfc0749bbf4f56426b24b5cd4e3fb6f",
+   "chars": 13228,
+   "tipo": "array"
+  },
+  "[Whatsapp IA] Tipo de actividad": {
+   "md5": "c4ca4238a0b923820dcc509a6f75849b",
+   "chars": 1,
+   "tipo": "text"
+  },
+  "[Ventas Wp] Prompt teléfono de contacto recibido": {
+   "md5": "d0662e6c9432a195eafd14aed9088ed7",
+   "chars": 192,
+   "tipo": "text"
+  },
+  "[Ventas Wp] Mensaje inicial solicitud teléfono": {
+   "md5": "b2d8d1fc41704da490f63bdcebeb8baa",
+   "chars": 145,
+   "tipo": "text"
+  },
+  "[Ventas Wp] Desactivar solicitud inicial teléfono": {
+   "md5": "68934a3e9455fa72420237eb05902327",
+   "chars": 5,
+   "tipo": "boolean"
+  },
+  "[Ventas Wp] Desactivar solicitud final teléfono": {
+   "md5": "68934a3e9455fa72420237eb05902327",
+   "chars": 5,
+   "tipo": "boolean"
+  },
+  "[Ventas Wp] Mensaje final solicitud teléfono": {
+   "md5": "04eb2a610bb254dc05d3993e337ff769",
+   "chars": 227,
+   "tipo": "text"
+  },
+  "[Ventas Wp] Desactivar Skill Potencial": {
+   "md5": "68934a3e9455fa72420237eb05902327",
+   "chars": 5,
+   "tipo": "boolean"
+  },
+  "[Ventas Wp] Desactivar Skill Programar": {
+   "md5": "68934a3e9455fa72420237eb05902327",
+   "chars": 5,
+   "tipo": "boolean"
+  },
+  "[WhatsApp IA] Instrucciones recolección de datos": {
+   "md5": "d41d8cd98f00b204e9800998ecf8427e",
+   "chars": 0,
+   "tipo": "text"
+  },
+  "[Ventas Wp] Desactivar asignación a asesor": {
+   "md5": "68934a3e9455fa72420237eb05902327",
+   "chars": 5,
+   "tipo": "boolean"
+  },
+  "[WhatsApp IA] Desactivar consulta de recordatorios": {
+   "md5": "b326b5062b2f0e69046810717534cb09",
+   "chars": 4,
+   "tipo": "boolean"
+  },
+  "Today_previo": {
+   "md5": "4a10e73fe28bf6f71b1fe7c9f7ba95ad",
+   "chars": 20,
+   "tipo": "date"
+  },
+  "[Ventas Wp] Solo Con Recaudo": {
+   "md5": "b326b5062b2f0e69046810717534cb09",
+   "chars": 4,
+   "tipo": "boolean"
+  },
+  "[Ventas Wp] Disparador de productos Extendido": {
+   "md5": "d41d8cd98f00b204e9800998ecf8427e",
+   "chars": 0,
+   "tipo": "longtext"
+  },
+  "[Ventas Wp] Solo Pendiente confirmación": {
+   "md5": "68934a3e9455fa72420237eb05902327",
+   "chars": 5,
+   "tipo": "boolean"
+  },
+  "[Ventas Wp] Desactivar Skill Datos producto físico": {
+   "md5": "68934a3e9455fa72420237eb05902327",
+   "chars": 5,
+   "tipo": "boolean"
+  },
+  "[WhatsApp IA] Registros del bot": {
+   "md5": "d41d8cd98f00b204e9800998ecf8427e",
+   "chars": 0,
+   "tipo": "array"
+  },
+  "[WhatsApp IA] Versión de bot": {
+   "md5": "287d1ac6a08490838018a515394ee921",
+   "chars": 5,
+   "tipo": "text"
+  },
+  "[WhatsApp IA] Nota estado de ventas": {
+   "md5": "b326b5062b2f0e69046810717534cb09",
+   "chars": 4,
+   "tipo": "boolean"
+  },
+  "[WhatsApp IA] Facturación de hoy": {
+   "md5": "cfcd208495d565ef66e7dff9f98764da",
+   "chars": 1,
+   "tipo": "number"
+  },
+  "[WhatsApp IA] Ventas de productos #1": {
+   "md5": "d41d8cd98f00b204e9800998ecf8427e",
+   "chars": 0,
+   "tipo": "array"
+  },
+  "[Integraciones] Datos de integracion": {
+   "md5": "7bad4014997f40340a877dd83465387a",
+   "chars": 154,
+   "tipo": "array"
+  }
+ },
+ "valores_del_logistico": {
+  "[Logistico] Plantillas de mensaje": "{\"confirmaciones\":{\"confirmacion_con_imagen\":{\"namespace\":\"string\",\"name\":\"string\",\"lang\":\"string\"},\"confirmacion_sin_imagen\":{\"namespace\":\"string\",\"name\":\"string\",\"lang\":\"string\"},\"recordatorio_1\":{\"namespace\":\"string\",\"name\":\"string\",\"lang\":\"string\"},\"recordatorio_2\":{\"namespace\":\"string\",\"name\":\"string\",\"lang\":\"string\"}},\"seguimiento\":{\"guia_generada\":{\"namespace\":\"string\",\"name\":\"string\",\"lang\":\"string\"},\"reparto\":{\"namespace\":\"string\",\"name\":\"string\",\"lang\":\"string\"},\"oficina\":{\"namespace\":\"string\",\"name\":\"string\",\"lang\":\"string\"},\"recordatorio_oficina\":{\"namespace\":\"string\",\"name\":\"string\",\"lang\":\"string\"},\"entregado\":{\"namespace\":\"string\",\"name\":\"string\",\"lang\":\"string\"}},\"novedad\":{\"novedad_generica\":{\"namespace\":\"string\",\"name\":\"string\",\"lang\":\"string\"},\"recordatorio_1\":{\"namespace\":\"string\",\"name\":\"string\",\"lang\":\"string\"},\"oficina\":{\"namespace\":\"string\",\"name\":\"string\",\"lang\":\"string\"}}}",
+  "[Novedades] Mensajes por tipo de novedad": "{\"coordinar entrega\":{\"motivo\":\"No te encontrabas en la dirección registrada al momento de la entrega.\",\"dato\":\"Indícanos los horarios en los que puedes recibir el pedido.\"},\"no contaba con dinero\":{\"motivo\":\"No contabas con el medio de pago disponible.\",\"dato\":\"Confírmanos si deseas que reprogramemos la entrega y tendrás el pago listo.\"},\"datos adicionales\":{\"motivo\":\"La dirección proporcionada está incompleta.\",\"dato\":\"Por favor, compártenos la dirección completa (ej. calle, torre, conjunto, punto de referencia, etc.).\"},\"requiere inventario\":{\"motivo\":\"Solicitaste abrir el paquete antes de pagar, lo cual no es permitido por políticas de la transportadora.\",\"dato\":\"Confírmanos si deseas recibir el producto bajo las condiciones establecidas.\"},\"no conocen al destinatario\":{\"motivo\":\"El destinatario no fue reconocido en la dirección registrada.\",\"dato\":\"Indícanos quién recibirá el pedido y asegúrate de que esté informado.\"},\"direccion no existe\":{\"motivo\":\"La dirección no existe o no fue localizada por la transportadora.\",\"dato\":\"Comparte una dirección válida o confirma si deseas cambiar el lugar de entrega.\"},\"se nego a recibir\":{\"motivo\":\"Se realizaron dos intentos de entrega, pero el cliente se negó a recibir el pedido.\",\"dato\":\"Confírmanos si deseas que programemos nuevamente la entrega.\"},\"cancelado\":{\"motivo\":\"Recibimos una solicitud de cancelación del pedido.\",\"dato\":\"Si cambiaste de opinión y deseas recibir el producto, confírmanos para reprogramar la entrega.\"},\"programar entrega\":{\"motivo\":\"Solicitaste recibir tu pedido en una fecha específica.\",\"dato\":\"Indícanos la fecha más próxima en la que puedes recibir el pedido.\"},\"no categorizada\":{\"motivo\":\"La transportadora nos informa que intentaron entregar el producto en la dirección registrada, pero esto no fue posible.\",\"dato\":\"Por favor, cuéntanos si tienes más detalles sobre lo ocurrido e indícanos si deseas que la transportadora haga un nuevo intento de entrega.\"},\"casos de asesor\":{\"motivo\":\"La transportadora nos informa que intentaron entregar el producto en la dirección registrada, pero esto no fue posible.\",\"dato\":\"Por favor, cuéntanos si tienes más detalles sobre lo ocurrido e indícanos si deseas que la transportadora haga un nuevo intento de entrega.\"}}",
+  "[Logistico] Novedad": "{\"mensajes_de_novedad\":{\"tiempo_no_solucionado\":\"6 horas\",\"novedad\":{\"novedad_generica\":{\"namespace\":\"\",\"name\":\"\",\"lang\":\"\"},\"recordatorio_1\":{\"namespace\":\"\",\"name\":\"\",\"lang\":\"\"},\"oficina\":{\"namespace\":\"\",\"name\":\"\",\"lang\":\"\"}},\"tiempo_recordatorio1\":\"1 horas\"},\"dias_de_ofrecimiento\":{\"dia_minimo\":\"2 días hábiles\",\"dia_maximo\":\"3 días hábiles\"},\"acciones_especiales\":{\"subir_a_dropi\":\"no\"}}",
+  "[Logistico] Seguimiento": "{\"ganchos_de_venta\":{\"guia_generada\":\"Crea un gancho de venta que resalte 2 cosas en orden: PRONTITUD y un BENEFICIO DEL PRODUCTO. Para ello, fíjate en los ”ejemplos” proporcionados y usa la ”Información del producto”\\n\\nEjemplos:\\n1. *Muy pronto, comenzarás a ver los resultados que tanto esperabas en tu piel.* 🛀🏼\\n2. *Prepárate para una transformación que tu piel agradecerá* 🛀🏼\\n3. *Pronto podrás disfrutar de la experiencia rejuvenecedora de [nombre del producto]* 🛀🏼\\n\\nfíjate que en esos ejemplos intentamos iniciar con cosas que denotaran prontitud o sorpresa. USA FRASES AL INICIO COMO ”EN POCO TIEMPO”, ”PREPÁRATE”, ”ESTÁS A PUNTO”, ”FALTA POCO”, ETC\\n\\n\\nmáximo 15 palabras\\nresponde siempre la frase entre asteriscos *[frase]*. debe ser un solo asterisco en cada lado, no doble\\nusa siempre un emoji al final\\n\\nConsideraciones:\\n1. Si la información del producto es: ”[No hay información disponible del producto, pero básate en el nombre del producto para proporcionar la información necesaria]”, Responde siempre: ”Falta poco para que puedas disfrutar de tu [nombre del producto] [complemento genérico de máximo 3 palabras] [emoji relacionado]”\\n2. Si la información del producto es distinta a lo mencionado en el paso 1, crea un gancho parecido al de los ejemplos\",\"en_reparto\":\"Completa el gancho de venta reemplazando el ”{gancho persuasivo}” con algo relacionado a la ”información del producto”\\n\\n*¡Estás a punto de experimentar {gancho persuasivo} [gif relacionado]!*\\n\\nEjemplos:\\n1. *¡Estás a punto de experimentar la suavidad incomparable en tu piel!* 🧴\\n2. *¡Estás a punto de experimentar una limpieza profunda y revitalizante!* 🛁\\n3. *¡Estás a punto de experimentar un cambio radical en tu rutina de cuidado personal!* 💆‍♀️\\n\\n\\nmáximo 15 palabras\\nresponde siempre la frase entre asteriscos *[frase]*. debe ser un solo asterisco en cada lado, no doble\\n\\nConsideraciones:\\n1. Si la información del producto es: ”[No hay información disponible del producto, pero básate en el nombre del producto para proporcionar la información necesaria]”, Responde siempre: ”¡Estás a punto de experimentar [beneficio genérico] de tu [nombre del producto] [emoji relacionado]”\\n2. Si la información del producto es distinta a lo mencionado en el paso 1, crea un gancho parecido al de los ejemplos\",\"en_oficina\":\"Completa el gancho de venta reemplazando el ”{gancho_de_venta}” con algo relacionado a la ”información del producto”\\n\\nTu {productos_de_la_orden} ya está en la oficina de {transportadora}, listo para que lo recojas.. {gancho_de_venta} [emoji relacionado]\\n\\n(el gancho de venta tiene la estructura: ”Esperamos que disfrutes de {personalización} tanto como nosotros disfrutamos haciéndolo llegar a ti”\\n\\nEjemplos de ganchos de venta:\\n1. Esperamos que disfrutes de *la suavidad que mereces,* tanto como nosotros disfrutamos prepararlo con cuidado para ti.\\n2. Esperamos que disfrutes de la *frescura revitalizante que este producto ofrece,* tanto como nosotros disfrutamos haciéndolo especialmente para ti.\\n3. Esperamos que disfrutes del *cuidado excepcional que ahora forma parte de tu rutina,* tanto como nosotros disfrutamos seleccionando cada detalle para ti.\\n\\nEjemplos completos:\\n1. Tus leggins ya se encuentran en la oficina de Domina, listo para ser recogido. *Esperamos que disfrutes de la suavidad y elegancia del terciopelo tanto como nosotros disfrutamos haciéndolo llegar a ti* 👜\\n\\n\\nIMPORTANTE: Haz que la frase tenga sentido, es decir, que si hablamos de 1 o más productos, hablemos en plural y respetando el género del producto para que la oración sea coherente. Así mismo, si existe, menciona la cantidad de productos. Por ejemplo:\\n\\n”Tus laptops ya se encuentran en la oficina de Servientrega, listas para ser recogidas.”\\n”Tu zapato ya se encuentran en la oficina de Servientrega, listo para ser recogido.”\\n”Tus 3 vasos de vidrio ya se encuentran en la oficina de Servientrega, listos para ser recogidos.”\\n\\nmáximo 15 palabras\\nresponde siempre el {gancho_de_venta} entre asteriscos *{gancho_de_venta}*. debe ser un solo asterisco en cada lado, no doble\\n\\nConsideraciones:\\n1. Si la información del producto es: ”[No hay información disponible del producto, pero básate en el nombre del producto para proporcionar la información necesaria]”, Responde siempre: ”Tus {productos_de_la_orden} ya se encuentra en la oficina de {transportadora}, listo para ser recogido. {gancho_de_venta} [emoji relacionado]” (el gancho de venta tiene la estructura: ”Esperamos que disfrutes de {personalización} tanto como nosotros disfrutamos haciéndolo llegar a ti”\\n2. Si la información del producto es distinta a lo mencionado en el paso 1, crea un gancho parecido al de los ejemplos.\\n3. si el pedido va para oficina no solicites o pidas al cliente una dirección.\\n\\nNUNCA USES CORCHETES NI PARÉNTESIS EN LA RESPUESTA\",\"entregado\":\"Completa el gancho de venta reemplazando el ”{gancho_de_venta}” con algo relacionado a la ”información del producto”\\n\\nNos alegra saber que ya tienes en tus manos tu {productos_de_la_orden}. {gancho_de_venta} [emoji relacionado]\\n\\n(el gancho de venta tiene la estructura: ”Esperamos que disfrutes de {personalización} tanto como nosotros disfrutamos haciéndolo llegar a ti”\\n\\nEjemplos:\\n1. Esperamos que disfrutes de *la suavidad que mereces,* tanto como nosotros disfrutamos preparando este producto para ti ⭐\\n2. Esperamos que disfrutes de la *frescura revitalizante que este producto ofrece,* tanto como nosotros disfrutamos haciéndolo especialmente para ti ⭐\\n3. Esperamos que disfrutes del *cuidado excepcional que ahora forma parte de tu rutina,* tanto como nosotros disfrutamos seleccionando cada detalle para ti ⭐\\n\\n\\nmáximo 15 palabras\\nresponde siempre el {gancho_de_venta} entre asteriscos *{gancho_de_venta}*. debe ser un solo asterisco en cada lado, no doble\\n\\n\\nIMPORTANTE: Haz que la frase tenga sentido, es decir, que si hablamos de 1 o más productos, hablemos en plural y respetando el género del producto para que la oración sea coherente. Así mismo, si existe, menciona la cantidad de productos. Por ejemplo:\\n\\n”Tus laptops ya se encuentran en la oficina de Servientrega, listas para ser recogidas.”\\n”Tu zapato ya se encuentran en la oficina de Servientrega, listo para ser recogido.”\\n”Tus 3 vasos de vidrio ya se encuentran en la oficina de Servientrega, listos para ser recogidos.”\\n\\n\\nConsideraciones:\\n1. Si la información del producto es: ”[No hay información disponible del producto, pero básate en el nombre del producto para proporcionar la información necesaria]”, Responde siempre: ”Nos alegra saber que ya tienes en tus manos {productos_de_la_orden}. {gancho_de_venta} [emoji relacionado]” (el gancho de venta tiene la estructura: ”Esperamos que disfrutes de {personalización} tanto como nosotros disfrutamos haciéndolo llegar a ti”\\n2. Si la información del producto es distinta a lo mencionado en el paso 1, crea un gancho parecido al de los ejemplos\\n\\nNUNCA USES CORCHETES NI PARÉNTESIS EN LA RESPUESTA\"},\"tiempos_envio\":{\"desde_guia_generada\":\"Ejemplo: ”de 2 a 5 días”\",\"desde_en_reparto\":\"de 1 a 2 días en ciudades principales y 2 a 3 para ciudades no principales\"},\"pedidos_en_oficina\":{\"activar\":\"si\",\"cantidad_dias\":\"3 días\",\"hora\":\"09:45\",\"mensajes\":{\"r_1\":\"No dejes que tu pedido espere más, fue preparado especialmente para ti\",\"r_2\":\"Queremos que lo tengas en tus manos cuanto antes, sabemos que te encantará!\",\"r_3\":\"Estamos seguros de que te encantará cuando lo veas. ¡Ven por él!\",\"r_4\":\"Tu pedido ya está listo y queremos que lo disfrutes sin esperar más!\",\"r_5\":\"Cada detalle de tu pedido fue preparado con cuidado. ¡Ven a recibirlo cuando quieras y no te lo pierdas!\"},\"oficina\":{\"namespace\":\"\",\"name\":\"\",\"lang\":\"\"},\"recordatorio_oficina\":{\"namespace\":\"\",\"name\":\"\",\"lang\":\"\"}},\"seguimiento\":{\"guia_generada\":{\"namespace\":\"\",\"name\":\"\",\"lang\":\"\"},\"reparto\":{\"namespace\":\"\",\"name\":\"\",\"lang\":\"\"},\"entregado\":{\"namespace\":\"\",\"name\":\"\",\"lang\":\"\"}}}",
+  "[Logistico] Confirmaciones": "{\"mensajes_de_confirmacion\":{\"posicion_imagen\":\"1\",\"mensaje_agradecimiento\":\"¡Gracias por confirmar tu pedido! Estamos procesando tu solicitud y pronto recibirás actualizaciones sobre el estado de tu envío...\",\"confirmaciones\":{\"confirmacion_con_imagen\":{\"namespace\":\"\",\"name\":\"\",\"lang\":\"\"},\"confirmacion_sin_imagen\":{\"namespace\":\"\",\"name\":\"\",\"lang\":\"\"},\"recordatorio_1\":{\"namespace\":\"\",\"name\":\"\",\"lang\":\"\"},\"recordatorio_2\":{\"namespace\":\"\",\"name\":\"\",\"lang\":\"\"}},\"tiempo_r1\":\"1 horas\",\"tiempo_r2\":\"24 horas\"},\"tiempos_envio\":{\"tiempos\":\"De 3 a 5 días en ciudades principales y de 5 a 7 días en ciudades no principales\"},\"analisis_direccion\":{\"evaluar_direccion\":\"no\",\"prompt_analisis\":\"#ROL: Asume el papel de un experto en direcciones colombianas. Tu tarea es analizar y evaluar una dirección colombiana proporcionada para determinar si parece estar bien estructurada, es suficientemente específica y contiene las referencias necesarias. Las direcciones en Colombia pueden adoptar diferentes formas, incluyendo calle, carrera, avenida, diagonal, transversal, corregimiento, entre otros términos relevantes según la nomenclatura local. Debes considerar si la dirección tiene suficientes detalles y referencias adicionales como el número de casa, el barrio o un punto de referencia.\\n\\n#CRITERIOS PARA EVALUAR LA DIRECCIÓN:\\nA) Suficientemente específica: La dirección incluye un tipo de vía (calle, carrera, avenida, etc.), y el número correspondiente. Por ejemplo “Cll 100 #42f-100“ “Cl 100 #35-100“ “Calle 90 #42f-23“ “Calle 15A 24 62“\\n- Nota: Si la dirección incluye un tercer número después del tipo de vía y el número de la vía, ese tercer número debe interpretarse como el número de puerta, casa o apartamento. No se debe pedir nuevamente este dato si ya está presente.\\n- Nota: Si la dirección termina con un guión, ignora el guión al final y evalúa la dirección como si no estuviera presente. El guión al final no indica que la dirección está incompleta.\\n\\nB) Incompleta o poco específica: Si la dirección carece de información clave que la haga suficientemente específica, como la calle o carrera, RETORNA “falta que proporcione [especificar los datos que faltan]“. No solicites el número de casa o apartamento si ya está presente en un tercer número. El punto de referencia solo debe pedirse si la dirección no tiene suficientes detalles para identificar la ubicación precisa. Por ejemplo, si ya tiene tres números y un nombre de barrio, no se requieren referencias adicionales.\\n\\nC) Direcciones rurales: En el caso de direcciones rurales, si la dirección incluye un nombre de vereda o finca y parece suficientemente específica, RETORNA “dirección correcta“, incluso si no hay puntos de referencia adicionales.\\n\\nD) Direcciones de oficinas: Para direcciones de oficinas, si incluye el número de la vía y el nombre de la oficina, RETORNA “dirección correcta“, sin necesidad de solicitar más detalles.\\n\\nCONSIDERACIONES:\\n- Si la dirección incluye una palabra, esa palabra suele ser el nombre del barrio. Si no se incluye un barrio, pero la dirección tiene suficientes detalles para identificar la ubicación precisa (por ejemplo, tres números y una referencia), RETORNA “dirección correcta“.\\n- Las referencias adicionales, como puntos de referencia o nombres de barrio, son necesarias cuando la dirección no tiene suficiente especificidad con solo los números y el tipo de vía. Si la dirección ya incluye tres números y un nombre de barrio o sector, RETORNA “dirección correcta“.\\n- Si la dirección incluye un nombre propio (por ejemplo, un sector o nombre de ciudad), no lo consideres como referencia faltante, a menos que sea necesario para la especificidad de la ubicación.\\n- Si la dirección termina en un guión, no lo interpretes como un indicio de que la dirección es incompleta. Evalúa la dirección como si no hubiera guión.\\n- si la dirección es oficina, solo se necesita un complemento. ejemplo: oficina serviente san martín, u oficina servientrega calle 90\\n- Nota: Si la direccion no esta correctamente escrita, pero cuenta con la informacion suficiente como calle, carrera y numero, asumela como “dirección correcta“. Por ejemplo “Calle 15A 24 62“\\n\\nRESPUESTA:\\nSolo debes responder “dirección correcta“ o “falta que proporcione [datos faltantes]“ DEPENDIENDO DEL CASO, sin proporcionar ninguna explicación adicional ni justificación.\\n\\n##EJEMPLOS DE CÓMO DEBERÍAS EVALUAR UNA DIRECCIÓN\\n-Dirección urbana: “Calle 27d sur # 27c - 51, el mamantial, cerca de la farmacia“\\n-Evaluación esperada: “dirección correcta“\\n-Dirección urbana: “Calle 15A 24 62“\\n-Evaluación esperada: “dirección correcta“\\n-Dirección urbana incompleta: “Carrera 53 # 70“\\n-Evaluación esperada: “falta que proporcione el número de casa o de apartamento“\\n-Dirección urbana incompleta: “Carrera 53 # 70 - 20“\\n-Evaluación esperada: “dirección correcta“\\n-Dirección rural: “Vereda El Bosque, finca Los Álamos“\\n-Evaluación esperada: “dirección correcta“ (porque incluye el nombre de la vereda y de la finca, lo cual es adecuado para áreas rurales)\\n-Dirección rural: “barrios altos de casa cruz, manzana 20, casa 5“\\n-Evaluación esperada: “dirección correcta“ (porque incluye el nombre del barrio, la manzana y el número de casa, lo cuál es aceptado en algunas direcciones)\\n-Dirección rural incompleta: “Corregimiento San Antonio“\\n-Evaluación esperada: “falta que proporcione el nombre de la vereda y una referencia específica como el nombre de la finca o una descripción adicional para ser una dirección precisa“\\n-Dirección de oficina correcta: “Oficina Servientrega, Carrera 10 # 15“\\n- Evaluación esperada: “dirección correcta“ (porque para las oficinas, basta con tener el nombre de la oficina y un complemento, puede ser un numero o una palabra)\\n-Dirección de oficina correcta: “Oficina Servientrega San martín“\\n- Evaluación esperada: “dirección correcta“ (porque para las oficinas, basta con tener el nombre de la oficina y un complemento, puede ser un numero o una palabra)\\n-Dirección de oficina incompleta: “Oficina Servientrega“\\n-Evaluación esperada: “falta que proporcione la dirección completa de la oficina, incluyendo el número de carrera o calle para ser una dirección precisa“\"},\"validaciones_orden\":{\"confirmacion_automatica\":\"no\",\"validar_entregas\":{\"esta_activo\":\"si\",\"porcentaje_minimo\":\"50%\",\"minimo_de_ordenes\":\"2\"},\"validar_flete\":{\"esta_activo\":\"si\",\"flete_minimo\":\"10000\"}},\"mensajes_personalizados\":{},\"pago_anticipado\":{\"activo\":\"no\",\"cliente_no_valido\":\"no\",\"ofrecer_a_todos\":\"no\",\"estrategia_persuasion\":\"\",\"cobrar_envio\":{\"activo\":\"no\",\"envio_completo\":\"no\",\"parte_del_envio\":{\"porcentaje\":\"\",\"valor auxiliar\":\"\"}},\"cobrar_pedido\":{\"activo\":\"no\"}}}",
+  "[Logistico] Configuracion General": "{\"datos_de_la_tienda\":{\"pais\":\"colombia\",\"nombre\":\"Tu Tienda\",\"enlace\":\"Tu tienda.com\",\"ubicacion\":\"operación 100% online con 5 años de experiencia vendiendo productos de la mas alta calidad\",\"politicas_de_garantia\":\"Garantía de 30 días por defectos de fabricación. Derecho de retracto de 5 días calendario según Estatuto del Consumidor (producto sin uso y en empaque original). Cambios por talla o referencia dentro de 7 días con costos de envío compartidos. Productos de uso personal o higiene sin cambio. Daños en transporte cubiertos si se reportan dentro de 48 horas con evidencia fotográfica. Reembolsos procesados entre 3 y 7 días hábiles tras validación.\",\"origen_de_datos\":\"Shopify\"},\"comportamiento_de_la_ia\":{\"tipo_de_envio\":\"Varios mensajes\",\"adaptacion_del_lenguaje\":\"Habla en un tono neutral, muy humano y profesional. Usa frases naturales, claras y cercanas, como si fuera una conversación auténtica. Evita emojis y expresiones poco naturales o robóticas. No uses frases como 'estoy aquí para ayudarte'; en su lugar, expresa disponibilidad de forma sencilla y cordial, por ejemplo: 'cuéntame qué necesitas' o 'claro, lo hacemos de esta manera'. Transmite confianza y calidez con un lenguaje sencillo, directo y amable, que genere cercanía real sin sonar forzado.\",\"saludo_del_asesor\":\"Hola! Un gusto saludarte, soy Santiago y estoy aquí para ayudarte en lo que necesites. Permíteme por fa unos minutos y enseguida estaré ayudándote 😊\",\"metodo_anticancelacion\":\"Menciona una breve historia realista de un cliente que canceló su pedido y luego se arrepintió al darse cuenta de que perdió la oportunidad de obtener el producto con el descuento o beneficio especial que tenía en ese momento. Resalta que, al cancelar, podría enfrentarse a un precio más alto, falta de stock o pérdida de la promoción.\",\"restricciones\":\"Nunca proporcionar información personal de otros clientes, no hacer promesas que no pueda cumplir, mantener siempre un tono respetuoso, no insistir más de 3 veces en la misma propuesta. No debemos pedirle codigo postal al cliente.\"},\"capacidades\":{\"plantillas\":{\"confirmacion\":\"si\",\"seguimiento\":\"si\",\"novedad\":\"si\"},\"respuestas\":{\"confirmacion\":\"si\",\"seguimiento\":\"si\",\"novedad\":\"si\"}},\"voz_con_ia\":{\"usar_audio\":\"no\",\"token\":\"\",\"id_de_la_voz\":\"\",\"estabilidad\":\"1\",\"similaridad\":\"0.8\",\"estilo\":\"0.7\",\"speaker_boost\":\"false\",\"reglas\":{\"responder_audio_con_audio\":\"no\",\"cantidad_maxima_de_audio\":\"4\"}},\"manejo_de_ubicaciones\":{\"activar_manejo\":\"no\",\"extraer_direccion\":\"no\",\"enviar_imagen\":\"no\"},\"modelo_ia\":{\"proveedor\":\"openai\",\"modelo\":\"gpt-4o-mini\"}}",
+  "[Logistico] Extraer nombre de Shopify o Dropi?": "true",
+  "[Logístico] Versión de bot": "1.0.18.3",
+  "[Logistico] Desactivar modificación con anulación": "false"
+ }
+}

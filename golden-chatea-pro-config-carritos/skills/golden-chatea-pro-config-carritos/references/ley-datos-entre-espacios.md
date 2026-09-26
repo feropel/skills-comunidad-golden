@@ -22,8 +22,8 @@ configuración de asistentes** — JAMÁS datos, en ninguna dirección, ni entre
 - **Claims y cifras de negocio**: años en el mercado, número de clientes, porcentajes de
   entrega, premios. Heredarlos no rompe nada técnico — ningún barrido de llaves los detecta —
   pero ponen al bot a MENTIRLE al cliente con datos de otra empresa. Caso real (2026-08-08): la
-  plantilla maestra clonada traía "Más de 100.000 clientes atendidos en Colombia" (dato de
-  Golden) a punto de quedar en boca del bot de otro espacio.
+  plantilla maestra clonada traía una cifra de clientes atendidos (dato del espacio de
+  origen) a punto de quedar en boca del bot de otro espacio.
 
 **Única excepción autorizada:** Le'côterra como producto-ejemplo en los espacios de trabajo
 (asistente de WhatsApp y de comentarios), para que la gente vea cómo se configura un producto.

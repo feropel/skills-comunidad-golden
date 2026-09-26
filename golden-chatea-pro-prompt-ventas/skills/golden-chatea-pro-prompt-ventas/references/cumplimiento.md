@@ -58,3 +58,22 @@ Un sello invocado sin tenerlo es publicidad engañosa ante el regulador SANITARI
 - **El regulador que importa es el del país donde se vende**, no el de EE.UU.: Colombia INVIMA · México COFEPRIS · Chile ISP · Perú DIGEMID/DIGESA · Ecuador ARCSA · Panamá la autoridad sanitaria del MINSA · Paraguay la autoridad sanitaria nacional. Confirma con el vendedor el nombre y número vigentes; no los deduzcas.
 - **Nunca inventes ni "adornes" un aval**: nada de "certificado", "avalado por dermatólogos", "clínicamente probado" o "recomendado por especialistas" sin el respaldo documental en mano del vendedor.
 - Si el producto NO tiene registro, no se menciona el tema: se vende por lo que sí es cierto (uso cosmético, pagas al recibir, garantía de cambio). El silencio no es engaño; la insinuación sí.
+
+## ⛔ LEY DEL CLAIM ACOTADO — el superlativo no se cree, el dato acotado sí (clase M6, 2026-09-05)
+Esta es la ley general de la que ya tenías tres casos sueltos: el envío gratis "por ser cliente nuevo" (`plantilla-prompt.md`), la garantía específica en vez de la genérica (`oferta-irresistible.md`) y la prueba social real (arriba). El principio común:
+
+**Un beneficio que aplica a todos no se percibe como beneficio, y una afirmación absoluta no se percibe como verdad.** Lo que convierte no es el tamaño del claim: es que sea verificable y esté acotado.
+
+| Se lee como PUBLICIDAD (se descuenta solo) | Se lee como DATO (se cree) |
+|---|---|
+| "Somos la marca #1 de Colombia" | "Fue lo más vendido en Bogotá el mes pasado" |
+| "El mejor producto del mercado" | "De las 6 referencias que manejamos, es la que menos cambios nos pide" |
+| "Envío gratis a todo el país" | "Por ser cliente nuevo te dejo el envío gratis" |
+| "Todos nuestros productos tienen garantía" | "Este es al que le damos garantía, porque es el más probado" |
+| "Miles de clientes satisfechos" | "Van 340 pedidos de este en lo que va del año" |
+
+Por qué el superlativo se descuenta: **lo dice el que vende.** El cliente ya sabe que el dueño va a decir que su producto es el mejor, así que esa frase no le entrega información — le entrega la confirmación de que le están vendiendo, y activa la defensa. El dato acotado (una ciudad, un mes, una referencia, un número) sí entrega información, y además se puede desmentir — y precisamente porque se puede desmentir, se cree.
+
+⛔ **La acotación tiene que ser CIERTA.** Esto no es una técnica para decir lo mismo con otras palabras: "el más vendido en Bogotá el mes pasado" solo se escribe si el vendedor lo midió y lo confirma. Un dato acotado FALSO es peor que un superlativo falso, porque el superlativo nadie se lo cree y el dato sí — y en COD el cliente que descubre el engaño rechaza el pedido con el flete ya gastado. Si no hay número real, se acota por lo que sí consta: *"de lo que manejamos, este es el que más repiten"* solo si es verdad; si no, se vende por el beneficio y ya.
+
+**Cómo se aplica al escribir el prompt:** cada vez que el borrador contenga *el mejor · el número uno · el más vendido (a secas) · líder · miles de · el favorito de todos · 100% garantizado*, párate y pregúntale al vendedor qué dato real hay detrás. Si lo hay, se acota y gana fuerza. Si no lo hay, la frase se borra: no se cambia por otra igual de vaga.

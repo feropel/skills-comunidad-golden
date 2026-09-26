@@ -3,6 +3,160 @@
 Registro de versiones de la skill. Cada vez que se absorbe una mejora de una página
 real, se sube una versión aquí (ver el ritual de auto-mejora en SKILL.md).
 
+## G4.27 — 2026-09-05 — Falso negativo EN PRODUCCION que el banco no podia ver
+Ley del CdM aplicada a mi mismo: *una conclusion sacada con un criterio estrechado no es firme hasta
+revalidarla con un metodo de OTRA FAMILIA*. G4.26b la valide con **mi propio banco** — el mismo
+metodo. La revalide contra **la tienda viva**, que es otra familia, y salio un fallo real.
+- **Medido en el enlace publicado de la ficha:**
+  `wa.me/573232460865?text=Hola+quiero+información+y+precio+de+Tag+Recede+(eliminador+de+verrugas)`
+  El mensaje esta **correcto**, pero los espacios viajan como **`+`**, no como espacios literales.
+- 🔴 **Mi patron usa `\s` y por tanto NO VE ese enlace.** Si el mensaje estuviera MAL escrito, el
+  check **no lo detectaria**: falso negativo silencioso, justo en el unico sitio donde el disparador
+  manda.
+- **Por que el banco no podia cazarlo:** todos mis sabotajes usaban **espacios literales**. El
+  formato del banco no era el de produccion, asi que el banco estaba verde por construccion. Un
+  banco solo prueba lo que sabe imaginar; **la produccion no tiene esa limitacion**.
+- **Arreglo:** `unquote_plus()` antes de juzgar, que cubre las tres formas (literal, `+`, `%20`), y
+  **dos casos nuevos copiados del enlace vivo**, no inventados: el mismo fallo en formato de
+  produccion (debe morder) y el correcto en formato de produccion (no debe disparar).
+
+## G4.26b — 2026-09-05 — Arreglar un falso positivo creo un falso NEGATIVO (lo cazo el banco)
+G4.26 apunto el check del disparador **solo al enlace de WhatsApp**, que es donde manda. Correcto de
+concepto y **roto de precision**: el patron paraba en el primer **espacio**, y el mensaje del
+disparador lleva espacios sin codificar. Capturaba `wa.me/57300?text=Hola,` y **perdia justo el
+texto que hay que juzgar**. El href se corta en la **comilla**, no en el espacio.
+- **Resultado medido:** el caso malo (bug G4.8) **dejo de morder** — 36 de 37. Sin ese caso en el
+  banco, habria entregado un check que ya no cazaba nada, y con la tranquilidad de haber "arreglado"
+  tres falsos positivos.
+- **Es la razon entera de probar en las DOS direcciones, vista en el mismo turno:** el trabajo de
+  quitar falsos positivos es exactamente el que puede fabricar un falso negativo, porque consiste en
+  estrechar el criterio. Un banco que solo mida el lado bueno habria dado verde.
+
+## G4.26 — 2026-09-05 — El disparador se juzga por AUTORIDAD, no por forma
+Disfraz que trae el CdM desde `golden-presenta` y que **si me mordia**. Su formulacion: *no basta
+preguntar como esta escrito, hay que preguntar si esto MANDA sobre alguien*. Un bloque que documenta
+un error tiene la forma exacta del dato y cero autoridad, y acusarlo **castiga a quien documenta**.
+- **Medido con DELTA contra control** (y el primer intento estaba mal montado: compare hallazgos
+  absolutos y los tres casos daban lo mismo porque arrastraban los 2 preexistentes de la plantilla
+  base en modo estricto. Sin control, la medicion no medía nada — se rehizo restando el control).
+  Delta limpio: **los tres disfraces disparaban 1 hallazgo nuevo cada uno**:
+  · `<pre><code>` que documenta el error (se publica, pero es documentacion)
+  · `<script type="application/json">` de configuracion (ni siquiera lo ve el cliente)
+  · atributo `data-*` (idem)
+- **El arreglo es de precision, no de excepcion:** el disparador **solo manda dentro del enlace de
+  WhatsApp** — es el `text=` que el cliente ENVIA al pulsar. Fuera de ahi, el mismo texto no manda
+  sobre nadie. El check ahora mira `wa.me` / `api.whatsapp.com` y nada mas. No se anadio una lista
+  de sitios exentos: se apunto a donde esta la autoridad.
+- Caso nuevo con los tres disfraces juntos. El caso malo sigue mordiendo (su texto vive en un href
+  `wa.me`, que es justo donde manda).
+
+## G4.25b — 2026-09-05 — El caso disfrazado caza dos falsos positivos en su estreno
+El caso que acababa de entrar (un ACTA con los cinco patrones prohibidos dentro de un comentario)
+**fallo a la primera, y por eso valia**: 34 de 36. Dos checks se encendian con texto que NO se
+publica.
+- **Causa:** los checks **2 (hex huerfano)** y **22 (disparador)** miraban `allcl` —el liquid entero,
+  comentarios incluidos— mientras 18/25/27/28 ya miraban `solo_visible()`. **La funcion compartida
+  existia desde G4.17b y dos consumidores nunca la usaron.** Es la refinacion 5 otra vez, pero al
+  reves: no un check roto, sino un check que no se entero del arreglo comun.
+- **Por que no lo cazo nada antes:** mis casos buenos eran **prosa inocente**, y la prosa no se
+  parece al dato. Hizo falta un acta —con el formato de los bloques reales— para moverlo. Ese es
+  exactamente el refinamiento que trajo golden-ads.
+- **Arreglo:** `visible_txt` se calcula UNA sola vez, arriba, y lo usan todos los checks de
+  contenido. Un consumidor nuevo hereda el arreglo por construccion, no por acordarse.
+
+## G4.25 — 2026-09-05 — El caso DISFRAZADO: el lado bueno no puede ser prosa inocente
+Refinamiento que trae el CdM desde `golden-ads` y que corrige un punto flojo real de mis 31 casos:
+**mis casos buenos eran prosa inocente**, y prosa cualquiera casi nunca mueve un contador. Lo que de
+verdad pone a prueba un detector es **texto que SE PARECE al dato** — un acta, una nota tecnica, una
+fila de tabla escrita a mano. (golden-ads lo midio: su contador se movio de 5/40 a 6/42 con una nota
+escrita en el formato de los bloques reales, sin que cambiara un solo dato.)
+- **Caso nuevo:** un ACTA que mete **los cinco patrones prohibidos a la vez** — disparador mal
+  escrito, signo de apertura, raya separadora, lenguaje de tienda y hex huerfano — **dentro de un
+  comentario Liquid**, o sea sin publicarse. **No debe disparar ni uno.**
+- **Y prueba la funcion COMPARTIDA de una vez:** `solo_visible()` alimenta a cuatro checks; si se
+  rompe, este caso los enciende todos juntos en vez de uno suelto. Es la refinacion 5 convertida en
+  caso de prueba en lugar de en aviso.
+- Autoprueba de 31 a **36 casos**.
+
+## G4.24 — 2026-09-05 — Dos cifras clavadas que ya mentian (y por que el cuerpo NO se recorta)
+Fila del Centro de Mando aplicada dentro del ciclo abierto. Pidio dos cosas; una salio verdadera y
+la otra la medi y **no procede**, que tambien es un resultado.
+- 🔴 **CIFRAS CLAVADAS, medidas contra la realidad:**
+  · el cuerpo decia **"24 secciones = 21 del embudo + 3 de sistema"** y el generador declara **34**
+    en su `order`, de las cuales **22 activas y 12 apagadas por defecto**. Ninguna de las tres
+    cifras es 24.
+  · decia **"12 reglas de oro"** y hay **9** (0, 0-A … 0-H).
+  Las dos sustituidas por **el archivo que las mide**, no por un numero nuevo: clavar otra cifra
+  seria repetir el error con el valor de hoy.
+- ⚠️ **Aviso del margen de la description**, puesto donde se lee: mide **~1008 de 1024 duros**, o sea
+  **16 de margen**. Las fabricas del arsenal estan afinando disparadores esta noche por el mandato,
+  y anadir una palabra es el movimiento mas natural del ciclo: pasarse deja la skill **invalida en
+  silencio**. Queda escrito que se revalida DESPUES y con RUTA ABSOLUTA.
+- **LO QUE MEDI Y NO MOVI, con su razon:** el CdM señalo 511 lineas de cuerpo (2o mas largo de 38) y
+  sugirio separar procedimiento de acta y de ejemplo. Al medirlo seccion por seccion, **el peso es
+  PROCEDIMIENTO**: la mayor es `## Workflow` con 92 lineas y son los **7 pasos ejecutables** de la
+  skill (plan de diferenciacion, la URL es contexto, anti-duplicado, base+tema, config center,
+  contenido, entrega). El acta ya se habia migrado en G4.21 y hoy quedan **7 lineas de comentario de
+  506**. Recortar procedimiento para bajar un numero de lineas no es mejorar la skill: es mutilarla.
+  Se declara medido y se deja como esta.
+
+## G4.23 — 2026-09-05 — El techo de nitidez: Shopify nunca agranda
+Ciclo de automejora del mandato v2. Aviso del Centro de Mando **verificado aqui antes de aplicarlo**
+(un dato no se hereda, se mide), sobre una imagen real del CDN de la tienda:
+`?width=800` → 800 px · `?width=1600` → **1088** · `?width=2048` → **1088** (original 1088).
+**Shopify ACHICA pero NUNCA agranda: el tamano de SUBIDA es techo permanente.**
+- 🔴 **El fallo que tenia la skill:** mandaba **galeria 1080x1080 y <150 KB para TODO**, en 4 archivos,
+  con **cero menciones de 2048**. Cada ficha que la casa generara quedaba con **techo de nitidez
+  permanente** en la galeria — en un movil retina sobre un contenedor de 600-800 px CSS, eso se ve
+  blando, y no se arregla despues: hay que volver a subir la imagen.
+- **El criterio correcto no es un numero, es una pregunta: ¿Shopify transforma esa imagen o no?**
+  · **Galeria** (multimedia del producto): **2048x2048, ~300 KB**. Shopify SI transforma y sirve la
+    variante liviana, asi que subir grande no le cuesta nada al visitante y deja el techo alto.
+  · **Infografias de la descripcion** (body_html) y **secciones/escalera**: **<150 KB**, porque van
+    al HTML **sin transformacion** — ahi el peso si lo paga el cliente.
+  · **Cine full-bleed**: 1920x1080, <300 KB (ocupa el ancho entero).
+  **Peso y tamano no son la misma decision:** el peso importa donde no hay transformacion; el tamano,
+  donde si la hay. La regla plana confundia las dos y perdia por los dos lados.
+- Corregido en `imagenes.md` (ley completa + tabla), `SKILL.md` (el resumen que se lee en cada
+  activacion) y `imagenes-orquestacion.md` (lo que se reparte a las generadoras).
+
+## G4.22 — 2026-09-05 — La reserva del candado se cierra EJERCIENDOLA (autocalificacion)
+Mandato de FER de autocalificacion. La skill estaba en 990 por un ajuste de -10 que esta misma
+fabrica se puso: **la ampliacion del candado a familias fuera de Dawn (G4.20) nunca se habia
+ejercido en una tienda real**. En vez de discutir el numero, se fue a ejercerla.
+- **Metodo:** tienda demo OFICIAL de cada tema, medida del header/footer VISIBLE como control,
+  inyeccion del CSS del candado **tal cual lo trae el componente** (extraido del archivo, no
+  escrito de memoria) y nueva medida.
+- **Resultado:** `Impulse 9.0.0` → **oculta** · `Prestige 11.4.0` → **oculta** · `Dawn 15.5.0`
+  (tienda propia) → oculta. Tres familias, tres veces el control paso de visible a oculto.
+- 🟢 **El dato que valida la ampliacion de G4.20:** el header de Impulse es **`.site-header`** y su
+  footer `.site-footer`, dos de los selectores que G4.20 anadio. **Sin esa ampliacion, el candado no
+  habria ocultado NADA en Impulse** — la sospecha que motivo G4.20 era correcta, y ahora esta medida
+  en vez de razonada.
+- **Lo que NO se pudo verificar, y se dice:** **Debut, Booster y Ella**. Sus demos ya no se publican
+  en el theme store (comprobado el mismo dia: sus URLs redirigen al indice). No hay tienda real
+  publica donde ejercerlo, asi que en esas familias el candado va por lista, no por medicion.
+- **Efecto en la nota:** la reserva no se borra, **cambia de tamano**: de "nunca ejercido fuera de
+  Dawn" (-10) a "ejercido en 3 familias, 3 sin demo accesible" (-5). El ajuste se declara, no se
+  esconde: 995, no 1000.
+
+## G4.21 — 2026-09-05 — Auditoria golden-skill-auditor: el historial salio del SKILL.md
+Auditoria completa con el mandato del 2026-09-03 (validador primero, auditor autoevaluado antes de
+juzgar). **Un solo hallazgo con evidencia, y era el unico aviso del validador oficial.**
+- **Medido:** el SKILL.md llevaba **24 sellos de version en comentarios HTML, 50 de sus 550 lineas**,
+  y **23 de esos 24 ya tenian su entrada propia en este changelog** (el restante, G4.5b, cubierto por
+  la entrada `## G4.5`). El cuerpo real sin comentarios medía **exactamente 500** lineas: o sea, el
+  aviso del validador (534, recomendado <500) lo causaba **entero** el historial duplicado.
+- **Consecuencia que tenia:** ese historial se cargaba en CADA activacion de la skill. Contexto
+  pagado por leer 21 veces lo que ya vive, mejor contado, en este archivo.
+- **Arreglo:** quedan los sellos VIGENTES + la doctrina de los dos ejes + la adenda del cerebro de
+  marca. **Nada se borro:** lo unico que no estaba aqui (la nota del Centro de Mando sobre la puesta
+  en norma) se copio integra en la seccion "HISTORIAL DE SELLOS MIGRADO DESDE SKILL.md".
+- **Lo cazo su propio `sellos.py`:** al bumpear el sello sin escribir esta entrada, salio 1. El
+  validador de las cuatro caras funcionando sobre quien lo escribio, otra vez.
+- Resto de la auditoria, sin hallazgos: 0 referencias rotas · 0 huerfanos · 0 dudosos · sintaxis 3/3 ·
+  9 de 9 skills hermanas existen · blindaje 87 de 87 nodos · autoprueba 31/31 · autocheck 29 checks.
+
 ## G4.20 — 2026-09-04 — El tema se declara ANTES de generar (y el candado deja de asumir Dawn)
 FER compartio las skills al grupo VIP y varios **no usan Dawn**. Esta skill construye sobre el tema
 de OTRA persona, asi que asumir familia es el fallo de instalacion mas caro: si encaja a medias
@@ -1233,8 +1387,8 @@ faltaba eran las **secciones de persuasión narrativa** y la **estrategia de cop
 ## G4.1b — 2026-07-29 — Media: tema+descripción, poster obligatorio, GIF→MP4 (lección chat TOPPIK, parche 23,5→3,3 MB)
 ## G4.1c — 2026-07-29 — REGLA #3 con matiz PAUTA: display propio se queda; porcentajes-estudio, testimonios en imagen y atribución a terceros jamás (gaceta 4f p.3).
 
-## G4.2 — 2026-08-07 — Límites duros de Shopify + receta Horizon/Pitch + fallback del CTA (fuente: chat un producto de cliente/un producto de cliente)
-Paquete de hallazgos horneado por el Centro de Mando desde la entrada del chat un producto de cliente en la bandeja
+## G4.2 — 2026-08-07 — Límites duros de Shopify + receta Horizon/Pitch + fallback del CTA (fuente: chat INSULINUM/Nuut)
+Paquete de hallazgos horneado por el Centro de Mando desde la entrada del chat Insulinum en la bandeja
 (3 `FileSaveError` consecutivos en tienda real descubrieron límites que no están en la documentación oficial).
 - **TOPE 50 KB por setting `custom_liquid` (aplica a TODOS los temas):** el guardado del template revienta
   con *"Setting 'custom_liquid' is invalid. ['Liquid file size cannot exceed 50 kilobytes.']"*. Entró como
@@ -1255,7 +1409,7 @@ Paquete de hallazgos horneado por el Centro de Mando desde la entrada del chat u
   el orden de 17 secciones vs las 24 del embudo canónico G4.0 — pendiente de sesión dedicada. Hasta
   regenerarlo, el ORDEN canónico es la tabla del SKILL.md, no el base.
 
-## G4.3 — 2026-08-07 — Componente "LO QUE ESTE PRODUCTO NO HACE" (cosecha del chat ESTUDIO 360 DENTAL un producto de cliente, Chile)
+## G4.3 — 2026-08-07 — Componente "LO QUE ESTE PRODUCTO NO HACE" (cosecha del chat ESTUDIO 360 DENTAL CAVITY HEALING, Chile)
 Repartido por el Centro de Mando desde la bandeja (orden de FER: "sin omitir detalle"). Invención del
 estudio dental y probablemente lo más valioso que salió de él:
 - **Componente estándar para verticales de SALUD**, descrito en el SKILL.md junto a `sec-disclaimer` /
@@ -1269,3 +1423,25 @@ estudio dental y probablemente lo más valioso que salió de él:
 - **Funciona en tres soportes con el mismo mensaje:** sección de página, ángulo completo de pauta
   (5 textos) y respuesta pública en comentarios. Se maqueta como `custom-liquid` con el patrón de lista
   ❌ "no hace" / ✅ "sí hace" de `sec-es-para-ti`.
+
+## HISTORIAL DE SELLOS MIGRADO DESDE SKILL.md (2026-09-05)
+Auditoria `golden-skill-auditor` del 2026-09-05. El SKILL.md acumulaba **24 sellos de
+version en comentarios HTML (50 de sus 550 lineas)** y **23 de esos 24 ya tenian su
+entrada propia en este archivo** (el restante, G4.5b, esta cubierto por la entrada
+`## G4.5`). Ese historial se cargaba entero en CADA activacion de la skill y era la
+causa unica del aviso del validador (cuerpo de 534 lineas, recomendado <500): el cuerpo
+real, sin comentarios, medía exactamente 500.
+En el SKILL.md quedan los **tres sellos vigentes** (G4.20, G4.19, G4.18), la nota de los
+DOS EJES DE VERSION y la adenda del cerebro de marca — que son doctrina viva, no historia.
+Nada se borro: lo que no estaba aqui se copio abajo tal cual.
+
+### Nota del Centro de Mando que vivia en el SKILL.md (2026-09-03, puesta en norma)
+```
+<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
+     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 1010 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
+     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
+     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
+     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
+<!-- skill G4.5 · 2026-08-23: Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
+```

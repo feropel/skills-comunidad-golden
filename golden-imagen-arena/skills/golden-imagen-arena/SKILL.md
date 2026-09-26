@@ -4,7 +4,8 @@ description: >-
   Golden Group — ARENA DE IMÁGENES por API. Genera la MISMA pieza de ecommerce en VARIOS
   motores de IA a la vez (Nano Banana Pro y 2, OpenAI Hazel, GPT Image 2, Seedream 5 Pro,
   FLUX.2, Recraft, DTC Ads con brand kit) por el MCP de Higgsfield, con la FOTO REAL del
-  producto como referencia, las descarga, las optimiza a WebP menor a 150 KB y las CALIFICA
+  producto como referencia, las descarga, las optimiza a WebP en la medida de su DESTINO
+  (galería de ficha 2048, descripción y pauta 1080) sin deformar el producto, y las CALIFICA
   con una rúbrica de conversión para decir cuál ganó y por qué. Sin navegador y sin
   arrastrar archivos: la foto entra por URL (CDN de Shopify) o por subida directa desde el
   Mac. Úsala SIEMPRE que el usuario quiera: comparar modelos de imagen, "cuál IA hace mejor
@@ -13,27 +14,12 @@ description: >-
   de producto sin navegador, o producir el paquete visual de una ficha Shopify de forma
   desatendida. Dispara aunque no nombren un modelo.
 ---
-<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
-     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 923 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
-     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
-     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
-     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
-     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
+
+**Fábrica:** chat «✅ SKILL golden-imagen-arena»
+<!-- skill v1.18 · 2026-09-20 (auditoría golden-skill-auditor) · agregada la declaración de conexión con el Centro de Mando en el propio SKILL.md (antes solo vivía en references/changelog.md y references/prompt-maestro.md; la regla de la casa exige que el archivo que se activa en cada corrida cargue el dato, no solo el histórico). Sin cambios funcionales. -->
+<!-- skill v1.17 · 2026-09-08 (fábrica golden-imagen-arena, cierre del ciclo) · añadida la sección "Lo que NO está verificado", forma tomada de golden-ads / golden-copywriting / golden-chatea-pro-config-ventas-wp: las seis reservas tipo (B) vivían en el informe del chat y no en la skill, que es el mismo defecto que esta skill le achaca a los demás · y su propio modo de fallo cerrado por estructura (aviso del CdM): una sección de reservas VACÍA es peor que ninguna porque parece que alguien miró, así que CADA reserva nombra QUIÉN la cierra — una que no puede nombrar a su cerrador o ya está cerrada o nadie la pensó. Ver v1.16 para los tres defectos medidos del ciclo. Historial completo: references/changelog.md. Cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO. -->
 # golden-imagen-arena — Varias IAs compiten, una gana
 
-<!-- skill v1.12 · 2026-08-30 (chat FILTRO, autoridad de FER) · NUEVO references/formato-por-destino.md. Origen: el documento "Un post en todas partes" (Maurys Alvarez) que FER trajo el 30-ago; se toma su TABLA DE FORMATO POR RED y se descarta su herramienta (Metricool de pago, Make/n8n), que no esta contratada. HUECO MEDIDO con sinapsis: la frase "formato por red social" daba 0 de 93 skills, y sobre esta skill 9:16 cero menciones, 16:9 cero, 2:3 cero. El prompt maestro solo ofrecia {1080x1080 | 1080x1350}: faltaban TRES de los cinco formatos, incluido el vertical de reel y story. VERIFICADO CONTRA EL SCHEMA VIVO del MCP de Higgsfield: outpaint_image (imagen) cubre los cinco ratios, pero reframe (video) NO soporta 4:5 ni 2:3, y 4:5 es justo el feed de Instagram; para llevar video a 4:5 el camino es recorte con ffmpeg en golden-video-editor. EJECUTADO get_cost (no lanza job): reframe cuesta 72 creditos a 15s/720p, 139,5 a 15s/1080p y 277,5 a 30s/1080p, mientras el saldo de la cuenta ese dia era 223,5 en plan plus, o sea que UN reframe de 30s a 1080p NO ALCANZA. Se añadieron TRES disparadores en el cuerpo (preflight, paso 4 y archivos de referencia) para que no nazca dormido. NO VERIFICADO: el costo de outpaint_image, que exige un image_id real ya subido y no acepta estimacion en seco; y las zonas seguras de cada red, que no se contrastaron con la documentacion oficial y por eso no llevan numero. No se tocaron las 5 leyes, ni la rubrica, ni el disparador de la skill. -->
-<!-- skill v1.11 · 2026-08-26 (chat FILTRO, autoridad de FER; corregido: sello el v1.9 estando la skill en v1.10 — DUPLIQUE un numero existente del 23-ago por leer el registro y no el historial de sellos del propio archivo. Leccion: el numero se saca del SKILL.md, que es la fuente, no del registro, que puede ir atrasado) · NUEVO references/motores-y-plan-b.md. Recoge DOS destilados que llevaban dias en STACK-GOLDEN/DESTILADOS sin que ninguna skill los nombrara (medido: 0 skills). Aporta: (1) la regla de reparto con Ecom Magic — plantilla vs motor — y sus capacidades GRATIS sin usar (financial_analyze da CPA objetivo y ROAS de equilibrio; research_generic_angle da angulo y avatar); (2) los 4 motores que la API REST expone y el MCP NO lista, incluido Veo 3.1, SIN VERIFICAR contra la cuenta de FER; (3) el plan B por API directa con polling de retroceso exponencial y jitter, porque el MCP se cayo dos veces en una sesion. -->
-<!-- skill v1.9 · 2026-08-23 (Estándar 9 del auditor) · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
-<!-- skill v1.10 · 2026-08-24 (barrido total del arsenal, CdM) · CAZADO Y CORREGIDO: el flujo mandaba consultar `job_status {job_id}` hasta completed (paso 4 del SKILL.md + references/motores.md) y ese tool NO EXISTE en el MCP de Higgsfield — verificado contra el schema vivo del servidor y contra golden-ugc-avatar (misma casa, verificada en producción, que ya lo advertía: "There is no job_status polling tool"). Dos skills hermanas sobre el mismo servidor se contradecían. La espera real es `jobs_wait` (bloqueante, acepta los ids de la tanda) o `job_display` por job + `show_generations` para historial. Sin más cambios. -->
-<!-- skill v1.8 · 2026-08-22 (turno del CENTRO DE MANDO al chat FILTRO) · NUEVO references/vocabulario-foto.md: tabla español→token exacto para lente/focal, esquemas de luz con tamaño-ángulo-ratio, materiales y ángulo de cámara. ORIGEN: evaluación del método que vendía la guía "Higgsfield director de arte"; el método ya existía en golden-cinematica (ley de tokens exactos) pero su vocabulario es 100% web/3D. HUECO MEDIDO con grep sobre esta skill: 0 menciones de focal (35/50/85mm), 0 de softbox/difusor, las 2 de "lente" eran metafóricas. El bloque [1 ESCENA] decía "luz suave de estudio" (adjetivo): la arena medía interpretaciones, no motores. NO se tocaron las 5 leyes, ni compliance, ni componer.py, ni el disparador. -->
-<!-- skill v1.7 · 2026-08-21 (auditoría golden-skill-auditor): ley 2 ahora cubre el style_id de ms_image dentro del intake único del preflight (antes goteaba a mitad de la arena); paso 6 suma checklist explícito de "definición de terminado" antes de entregar a golden-shopify/golden-ads -->
-<!-- skill v1.6 · 2026-08-10 (loop del arsenal, semana 2 · producción): el corte de ANTES/DESPUÉS POR VERTICAL en references/prompt-maestro.md. La norma del 2026-08-07 prohibía el antes/después solo en dental; Meta 2026 lo prohíbe además en antiedad/arrugas/reafirmante y en pérdida de peso, y lo permite en cosmética general con 18+. Añadidos los dos transversales al bloque [5 PROHIBIDO]: segunda persona que señala la condición del espectador y titular de plazo con resultado (Meta juzga el significado implícito). Roster de motores verificado contra el MCP en vivo el 2026-08-10: al día. Parche espejo en golden-ecom-magic y golden-ugc-avatar -->
-<!-- skill v1.5 · 2026-08-07 (centro de mando, cosecha del chat ESTUDIO 360 DENTAL un producto de cliente Chile) · reglas de arte para SALUD (dental y afines) horneadas en references/prompt-maestro.md: PROHIBIDO bocas con lesiones visibles, antes/después de dentadura, delantal blanco/estetoscopio/sillón dental (aval médico aparente), porcentajes de resultados en pantalla y preguntas que señalen una condición del espectador; PERMITIDO y probado macro del gotario, textura, corte de esmalte ilustrado y lifestyle de baño. Van al bloque [5 PROHIBIDO] del prompt maestro cuando el vertical es salud -->
-<!-- skill v1.4 · 2026-08-02 · filtro de un carrusel de 20 repos open source (saul.vicentem). De los 20, UNO sirve de verdad y se PROBO con un packshot real: rembg (MIT) queda horneado como scripts/quitar-fondo.py — recorte de fondo LOCAL, 0,63 s por imagen y CERO creditos, frente a remove_background del MCP que cobra por imagen. Medido: tapa blanca sobre fondo blanco resuelta sin halos (52% transparente, 1,7% de borde con antialiasing). Corre offline tras bajar el modelo una vez. El MCP se reserva para pelo/humo/cristal, donde el modelo grande sigue ganando. El script usa histogram() y no getdata(), que Pillow elimina en 2027 -->
-<!-- skill v1.3 · filtro de 9 reels 2026-07-27: benchmark de costo REAL por generación en motores.md (tarifario público verificado) + punto de equilibrio contra la suscripción, para decidir con número si el plan se justifica; y veredicto documentado sobre Open-Generative-AI (descartado: el repo "alternativa open source" es un embudo hacia la API de pago del propio autor) -->
-<!-- skill v1.2 · fix auditoría 2026-07-25: rutas de scripts absolutas (el cwd se resetea entre llamadas Bash), componer.py recorta a 0 las coordenadas de borde (evita crash de alpha_composite) y guarda PNG sin el quality muerto -->
-<!-- skill v1.1 · auditoría golden-skill-auditor 2026-07-23: job_status horneado en el flujo (paso 4), plan B sin MCP, rúbrica sin signos de apertura, componer.py genérico con chequeo de uso -->
-<!-- skill v1.0 · motor: MCP Higgsfield (catálogo verificado en vivo 2026-07-21) -->
 
 Eres el **director de arte automático** de Golden Group. Recibes una foto real de producto
 y un brief, y en vez de apostar a un solo modelo de IA, **haces competir a varios** con el
@@ -49,6 +35,55 @@ pidiendo auth): no improvises otra vía. Informa que hay que autorizarlo (`/mcp`
 sesión interactiva) y detente ahí.
 Esta skill sin su MCP no genera nada — mejor decirlo en la primera línea que fallar en
 el paso 3.
+
+## 🔴 REGLA DURA — EL TAMAÑO DE SUBIDA ES UN TECHO PERMANENTE (medido 2026-09-08)
+
+**Shopify REDUCE al servir, pero NUNCA AGRANDA.** Medido contra el CDN real con una imagen de
+600 px de la tienda: `?width=400` devolvió 400; `?width=1024`, `2048` y `4000` devolvieron los
+600 originales, sin error y sin aviso. **Subir la galería a 1080 condena el zoom de esa ficha a
+1080 para siempre**, y no se arregla con un parámetro: se arregla volviendo a subir.
+
+Por eso **el tamaño se decide POR DESTINO, nunca con una cifra única**:
+
+| Destino | Medida | Peso | Por qué |
+|---|---|---|---|
+| **Galería de ficha Shopify** | **2048×2048** | ~300 KB | Es el techo de zoom. El CDN ya sirve la variante liviana al móvil |
+| **Infografía de la descripción** | 1080×1350 | **< 150 KB** | Va al HTML **sin transformación**: aquí el peso sí lo paga el comprador |
+| Pauta | según la red | < 150 KB | `references/formato-por-destino.md` |
+
+Esta skill arrastró durante meses la regla plana *"1080 y < 150 KB para todo"*. **Una sola cifra
+para todo optimiza el caso equivocado** y le ponía techo de nitidez a todas las fichas de la casa.
+
+⚠️ **Y el reverso, que es la misma trampa disfrazada de solución: agrandar no es subir de
+resolución.** Si el motor entregó 1K y tú pides `galeria-shopify`, sale un archivo de 2048 con
+1024 de detalle real: el fichero dice 2K y el zoom sigue siendo de 1K, pero ahora nadie vuelve a
+mirarlo porque el número ya se ve bien. El script lo delata con un aviso 🔴 AGRANDADO; cuando
+salte, **regenera en 2K desde el motor** (`resolution` 2k), no lo estires aquí.
+
+## 🔴 REGLA DURA — NO SE DEFORMA EL PRODUCTO NI AL ENTREGARLO (medido 2026-09-08)
+
+La Ley 1 descalifica una pieza por envase deformado. **El script de entrega de esta misma skill
+lo deformaba un 20%**: `optimizar-webp.py` estiraba hasta la medida pedida sin mirar la
+proporción de origen. Control conocido (círculo perfecto 1024×1024 → 1080×1350): salió óvalo de
+relación **0,800**. Como los motores entregan 1:1 o 2K cuadrado y la ficha pide 4:5, **el caso
+deformado era el caso normal**: el jurado castigaba al motor por lo que hacía el script.
+
+Ya no puede pasar — el script escala conservando proporción y recorta (`cover`) o rellena
+(`contain`). **Compruébalo antes de confiar en él:** `optimizar-webp.py --autoprueba` (6 casos,
+muerde el estirón conocido y calla ante los buenos).
+
+## 🔴 LEY DEL INSTRUMENTO — esta skill COMPARA, así que se audita a sí misma primero
+
+**Cuando dos mediciones discrepan, se audita el INSTRUMENTO antes que el resultado**, y se busca
+un control con resultado conocido. Sin control no es una medición, es una lectura.
+
+No es teoría: en la vuelta del 08-sep esta skill traía **dos cifras para una sola corrida de
+rembg** (0,63 s en `motores.md`, 0,86 s en el propio script, mismo día y mismo packshot), y un
+chat hermano reportó "rembg no está instalado" porque buscó en el Python del sistema y no en el
+venv aislado. Ninguno de los dos hallazgos era sobre rembg: los dos eran sobre el instrumento.
+
+Aplícalo también al jurado: si un motor puntúa raro, mira primero si la pieza pasó por un paso
+tuyo que la alteró.
 
 ## ⚠️ REGLA DURA — DATO DURO EN IMAGEN SE VERIFICA LETRA POR LETRA (2026-07-29)
 La IA no solo no sabe dibujar la etiqueta del frasco (método 1.5): **tampoco sabe escribir el texto
@@ -89,7 +124,8 @@ igual que se verifica un JSON. Un motor que escribe mal los datos queda DESCALIF
 1. ENTRADA     → foto real del producto → media_id (URL o subida)
 2. PROMPT      → un solo prompt maestro de ecom (references/prompt-maestro.md)
 3. ARENA       → mismo prompt + misma foto en 3-4 motores en paralelo
-4. DESCARGA    → jobs_wait hasta completed → curl de los resultados + WebP < 150 KB
+4. DESCARGA    → jobs_wait hasta completed → curl de los resultados + WebP en la medida
+                 de SU DESTINO (galería 2048 · HTML y pauta 1080), sin deformar
 5. JURADO      → rúbrica de conversión (references/rubrica.md) → ranking y ganador
 6. ENTREGA     → ganador a golden-shopify / golden-ads + motor default del producto
 ```
@@ -104,10 +140,14 @@ generate_image {model, prompt, get_cost:true}  → costo en créditos, sin gener
 Reporta: "la arena de 4 motores cuesta N créditos, tienes M. Disparo." Una confirmación,
 no cuatro.
 
-**En el mismo preflight se fija la RELACIÓN DE ASPECTO**, porque regenerar en otra medida
-cuesta una arena entera. Pregunta a dónde va la pieza y saca la medida de
-`references/formato-por-destino.md`: feed de Instagram 1080×1350, reel o TikTok 1080×1920,
-LinkedIn 1080×1080. Si no te lo dicen, el default de Golden es **4:5 (1080×1350)**.
+**En el mismo preflight se fijan el DESTINO, la RELACIÓN DE ASPECTO y la RESOLUCIÓN**, porque
+regenerar en otra medida cuesta una arena entera. Pregunta a dónde va la pieza y saca las tres
+de `references/formato-por-destino.md`: galería de ficha 1:1 **en 2K**, infografía de
+descripción 4:5 en 1K, feed de Instagram 4:5, reel o TikTok 9:16, LinkedIn 1:1. Si no te lo
+dicen, el default de Golden es **4:5 en 1K**.
+
+**El destino no es un detalle de entrega, es una decisión de generación:** si la pieza va a
+galería y la sacas en 1K, el techo de zoom de esa ficha queda clavado en 1K para siempre.
 
 ### 1. Meter la foto real (el desbloqueo)
 
@@ -210,9 +250,15 @@ Ajusta la alineación al encargo: pieza con mucho texto → sube `gpt_image_2`; 
 texto, puro producto bello → `seedream_v4_5` o `flux_2`; logo/ícono vectorial → `recraft_v4_1`.
 Si el usuario quiere barato, corre primero `nano_banana_2_lite` como sonda.
 
-Formatos Golden: **1080×1080** (`aspect_ratio "1:1"`) para carrusel y **1080×1350**
-(`"4:5"`) para secciones/infografías. `count` de 1 por motor en la primera ronda: la
-diversidad la da la arena, no las variantes del mismo modelo.
+Formatos Golden: `aspect_ratio "1:1"` para carrusel y galería, `"4:5"` para secciones e
+infografías. `count` de 1 por motor en la primera ronda: la diversidad la da la arena, no las
+variantes del mismo modelo.
+
+🔴 **Si la pieza va a la GALERÍA de una ficha, genera en 2K desde el motor** (`resolution` 2k
+en los que lo aceptan: Nano Banana Pro/2, GPT Image 2, Seedream, FLUX.2, Recraft). Sale más
+barato que descubrir después que la galería quedó con techo de 1080, porque **eso solo se
+arregla regenerando**: el CDN de Shopify reduce pero nunca agranda. Para infografía de
+descripción y para pauta, 1K basta y sobra.
 
 ### 4. Descargar y optimizar
 
@@ -232,14 +278,22 @@ conviértelas con `scripts/optimizar-webp.py`, que acepta dimensión rectangular
 python3 ~/.claude/skills/golden-imagen-arena/scripts/optimizar-webp.py entrada.png salida.webp 1080x1350 150
 ```
 
-El tercer argumento es la medida, y **sale de la tabla de `references/formato-por-destino.md`**
-según a qué red va la pieza. Si hay que llevar una pieza YA hecha a otro formato, esa misma
-tabla manda: recortar es gratis y `outpaint_image` cuesta créditos, y para VIDEO la
-herramienta `reframe` no soporta 4:5 ni 2:3.
+El tercer argumento es el **DESTINO por su nombre**, no una cifra suelta: el script ya trae la
+medida y el peso de cada uno (`galeria-shopify` 2048/300 KB · `ficha-html` 1080×1350/150 KB ·
+`ig-feed` · `ig-reel` · `cuadrado` · `youtube` · `pinterest`). La tabla vive en
+`references/formato-por-destino.md`.
+
+**El script no deforma**: escala conservando proporción y recorta por el centro (`cover`, el
+default, correcto para packshot centrado) o rellena el borde (`--modo contain`, cuando recortar
+se comería producto o texto). Si dudas de él, córrele `--autoprueba` antes de entregar.
+
+Si hay que llevar una pieza YA hecha a otro formato manda esa misma tabla: recortar es gratis y
+`outpaint_image` cuesta créditos, y para VIDEO `reframe` no soporta 4:5 ni 2:3.
 
 Guarda todo en `PROYECTOS/<PRODUCTO>/IMAGENES/` con el naming de Golden:
 `PRODUCTO - Contexto NN.webp` (ej. `TAG RECEDE - Hero nanobananapro 01.webp`). Jamás
-`1.jpg`. Meta de peso: **< 150 KB**.
+`1.jpg`. **El peso meta lo pone el destino, no una cifra única:** ~300 KB la galería de ficha
+(donde manda la nitidez, porque el CDN nunca agranda), < 150 KB lo que va al HTML y a pauta.
 
 ### 5. El jurado (tu valor real)
 
@@ -267,10 +321,54 @@ saldo restante.
 - [ ] Cada pieza pasó la regla dura de dato-duro-en-imagen (texto verificado letra por letra).
 - [ ] Ninguna pieza ganadora está descalificada por la rúbrica (producto adulterado, botón
   falso, WhatsApp incrustado, claim inventado, texto ilegible).
-- [ ] Todos los WebP pesan < 150 KB y llevan el naming `PRODUCTO - Contexto NN.webp`.
+- [ ] Cada WebP salió en la medida de SU destino (galería 2048 · descripción y pauta 1080), no
+      todos con la misma cifra, y lleva el naming `PRODUCTO - Contexto NN.webp`.
+- [ ] Ninguna pieza salió deformada: si el motor entregó una proporción distinta a la del
+      destino, se recortó o se rellenó — nunca se estiró. Ante la duda, `--autoprueba`.
 - [ ] El motor default del producto quedó fijado y anotado para la próxima ronda.
 - [ ] El reporte final trae piezas, ganador, pesos, créditos gastados y saldo restante.
 Si falta cualquier casilla, la arena no está lista para pasar a `golden-shopify` / `golden-ads`.
+
+## Lo que NO está verificado en esta skill
+
+Forma tomada de `golden-ads`, `golden-copywriting` y `golden-chatea-pro-config-ventas-wp`, que
+ya la usaban (barrido del CdM, 2026-09-08). **Va aquí y no en un informe** porque una reserva que
+vive solo en la memoria de un chat no es un guardarraíl, es un recuerdo.
+
+🔴 **Regla de esta sección, porque tiene su propio modo de fallo: una sección de reservas VACÍA
+es peor que ninguna, porque parece que alguien miró.** Para que no pueda vaciarse en silencio,
+**cada reserva nombra QUIÉN la cierra** — un hecho externo concreto, no una intención. Una
+reserva que no puede nombrar a su cerrador no es una reserva: o ya está cerrada y sobra, o nadie
+la ha pensado. Y si algún día esta sección dice *"todo revisado"* sin nombrar el instrumento con
+el que se revisó, **está mintiendo**: bórrala y vuelve a llenarla midiendo.
+
+Si trabajas con esta skill, esto es lo que todavía no puedes dar por bueno:
+
+- **La arena completa no se ha corrido de punta a punta desde el 2026-09-08.** Lo verificado esa
+  fecha fue la mitad de ENTREGA (scripts, medidas, CDN); el preflight, la subida de la foto y los
+  motores en paralelo **no se ejecutaron** porque el MCP de Higgsfield no estaba conectado. Si
+  algo del paso 0 al 3 no cuadra con lo escrito aquí, **gana lo que veas en vivo**.
+  → **LO CIERRA:** el MCP de Higgsfield conectado y una corrida real con un producto.
+- **El 2048 de galería nunca se ha subido a una ficha real.** Está medido que Shopify **nunca
+  agranda** — de ahí sale la regla —, pero **no** que subir 2048 mejore el zoom que percibe el
+  comprador.
+  → **LO CIERRA:** `golden-shopify`, que es quien sube, contra una ficha viva.
+- **`outpaint_image` sigue sin costo conocido.** Exige un `image_id` real ya confirmado y no
+  acepta estimación en seco. No lo ofrezcas con una cifra.
+  → **LO CIERRA:** una corrida sobre una pieza de verdad.
+- **El saldo de créditos escrito en los references está CADUCADO** (223,5 el 30-ago) y otros
+  chats gastan de la misma cuenta. **Nunca lo cites.**
+  → **LO CIERRA:** `balance`, en cada preflight. Este caduca solo: no lo escribas fijo.
+- **Las zonas seguras por red** (cuánto tapa la interfaz de TikTok o Instagram) no están
+  verificadas. Lo que hay es una regla provisional, no un número.
+  → **LO CIERRA:** la documentación oficial de cada plataforma.
+- **El catálogo de motores se verificó el 2026-07-21** y cambia sin aviso.
+  → **LO CIERRA:** `models_explore`, que manda sobre `references/motores.md` ante cualquier duda.
+
+**Lo que sí está verificado y con qué:** el techo de nitidez, contra el CDN en vivo con imagen
+real de la tienda · la no-deformación y el aviso de agrandado, contra `--autoprueba` de 6 casos
+que muerde los dos casos malos y calla ante los buenos · la instalación de rembg, abriendo el
+venv. Todo lo demás de este archivo es doctrina acumulada, no medición de hoy.
 
 ## Reparto con otras skills (no dupliques)
 
@@ -296,19 +394,62 @@ Si falta cualquier casilla, la arena no está lista para pasar a `golden-shopify
   pagados que el MCP no lista** (Veo 3.1 entre ellos) y el **plan B por API directa** si el MCP cae.
 - `references/prompt-maestro.md` — plantilla del prompt de ecom y cómo escribir el texto
   que va dentro de la imagen. Léelo antes de generar.
-- `references/formato-por-destino.md` — **en qué medida sale cada pieza según la red a la que
-  va**, los cinco formatos con sus píxeles, cuándo recortar gratis y cuándo pagar por rellenar,
-  qué formatos NO cubre `reframe` en video, y el costo medido del reencuadre. Léelo en el
-  preflight, antes de disparar la arena.
+- `references/formato-por-destino.md` — **la tabla que manda: en qué medida y con qué peso sale
+  cada pieza según su DESTINO** (galería de ficha, infografía de descripción, cada red), la
+  medición del techo de nitidez contra el CDN de Shopify, cuándo recortar gratis y cuándo pagar
+  por rellenar, qué formatos NO cubre `reframe` en video, y el costo medido del reencuadre.
+  **Léelo en el preflight**, antes de disparar la arena: aquí el destino decide la generación.
 - `references/rubrica.md` — rúbrica de conversión para calificar y rankear. Léelo antes de
   dar el veredicto.
-- `scripts/optimizar-webp.py` — convierte a WebP < 150 KB en cualquier proporción.
+- `scripts/optimizar-webp.py` — lleva la pieza a la medida de su DESTINO por nombre
+  (`galeria-shopify`, `ficha-html`, `ig-feed`, `ig-reel`, `cuadrado`, `youtube`, `pinterest`)
+  **sin deformar nunca**: recorta (`cover`) o rellena (`--modo contain`), y **avisa si tuvo que
+  AGRANDAR**, que es el techo de nitidez disfrazado. Trae `--autoprueba` de 6 casos en los dos
+  sentidos.
 - `scripts/componer.py` — pega los PNG reales del producto sobre la placa generada por IA,
   con sombra y posicionamiento relativo. Es la pieza clave del método definitivo (paso 1.5).
+- `scripts/quitar-fondo.py` — recorta el fondo EN LOCAL con rembg, sin gastar créditos.
+  Alternativa gratis a `remove_background` del MCP para lotes de packshots de frasco, caja
+  o producto sólido (para pelo, humo o cristal sigue ganando el modelo del MCP). Detalle en
+  `references/motores.md`, sección "Utilidades de post".
 
 ## Fronteras y desambiguacion
 
-Descripcion completa anterior (se conserva para no perder ningun matiz de frontera):
+Descripcion completa anterior (se conserva para no perder ningun matiz de frontera).
+
+⚠️ **Es una CITA HISTÓRICA, no la norma vigente.** Dice *"las optimiza a WebP < 150 KB"*, que es
+justo la regla plana derogada el 2026-09-08 por el techo de nitidez: hoy manda el tamaño POR
+DESTINO (galería 2048, HTML y pauta 1080). Se conserva solo por sus **fronteras** — el reparto
+con `golden-ecom-magic`, `golden-ugc-avatar` y `golden-shopify` —, que siguen vigentes.
 
 > Golden Group — ARENA DE IMÁGENES por API. Genera la MISMA pieza de ecommerce en VARIOS motores de IA a la vez (Nano Banana Pro, Nano Banana 2, OpenAI Hazel, GPT Image 2, Seedream 5 Pro, FLUX.2, Recraft, DTC Ads con brand kit) a través del MCP de Higgsfield, con la FOTO REAL del producto como referencia, las descarga, las optimiza a WebP < 150 KB y las CALIFICA con una rúbrica de conversión para decir cuál ganó y por qué. Sin navegador, sin arrastrar archivos: la foto entra por URL (CDN de Shopify) o por subida directa desde el Mac. Úsala SIEMPRE que el usuario quiera: comparar modelos de imagen, "cuál IA hace mejor esta imagen", "genérame esta imagen en varios modelos", "hazlo automático por API", "prueba nano banana", "cuál motor uso para este producto", generar creativos/infografías de producto sin navegador, o producir el paquete visual de una ficha Shopify de forma desatendida. Dispara aunque no nombren un modelo: basta con "imágenes de producto automáticas / por API / comparando IAs". Si golden-ecom-magic está instalada, esa es la productora por defecto con un solo motor y plantillas; esta manda cuando hay que COMPARAR motores o producir por API sin navegador. NO usar para avatares UGC o video (eso es golden-ugc-avatar), ni para montar la página (golden-shopify).
 
+## Operación de esta skill
+
+Comprobar que está en norma. **Ruta ABSOLUTA siempre: con `.` da fallo falso.**
+```bash
+agentskills validate ~/.claude/skills/golden-imagen-arena
+python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py ~/.claude/skills/golden-imagen-arena
+```
+Salida 0 = en norma. Se corre **DESPUÉS** de tocar la `description`, no solo antes.
+Los dos techos NO son el mismo: **1024 VALIDA (duro) · ~1536 TRUNCA en runtime.**
+
+El script de entrega se comprueba solo, y hay que correrlo cuando se toque:
+```bash
+python3 ~/.claude/skills/golden-imagen-arena/scripts/optimizar-webp.py --autoprueba
+```
+6 casos **en los dos sentidos**: debe MORDER el estirón conocido (relación 0,800) y CALLAR ante
+cover, contain y el destino de galería. Un banco que solo prueba el lado bueno no prueba nada —
+esta skill vivió meses con un script que deformaba el producto y nada mordió.
+
+Blindaje. `chflags uchg` y `chmod` conviven en el mismo árbol y **el orden importa**:
+- abrir: `chflags nouchg <ruta>` **primero**, luego `chmod 644`
+- cerrar: `chmod 444` **primero**, luego `chflags uchg`
+- el **directorio** lleva su propio `uchg` + `555`, y hay que abrirlo para crear ficheros
+
+Al revés, el `chmod` choca contra el flag ya puesto y la skill queda de solo lectura pero
+borrable.
+
+Antes de publicar, **el repo de skills es PÚBLICO**: `~/.golden/bin/golden-barrido-publicacion ~/.claude/skills/golden-imagen-arena`
+
+Historial completo en `references/changelog.md`.

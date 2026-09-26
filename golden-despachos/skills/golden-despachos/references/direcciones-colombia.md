@@ -69,3 +69,22 @@ Nunca pedir código postal.
 
 Los campos vienen sucios: correos metidos en la dirección, el nombre repetido, guiones sueltos al
 final, dobles espacios. Eso no invalida la dirección — se ignora y se evalúa lo que sí es dirección.
+
+## Tres cosas que PARECEN dirección mala y no lo son
+
+Medido sobre 895 direcciones reales del export. Las tres se marcaban mal por la palabra, no por el
+defecto:
+
+- **«Oficina» no siempre es punto de retiro.** `Calle 17 # 2E-30 Barrio Caobos oficina EMNFC SAS`
+  es la oficina del cliente y se entrega ahí normal. Solo bloquea cuando nombra una transportadora
+  (oficina InterRapidísimo, oficina Coordinadora) o cuando dice «recoge en» / «retira en». Si dice
+  oficina, no nombra transportadora y **no** trae nomenclatura, ahí sí hay que confirmar.
+- **La letra del número puede ser doble.** `# 100 AB - 03`, `# 65 GG - 22`, `# 66 BB - 51` y el
+  `# 23AN-45` del norte de Cali son nomenclaturas completas. Pedirle a ese cliente «el número de
+  puerta» es pedirle algo que ya escribió.
+- **En zona rural no hay número de puerta.** Vereda, corregimiento, parcelación o kilómetro: la
+  dirección se completa con un **punto de referencia**, no con nomenclatura. Se marca `RURAL`, no
+  `INCOMPLETA`, y la pregunta al cliente cambia: por dónde se llega, no cuál es el número.
+
+Ojo con el atajo fácil: la palabra **finca** NO es marca de zona rural. Hay edificios urbanos que
+se llaman así.

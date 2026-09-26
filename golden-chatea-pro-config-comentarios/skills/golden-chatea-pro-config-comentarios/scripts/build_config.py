@@ -6,8 +6,8 @@ información adicional del negocio, y la lista de productos con la dolencia que
 trata cada uno (guardarraíl anti-dolencias, --producto obligatorio y repetible).
 
 Datos que la IA pide al cliente (datos_req): se generan solos según el país.
-Ver DATOS_POR_PAIS (7 packs: COLOMBIA, ECUADOR, CHILE, MEXICO, PANAMA, PERU,
-PARAGUAY — cada uno con su nomenclatura real de direcciones; no existe un
+Ver DATOS_POR_PAIS (8 packs: COLOMBIA, ECUADOR, CHILE, MEXICO, PANAMA, PERU,
+PARAGUAY, GUATEMALA; ARGENTINA y BRASIL aceptados sin pack — cada uno con su nomenclatura real de direcciones; no existe un
 esquema "internacional"). Lista manual: --datos-cliente.
 
 Cantidad y precios NO se piden aquí: van en la ficha del producto dentro de
@@ -45,21 +45,35 @@ import os
 import re
 import sys
 
-# El tope lo pone el TIPO del Bot Field, no la plataforma (medido por API 2026-07-25):
-#   tipo JSON (var_type text/array) = 20.000   ·   tipo LONG JSON (longtext) = 500.000
-# El campo se crea LONG JSON. LIMITE_JSON queda para avisar cuando el campo del
-# cliente todavía sea del tipo viejo. Pasarse NO da error: la API responde 200 ok
-# y guarda el JSON CORTADO, así que siempre hay que releer y comparar.
-LIMITE_JSON = 20000        # techo duro del campo tipo JSON, medido en ESCAPADOS
-LIMITE_ESCAPADO_SEGURO = 19000  # margen de trabajo (briefing 2026-08-07)
-LIMITE_TOTAL = 500000
+# TECHO DEL CAMPO — REMEDIDO EN VIVO EL 2026-09-22, y la corrección importa:
+# el tope de 20.000 se mide en CRUDOS, no en escapados. Durante semanas este
+# script lo trató como escapados y de ahí salió un "techo práctico de ~17.000
+# crudos" que era falso y que RECHAZABA configuraciones buenas con exit 1.
+#
+#   MEDIDO en un espacio real, campo [Comentarios] Configuracion General (array):
+#     13.004 crudos            -> guarda
+#     19.617 crudos = 21.457 escapados -> guarda por API y se relee IDÉNTICO
+#     20.811 crudos            -> error 500 al guardar desde el panel
+#
+# Es decir: 21.457 escapados viven sin problema. La unidad es el CRUDO.
+# El tipo del campo (array) NO se cambia por API y NO hace falta cambiarlo:
+# el campo array aguanta la configuración completa.
+LIMITE_CRUDO = 20000         # techo del bot field, EN CRUDOS (medido 2026-09-22)
+MARGEN_SEGURO = 400          # se entrega por debajo de 19.600 crudos
+LIMITE_TOTAL = 500000        # tipo longtext, para el caso raro de un campo así
 SCRIPT_DIR = os.path.dirname(os.path.abspath(__file__))
 TEMPLATE = os.path.join(SCRIPT_DIR, "..", "assets", "template.json")
 
 # Datos que la IA debe pedirle al cliente para completar la compra, por país
 # y según su nomenclatura REAL de direcciones (briefing 2026-08-07).
-# La plataforma solo acepta 7 países: COLOMBIA, ECUADOR, CHILE, MEXICO,
-# PANAMA, PERU, PARAGUAY. El viejo esquema "internacional" con
+# La plataforma acepta 10 países (REMEDIDO 2026-08-29 contra el bundle vivo;
+# deroga el "solo 7"): los 7 con pack propio + GUATEMALA, ARGENTINA y BRASIL.
+# Guatemala YA tiene pack aquí (esquema de ZONAS, tomado de la skill hermana
+# golden-chatea-pro-validacion-direcciones, que lo tiene medido). Argentina y
+# Brasil están aceptados por la plataforma pero AÚN SIN PACK: se declaran para
+# no mentirle al usuario diciendo que su país no existe, y se le pide la lista
+# con --datos-cliente en vez de darle la nomenclatura de otro país.
+# El viejo esquema "internacional" con
 # Estado/Colonia/Código Postal era un criterio de MÉXICO clonado: falso en
 # Chile (comuna, sin CP), Ecuador, Perú (distrito), Panamá y Paraguay.
 # El CP solo es REQUERIDO en México (define la zona de reparto).
@@ -82,20 +96,63 @@ DATOS_POR_PAIS = {
     "paraguay": ("Nombre completo; Número de WhatsApp; Dirección (calle y "
                  "entre qué calles o casi qué esquina); Barrio; Ciudad; "
                  "Departamento; Referencia"),
+    "guatemala": ("Nombre completo; Número de WhatsApp; Dirección exacta con "
+                  "ZONA (ej. 5a avenida 12-34, Zona 10); Colonia, residenciales "
+                  "o aldea si es área rural; Municipio; Departamento"),
 }
+# Aceptados por la plataforma pero SIN pack de direcciones propio: se les pide la
+# lista al negocio en vez de heredarles la nomenclatura de otro país.
+SIN_PACK = {"argentina", "brasil"}
 # Vocabulario regional para las frases del prompt de venta (F3 2026-08-08: las
 # frases colombianas de envio estaban QUEMADAS y sobrevivian al relleno).
 REGION_POR_PAIS = {
     "colombia": "departamento", "mexico": "estado", "chile": "comuna",
     "ecuador": "provincia", "panama": "provincia", "peru": "distrito",
-    "paraguay": "departamento",
+    "paraguay": "departamento", "guatemala": "departamento",
 }
 DIRECCION_EJ_POR_PAIS = {
     "colombia": "calle, carrera, número", "mexico": "calle, número y colonia",
     "chile": "calle y número", "ecuador": "calle principal y secundaria",
     "panama": "calle o referencia clara", "peru": "calle o jirón y número",
     "paraguay": "calle y entre qué calles",
+    "guatemala": "avenida o calle con número y ZONA",
 }
+
+# Palabra LOCAL con la que el cliente dice que un producto es malo o no original.
+# El clasificador stock no la entiende y deja pasar justo el comentario que más
+# duele. Origen: clase M7 de Kevin Galeano (2026-09-02) — "chafa" en Guatemala le
+# pasaba seguido y tuvo que agregarla A MANO EN VIVO durante la clase.
+#
+# 🔴 HONESTIDAD SOBRE LA PROCEDENCIA DE ESTAS PALABRAS, porque quien las use tiene
+# derecho a saber de dónde salen:
+#   · GUATEMALA está MEDIDA: "chafa" la dijo Kevin en la clase, sobre su propia
+#     operación, tras verla llegar repetida.
+#   · EL RESTO ES SEMILLA, NO DATO. Salen de conocimiento general del español
+#     regional, NO de los comentarios reales de ninguna tienda. Se intentó
+#     verificarlas contra la operación viva de Golden y NO SE PUDO: la API de
+#     Chatea tiene 227 rutas y NINGUNA de comentarios (medido 2026-09-05), y
+#     /flow/conversations/data devuelve 0 registros en ese espacio, tanto global
+#     como por suscriptor, con control positivo hecho (11.626 suscriptores sí se
+#     leen, así que el token funciona y el vacío es real).
+#
+# POR ESO EL DISEÑO CAMBIÓ: una lista fija de argot es la solución equivocada, y
+# lo dice el propio método de Kevin — "leo los comentarios, detecto el patrón,
+# ajusto". La semilla arranca el trabajo; la palabra que MANDA es la que el dueño
+# ve en SUS comentarios y pasa con --despectivo. Lo que se pase por bandera
+# REEMPLAZA a la semilla, no se suma, para que nadie herede argot que no es suyo.
+DESPECTIVO_POR_PAIS = {
+    "guatemala": "chafa",          # MEDIDA en la clase M7, caso real de Kevin
+    # --- de aquí abajo, SEMILLA sin verificar en comentarios reales ---
+    "colombia": "chiviado, corroncho, cacharro",
+    "mexico": "chafa, pirata, corriente",
+    "chile": "trucho, chanta, ordinario",
+    "ecuador": "bamba, feque, cachina",
+    "panama": "pirata, cachivache",
+    "peru": "bamba, cachina",
+    "paraguay": "trucho, pirata",
+}
+DESPECTIVO_MEDIDOS = {"guatemala"}   # los únicos con fuente real
+DESPECTIVO_GENERICO = "chafa, trucho, bamba, chiviado, pirata, corriente"
 
 ALIAS_PAIS = {
     "co": "colombia", "méxico": "mexico", "mx": "mexico", "cl": "chile",
@@ -115,12 +172,39 @@ def datos_req_por_pais(pais, override=None):
     clave = ALIAS_PAIS.get(clave, clave)
     if clave in DATOS_POR_PAIS:
         return DATOS_POR_PAIS[clave]
-    # País fuera de los 7 que acepta la plataforma: avisar y usar el esquema
-    # de Colombia (el patrón oro) como base neutra, nunca el de México.
-    print(f"AVISO: '{pais}' no está entre los 7 países que acepta Chatea Pro "
-          "(COLOMBIA, ECUADOR, CHILE, MEXICO, PANAMA, PERU, PARAGUAY). "
-          "Confirma el país o pasa --datos-cliente con la lista correcta.")
-    return DATOS_POR_PAIS["colombia"]
+    # 🔴 SIN PACK NO SE FABRICA. Hasta el 2026-09-06 las dos ramas de abajo avisaban de que
+    # heredar la nomenclatura de otro país produce direcciones no entregables... y a dos
+    # líneas hacían `return DATOS_POR_PAIS["colombia"]`. Medido: argentina y bolivia salían
+    # con "Barrio…; Ciudad; Departamento" colombiano. En Argentina no hay departamentos.
+    # La autoprueba daba 24/24 porque comprobaba EL AVISO, no EL RESULTADO.
+    #
+    # El país NO se rechaza —eso lo prohíbe la doctrina de FER, el país es parámetro y no
+    # puerta—: lo que se rechaza es INVENTAR sus campos de dirección. Un hueco declarado se
+    # llena; una dirección fabricada llega mal y nadie sabe por qué.
+    #
+    # 🔴 CORREGIDO EL 2026-09-07: este mensaje decía "Pregúntale al negocio qué campos lleva
+    # una dirección ahí", y eso contradice de frente la ley de FER del 06-sep: "La jerga y la
+    # configuración de las direcciones NO se le pregunta a la gente, porque precisamente para
+    # eso es la skill. Tú tienes que ir a Internet, revisar, estudiar, analizar, extraer esa
+    # información y configurarla." El bloqueo estaba bien; el SIGUIENTE PASO que ordenaba
+    # estaba mal, y un mensaje de error es una instrucción: se obedece tal cual.
+    # Preguntar lo averiguable es cobrarle al negocio nuestro trabajo, y encima arriesga que
+    # conteste mal y esa respuesta mala quede escrita como regla.
+    conocido = "tiene pack de direcciones pendiente" if clave in SIN_PACK else \
+        "todavía no tiene pack de direcciones en esta skill"
+    sys.exit(
+        f"🔴 '{pais}' {conocido}. El país NO está rechazado: lo que falta es un dato.\n"
+        f"   NO se hereda el pack de otro país: produce direcciones no entregables.\n"
+        f"   La forma de la dirección se INVESTIGA, NO se le pregunta al negocio (ley de FER,\n"
+        f"   2026-09-06). Averigua en fuentes del país —correos/servicio postal, webs de las\n"
+        f"   transportadoras, y sitios donde gente real escribe direcciones de verdad— qué\n"
+        f"   campos la componen, en qué orden y cómo se abrevian. Tres fuentes independientes.\n"
+        f"   Lo que no se logre confirmar se marca NO VERIFICADO y SOLO eso se le confirma al\n"
+        f"   negocio, diciéndole por qué se le pregunta.\n"
+        f"   Con la lista en la mano, vuelve a correr con:\n"
+        f"     --datos-cliente \"Nombre completo; Número de WhatsApp; …\"\n"
+        f"   Y entrega el pack investigado con sus fuentes, para que el siguiente negocio de\n"
+        f"   ese país no obligue a repetir la investigación entera.")
 
 
 def cargar_template():
@@ -161,7 +245,7 @@ def _pais_clave(pais):
     return ALIAS_PAIS.get(clave, clave)
 
 
-def rellenar_datos_envio(cfg):
+def rellenar_datos_envio(cfg, despectivo_real=None):
     """Coherencia interna: la checklist/orden/confirmación de datos de envío del
     prompt de venta salen del MISMO pack de país que datos_req (antes estaban
     quemadas con el esquema de Colombia y contradecían a México)."""
@@ -173,6 +257,15 @@ def rellenar_datos_envio(cfg):
     region = REGION_POR_PAIS.get(clave, "ciudad")
     direccion_ej = DIRECCION_EJ_POR_PAIS.get(clave, "calle y número")
     lista_corta = ", ".join(d.split("(")[0].strip().lower() for d in datos)
+    if despectivo_real:
+        despectivo = despectivo_real.strip()
+    else:
+        despectivo = DESPECTIVO_POR_PAIS.get(clave, DESPECTIVO_GENERICO)
+        if clave not in DESPECTIVO_MEDIDOS:
+            print(f"AVISO: la palabra despectiva local de '{clave}' es SEMILLA, no dato "
+                  "medido en comentarios reales. Mira TUS comentarios y pasa la que de "
+                  "verdad te llega con --despectivo \"palabra1, palabra2\". "
+                  "El metodo de Kevin: leo, detecto el patron, ajusto.")
 
     def rellena(o):
         if isinstance(o, dict):
@@ -183,18 +276,49 @@ def rellenar_datos_envio(cfg):
                      .replace("{{CONFIRMACION_DATOS_ENVIO}}", confirmacion)
                      .replace("{{LISTA_DATOS_CORTA}}", lista_corta)
                      .replace("{{DATO_REGION}}", region)
-                     .replace("{{DIRECCION_EJEMPLO}}", direccion_ej))
+                     .replace("{{DIRECCION_EJEMPLO}}", direccion_ej)
+                     .replace("{{DESPECTIVO_LOCAL}}", despectivo))
         return o
     return rellena(cfg)
 
 
+TOPE_DOLENCIAS = 12   # cuántas dolencias distintas entran en el guardarraíl
+
+
 def rellenar_guardarrail(cfg, productos):
-    """Rellena los placeholders {{LISTA_DOLENCIAS}} y {{LISTA_PRODUCTOS_DOLENCIAS}}
-    del guardarraíl anti-dolencias con los productos de LA TIENDA DESTINO."""
-    lista_dolencias = ", ".join(d for _, d in productos)
-    lineas = "\n".join(
-        f"- {n}: trata {d}. Comentarios tipo 'tengo {d}', 'esto sirve para {d}' = cliente interesado."
-        for n, d in productos)
+    """Rellena {{LISTA_DOLENCIAS}} y {{LISTA_PRODUCTOS_DOLENCIAS}} con las
+    DOLENCIAS de la tienda destino — nunca con los nombres de sus productos.
+
+    DOS DEFECTOS QUE ESTO CORRIGE (2026-09-22):
+
+    1. CADUCIDAD. La versión anterior escribía una línea por producto con su
+       NOMBRE ("- Tag Recede: trata verrugas..."). El día que la tienda saca ese
+       producto, el clasificador sigue citándolo y nadie se entera, porque el bot
+       no da error: simplemente razona sobre un catálogo que ya no existe.
+
+    2. NO ESCALABA. Con ~20 productos el bloque ya pesaba miles de caracteres y
+       con ~50 reventaba el campo entero. Un catálogo grande rompía la skill.
+
+    La clave: al clasificador NO le hace falta saber qué producto trata qué. Le
+    hace falta reconocer la FORMA de la frase con la que alguien nombra su
+    problema. Por eso se deduplican las dolencias y se cortan en TOPE_DOLENCIAS:
+    el guardarraíl deja de crecer con el catálogo y el prompt es estable tenga la
+    tienda 3 productos o 1.000."""
+    vistas, unicas = set(), []
+    for _, d in productos:
+        clave = d.strip().lower()
+        if clave and clave not in vistas:
+            vistas.add(clave)
+            unicas.append(d.strip())
+    recortadas = unicas[:TOPE_DOLENCIAS]
+    lista_dolencias = ", ".join(recortadas)
+    if len(unicas) > TOPE_DOLENCIAS:
+        lista_dolencias += (f", y cualquier otra condición del mismo tipo "
+                            f"({len(unicas) - TOPE_DOLENCIAS} más que esta lista no enumera)")
+    lineas = ("Ninguna de estas frases se elimina jamás, y no dependen del catálogo: "
+              "cualquier frase del mismo tipo entra aquí aunque los productos cambien.\n"
+              + "; ".join(f"tengo {d}" for d in recortadas)
+              + "; llevo años con esto; ya probé de todo.")
 
     def rellena(o):
         if isinstance(o, dict):
@@ -234,8 +358,56 @@ def validar_sin_placeholders(cfg):
         sys.exit(1)
 
 
-def construir(pais, contacto, t_envio, info_extra, datos_cliente=None, productos=None):
+def cargar_overrides_no_vip():
+    """DEROGADA el 2026-09-22. Cargaba los prompts recortados de la via NO VIP.
+
+    Ya no existe esa via: la plantilla actual cabe entera respetando los nueve
+    topes nativos, asi que una sola base sirve a todos. Se conserva la funcion
+    (no el asset) para que, si algo antiguo la llama, falle RUIDOSAMENTE en vez
+    de devolver silenciosamente unos prompts que ya no existen."""
+    print("ERROR: la via NO VIP fue derogada (FER 2026-09-22). Hay UNA sola base,")
+    print("       que cabe en los topes nativos. No hay overrides que cargar.")
+    sys.exit(1)
+
+
+def construir(pais, contacto, t_envio, info_extra, datos_cliente=None, productos=None,
+              negocio=None,
+              aut_link=None, aut_precio=None, vip=True, despectivo=None):
     cfg = cargar_template()
+    # BASE UNICA (FER, 2026-09-22). Ya NO hay via VIP en la configuracion general.
+    # Antes habia dos entregables: uno completo que se pegaba como JSON en Campos
+    # de Bot excediendo topes a proposito, y uno recortado para quien pega en el
+    # formulario. La bifurcacion existia porque la plantilla vieja NO CABIA
+    # (3.895 > 3.000 y 10.771 > 8.000, ~22.7k en total).
+    # La plantilla actual cabe entera respetando los nueve topes nativos, asi que
+    # la variante recortada perdio su razon de ser: una sola base sirve a todos,
+    # se pegue por formulario o por JSON. El VIP ahora vive solo en el manejo de
+    # PRODUCTOS, que es otra skill (golden-chatea-pro-producto-comentarios).
+    # Panel "Autorizaciones" de Respuesta pública. Son DECISIONES DE VENTA, no
+    # detalles: definen si el comentario empuja al privado o saca al cliente del
+    # anuncio. Doctrina medida en la clase M7 de Kevin (2026-09-02):
+    #   enlace NO  -> el asistente cierra en la misma conversación; mandarlo a la
+    #                 web lo enfría y se pierde el hilo caliente.
+    #   precio SÍ  -> el precio filtra curiosos EN PÚBLICO, y aun así el asistente
+    #                 abre el privado solo, así que no se pierde el lead.
+    # Se dejan configurables porque quien vende por landing sí quiere el enlace.
+    if aut_link is not None:
+        cfg["respuesta_publica"]["aut_link_pub"] = "sí" if aut_link else "no"
+    if aut_precio is not None:
+        cfg["respuesta_publica"]["aut_precio_pub"] = "sí" if aut_precio else "no"
+    # NOMBRE DEL NEGOCIO. Es la primera pieza de la parte dinamica y durante mucho
+    # tiempo NO existio como parametro: el ROL del clasificador decia "esta tienda"
+    # mientras el espacio vivo decia el nombre real, asi que la skill y el espacio
+    # se separaban desde la primera linea del prompt. Si no se pasa, se queda el
+    # generico, que es correcto aunque menos concreto — nunca se hornea un nombre.
+    if negocio:
+        cfg = {k: ({kk: (vv.replace("{{NOMBRE_NEGOCIO}}", negocio) if isinstance(vv, str) else vv)
+                    for kk, vv in v.items()} if isinstance(v, dict) else v)
+               for k, v in cfg.items()}
+    else:
+        cfg = {k: ({kk: (vv.replace("{{NOMBRE_NEGOCIO}}", "esta tienda") if isinstance(vv, str) else vv)
+                    for kk, vv in v.items()} if isinstance(v, dict) else v)
+               for k, v in cfg.items()}
     # Solo se reemplaza la información del negocio. Los prompts quedan intactos.
     cfg["informacion_del_negocio"]["pais"] = pais
     cfg["informacion_del_negocio"]["contacto"] = contacto
@@ -246,22 +418,30 @@ def construir(pais, contacto, t_envio, info_extra, datos_cliente=None, productos
     # Guardarraíl anti-dolencias: SIEMPRE con los productos de la tienda destino.
     cfg = rellenar_guardarrail(cfg, productos or [])
     # Datos de envío del prompt de venta: mismo pack de país que datos_req.
-    cfg = rellenar_datos_envio(cfg)
+    cfg = rellenar_datos_envio(cfg, despectivo_real=despectivo)
     validar_sin_placeholders(cfg)
     return cfg
 
 
 TOPES_NATIVOS = [
-    # (ruta, tope, deliberado): deliberado=True EXCEDE a proposito (se pega por
-    # JSON completo; prohibido guardar desde su formulario del panel).
+    # (ruta, tope, deliberado). Desde 2026-09-22 NINGUN campo es "deliberado":
+    # FER derogo la via VIP de la configuracion general y quedo UNA sola base,
+    # que cabe entera respetando todos los topes nativos. El tercer elemento se
+    # conserva en False para no romper a quien lea la tupla.
+    #
+    # OJO, LA COSTURA QUE NADIE VE: estos topes SUMAN 24.100 y el campo aguanta
+    # 20.000. El panel valida caja por caja y NUNCA la suma, asi que se pueden
+    # llenar las nueve en verde y que el guardado reviente con un 500 sin decir
+    # por que. Respetar el tope de cada campo NO garantiza que el conjunto entre:
+    # eso lo decide el gate de LIMITE_CRUDO de mas abajo.
     ("informacion_del_negocio.contacto", 200, False),
     ("informacion_del_negocio.t_envio", 200, False),
     ("informacion_del_negocio.info_extra", 500, False),
     ("comentarios_negativos.prompt_general", 10000, False),
     ("comentarios_negativos.ej_a_eliminar", 1000, False),
     ("comentarios_negativos.ej_a_no_eliminar", 1000, False),
-    ("respuesta_publica.prompt", 3000, True),
-    ("venta_conversacional.prompt", 8000, True),
+    ("respuesta_publica.prompt", 3000, False),
+    ("venta_conversacional.prompt", 8000, False),
     ("venta_conversacional.datos_req", 200, False),
 ]
 
@@ -298,12 +478,16 @@ def _campo(cfg, ruta):
     return cfg[seccion][llave]
 
 
-def validar_topes(cfg):
-    """ERROR DURO (exit 1, SIN archivo) si un campo no-deliberado excede su tope
-    nativo. Jamás truncar en silencio: el Save del panel cortaría el campo."""
+def validar_topes(cfg, vip=True):
+    """ERROR DURO (exit 1, SIN archivo) si un campo excede su tope nativo.
+    Jamás truncar en silencio: el Save del panel cortaría el campo.
+
+    Desde 2026-09-22 TODOS los topes bloquean, sin excepción: se acabaron los
+    campos "deliberados". El parámetro vip se conserva para no romper llamadas
+    antiguas y ya no cambia nada."""
     excesos = [(r, len(_campo(cfg, r)), tope)
                for r, tope, deliberado in TOPES_NATIVOS
-               if not deliberado and len(_campo(cfg, r)) > tope]
+               if (not deliberado or not vip) and len(_campo(cfg, r)) > tope]
     if excesos:
         print("!" * 62)
         for r, n, tope in excesos:
@@ -331,20 +515,36 @@ def detectar_colombianismos(cfg, pais):
     return hallazgos
 
 
-def reporte(cfg):
+def reporte(cfg, vip=True):
     out = json.dumps(cfg, ensure_ascii=False, indent=4)
     # Lo que se escribe por API es el JSON COMPACTO: medir contra el tope
     # LONG JSON (500.000) sobre esa forma, escapada (tilde=6, emoji=12).
     compacto = json.dumps(cfg, ensure_ascii=False, separators=(",", ":"))
     escapado = len(json.dumps(compacto)[1:-1])
+    tope_trabajo = LIMITE_CRUDO - MARGEN_SEGURO
     print("=" * 62)
     print(f"LARGO indentado (para pegar en panel): {len(out)} crudos")
-    print(f"LARGO compacto  (para escribir por API): {len(compacto)} crudos")
-    print(f"LARGO ESCAPADO compacto (cuenta contra el techo): {escapado} / {LIMITE_TOTAL} (LONG JSON)")
+    print(f"LARGO COMPACTO — ES EL QUE CUENTA: {len(compacto)} / {LIMITE_CRUDO} crudos "
+          f"(margen {LIMITE_CRUDO - len(compacto)})")
+    if len(compacto) > tope_trabajo:
+        print(f"    SE PASA del limite de trabajo ({tope_trabajo}). No se entrega.")
+    print(f"escapado: {escapado} — informativo. NO es la unidad del techo: medido")
+    print("  el 2026-09-22, 21.457 escapados viven en el campo sin problema.")
     print("=" * 62)
     print(f"  pais: {cfg['informacion_del_negocio']['pais']}")
+    # Los dos interruptores del panel Autorizaciones se IMPRIMEN siempre: son
+    # decisiones de venta y un interruptor que nadie ve es uno que nadie revisa.
+    rp = cfg.get("respuesta_publica", {})
+    link, precio = rp.get("aut_link_pub", "?"), rp.get("aut_precio_pub", "?")
+    print(f"  Autorizaciones -> enlace en respuesta pública: {link} · precio: {precio}")
+    if link == "sí":
+        print("    AVISO: con el enlace encendido el cliente sale del anuncio hacia la web "
+              "y se enfría. Déjalo en 'no' si quieres que el asistente cierre en el chat.")
+    print("  BASE UNICA: sirve igual pegando campo por campo en el formulario que")
+    print("  pegando el JSON en Campos de Bot. Ya no hay via VIP (FER 2026-09-22).")
     print("  Campos con tope (len/tope). Un Save del panel CORTA lo que sobre:")
     for ruta, tope, deliberado in TOPES_NATIVOS:
+        deliberado = False   # ya no existen excesos permitidos
         n = len(_campo(cfg, ruta))
         if n <= tope:
             print(f"    OK      {ruta}: {n} / {tope} (margen {(tope - n) / tope * 100:.0f}%)")
@@ -353,11 +553,12 @@ def reporte(cfg):
             print("            (el backend valida el total). PROHIBIDO guardar desde ese formulario.")
         else:
             print(f"    EXCEDE  {ruta}: {n} / {tope} — no deberia llegar aqui (validar_topes fallo antes)")
-    if escapado > LIMITE_JSON:
+    if len(compacto) > LIMITE_CRUDO - MARGEN_SEGURO:
         print()
-        print(f"  NOTA: {escapado} escapados > {LIMITE_JSON}: esta config NO cabe en un bot field")
-        print("        tipo JSON legado. El campo DEBE ser LONG JSON (500.000) — asi lo")
-        print("        exige esta skill. Tras escribir por API: RELEER y comparar.")
+        print(f"  NOTA: {len(compacto)} crudos supera el limite de trabajo")
+        print(f"        ({LIMITE_CRUDO - MARGEN_SEGURO}). El guardado desde el panel devolveria")
+        print("        ERROR 500 y abortaria el campo entero. Hay que recortar.")
+    print("  Tras escribir por API: RELEER del servidor y comparar. Es la unica prueba.")
     excede_total = escapado > LIMITE_TOTAL
     if excede_total:
         print()
@@ -380,14 +581,37 @@ def main():
     p.add_argument("--producto", action="append", dest="productos", metavar="'Nombre:dolencia'",
                    help="Producto de la tienda y la dolencia que trata (repetible). "
                         "Rellena el guardarrail anti-dolencias. Obligatorio: al menos 1.")
+    p.add_argument("--negocio", help="Nombre del negocio tal como debe nombrarlo el bot "
+                        "(ej: Golden Group). Entra en el ROL del clasificador. Si se omite "
+                        "queda el generico \"esta tienda\": correcto, pero menos concreto.")
     p.add_argument("--out", required=True, help="Ruta del JSON de salida")
     p.add_argument("--destino", choices=["array", "longjson"], default="array",
-                   help="Tipo REAL del bot field destino. Por defecto 'array' (fail-closed): "
-                        "los campos existentes de Comentarios son tipo array, su tipo NO se "
-                        "puede cambiar por API, y por encima de ~19.000 escapados el campo "
-                        "muere EN SILENCIO (la API responde 200 y el asistente nace muerto; "
-                        "medido: 19.922 entra, 23.266 ya no). Pasa 'longjson' SOLO tras "
-                        "verificar en el servidor que el campo es longtext.")
+                   help="Tipo REAL del bot field destino. Por defecto 'array', que es lo que "
+                        "son los campos de Comentarios y lo que NO hay que cambiar: medido el "
+                        "2026-09-22, un campo array guarda 19.617 crudos y los devuelve "
+                        "idénticos. El gate mide CRUDOS contra 20.000, no escapados. Pasa "
+                        "'longjson' solo si verificaste en el servidor que el campo es longtext.")
+    p.add_argument("--vip", choices=["si", "no"], default="no",
+                   help="DEROGADO el 2026-09-22 por orden de FER: ya no hay vía VIP en la "
+                        "configuración general, hay UNA sola base que cabe en los topes "
+                        "nativos y sirve igual por formulario que por JSON. Se sigue "
+                        "aceptando para no romper llamadas antiguas, pero no cambia nada y "
+                        "pasar 'si' imprime un aviso. El VIP hoy vive solo en el manejo de "
+                        "PRODUCTOS, que es la skill golden-chatea-pro-producto-comentarios.")
+    p.add_argument("--despectivo",
+                   help="Palabra o palabras LOCALES con las que TUS clientes dicen que el "
+                        "producto es malo o no original, separadas por coma. Sale de MIRAR tus "
+                        "comentarios, no de una lista generica: reemplaza la semilla del pack de "
+                        "pais. Kevin tuvo que agregar 'chafa' a mano en vivo por esto mismo.")
+    p.add_argument("--aut-link", dest="aut_link", choices=["si", "no"],
+                   help="Autorizaciones: enviar el ENLACE en la respuesta pública. "
+                        "Por defecto se respeta el template. Ponlo en 'no' si quieres que el "
+                        "asistente cierre en la misma conversación (recomendado cuando el "
+                        "canal de cierre es el propio chat); 'si' solo si vendes por landing.")
+    p.add_argument("--aut-precio", dest="aut_precio", choices=["si", "no"],
+                   help="Autorizaciones: enviar el PRECIO en la respuesta pública. "
+                        "'si' filtra curiosos en público sin perder el lead, porque el "
+                        "asistente abre el privado igual.")
     a = p.parse_args()
 
     if a.intake:
@@ -424,19 +648,34 @@ def main():
         print("       y se rellena con los productos de LA TIENDA DESTINO, jamas de otra.")
         sys.exit(1)
 
-    cfg = construir(pais, contacto, t_envio, info_extra, datos_cliente, productos)
-    validar_topes(cfg)                      # exit 1 SIN archivo si un tope nativo revienta
-    out, escapado, excede_total = reporte(cfg)
-    if a.destino == "array" and escapado > LIMITE_ESCAPADO_SEGURO:
+    aut_link = None if a.aut_link is None else (a.aut_link == "si")
+    aut_precio = None if a.aut_precio is None else (a.aut_precio == "si")
+    vip = (a.vip == "si")
+    if vip:
+        print("AVISO: --vip esta DEROGADO desde el 2026-09-22 y no cambia la salida.")
+        print("       Hay UNA sola base y cabe en los topes nativos. Para el manejo")
+        print("       VIP de productos, usa golden-chatea-pro-producto-comentarios.")
+    cfg = construir(pais, contacto, t_envio, info_extra, datos_cliente, productos,
+                    negocio=a.negocio,
+                    aut_link=aut_link, aut_precio=aut_precio, vip=vip,
+                    despectivo=a.despectivo)
+    validar_topes(cfg, vip=vip)                      # exit 1 SIN archivo si un tope nativo revienta
+    out, escapado, excede_total = reporte(cfg, vip=vip)
+    crudo = len(json.dumps(cfg, ensure_ascii=False, separators=(",", ":")))
+    if a.destino == "array" and crudo > LIMITE_CRUDO - MARGEN_SEGURO:
         print()
         print("!" * 62)
-        print(f"ERROR: {escapado} escapados > {LIMITE_ESCAPADO_SEGURO} y el destino es un campo")
-        print("       tipo ARRAY: el campo muere EN SILENCIO (la API responde 200 y el")
-        print("       asistente nace muerto; medido en plataforma: 19.922 entra, 23.266 no).")
-        print("       El tipo de un bot field NO se puede cambiar por API.")
-        print("       Salidas: (a) compactar los prompts largos hasta bajar de")
-        print(f"       {LIMITE_ESCAPADO_SEGURO}, o (b) verificar EN EL SERVIDOR que el campo")
-        print("       destino es longtext y correr de nuevo con --destino longjson.")
+        print(f"ERROR: {crudo} crudos supera el limite de trabajo "
+              f"({LIMITE_CRUDO - MARGEN_SEGURO} = {LIMITE_CRUDO} menos {MARGEN_SEGURO} de margen).")
+        print("       El campo NO trunca en silencio: el panel devuelve ERROR 500 y")
+        print("       aborta el guardado del campo entero (medido 2026-09-22: 19.617")
+        print("       crudos guarda y se relee identico; 20.811 crudos da 500).")
+        print("       Se recorta por ORDEN DE MENOR VALOR, nunca de la rotacion")
+        print("       anti-baneo ni de los criterios de borrado:")
+        print("         1. justificacion economica escrita para humanos")
+        print("         2. ejemplos atados a NOMBRES de producto (ademas caducan)")
+        print("         3. repeticiones literales de la misma lista")
+        print("         4. campos de negocio: contacto, tiempos de envio, info extra")
         print("       No se escribio ningun archivo.")
         print("!" * 62)
         sys.exit(1)

@@ -27,8 +27,9 @@ the product to be composited later; no rectangle, no panel, no block of flat col
 
 ## Plantilla lista para llenar
 
-> Anuncio de ecommerce profesional para **{PRODUCTO}**, formato **{1080×1080 | 1080×1350}**,
-> vertical **{nicho}**, mercado **{país}**.
+> Anuncio de ecommerce profesional para **{PRODUCTO}**, formato **{el del DESTINO — ver
+> `formato-por-destino.md`: galería de ficha 1:1 en 2K, infografía de descripción 4:5,
+> reel 9:16}**, vertical **{nicho}**, mercado **{país}**.
 >
 > **Producto:** usa el producto de la imagen de referencia exactamente como es — mismo
 > envase, mismo logo, misma etiqueta, mismos colores y proporciones. No lo redibujes, no

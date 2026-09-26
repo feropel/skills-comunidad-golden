@@ -4,6 +4,12 @@ Mira cada imagen con el tool `Read` (no juzgues por el prompt, juzga por el píx
 El veredicto es **holístico 1-1000**: una lectura del TODO, no la suma de casillas. Los
 seis ejes de abajo son las lentes con las que miras, no una calculadora.
 
+🔴 **Antes de descalificar a un motor, audita tu propio instrumento.** Juzga siempre el archivo
+que salió del MOTOR, no el que ya pasó por tu pipeline. Durante meses el script de entrega de
+esta casa estiraba las piezas un 20% al llevarlas de 1:1 a 4:5, así que "envase deformado"
+—causal de descalificación número 1— podía ser culpa de la entrega y no del modelo. Si ves una
+deformación, comprueba la proporción del original antes de castigar a nadie.
+
 ## Descalificación inmediata (la pieza no compite, da igual lo demás)
 
 1. **Producto adulterado** — envase deformado, logo cambiado, etiqueta reinventada, color

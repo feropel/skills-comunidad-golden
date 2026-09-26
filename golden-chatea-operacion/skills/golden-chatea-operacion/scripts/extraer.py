@@ -124,6 +124,49 @@ def quedan_secretos(obj):
     return _quedan_secretos_texto(json.dumps(obj, ensure_ascii=False))
 
 
+# 🔴 CUPO DE LA API · 1.000 peticiones por HORA; pasarse BLOQUEA una hora entera.
+# Medido contra la API viva el 2026-09-07: cada respuesta trae `x-ratelimit-remaining` y
+# `x-ratelimit-limit` (en ingles X-RateLimit-Remaining / X-RateLimit-Limit). Se repone cada
+# hora, PERO no viene `x-ratelimit-reset`: el servidor no dice a que minuto empezo la ventana,
+# asi que si te bloqueas se espera una hora COMPLETA y se comprueba MIRANDO el contador.
+#
+# 🔴 POR QUE AQUI ES LA MAS CARA DE LA FAMILIA, y hay que decirlo: las hermanas leen una
+# configuracion de tamano FIJO (61 bot fields). Esta barre CONVERSACIONES, y su coste depende
+# de cuantas hubo: el listado pagina de 10 en 10, y ADEMAS cada hilo pide sus mensajes aparte.
+# Un dia flojo son decenas de peticiones; un dia de campana pueden ser cientos. **El coste no
+# es una constante que se pueda hornear aqui: se mide en la corrida.** Por eso no se escribe un
+# numero fijo -- se cuenta lo gastado y se informa al final.
+CUPO = {"quedan": None, "limite": None, "gastadas": 0}
+
+
+def _anotar_cupo(resp):
+    """Gratis: la cabecera ya llego con la respuesta."""
+    try:
+        q = resp.headers.get("x-ratelimit-remaining")
+        if q is not None:
+            if CUPO["quedan"] is not None:
+                CUPO["gastadas"] += max(CUPO["quedan"] - int(q), 0)
+            CUPO["quedan"] = int(q)
+            CUPO["limite"] = int(resp.headers.get("x-ratelimit-limit") or 0) or CUPO["limite"]
+    except Exception:                                            # noqa: BLE001
+        pass
+
+
+def informe_cupo():
+    """Lo que se DICE al terminar. Un numero sin vara al lado no es un chequeo."""
+    if CUPO["quedan"] is None:
+        return ("⚠️ el servidor no devolvio 'x-ratelimit-remaining': NO se sabe cuanto cupo "
+                "queda, y eso NO es lo mismo que 'queda de sobra'.")
+    q, lim = CUPO["quedan"], CUPO["limite"] or 1000
+    base = f"CUPO API: esta corrida gasto ~{CUPO['gastadas']} · quedan {q} de {lim} esta hora"
+    if q < 50:
+        return (f"🔴 {base}. Casi agotado: NO arranques otra corrida. Se repone cada hora, "
+                "pero el servidor no dice a que minuto -- comprueba con `golden-chatea-cupo`.")
+    if CUPO["gastadas"] and q < CUPO["gastadas"]:
+        return f"⚠️ {base}. NO alcanza para otra corrida de este tamano."
+    return base
+
+
 def pedir(token, path, **params):
     """SOLO LEE. A diferencia de la hermana (que necesita PUT/POST para auditar
     escritura), esta skill nunca escribe en Chatea -- el encargo lo exige y
@@ -137,8 +180,19 @@ def pedir(token, path, **params):
         headers={"Authorization": "Bearer " + token, "User-Agent": UA,
                  "Accept": "application/json"})
     try:
-        return json.load(urllib.request.urlopen(req, timeout=60))
+        with urllib.request.urlopen(req, timeout=60) as r:
+            _anotar_cupo(r)
+            return json.load(r)
     except urllib.error.HTTPError as e:
+        _anotar_cupo(e)          # el 429 tambien trae la cabecera: es cuando mas importa
+        if e.code == 429:
+            # 🔴 No se reintenta (reintentar sobre un bloqueo lo alarga) y NO se disimula: un
+            # barrido del dia cortado a la mitad, informado sin aviso, se lee como "el dia
+            # entero" -- y el informe diria que nadie quedo sin contestar cuando si.
+            return {"_ERROR_HTTP": 429,
+                    "_detalle": "CUPO AGOTADO (1.000/hora). El bloqueo dura una hora. "
+                                "🔴 Este barrido esta INCOMPLETO: no lo informes como el dia "
+                                "entero. Los hilos que falten NO son hilos sin novedad."}
         return {"_ERROR_HTTP": e.code,
                 "_detalle": e.read()[:300].decode("utf8", "ignore")}
     except Exception as e:                                       # noqa: BLE001
@@ -409,6 +463,7 @@ def main():
     destino = salida / f"DUMP-{etiqueta}-{fecha}.json"
     destino.write_text(json.dumps(dump, ensure_ascii=False, indent=1))
     print(f"\nListo -> {destino}  ({destino.stat().st_size:,} bytes)")
+    print("  " + informe_cupo())
     print("Siguiente: autoprueba.py y despues clasificar.py sobre este DUMP.")
 
 

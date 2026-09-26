@@ -107,6 +107,55 @@ def quedan_secretos(obj):
     return encontrados
 
 
+# 🔴 CUPO DE LA API · 1.000 peticiones por HORA, y pasarse BLOQUEA una hora entera.
+# Medido contra la API viva el 2026-09-07: la respuesta trae `x-ratelimit-limit: 1000` y
+# `x-ratelimit-remaining: N` (en ingles X-RateLimit-Limit / X-RateLimit-Remaining). Hasta hoy
+# NINGUNA skill de la familia leia ese contador: se trabajaba a ciegas y el bloqueo aparecia a
+# mitad de la operacion, con la configuracion escrita a medias.
+#
+# 🔴 COSTE MEDIDO, en dos espacios distintos:
+#     espacio de referencia casi VACIO (61 campos) ...... 137   (2026-09-07)
+#     espacio REAL (Dolce Incanto, 86 campos) ........... 172   (2026-09-08)
+# Las 137 eran el PISO y ya se midio cuanto sube. Por eso la guardia usa 200 y no 137: con 137
+# dejaria arrancar una extraccion de un espacio real que NO cabe, y el bloqueo llegaria a mitad
+# -- que es exactamente lo que esta guardia existe para evitar. Con 1.000/hora caben ~5.
+COSTE_MEDIDO = 200
+#
+# EL RESET: cada hora (dato del desarrollador via FER). Pero NO viene `x-ratelimit-reset`,
+# asi que el servidor no dice A QUE MINUTO empezo la ventana: si te bloqueas, espera una
+# hora COMPLETA desde ese momento, y para saber si ya se repuso MIRA el contador (1
+# peticion), no lo calcules.
+CUPO = {"quedan": None, "limite": None, "leidas": 0}
+
+
+def _anotar_cupo(resp):
+    """Guarda el contador de cada respuesta. Es gratis: viaja en la cabecera que ya llego."""
+    try:
+        q = resp.headers.get("x-ratelimit-remaining")
+        if q is not None:
+            CUPO["quedan"] = int(q)
+            CUPO["limite"] = int(resp.headers.get("x-ratelimit-limit") or 0) or CUPO["limite"]
+            CUPO["leidas"] += 1
+    except Exception:                                         # noqa: BLE001
+        pass
+
+
+def informe_cupo():
+    """Lo que hay que DECIR al terminar. Un numero sin vara al lado no es un chequeo."""
+    if CUPO["quedan"] is None:
+        return ("⚠️ el servidor no devolvio 'x-ratelimit-remaining' en ninguna respuesta: "
+                "NO se sabe cuanto cupo queda, y eso NO es lo mismo que 'queda de sobra'.")
+        # Callarlo seria peor que no mirarlo: el siguiente creeria que hay cupo.
+    q, lim = CUPO["quedan"], CUPO["limite"] or 1000
+    linea = f"CUPO API: quedan {q} de {lim} peticiones esta hora"
+    if q < COSTE_MEDIDO:
+        return (f"🔴 {linea}. NO alcanza para otra extraccion (cuesta ~{COSTE_MEDIDO}). "
+                "Pasarse BLOQUEA una hora entera.")
+    if q < COSTE_MEDIDO * 2:
+        return f"⚠️ {linea}. Alcanza para UNA extraccion mas, no dos."
+    return f"{linea} · ~{q // COSTE_MEDIDO} extracciones mas"
+
+
 def pedir(token, path, metodo="GET", cuerpo=None, **params):
     if params:
         path += "?" + urllib.parse.urlencode(params)
@@ -116,8 +165,18 @@ def pedir(token, path, metodo="GET", cuerpo=None, **params):
         headers={"Authorization": "Bearer " + token, "User-Agent": UA,
                  "Accept": "application/json", "Content-Type": "application/json"})
     try:
-        return json.load(urllib.request.urlopen(req, timeout=60))
+        with urllib.request.urlopen(req, timeout=60) as r:
+            _anotar_cupo(r)
+            return json.load(r)
     except urllib.error.HTTPError as e:
+        _anotar_cupo(e)          # el 429 tambien trae la cabecera: es cuando mas importa
+        if e.code == 429:
+            # 🔴 No se disimula ni se reintenta: reintentar sobre un bloqueo lo alarga. El
+            # DUMP queda incompleto y hay que decirlo, porque un inventario a medias sin
+            # aviso se lee como el universo entero -- el fallo que esta casa ya pago.
+            return {"_ERROR_HTTP": 429,
+                    "_detalle": "CUPO AGOTADO (1.000/hora). El bloqueo dura una hora. "
+                                "Este DUMP esta INCOMPLETO: no lo audites como si fuera todo."}
         return {"_ERROR_HTTP": e.code,
                 "_detalle": e.read()[:300].decode("utf8", "ignore")}
     except Exception as e:                                    # noqa: BLE001
@@ -155,6 +214,9 @@ def todas_las_paginas(token, path):
 
 
 def main():
+    # 🔴 COMPROBACION PREVIA. Arrancar una extraccion de ~137 peticiones sin saber si caben
+    # es la forma de quedarse bloqueado A MITAD, con el DUMP incompleto. Cuesta 1 peticion
+    # saberlo antes; cuesta una hora averiguarlo despues.
     if len(sys.argv) < 3:
         sys.exit(__doc__)
 
@@ -165,6 +227,22 @@ def main():
     if len(token) < 20 or "TU_TOKEN" in token:
         sys.exit(f"El archivo {ruta_token} no parece un token real ({len(token)} bytes). "
                  "Apunta al deposito, no a un marcador de posicion.")
+
+    # Una peticion barata para saber si CABE la extraccion entera.
+    sonda = pedir(token, "/team-info")
+    if isinstance(sonda, dict) and sonda.get("_ERROR_HTTP") == 429:
+        sys.exit("🔴 CUPO AGOTADO (1.000 peticiones/hora). El bloqueo dura una hora. "
+                 "No se arranca la extraccion: quedaria a medias.")
+    if CUPO["quedan"] is not None and CUPO["quedan"] < COSTE_MEDIDO:
+        sys.exit(f"🔴 NO ARRANCO: quedan {CUPO['quedan']} peticiones de "
+                 f"{CUPO['limite'] or 1000} y una extraccion cuesta ~{COSTE_MEDIDO}.\n"
+                 f"   Empezar ahora deja el DUMP incompleto Y gasta el resto del cupo.\n"
+                 f"   Espera a que se reponga, o corre `golden-chatea-cupo` para verlo.\n"
+                 f"   (Si de verdad hace falta un DUMP parcial, se pide a mano y se DECLARA "
+                 f"como parcial en el informe -- nunca se audita como si fuera todo.)")
+    if CUPO["quedan"] is not None:
+        print(f"  cupo antes de empezar: {CUPO['quedan']} de {CUPO['limite'] or 1000} "
+              f"· esta extraccion cuesta ~{COSTE_MEDIDO}")
 
     etiqueta = sys.argv[2]
     salida = Path(sys.argv[3]) if len(sys.argv) > 3 else Path.cwd()
@@ -236,6 +314,7 @@ def main():
     destino = salida / f"DUMP-{etiqueta}.json"
     destino.write_text(json.dumps(dump, ensure_ascii=False, indent=1))
     print(f"\nListo -> {destino}  ({destino.stat().st_size:,} bytes)")
+    print("  " + informe_cupo())
     print("Siguiente: autoprueba.py y despues auditar.py sobre este DUMP.")
 
 

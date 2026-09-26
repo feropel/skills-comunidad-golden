@@ -1,0 +1,675 @@
+{
+ "_que_es": "EL ESQUEMA DE REFERENCIA de la configuracion de los asistentes de Chatea: que llaves lleva el JSON de cada asistente y cuanto mide cada una en el patron oro. Es la lista contra la que se dice 'a esta tienda le falta esto, esto y lo otro'.",
+ "_de_donde_sale": "Leido por API el 2026-09-08 del espacio de referencia de Golden (95 bot fields, 11 peticiones), de los 7 campos JSON que FER senala como LA configuracion. 156 llaves.",
+ "_la_regla_de_FER": "Palabras suyas, 2026-09-08: 'Antes yo copiaba y pegaba mi espacio al del cliente, era una copia identica y me tocaba cambiar a mano el nombre. Lo que quiero ahora es que no sea un espejo: que se interprete lo que cada tienda es -si es una marca o si es multinicho- y se adapten estos campos a la personalidad de cada tienda. La MISMA ESTRUCTURA, pero con SU personalidad.'",
+ "_como_se_usa": "La ESTRUCTURA se exige; el CONTENIDO se adapta. Una llave que falta es un hueco: el asistente lee ese trozo de su configuracion vacio y se inventa el comportamiento. Un `largo_en_el_patron` NO es un objetivo ni un minimo: es un orden de magnitud. Si el patron tiene 1.786 caracteres de personalidad y la tienda auditada tiene 40, eso no es 'adaptado', es puesto de compromiso — y si tiene los mismos 1.786 byte a byte, es un espejo sin adaptar, que es el defecto contrario y lo que FER quiere dejar de hacer.",
+ "_por_que_no_hay_valores": "A proposito. El repo de skills es PUBLICO y el valor es de una tienda concreta. Para auditar a OTRA tienda sirve saber que la llave existe y que orden de magnitud tiene un campo bien puesto; el texto de Golden no sirve, y encima lo convertiria en la plantilla que hay que dejar de clonar.",
+ "_topes": "El campo JSON normal corta en 20.000 escapados; convertido a LONG JSON, en 500.000. Ese techo es el que permite ROMPER los topes nativos del panel (2.000 en los textos de identidad, 3.000 en los ganchos, 8.000 en el prompt de direccion): lo que no cabe escribiendo a mano en el formulario, cabe escribiendo el JSON. Medido en el patron: el campo mas lleno va al 67,5% de 20.000.",
+ "asistentes": {
+  "logistico": {
+   "[Logistico Configuracion General]": {
+    "escapado_en_el_patron": 9385,
+    "llaves": {
+     "datos_de_la_tienda.pais": [
+      "texto",
+      8
+     ],
+     "datos_de_la_tienda.nombre": [
+      "texto",
+      23
+     ],
+     "datos_de_la_tienda.enlace": [
+      "texto",
+      32
+     ],
+     "datos_de_la_tienda.ubicacion": [
+      "texto",
+      247
+     ],
+     "datos_de_la_tienda.politicas_de_garantia": [
+      "texto",
+      1219
+     ],
+     "datos_de_la_tienda.origen_de_datos": [
+      "texto",
+      7
+     ],
+     "comportamiento_de_la_ia.tipo_de_envio": [
+      "texto",
+      15
+     ],
+     "comportamiento_de_la_ia.adaptacion_del_lenguaje": [
+      "texto",
+      1786
+     ],
+     "comportamiento_de_la_ia.saludo_del_asesor": [
+      "texto",
+      326
+     ],
+     "comportamiento_de_la_ia.metodo_anticancelacion": [
+      "texto",
+      1954
+     ],
+     "comportamiento_de_la_ia.restricciones": [
+      "texto",
+      1990
+     ],
+     "capacidades.plantillas.confirmacion": [
+      "texto",
+      2
+     ],
+     "capacidades.plantillas.seguimiento": [
+      "texto",
+      2
+     ],
+     "capacidades.plantillas.novedad": [
+      "texto",
+      2
+     ],
+     "capacidades.respuestas.confirmacion": [
+      "texto",
+      2
+     ],
+     "capacidades.respuestas.seguimiento": [
+      "texto",
+      2
+     ],
+     "capacidades.respuestas.novedad": [
+      "texto",
+      2
+     ],
+     "voz_con_ia.usar_audio": [
+      "texto",
+      2
+     ],
+     "voz_con_ia.token": [
+      "texto",
+      0
+     ],
+     "voz_con_ia.id_de_la_voz": [
+      "texto",
+      20
+     ],
+     "voz_con_ia.estabilidad": [
+      "texto",
+      1
+     ],
+     "voz_con_ia.similaridad": [
+      "texto",
+      3
+     ],
+     "voz_con_ia.estilo": [
+      "texto",
+      3
+     ],
+     "voz_con_ia.speaker_boost": [
+      "texto",
+      4
+     ],
+     "voz_con_ia.reglas.responder_audio_con_audio": [
+      "texto",
+      2
+     ],
+     "voz_con_ia.reglas.cantidad_maxima_de_audio": [
+      "texto",
+      1
+     ],
+     "manejo_de_ubicaciones.activar_manejo": [
+      "texto",
+      2
+     ],
+     "manejo_de_ubicaciones.extraer_direccion": [
+      "texto",
+      2
+     ],
+     "manejo_de_ubicaciones.enviar_imagen": [
+      "texto",
+      2
+     ],
+     "modelo_ia.proveedor": [
+      "texto",
+      6
+     ],
+     "modelo_ia.modelo": [
+      "texto",
+      11
+     ]
+    }
+   },
+   "[Logistico Confirmaciones]": {
+    "escapado_en_el_patron": 13494,
+    "llaves": {
+     "mensajes_de_confirmacion.posicion_imagen": [
+      "texto",
+      1
+     ],
+     "mensajes_de_confirmacion.mensaje_agradecimiento": [
+      "texto",
+      490
+     ],
+     "mensajes_de_confirmacion.confirmaciones.confirmacion_con_imagen.namespace": [
+      "texto",
+      36
+     ],
+     "mensajes_de_confirmacion.confirmaciones.confirmacion_con_imagen.name": [
+      "texto",
+      31
+     ],
+     "mensajes_de_confirmacion.confirmaciones.confirmacion_con_imagen.lang": [
+      "texto",
+      2
+     ],
+     "mensajes_de_confirmacion.confirmaciones.confirmacion_sin_imagen.namespace": [
+      "texto",
+      36
+     ],
+     "mensajes_de_confirmacion.confirmaciones.confirmacion_sin_imagen.name": [
+      "texto",
+      31
+     ],
+     "mensajes_de_confirmacion.confirmaciones.confirmacion_sin_imagen.lang": [
+      "texto",
+      2
+     ],
+     "mensajes_de_confirmacion.confirmaciones.recordatorio_1.namespace": [
+      "texto",
+      36
+     ],
+     "mensajes_de_confirmacion.confirmaciones.recordatorio_1.name": [
+      "texto",
+      22
+     ],
+     "mensajes_de_confirmacion.confirmaciones.recordatorio_1.lang": [
+      "texto",
+      2
+     ],
+     "mensajes_de_confirmacion.confirmaciones.recordatorio_2.namespace": [
+      "texto",
+      36
+     ],
+     "mensajes_de_confirmacion.confirmaciones.recordatorio_2.name": [
+      "texto",
+      23
+     ],
+     "mensajes_de_confirmacion.confirmaciones.recordatorio_2.lang": [
+      "texto",
+      2
+     ],
+     "mensajes_de_confirmacion.tiempo_r1": [
+      "texto",
+      7
+     ],
+     "mensajes_de_confirmacion.tiempo_r2": [
+      "texto",
+      7
+     ],
+     "tiempos_envio.tiempos": [
+      "texto",
+      126
+     ],
+     "analisis_direccion.evaluar_direccion": [
+      "texto",
+      2
+     ],
+     "analisis_direccion.prompt_analisis": [
+      "texto",
+      7820
+     ],
+     "validaciones_orden.confirmacion_automatica": [
+      "texto",
+      2
+     ],
+     "validaciones_orden.validar_entregas.esta_activo": [
+      "texto",
+      2
+     ],
+     "validaciones_orden.validar_entregas.porcentaje_minimo": [
+      "texto",
+      3
+     ],
+     "validaciones_orden.validar_entregas.minimo_de_ordenes": [
+      "texto",
+      1
+     ],
+     "validaciones_orden.validar_flete.esta_activo": [
+      "texto",
+      2
+     ],
+     "validaciones_orden.validar_flete.flete_minimo": [
+      "texto",
+      5
+     ],
+     "pago_anticipado.activo": [
+      "texto",
+      2
+     ],
+     "pago_anticipado.cliente_no_valido": [
+      "texto",
+      2
+     ],
+     "pago_anticipado.ofrecer_a_todos": [
+      "texto",
+      2
+     ],
+     "pago_anticipado.estrategia_persuasion": [
+      "texto",
+      1490
+     ],
+     "pago_anticipado.cobrar_envio.activo": [
+      "texto",
+      2
+     ],
+     "pago_anticipado.cobrar_envio.envio_completo": [
+      "texto",
+      2
+     ],
+     "pago_anticipado.cobrar_envio.parte_del_envio.porcentaje": [
+      "texto",
+      0
+     ],
+     "pago_anticipado.cobrar_envio.parte_del_envio.valor auxiliar": [
+      "texto",
+      5
+     ],
+     "pago_anticipado.cobrar_pedido.activo": [
+      "texto",
+      2
+     ]
+    }
+   }
+  },
+  "ventas_whatsapp": {
+   "[Ventas Wp Configuracion General]": {
+    "escapado_en_el_patron": 13293,
+    "llaves": {
+     "conexion_con_dropi.conectar": [
+      "texto",
+      2
+     ],
+     "conexion_con_dropi.pais": [
+      "texto",
+      8
+     ],
+     "acciones_especiales.validaciones_orden.subida_automatica": [
+      "texto",
+      2
+     ],
+     "acciones_especiales.validaciones_orden.validar_entregas.esta_activo": [
+      "texto",
+      2
+     ],
+     "acciones_especiales.validaciones_orden.validar_entregas.porcentaje_minimo": [
+      "texto",
+      2
+     ],
+     "acciones_especiales.validaciones_orden.validar_entregas.minimo_de_ordenes": [
+      "texto",
+      1
+     ],
+     "acciones_especiales.validaciones_orden.validar_flete.esta_activo": [
+      "texto",
+      2
+     ],
+     "acciones_especiales.validaciones_orden.validar_flete.flete_minimo": [
+      "texto",
+      5
+     ],
+     "acciones_especiales.validaciones_orden.validar_flete.moneda": [
+      "texto",
+      3
+     ],
+     "producto_segundos.prompt_datos": [
+      "texto",
+      3985
+     ],
+     "producto_segundos.prompt_prompt": [
+      "texto",
+      6850
+     ],
+     "notificaciones.notificacion_1.activa": [
+      "texto",
+      2
+     ],
+     "notificaciones.notificacion_1.evento": [
+      "texto",
+      15
+     ],
+     "notificaciones.notificacion_1.whatsapp": [
+      "texto",
+      13
+     ],
+     "notificaciones.notificacion_1.mensaje": [
+      "texto",
+      254
+     ],
+     "notificaciones.notificacion_1.plantilla.lang": [
+      "texto",
+      2
+     ],
+     "notificaciones.notificacion_1.plantilla.name": [
+      "texto",
+      26
+     ],
+     "notificaciones.notificacion_1.plantilla.namespace": [
+      "texto",
+      36
+     ]
+    }
+   },
+   "[Ventas Wp Configuracion General 2]": {
+    "escapado_en_el_patron": 6728,
+    "llaves": {
+     "comportamiento_ia.division.cantidad": [
+      "texto",
+      6
+     ],
+     "comportamiento_ia.division.limite": [
+      "texto",
+      1
+     ],
+     "comportamiento_ia.rol": [
+      "texto",
+      1974
+     ],
+     "comportamiento_ia.restricciones": [
+      "texto",
+      1970
+     ],
+     "comportamiento_ia.analizar_palabra.activar": [
+      "si_no"
+     ],
+     "comportamiento_ia.analizar_palabra.prompt": [
+      "texto",
+      1994
+     ]
+    }
+   }
+  },
+  "carritos": {
+   "[Carritos Configuracion]": {
+    "escapado_en_el_patron": 6421,
+    "llaves": {
+     "onboarding_completed": [
+      "si_no"
+     ],
+     "identidad_asistente.nombre_asesor": [
+      "texto",
+      9
+     ],
+     "identidad_asistente.adaptacion_lenguaje": [
+      "texto",
+      1681
+     ],
+     "identidad_asistente.metodo_anticancelacion": [
+      "texto",
+      1504
+     ],
+     "datos_tienda.nombre_tienda": [
+      "texto",
+      23
+     ],
+     "datos_tienda.ubicacion_tienda": [
+      "texto",
+      166
+     ],
+     "datos_tienda.pais": [
+      "texto",
+      8
+     ],
+     "datos_tienda.ofrecer_descuento": [
+      "texto",
+      2
+     ],
+     "datos_tienda.descuento_maximo": [
+      "int"
+     ],
+     "datos_tienda.mensaje_descuento": [
+      "texto",
+      108
+     ],
+     "datos_logisticos.tiempos_envio": [
+      "texto",
+      112
+     ],
+     "datos_logisticos.metodo_pago.contraentrega": [
+      "texto",
+      2
+     ],
+     "datos_logisticos.metodo_pago.anticipado": [
+      "texto",
+      2
+     ],
+     "datos_logisticos.metodo_pago.datos_pago_anticipado": [
+      "texto",
+      43
+     ],
+     "datos_logisticos.transportadoras_disponibles": [
+      "texto",
+      132
+     ],
+     "mensajes_recuperacion.posicion_imagen": [
+      "int"
+     ],
+     "mensajes_recuperacion.carritos.carritos_mensaje_1.name": [
+      "texto",
+      18
+     ],
+     "mensajes_recuperacion.carritos.carritos_mensaje_1.lang": [
+      "texto",
+      2
+     ],
+     "mensajes_recuperacion.carritos.carritos_mensaje_1.namespace": [
+      "texto",
+      36
+     ],
+     "mensajes_recuperacion.carritos.carritos_mensaje_1.status": [
+      "texto",
+      8
+     ],
+     "mensajes_recuperacion.carritos.recordatorio_1.name": [
+      "texto",
+      31
+     ],
+     "mensajes_recuperacion.carritos.recordatorio_1.lang": [
+      "texto",
+      2
+     ],
+     "mensajes_recuperacion.carritos.recordatorio_1.namespace": [
+      "texto",
+      36
+     ],
+     "mensajes_recuperacion.carritos.recordatorio_1.status": [
+      "texto",
+      8
+     ],
+     "mensajes_recuperacion.carritos.recordatorio_2.name": [
+      "texto",
+      31
+     ],
+     "mensajes_recuperacion.carritos.recordatorio_2.lang": [
+      "texto",
+      2
+     ],
+     "mensajes_recuperacion.carritos.recordatorio_2.namespace": [
+      "texto",
+      36
+     ],
+     "mensajes_recuperacion.carritos.recordatorio_2.status": [
+      "texto",
+      8
+     ],
+     "mensajes_recuperacion.tiempo_recordatorio_1": [
+      "texto",
+      7
+     ],
+     "mensajes_recuperacion.tiempo_recordatorio_2": [
+      "texto",
+      7
+     ],
+     "mensajes_recuperacion.tiempo_recordatorio_3": [
+      "texto",
+      7
+     ],
+     "mensajes_recuperacion.mensaje_agradecimiento": [
+      "texto",
+      294
+     ],
+     "envio_correos.activar_envio": [
+      "texto",
+      2
+     ],
+     "envio_correos.asunto": [
+      "texto",
+      28
+     ],
+     "envio_correos.contenido": [
+      "texto",
+      398
+     ],
+     "acciones_especiales.subida_automatica": [
+      "texto",
+      2
+     ],
+     "acciones_especiales.imagenes_producto": [
+      "texto",
+      2
+     ],
+     "acciones_especiales.origen_datos": [
+      "texto",
+      7
+     ]
+    }
+   }
+  },
+  "comentarios": {
+   "[Comentarios Configuracion General]": {
+    "escapado_en_el_patron": 11984,
+    "llaves": {
+     "informacion_del_negocio.pais": [
+      "texto",
+      8
+     ],
+     "informacion_del_negocio.contacto": [
+      "texto",
+      82
+     ],
+     "informacion_del_negocio.t_envio": [
+      "texto",
+      112
+     ],
+     "informacion_del_negocio.info_extra": [
+      "texto",
+      306
+     ],
+     "comentarios_negativos.habilitar": [
+      "texto",
+      2
+     ],
+     "comentarios_negativos.prompt_general": [
+      "texto",
+      1548
+     ],
+     "comentarios_negativos.ej_a_eliminar": [
+      "texto",
+      503
+     ],
+     "comentarios_negativos.ej_a_no_eliminar": [
+      "texto",
+      995
+     ],
+     "respuesta_publica.habilitar": [
+      "texto",
+      2
+     ],
+     "respuesta_publica.prompt": [
+      "texto",
+      1467
+     ],
+     "respuesta_publica.aut_link_pub": [
+      "texto",
+      2
+     ],
+     "respuesta_publica.aut_precio_pub": [
+      "texto",
+      2
+     ],
+     "venta_conversacional.habilitar": [
+      "texto",
+      2
+     ],
+     "venta_conversacional.prompt": [
+      "texto",
+      5091
+     ],
+     "venta_conversacional.datos_req": [
+      "texto",
+      100
+     ]
+    }
+   }
+  },
+  "remarketing_ia": {
+   "[Remarketing Ia Configuracion General]": {
+    "escapado_en_el_patron": 465,
+    "llaves": {
+     "acciones_especiales.validaciones_orden.subida_automatica": [
+      "texto",
+      2
+     ],
+     "acciones_especiales.validaciones_orden.validar_entregas.esta_activo": [
+      "texto",
+      2
+     ],
+     "acciones_especiales.validaciones_orden.validar_entregas.minimo_de_ordenes": [
+      "texto",
+      1
+     ],
+     "acciones_especiales.validaciones_orden.validar_entregas.porcentaje_minimo": [
+      "texto",
+      1
+     ],
+     "acciones_especiales.validaciones_orden.validar_flete.esta_activo": [
+      "texto",
+      2
+     ],
+     "acciones_especiales.validaciones_orden.validar_flete.flete_minimo": [
+      "texto",
+      1
+     ],
+     "acciones_especiales.validaciones_orden.validar_flete.moneda": [
+      "texto",
+      3
+     ],
+     "comportamiento_ia.division.cantidad": [
+      "texto",
+      6
+     ],
+     "comportamiento_ia.division.limite": [
+      "texto",
+      1
+     ],
+     "comportamiento_ia.restricciones": [
+      "texto",
+      0
+     ],
+     "comportamiento_ia.rol": [
+      "texto",
+      0
+     ],
+     "conexion_con_dropi.conectar": [
+      "texto",
+      2
+     ],
+     "conexion_con_dropi.pais": [
+      "texto",
+      0
+     ],
+     "notificaciones": [
+      "lista",
+      0
+     ]
+    }
+   }
+  }
+ }
+}

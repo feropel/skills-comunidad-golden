@@ -20,6 +20,10 @@ PORTADA — Producto · País · Fecha · "Golden Group — Estudio de Mercado 3
 
 2. EL PRODUCTO
    - Qué es, mecanismo, beneficios→resultados, specs (confirmadas), diferenciales, claims sensibles.
+   - **INGREDIENTES leídos de la ETIQUETA que se despacha** (con la foto/fotograma como fuente),
+     jamás de la página de un competidor homónimo.
+   - **ALÉRGENOS literales del envase** — obligatorio; si no se pudo leer el panel:
+     `[ALÉRGENOS NO VERIFICADOS — falta foto]`, nunca "no tiene". (Regla 11.)
 
 3. MERCADO Y DEMANDA
    - Tamaño/tendencia, estacionalidad, validación como ganador, saturación. (con fuentes)
@@ -43,6 +47,16 @@ PORTADA — Producto · País · Fecha · "Golden Group — Estudio de Mercado 3
 
 8. INTELIGENCIA DE ANUNCIOS
    - Qué anuncian negocio y competidores (Meta + TikTok), ángulos dominantes, ofertas, formatos.
+
+8.bis MERCADO EN VIVO (Fase 3 — ver `03-mercado-en-vivo.md`)
+   - Tabla PAÍS POR PAÍS: quién vende, precio local y en USD, oferta, pago, anuncios activos, antigüedad.
+   - MATRIZ DE OFERTA Y COMBOS: 1/2/3 unidades por competidor, con regalo, envío, garantía y ancla.
+   - AUTOPSIA DE PÁGINA de los 2-3 que más llevan anunciando: secciones en ORDEN y stack técnico.
+   - INVENTARIO DE CREATIVOS ordenado por DÍAS ACTIVO, con el gancho de los 3 primeros segundos.
+   - **LOS HUECOS**: lo que nadie está sembrando — dolores sin nombrar, públicos sin atacar, ángulos,
+     escalones de precio, secciones y formatos ausentes, países con demanda y sin oferta. Cada uno con
+     la evidencia de que está vacío y con la hipótesis de por qué.
+   - Todo con FECHA DE MEDICIÓN. Conteos cerrados o marcados `N+ (abierto)`.
 
 9. ESTRATEGIA DE MENSAJE
    - Mapa de ángulos (5–8), objeciones + rebatidos, diferenciales priorizados, oferta/ancla.

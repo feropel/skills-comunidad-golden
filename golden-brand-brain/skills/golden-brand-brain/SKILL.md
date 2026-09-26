@@ -14,12 +14,14 @@ description: >
   tampoco genera los assets (eso lo hacen golden-ads/copywriting/shopify/ugc leyendo de aquí).
 ---
 
+**Fábrica:** chat «✅ SKILL golden-brand-brain»
+<!-- Historial completo de esta skill: references/changelog.md (4 actas + bitácora AUTO-MEJORA, migración completada 2026-09-20). El cuerpo se paga en cada activación; el acta no. -->
+<!-- skill BB1.4 — 2026-09-20 — auditoría golden-skill-auditor (AUDITA+ARREGLA): la mudanza de changelog del 2026-09-05 había quedado a medias — el cuerpo seguía cargando la sección "## Changelog" completa (BB1.0-BB1.3) Y el AUTO-MEJORA traía una entrada fechada suelta, mientras references/changelog.md solo tenía 2 de 4 actas en forma resumida (contradice su propia frase "todo está literal"). Se completa el acta con las 4 versiones + la bitácora AUTO-MEJORA, literales, y se trimma el cuerpo al puntero — el patrón que ya usan las demás skills mudadas el 2026-09-05. Contenido y estructura operativos intactos. -->
+
 # Golden Brand Brain — el cerebro vivo de cada marca
 
-<!-- BB1.3 — 2026-08-24 (barrido total del arsenal, CdM): la skill acaba de volverse dependencia obligatoria de 7 skills de contenido (Paso 0 del cerebro) y el contrato no era ejecutable por un chat limpio — "PROYECTOS/BRAND-BRAINS/<MARCA>/" era una ruta relativa sin regla de resolución. Se hornea el contrato de resolución (verificar con ls, buscar BRAND-BRAINS existente antes de crear otra, naming MAYÚSCULAS-CON-GUIONES) y el contrato de consumo para las skills lectoras. -->
-<!-- BB1.2 — Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
 
-**Versión:** `BB1.3` · Un setup, todos los assets on-brand.
+**Versión:** `BB1.4` · Un setup, todos los assets on-brand.
 
 La idea: en vez de re-explicar tu negocio en cada chat, cada marca tiene UNA carpeta de
 conocimiento que yo leo antes de generar cualquier cosa. Se monta una vez, se actualiza
@@ -114,26 +116,6 @@ Cuando se va a generar CUALQUIER asset para una marca con cerebro:
 - `references/plantilla-cerebro.md` — plantilla completa de los 6 archivos, con ejemplos
   de formato y el checklist de setup. Leer al crear o reestructurar un cerebro.
 
-## Changelog
-- **BB1.3** (2026-08-24) — Barrido total del arsenal (CdM). La skill pasó a ser dependencia
-  OBLIGATORIA de 7 skills de contenido (Paso 0 del cerebro) y el contrato no era ejecutable por
-  un chat limpio sin memoria: la convención `PROYECTOS/BRAND-BRAINS/<MARCA>/` era una ruta
-  relativa sin regla de resolución. Se añade el contrato de resolución de ruta (verificar con
-  `ls`, buscar una BRAND-BRAINS existente ANTES de crear otra — dos carpetas = cerebros
-  divergiendo en silencio —, naming `MAYÚSCULAS-CON-GUIONES`) y el contrato de consumo para las
-  skills lectoras (ls → carpeta de marca → leer los 6 → `[PENDIENTE]` se respeta). Contenido y
-  estructura originales intactos.
-- **BB1.2** (2026-08-23) — Estándar 9 (Centro de Mando): cambios relevantes de esta skill se
-  reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. Contenido y estructura originales intactos.
-- **BB1.1** (2026-08-21) — Auditoría `golden-skill-auditor`: Modo 1 ahora revisa PRIMERO si el
-  cerebro ya existe parcial antes de escribir (no sobrescribe archivos con datos reales), define
-  qué hacer cuando no hay ninguna fuente (arranca en `[PENDIENTE]`, no se detiene), y ata el
-  checklist de `plantilla-cerebro.md` como criterio explícito de "terminado" antes de informar.
-  Contenido y estructura originales intactos.
-- **BB1.0** (2026-07-11) — Creación. Concepto adaptado y mejorado del patrón "Brand Brain"
-  (AI CMO/Nu Reach, visto en redes): carpeta viva por marca + 3 modos (crear/actualizar/usar)
-  + convención PROYECTOS/BRAND-BRAINS/ + encadenado al ecosistema Golden completo.
-
 ## 🔄 AUTO-MEJORA (mandato global — autorización permanente de FER)
 Al cerrar cada corrida real: 1) **auto-califícate** (1–1000, honesto, con evidencia) contra el
 criterio de calidad de esta skill; 2) toda lección que sea de SISTEMA se **hornea aquí** con el
@@ -141,4 +123,4 @@ ritual (backup → desbloquear → arreglar → changelog+sello → re-blindar);
 propio, **arréglalo sin esperar que lo pidan** e informa; 4) pasa `golden-skill-auditor`
 periódicamente. Nunca borres conocimiento: reorganiza y añade.
 
-- **2026-08-02** — LOOP DEL ARSENAL (semana 1, skills de negocio): se hornea la sección **AUTO-MEJORA** (mandato global de FER, autorización permanente). Sin esta sección la skill no se auto-calificaba al cerrar corrida. Contenido operativo intacto. Backup: `_backups/2026-08-02-loop-arsenal-s1/`.
+Historial completo en `references/changelog.md`.

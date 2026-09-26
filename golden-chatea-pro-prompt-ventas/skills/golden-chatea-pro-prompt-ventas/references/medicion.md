@@ -17,7 +17,7 @@ Producto: ______            Del ___ al ___ (7 días)
 6. Pedidos ENTREGADOS (no despachados) ........... ____
 7. Rechazados o devueltos ........................ ____
 ```
-De ahí salen las 4 tasas que importan, y **cada una señala un tramo distinto del prompt**:
+De ahí salen las tasas que importan — **Respuesta, Interés, Captura, Cierre y Entrega** —, y **cada una señala un tramo distinto del prompt**:
 - **Respuesta** (2÷1): falla el saludo, la multimedia o la pregunta de entrada.
 - **Interés** (3÷2): falla la conexión o la recomendación.
 - **Captura** (4÷3): falla el precio, la oferta o la razón de preferencia.
@@ -47,7 +47,8 @@ Abre 20 conversaciones perdidas de esa semana y clasifica cada una por el ÚLTIM
 ## PASO 4 — CÓMO DECIDIR SI SIRVIÓ (sin engañarse)
 1. **Cambia UNA cosa a la vez.** Si cambias prompt, recordatorios y multimedia el mismo día y sube la venta, no sabes qué lo hizo — y el día que baje, tampoco sabrás qué devolver.
 2. **7 días mínimo**, y compara contra los 7 anteriores del MISMO producto. No compares productos entre sí ni semanas con festivo contra semanas normales.
-3. **Mira el volumen antes de celebrar:** pasar de 1 de 3 a 2 de 4 no es "subir del 33% al 50%", es ruido. Con menos de 30 conversaciones en la semana, la tasa no dice nada — espera a acumular.
+3. **Mira el volumen antes de decidir, pero NO descartes el dato por pequeño.** Pasar de 1 de 3 a 2 de 4 no autoriza a decir "subió del 33% al 50%" como si fuera una tendencia: con 4 conversaciones, una sola venta mueve la tasa 25 puntos. La regla es **mostrar siempre la muestra junto a la tasa** ("50%, 2 de 4"), no esconder el número pequeño ni esperar a que crezca. Con pocas conversaciones se decide con más cautela y se prefiere una señal fuerte, pero se decide.
+   🔴 *Corregido v3.46.0: esta línea decía "con menos de 30 conversaciones la tasa no dice nada — espera a acumular", y reintroducía un umbral que FER derogó para todo el ecosistema: "si hay uno, pues tomamos el dato de uno… esa es la muestra". Un umbral hace tirar a la basura la única información que existe cuando un producto arranca, que es justo cuando más falta hace.*
 4. **Si la pauta cambió, la comparación no vale.** Más presupuesto o un creativo nuevo mueven la calidad del tráfico, y eso mueve todas las tasas sin que el prompt tenga nada que ver.
 5. **Criterio de decisión:** si la tasa del tramo que tocaste sube y las demás no bajan, se queda. Si sube esa y baja otra, se revisa: casi siempre significa que empujaste más y filtraste menos.
 

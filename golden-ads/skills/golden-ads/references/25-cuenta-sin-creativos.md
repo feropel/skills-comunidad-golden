@@ -96,6 +96,11 @@ Motor: **`golden-copywriting`** + `golden-copywriting/references/estandar-meta-m
 Por cada pieza: **5 textos principales + 5 títulos + 5 descripciones**, cargados como
 **opciones múltiples del mismo anuncio** (`asset_feed_spec`), no como cinco anuncios.
 
+⚠️ **El techo de CARGA no es 15**: medido por DOM en "Crear anuncio y mensaje", Meta admite
+**5 textos + 5 títulos + 1 descripción = 11** (Descripción NO tiene "Agregar opción"). Se escriben
+las variantes buenas, se cargan las que quepan y **se declara qué queda fuera** — y se mide en la
+interfaz de CADA tipo de anuncio antes de prometer un número (`29-compuerta-de-copys.md`).
+
 Largos medidos: **125 / 40 / 25**. Los 125 son la **ventana visible** del texto principal: lo que
 va después queda tras "ver más".
 

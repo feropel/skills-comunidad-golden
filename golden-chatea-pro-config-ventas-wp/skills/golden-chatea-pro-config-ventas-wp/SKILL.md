@@ -2,44 +2,23 @@
 name: golden-chatea-pro-config-ventas-wp
 description: >-
   Golden Group — Configura el asistente de VENTAS POR WHATSAPP de Chatea Pro (la "Experta en
-  ventas por WhatsApp", el bot o agente de ventas) de punta a punta, con los Bot Fields JSON
-  NATIVOS listos para COPIAR Y PEGAR: 2 campos de configuración general (Dropi, validaciones
+  ventas por WhatsApp", el bot o agente de ventas) con los Bot Fields JSON nativos listos para
+  pegar: 2 campos de configuración general (Dropi, validaciones
   de orden, Producto en Segundos con prompt maestro, notificaciones, comportamiento de la
   IA), 1 campo por producto ([Producto Ventas Wp] N) y su entrada en el Disparador de
-  productos Extendido, con los prompts del motor afinados, parametrización por los 10 países
-  que acepta la plataforma, y validadores de los DOS techos reales. Úsala SIEMPRE que el
-  usuario quiera montar, configurar o replicar el asistente, agente o bot de ventas de
-  WhatsApp de Chatea Pro para una tienda o cliente, "configurar ventas whatsapp", "montar el
+  productos Extendido, con los prompts del motor afinados, parametrización por país (el país es
+  parámetro, no puerta: sin pack se configura igual) y validadores de los DOS techos reales. Úsala SIEMPRE que quiera montar,
+  configurar o replicar el asistente, agente o bot de ventas de WhatsApp de Chatea Pro, "configurar ventas whatsapp", "montar el
   asistente de ventas", "el JSON del asistente de ventas", "genera los bot fields de
   ventas", "configura la experta en ventas", o cargar y validar un producto nuevo en ese
   asistente.
 ---
-<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
-     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 979 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
-     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
-     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
-     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
-     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
+
+**Fábrica:** chat «✅ SKILL golden-chatea-pro-config-ventas-wp»
 # Golden · Chatea Pro — Asistente de Ventas WhatsApp
+<!-- skill v4.17 — 2026-09-22 — el Centro de Mando reverifico v4.16 en vivo (espacio de Golden, servidor) y pregunto por el doble negativo de "[WhatsApp IA] Desactivar consulta de recordatorios" antes de que alguien lo invirtiera dos veces: el valor false esta CORRECTO (confirmado contra el servidor, no de memoria) y se le sumo la nota _trampa_doble_negativo en campos-sueltos.json para el siguiente lector. Antes, v4.16 — 2026-09-22 — auditoría golden-skill-auditor (AUDITA+ARREGLA, pedido de FER "que se automejore y llegue a mil"): 890→ver acta, 5 hallazgos reparados (Argentina/Brasil caducado en 3 archivos, push_config comparaba texto crudo en vez de JSON parseado, detector de fuga de vocabulario solo conocía Colombia, chequeo de signos de apertura no cubría remarketing/upsells, "18" mal corregido a "16" y vuelto a corregir con precisión). Además: retirado el puntero a golden-chatea-pro-config-remarketing (orden de FER vía Centro de Mando — la skill se borró del arsenal; el campo Producto Remarketing de ESTA skill no se tocó, es de otro dueño). Antes, v4.15 — 2026-09-21 — el Centro de Mando reverificó v4.14 con sus propios sabotajes (7 de 7 detectados) y midió un pulido: borrar un país entero reventaba con KeyError en vez de fallar limpio. Corregido con un roster de países ANCLADO por nombre (PAISES_MAPA) que se compara antes de indexar. Con esto el CdM dio cerrada la extensión de vocabulario. Antes, v4.14 — 2026-09-21 — el Centro de Mando midió TRES puntos ciegos del banco de vocabulario (campo alterado con la cita intacta, aclaración alterada, origen borrado, los tres 100% verdes antes) y se corrigieron: contenido validado contra el PACK COMPLETO, origen de un conjunto cerrado, total anclado. Antes, v4.13 — 2026-09-20 — MAPA DE VOCABULARIO DE DIRECCIÓN de 23 países copiado de los packs (autorizado por el Centro de Mando) + ley de credenciales en el dato 6. Antes, v4.12 — 2026-09-19 — INTAKE AL CLIENTE Y FLETE (estándar de FER, vía Centro de Mando): intake de siete datos, WhatsApp de último y tras el pago, correo/contraseña del espacio como ACCESO no como campo. Historial completo en references/changelog.md. Auditoría golden-skill-auditor 2026-09-20: agregada esta línea de versión bajo el H1, que faltaba; sin otros hallazgos con evidencia (los 2 DUDOSOS de inventario.sh son falsos positivos — concatenación de string Python `S + "/scripts/..."` en autoprueba_d1.py, ambos archivos están citados en el cuerpo). Cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO. -->
 
-<!-- corrección CdM 2026-08-29 · CAMBIO DE ESTÁNDAR países: la plataforma acepta 10, no 7 (doble medición contra el bundle vivo index-BrZVg7KW.js, sha256 2c947877…; deroga 'solo 7' y 'Guatemala fuera de plataforma'; detalle en la gaceta). Menciones del conteo viejo actualizadas a 10; el resto intacto. -->
-<!-- skill v4.4 · 2026-08-23 (auditoría golden-skill-auditor, PLATA→reparada) · TRES fallas cazadas por EJECUCIÓN, no por lectura: (1) 🔴 D1 NO era byte a byte — valida_producto comparaba las palabras clave con .strip(","), así que producto "TOPPIK,,,,,," y registro ",TOPPIK,,,,," (misma palabra en OTRO slot, bytes distintos) pasaban como ✅ Válido; justo la clase que la adenda D1 declaró crítica tras el incidente Kingo Shop. Ahora comparación exacta, con repr de ambos lados en el error, y línea "D1 OK" cuando coincide. (2) 🔴 build_config ESCRIBÍA los 2 BOTFIELD aunque un tope DURO se excediera (solo salía exit 1): quedaba en disco un archivo con pinta de pegable que, pegado, se guarda CORTADO y mata al bot en silencio — el fallo que esta skill existe para evitar. Ahora compuerta gemela de la de huecos: si un tope duro falla, NO se escribe nada. (3) 🟡 tres tracebacks de Python crudos (--prompt-maestro inexistente, --in inexistente, JSON corrupto) → errores legibles; el gemelo makedirs ya se había arreglado en v4.1.3 y estos quedaron. Además: aviso explícito cuando se corre el validador SIN --registro (sin él no hay chequeo D1) y D1 sumado al checklist de Terminado. -->
-<!-- skill v4.3 · 2026-08-23 (Estándar 9, golden-skill-auditor) · Estándar 9 (Centro de Mando): cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
-<!-- skill v4.2 · 2026-08-21 (auditoría golden-skill-auditor, PLATA→verificar) · DOS CONTRADICCIONES reales cazadas por ejecución (no por lectura): (1) SKILL.md Intake #6 decía "(Opcional)" el prompt maestro, pero build_config.py YA fallaba con exit 1 sin él desde v4.1.4 — el docstring se corrigió entonces pero el cuerpo de SKILL.md quedó desincronizado; ahora dice EXIGE y por qué. (2) build_config.py tenía --flete-max con required=True SIEMPRE, contradiciendo el caso borde documentado "Negocio sin Dropi... el flete no se pregunta" — probado en vivo: --dropi no sin --flete-max tiraba error de argparse (exit 2). Ahora --flete-max solo es obligatorio si --dropi si (el default); sin Dropi se omite y el JSON queda con "0". Probado: dropi=si sin flete-max → exit claro pidiendo el dato; dropi=no sin flete-max → exit 0, JSON con flete_minimo="0". -->
-<!-- skill v4.1.4 · 2026-08-08 (centro de mando, spot-check final) · docstring de scripts/build_config.py: --prompt-maestro re-etiquetado de '(opcional)' a OBLIGATORIO (el código lo volvió bloqueante en v4.1.3 y el docstring quedó sin corregir — la lección 'todos los soportes' aplicada al soporte que la incumplía). -->
-<!-- skill v4.1.3 · 2026-08-08 (centro de mando, verificación final, bloqueante F2) · scripts/build_config.py entregaba {{PROMPT_MAESTRO}} LITERAL con exit 0 cuando faltaba --prompt-maestro (solo un aviso ⚠️) — la clase exacta que v4.1.2 declaró cerrada, viva en el script que nadie miró. Ahora valida la SALIDA con el mismo validador de huecos que valida_producto (dobles {{[^{}]*}} + llaves simples fuera de la whitelist runtime) y ante cualquier hueco da exit 1 SIN escribir archivo, con mensaje que manda a generar el prompt maestro con golden-chatea-pro-prompt-ventas. También: --out-prefix con directorio inexistente da error legible (makedirs). Probado: sin --prompt-maestro exit 1 y cero archivos; con él exit 0 y los 2 BOTFIELD escritos. -->
-<!-- skill v4.1.2 · 2026-08-08 (centro de mando, hallazgo del golden-verificador en la auditoría de la hermana config-comentarios) · FIX PUNTUAL en scripts/valida_producto.py: el regex de placeholders \{\{[A-Z0-9_]+\}\} solo cazaba mayúsculas puras — {{Hueco}}, {{hueco}}, {{ X }}, {{HUECO-2}}, {{HUECO 3}} y los slots de llave SIMPLE sin llenar ({URL_TIENDA}, {ID_DROPI}...) viajaban LITERALES al bot del cliente. Ahora: dobles con \{\{[^{}]*\}\} (cualquier contenido) + llaves simples contra whitelist de las 5 runtime legítimas de Chatea (las de notificacion-venta-realizada.txt: nombre_cliente, nombre_producto, porcentaje_entrega, telefono_cliente, valor_venta) con error ante cualquier otra. Probado: 5 variantes dobles plantadas cazadas, slot simple colado cazado, producto lleno con {valor_venta} runtime sin falso positivo. -->
-<!-- skill v4.1.1 · 2026-08-08 (centro de mando, chat CHATEA un cliente COL 2026-08-08 (2ª ronda: 5ª categoría + prosa libre)) · QUINTA CATEGORÍA VETADA en la ley: claims y cifras de negocio (años en el mercado, clientes atendidos, porcentajes de entrega, premios) — no rompen nada técnico ni los caza un barrido de llaves, pero el bot termina mintiendo con datos de otra empresa (caso real: "Más de 100.000 clientes atendidos en Colombia" a punto de heredarse). Y regla operativa LA MARCA VIVE TAMBIÉN EN PROSA LIBRE: al barrido se añade grep -i por el nombre de la marca origen sobre todo el texto a escribir (cazó 10 menciones en 3 campos que el mapeo de llaves no vio). -->
-<!-- skill v4.1 · 2026-08-08 (centro de mando, chat CHATEA un cliente COL 2026-08-08) · horneada la LEY "NUNCA HEREDAR DATOS ENTRE ESPACIOS": al basarse en una cuenta guía se hereda estructura/prompts/config, JAMÁS datos (APIs, plantillas de WhatsApp, teléfonos, correos, dominios, marca, productos y disparadores); única excepción Le'côterra como producto-ejemplo; método de barrido obligatorio antes y después de escribir en espacio ajeno. Origen: incidente Golden → un cliente Incanto 2026-08-08 (se colaron llave ElevenLabs, teléfono, plantilla de notificación y firmas de la marca origen; revertido el mismo día). La ley entra como PREVENCIÓN, no reparación: línea base pre-horneado verificada por verificador externo — 8/8 skills sin credenciales (CRITICA=0); únicos hallazgos 3 teléfonos de relleno legítimos (+57 300 de ejemplo) que se conservan. ADEMÁS (chat CHATEA un cliente COL 2026-08-08, retractación pixel): regla CAMPOS [Meta] = VALORES CALIENTES — los eventos de pixel los mueve el flujo en vivo, prohibido diagnosticar con una lectura suelta. -->
-<!-- skill v4.0 · 2026-08-07 · BRIEFING de instalación (aprobado por FER, verificado en vivo contra dos workspaces reales). FIX MAYOR: los 2 TECHOS. (A) el bot field se mide ESCAPADO — len(json.dumps(valor)[1:-1]), cada tilde 6, cada emoji 12 — no en crudo; salida COMPACTA (separators). (B) topes NATIVOS del formulario extraídos del CÓDIGO de la app (rol/restr/analisis 2000, prompt_datos 4000, notif 400, prompt_libre 12000, mensaje_inicial/pregunta 1000, remarketing 1000, descripcion 500, token Dropi 1200). PAÍSES: solo 7 válidos (COLOMBIA/ECUADOR/CHILE/MEXICO/PANAMA/PERU/PARAGUAY), build_config los valida; references/paises.md con deltas (MX: CP requerido, sin oficina, "domicilio"=casa). Gotchas API: llave `data`, var_type+value al crear, listado PAGINA, trigger sin 4-bytes (validado, rompe el bot), releer siempre. Sección "no se hereda al clonar" (incl. nombres de producto/paquetería en los ganchos). -->
-<!-- skill v3.2 · 2026-07-12 · prompts del motor endurecidos tras test de campo (3 prioridades, memoria del pedido, única confirmación, URLs blindadas, sin 2 preguntas/mensaje); division.limite 3→2 (con 3 la IA responde en ráfagas robot; 2 cubre imagen-URL + texto) -->
-<!-- skill v3.1 · 2026-07-09 · PRODUCTOS también nativos: 1 Bot Field JSON por producto ([Producto Ventas Wp] N) + entrada en el índice "[Ventas Wp] Disparador de productos Extendido" (Long JSON); template-botfield-producto.json con esquema real (recordatorios=prompt-instrucción EVENTO/35 palabras, remarketing=rol por fase, keyW/idAd=7 slots por comas), valida_producto.py con cruce producto↔registro y copia _LIMPIO; interruptores Boolean del workspace documentados -->
-<!-- skill v3.0 · 2026-07-09 · FORMATO NATIVO descubierto y verificado: la config general vive en 2 Bot Fields JSON (<20000 c/u, carpeta del agente); templates con el esquema real (claves intocables), build_config.py emite los 2 campos copy-paste (estructura IDÉNTICA a producción); prompts del motor pulidos ≤ límites de la UI -->
-<!-- skill v2.1 · 2026-07-09 · auditoría golden-skill-auditor 838→990: sin ¿¡ en prompts horneados, limites.json fuente única, casos borde + checklist -->
-<!-- skill v2.0 · 2026-07-08 · reconstruida sobre el mapa levantado en vivo de la UI de Entrenar -->
-
-<!-- adenda 2026-08-23 (centro de mando, incidente de campo en espacio VIP Kingo Shop reportado por Cuenta PRO Chatea Golden): gotcha D1 horneado — la edición de texto que toca palabras_clave rompe el disparador byte a byte; excluir el subcampo o verificar D1 tras escribir. -->
-**⚠️ Gotcha D1 — palabras clave son BYTE A BYTE con el Disparador (caso Kingo Shop, 2026-08-23):**
+**⚠️ Gotcha D1 — palabras clave son BYTE A BYTE con el Disparador (incidente de campo del 2026-08-23 en un espacio VIP):**
 cualquier edición de texto sobre un campo que contenga `activadores_del_flujo.palabras_clave`
 (quitar signos, tildes, mayúsculas, un espacio) rompe la coincidencia exacta con el Disparador de
 productos Extendido y el producto DEJA DE ARRANCAR en silencio. Regla: todo barrido o edición
@@ -110,7 +89,9 @@ Configura la **Experta en ventas por WhatsApp** de un workspace de Chatea Pro.
 > string, `activar: true` boolean. Esquema real:
 > `PROYECTOS/CHATEA-PRO-VENTAS-WP/bot-fields-reales/`.
 
-**Regla de Chatea Pro:** 1 workspace = 1 país (solo 7 válidos, ver "Países" abajo).
+**Regla de Chatea Pro:** 1 workspace = 1 país. 🔴 **El país es PARÁMETRO, no PUERTA**:
+de él dependen jerga, transportadoras, moneda y forma de la dirección, así que se pide
+siempre — pero **no tenerlo en nuestra lista nunca bloquea**. Ver "Países" abajo.
 
 ## Los DOS techos (lo que más rompe — verificado en vivo 2026-08-07)
 
@@ -151,10 +132,20 @@ Hay que respetar **los dos**; `assets/limites.json` los tiene y los scripts los 
   <500.000, UNO por workspace) → `assets/template-registro-disparador.json`. Se AÑADE al
   array existente sin borrar los demás productos.
 
-**Interruptores del workspace** (Bot Fields Boolean, se dejan en su default salvo pedido):
-Respuesta Múltiple=true · Oficina=false · Pedido programado=true · Intento de
-cancelación=true · Solo Con Recaudo=true · Solo Sin Recaudo=false · Solo Pendiente
-confirmación=false · Desactivar Skill Datos=false · Desactivar asignación=false.
+**Interruptores del workspace** — 16 Bot Fields sueltos, uno por campo, NO son la
+configuración (esa son los 2 JSON de arriba): `assets/campos-sueltos.json` es su ÚNICA
+fuente (`build_config.py` los emite en `<prefijo>_CAMPOS_SUELTOS.txt`). Oficina y los dos
+de Recaudo se DERIVAN de país/modelo, los demás son fijos — no se copian valores sueltos
+aquí porque un texto fijo describiendo un valor derivado es la misma trampa que ya rompió
+el conteo de países.
+
+**Prefijo `[WhatsApp IA]`** (10 campos, MEDIDO en vivo 2026-09-08, mismo archivo): 7 son
+ESTADO que escribe el bot mientras opera — contadores de venta, logs, versión — y **nunca
+se tocan al configurar**: escribir sobre ellos borra datos de venta reales del día (uno
+trae literalmente "NO MODIFICAR ESTE VALOR" en su descripción). Solo 2 son decisión real
+del negocio: si el recordatorio revisa el estado del producto antes de enviarse, y si sale
+la nota de felicitación en cada venta. Uno queda `_pendiente_declarado`: sin descripción
+en el panel, no se le inventa semántica.
 
 ## Prompts del motor (fijos, horneados en `assets/prompts/`)
 
@@ -163,87 +154,89 @@ límites de la UI de Entrenar para que sirvan por las dos vías:
 
 | Archivo | Va en | Límite UI |
 |---|---|---|
-| `assets/prompts/rol-general.txt` | campo 2 → `comportamiento_ia.rol` | 2000 |
-| `assets/prompts/restricciones.txt` | campo 2 → `comportamiento_ia.restricciones` | 2000 |
+| `assets/prompts/rol-general.txt` | campo 2 → `comportamiento_ia.rol` (huecos `{{IDENTIDAD}}`, `{{CAMPOS_DIRECCION}}`) | 2000 |
+| `assets/prompts/restricciones.txt` | campo 2 → `comportamiento_ia.restricciones` (huecos `{{PAGO_REGLA}}`, `{{ACLARACION_DIRECCION}}`) | 2000 |
 | `assets/prompts/analisis-palabra-clave.txt` | campo 2 → `analizar_palabra.prompt` (lleva `{{URL_TIENDA}}`) | 2000 |
-| `assets/prompts/reglas-estructura-producto.txt` | campo 1 → `producto_segundos.prompt_datos` | 4000 |
+| `assets/prompts/reglas-estructura-producto.txt` | campo 1 → `producto_segundos.prompt_datos` (hueco `{{ACLARACION_CORTA}}`; solo ~15 caracteres de margen) | 4000 |
 | `assets/prompts/notificacion-venta-realizada.txt` | campo 1 → `notificaciones...mensaje` (variables `{nombre_producto}` etc.) | 400 |
 
-## Intake (pregunta solo lo que falte; el resto por defecto e INFORMA)
+**Huecos derivados, no escritos a mano.** El vocabulario de direccion (departamento/barrio en
+Colombia, estado/colonia/código postal en México, comuna en Chile…) sale de `assets/limites.json →
+vocabulario_direccion_por_pais`, nunca del texto fijo. El mapa tiene **23 países**, copiados de los
+packs de `golden-chatea-pro-validacion-direcciones` (cada entrada guarda `fuente` y la cita literal).
+Un país sin pack NO bloquea ni hereda a Colombia: cae a un genérico neutro y lo declara. Cómo se
+regenera, cómo añadir un país y por qué la cláusula corta pesa: `references/paises.md`.
 
-1. **País** del workspace (ej: colombia).
-2. **Moneda** (ej: COP) y **flete máximo** para validar la orden (ej: 23000).
-3. **WhatsApp** que recibe las notificaciones de venta.
-4. **URL de la tienda** (para redirigir productos no configurados).
-5. **Dropi** sí/no (default sí).
-6. **Prompt maestro** de Producto en Segundos: el prompt de venta GENERAL del negocio que usa
-   "Crea tu asistente en segundos". **`build_config.py` lo EXIGE** (falla con exit 1 y no
-   escribe archivos si falta — el bot field no puede quedar con `{{PROMPT_MAESTRO}}` literal);
-   no es opcional para generar los 2 Bot Fields. Su único tope es el del bot field (Techo A
-   escapado). Si el negocio todavía no tiene uno, pídelo a `golden-chatea-pro-prompt-ventas`
-   como prompt de negocio (catálogo completo) ANTES de correr `build_config.py`.
+## Intake — LOS 7 DATOS que se le piden al cliente (estándar de FER, 2026-09-19)
 
-Defaults sin preguntar: subida automática del pedido sí · validar entregas sí (mín 3
-órdenes, 60%) · validar flete sí · división "varios" / **máx 2 mensajes** (con 3 la IA
-responde en ráfagas de 3 burbujas que se sienten robot; 2 cubre el caso legítimo de
-imagen-URL + texto) · análisis de palabra clave activado · notificación de Venta Realizada
-activa sin plantilla Meta.
+🔴 **Vale igual para instalación nueva y para optimización de un espacio en uso**, y es el conjunto
+de TODOS los asistentes del espacio: se releva una vez. Lo que no está aquí no se pregunta: se lee,
+se deriva o se decide con nuestro criterio. FER: *"mucha gente confía en mi criterio... preguntarles
+sería una fricción y me van a responder cualquier cosa sin saberlo realmente"*. Un cliente que no
+sabe de optimización contesta por salir del paso, y ese dato malo queda configurado.
 
-### Generar los 2 Bot Fields
+1. **Nombre y link de la tienda.** → `rol` (nombre de la empresa) y `analizar_palabra.prompt` (la URL a
+   la que se redirige lo no configurado). La web se **LEE** para escribir el prompt maestro y para el nicho.
+2. **País.** → `conexion_con_dropi.pais`. De él salen la moneda, el flete nativo, el vocabulario de
+   dirección y el interruptor Oficina: ninguno se pregunta.
+3. **Dropshipping, marca propia o los dos.** → `--modelo dropshipping|marca|mixto`. Decide el modelo de
+   pago del `rol` y las restricciones y los dos interruptores de recaudo (dropshipping = contra entrega ·
+   marca = anticipado · **mixto = contra entrega por defecto y anticipo solo si el cliente lo pide o la
+   ficha del producto lo exige**, como opera Golden). Es el dato que más cambia el texto.
+4. **Nombre del asesor.** → `--nombre-bot`. No existe llave propia: vive DENTRO del `rol` (tope 2.000).
+   `build_config.py` mide el conjunto y, si se pasa, **no escribe nada** en vez de entregar un rol cortado.
+5. **WhatsApp de la empresa.** → `notificaciones.notificacion_1.whatsapp`. Va **DE ÚLTIMO y después del
+   pago**. Si aún no lo tiene, se monta igual con la notificación apagada y se conecta cuando lo tenga.
+6. **Correo y contraseña del espacio.** → es **ACCESO, no un campo**: excepción a "todo lo que se pregunta
+   cae en un campo", autorizada por FER. Nunca va a un archivo, JSON o bot field, ni se repite en el chat;
+   la API va por **token**, no por contraseña; el asistente **no teclea contraseñas** en formularios; al
+   cerrar se cambia (protocolo VIP: rotar al cerrar). Si hay que guardarlos temporalmente, van a
+   `<PROYECTO>/.secrets/` con permisos 600 (ley del Centro de Mando), jamás a un `.md`, a un JSON ni a esta
+   skill, que es repositorio público.
+7. **Desde qué valor considera que un flete ya es demasiado caro.** → `validar_flete.flete_minimo`: el
+   corte de "cliente no calificado". Ver "Flete".
 
-```bash
-python3 scripts/build_config.py \
-  --pais "colombia" --moneda "COP" --flete-max "23000" \
-  --whatsapp-notif "+57 3001234567" \
-  --url-tienda "https://mitienda.co" \
-  --prompt-maestro /ruta/prompt_maestro.txt \
-  --out-prefix /ruta/<NEGOCIO>
-```
+**Ya NO se preguntan:** el **nicho** (se lee de su web) y el **número de servicio al cliente**.
 
-Produce `<NEGOCIO>_BOTFIELD_1.json` y `<NEGOCIO>_BOTFIELD_2.json` **compactos** (sin claves
-_meta), inyecta los prompts fijos, reemplaza `{{URL_TIENDA}}`, **valida el país** contra los 7
-y valida los DOS techos: Techo A (bot field ESCAPADO ≤19.000 seguro / ≤500.000 en LONG JSON) y
-Techo B (cada prompt bajo su tope nativo). Exit 1 si algo excede un tope duro — nunca recortes
-los prompts fijos; acorta el prompt maestro o lo variable. La entrega es: los 2 archivos + en
-cuál Bot Field va cada uno + recordar crearlos como LONG JSON.
+### Nicho: se LEE de su web, y el modelo dice cuánto pesa
+Se lee la **web**, no los productos cargados en un campo. `--nicho` es opcional; sin él la identidad se
+escribe sin coletilla (nunca un paréntesis vacío).
+- **Marca propia:** una sola línea → si la web muestra una especialidad clara, entra como nicho.
+- **Dropshipping o mixto:** por definición vende sin relación entre categorías y rota lo que promociona →
+  **por defecto sin nicho**; solo si la web muestra UNA especialidad clara y sostenida.
+🔴 Error real (2026-09-18, Golden): se derivó "cuidado capilar y bienestar" de los 12 productos cargados
+ese día y la empresa vende también café, crema para arrugas y más. Prometer una asesora "experta en X"
+en un catálogo variado es peor que no decir nada, y como el catálogo rota, el texto caduca solo.
 
-### Carga automática por API (opcional, recomendado para instalaciones en serie)
+### Flete: promedio del país + el corte del cliente
+- **Nativo:** `assets/limites.json → flete_max_por_pais` (el promedio del país). Hoy solo Colombia (25.000);
+  los otros nueve los aporta el Centro de Mando y se añaden cada uno en la moneda de su país.
+- **El corte del cliente manda encima:** su respuesta al dato 7 va a `--flete-max` (acepta "25.000" o
+  "$25 000"). Quien no sepa responder se queda con el promedio nativo, así que la pregunta no lo frena.
+- Si el **ticket promedio del espacio subió**, el tope se sube por criterio de Golden o se consulta.
+  🔴 **NO se deriva el flete del ticket ignorando el promedio del país**, ni se copia el de otro país.
+- País sin promedio y sin respuesta: el script se detiene y lo pide. Sin Dropi no aplica (queda "0").
 
-Chatea Pro es whitelabel de **UChat**: su API (base `https://chateapro.app/api`, Swagger en
-`/api#/`, auth Bearer) permite **escribir los Bot Fields directamente**, sin pegar a mano — la
-skill se vuelve una máquina de instalaciones para muchos clientes/países. Endpoints:
-`GET /flow/bot-fields?name=` · `PUT /flow/set-bot-fields-by-name` con
-`{ "data":[ {"name","value"}, ... ] }`.
+**NO SE PREGUNTA — se lee del espacio, se deriva o es doctrina:**
 
-`scripts/push_config.py` hace read → backup → push (dry-run por defecto; escribe solo con
-`--confirm`). Token del workspace del cliente por `--token`, env `CHATEAPRO_TOKEN` o
-`~/.chatea_pro_token`. Flujo seguro SIEMPRE: (1) `read` los 2 campos; (2) `backup` del estado
-actual; (3) mostrar qué cambia y, con OK del usuario, `push --confirm`.
+· **Dropi conectado** → se LEE del espacio con el token. Si no se puede leer, default sí e INFORMA.
+· **Subida automática del pedido** → se LEE: sin historial de órdenes entra en **NO** (recomendación de
+  FER para quien arranca); con operación en marcha, sí.
+· **Moneda** → se DERIVA del país (`assets/limites.json`).
+· **Rol y restricciones** → doctrina de la casa más los datos 1, 3 y 4. Las restricciones son método con
+  **UNA sola línea que depende del negocio: la regla de pago**, que decide el dato 3.
+· **Prompt maestro** → **NO se pide: se ESCRIBE**, con `golden-chatea-pro-prompt-ventas`, leyendo la web y
+  con la doctrina de venta de la casa. `build_config.py` lo EXIGE (exit 1 sin escribir si falta, para que el
+  campo no quede con `{{PROMPT_MAESTRO}}` literal).
+· **Plantilla de Meta** → **NO se usa** (FER, 2026-09-08). `notificacion_1.plantilla` queda vacía; las
+  banderas `--plantilla-notif` y `--plantilla-ns` siguen en el script por si alguna vez hace falta.
 
-```bash
-CHATEAPRO_TOKEN="<TOKEN_DEL_CLIENTE>" python3 scripts/push_config.py push \
-  "[Ventas Wp] Configuracion general=/ruta/<NEGOCIO>_BOTFIELD_1.json" \
-  "[Ventas Wp] Configuracion general 2=/ruta/<NEGOCIO>_BOTFIELD_2.json" \
-  --confirm
-```
+**Defaults de FER, no se preguntan y no se negocian:** validar entregas sí, con **60%** y mínimo **3
+órdenes** · validar flete sí · división "varios" / **máx 2 mensajes** (con 3 la IA responde en ráfagas que
+se sienten robot) · análisis de palabra clave activado · notificación de Venta Realizada.
 
-**Gotchas de API verificados en vivo (2026-07-09 y 2026-08-07):**
-- El `PUT /flow/set-bot-fields-by-name` usa la llave **`data`**: `{"data":[{"name","value"}]}`.
-  Con `bot_fields` responde **400**.
-- El alta `POST /flow/create-bot-field` usa **`var_type`** (no `type`) y **exige `value`** aunque
-  sea vacío; con otra llave, **422**. Campo nuevo = `var_type: "longtext"` (LONG JSON).
-- `GET /flow/bot-fields` **PAGINA** y `per_page` se ignora; para listar TODO hay que recorrer
-  páginas (pedir solo la primera dejó fuera 46 de 56 campos en un workspace real). `push_config.py` consulta
-  por nombre exacto, así que no depende de paginar.
-- El token debe estar **atado al bot/flujo** o la API responde 404 `"Flow not found"`.
-- Cloudflare bloquea urllib sin User-Agent (error 1010) — `call()` manda UA de navegador.
-- Los pares `nombre=archivo` van ANTES de `--confirm`.
-- **Escribir y RELEER siempre**: comparar lo guardado contra lo enviado es la única prueba real
-  (y detecta si alguien pisó el cambio desde el panel). `push_config.py` lo hace.
-
-**Token = dato sensible**: no es de pagos pero da acceso a datos de suscriptores del cliente y
-puede enviar mensajes. Scope mínimo ("Gestionar el flujo"), no hornearlo en la skill ni en git,
-rotar/borrar al terminar. Un `push` a un workspace en vivo SIEMPRE se confirma antes de escribir.
+🔵 **Sin fuente, y se declara:** las transportadoras prohibidas del asistente logístico. Se intenta LEER de
+Dropi; esa pregunta es del logístico, no de este asistente.
 
 ## Producto (Bot Field por producto + registro)
 
@@ -283,6 +276,21 @@ producto NO hace su propio pitch de upsell** (se pisarían y el cliente vería d
 ofrecimiento): el prompt solo procesa la aceptación y cuadra el total. El texto de las
 tarjetas lo produce `golden-chatea-pro-prompt-ventas`; el validador chequea sus límites.
 
+## Espacio que YA existe: se AUDITA antes de tocar (optimizar, no instalar)
+
+```bash
+python3 scripts/auditar_espacio.py --token-file <ruta>     # solo lectura; --guardar-volcado para respaldo
+```
+Da una nota medida sobre 1000 y separa **DEFECTO** (se arregla), **DECISIÓN** (puede ser una elección del
+negocio: la resuelve Golden con su criterio, con la propuesta ya validada, y **no se escribe por cuenta
+propia**; en un espacio de cliente NO se le consulta al cliente, salvo el corte de flete) y **AVISO**.
+Ejemplo real: 8 de 12 productos activos sin entrada en el Disparador. Puede ser un defecto o una
+decisión de vender kits solo dentro del flujo del producto principal; cambia qué arranca en
+producción, así que se pregunta. Después: respaldo → escribir → releer del servidor → auditar de nuevo.
+🔴 **Antes de "restaurar" un espacio que se ve en blanco, LEER el servidor:** el panel puede mostrar
+vacío un espacio intacto (workspace equivocado, caché, JSON inválido). Restaurar sobre datos buenos
+con una copia vieja los destruye. Detalle, rúbrica y trampas de la API: `references/espacio-existente.md`.
+
 ## Casos borde (decide por convención e informa)
 
 - **Negocio sin Dropi** → `--dropi no` (apaga también la subida automática); `--flete-max` se
@@ -315,17 +323,44 @@ tarjetas lo produce `golden-chatea-pro-prompt-ventas`; el validador chequea sus 
 - **Pendiente con dueño**: otros eventos del dropdown de notificaciones (falta pantallazo
   del dropdown abierto).
 
+## Techo alcanzable de esta skill (mandato de autocalificacion v2)
+
+PARA EL 1000 ME FALTA: probar la ESCRITURA de `scripts/push_config.py` contra la API REAL de
+Chatea Pro en un workspace de control desechable. (Verificado en vivo el 2026-09-18: `read` y
+`backup`, y así se descubrió que el filtro `name` casa por coincidencia parcial; la escritura no.) **(Actualizado el 2026-09-06: la otra reserva que había aquí
+—la puerta de país— ya no es una reserva, es un defecto reparado; ver el changelog.)** Hoy su comportamiento esta verificado por
+`scripts/autoprueba_push.py`, que SIMULA la API (12 de 12 en verde, con contraprueba que
+demuestra que el banco muerde); pero un simulador escrito por la misma mano que el codigo puede
+compartir su error, y un cambio de contrato del servidor real no se veria. Lo puede dar: FER /
+una corrida real / una credencial. No lo puedo cerrar yo.
+
+Con eso declarado, el techo alcanzable de esta skill es **985/1000**, y ese es su estado:
+terminada y correcta, no incompleta.
+
 ## Terminado = checklist
 
-- [ ] País entre los 7 válidos; `build_config.py` con exit 0 → los 2 Bot Fields con Techo A
+- [ ] `build_config.py` con exit 0 → los 2 Bot Fields con Techo A
+      🔴 **Este punto ya NO exige que el país esté en una lista.** Lo exigía, y era una
+      puerta ejecutable: rechazaba El Salvador y Bolivia por escrito. Si el país no tiene
+      pack, se investiga lo que falte (moneda incluida) y se configura igual.
   (escapado) OK y cada prompt bajo su tope nativo (Techo B).
 - [ ] Campos creados como **LONG JSON** (no JSON) y `push_config.py` cerrando con "todo guardado
   íntegro" (releído y comparado).
 - [ ] Sin caracteres de 4 bytes (emoji) en las palabras clave/trigger.
+- [ ] Si se tocó `scripts/valida_producto.py`, su banco en verde:
+  `python3 scripts/autoprueba_d1.py` (9 casos del cruce D1 con el registro en su forma
+  REAL de array, incluidos los que se saben malos).
+- [ ] Si se tocó `scripts/build_config.py`, el guardarraíl de doctrina en verde:
+  `bash scripts/verificar_pais_no_es_puerta.sh` (4 de 4). **No comprueba que la lista de países
+  esté completa —eso es un dato que caduca solo— sino que la lista NO haya vuelto a ser una
+  puerta**, ejerciendo con un país sin pack, y trae contraprueba que muerde si alguien la repone.
+- [ ] Si se tocó `scripts/push_config.py`, su banco en verde:
+  `python3 scripts/autoprueba_push.py` (10 pruebas contra un servidor que imita la API,
+  incluida la truncada silenciosa). Simula la API; NO sustituye una prueba en vivo.
 - [ ] **D1 verificado**: la palabra clave del producto y la entrada del Disparador Extendido
   son idénticas **byte a byte** (lo chequea `valida_producto.py --registro`; sin `--registro`
   ese cruce NO se hace). Re-verificar D1 también DESPUÉS de cualquier edición de texto que
-  toque `palabras_clave` — es lo que rompió el arranque en el incidente Kingo Shop.
+  toque `palabras_clave` — es lo que rompió el arranque en ese incidente de campo.
 - [ ] Por cada producto: `valida_producto.py --registro` con exit 0, sin `{{placeholders}}`,
   y entregada la copia `_LIMPIO.json`.
 - [ ] Datos reales confirmados por el usuario (precio, WhatsApp, palabra clave, ID Dropi).
@@ -334,11 +369,55 @@ tarjetas lo produce `golden-chatea-pro-prompt-ventas`; el validador chequea sus 
   AÑADIR al Disparador de productos Extendido.
 - [ ] Informados los defaults aplicados y los casos borde activados.
 
-## Países (solo 7 válidos)
+## Compuertas de esta skill
 
-Chatea Pro **solo acepta**: **COLOMBIA · ECUADOR · CHILE · MEXICO · PANAMA · PERU · PARAGUAY**
-(sin Guatemala/Argentina/Bolivia/etc.). `build_config.py` rechaza cualquier otro. En el JSON,
-`conexion_con_dropi.pais` va en minúscula pero debe ser uno de los 7. Lo que cambia por país
+Cuatro reglas de procedimiento que se aplican a esta skill misma, no al bot del cliente.
+
+- **Validador oficial:** `agentskills validate <RUTA ABSOLUTA>` debe decir "Valid skill".
+  Con `.` en vez de la ruta absoluta da un fallo FALSO (confirmado); no se corre con punto.
+- **Tope DURO de la `description`: 1024 caracteres.** Lo que se pasa se TRUNCA, y lo primero que
+  se pierde son los disparadores del final, que son los mas nuevos. Lo comprueba
+  `python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>`
+  (salida 0 = en norma). Medir sin comparar contra la vara no es un chequeo: por eso esto se
+  corre, no se mira.
+- **Auditoría repetible:** `python3 scripts/autoprueba_auditor.py` (26 de 26) prueba que
+  `auditar_espacio.py` da 1000 a lo limpio en dos países y tres modelos y muerde 16 clases de fallo
+  (incluida la fuga de vocabulario entre CUALQUIER par de los 23 países, no solo Colombia).
+  Si se toca `build_config.py`, los assets o los límites, se corren los cuatro bancos:
+  `autoprueba_push` 12/12 · `autoprueba_d1` 9/9 · `autoprueba_auditor` 26/26 (incluye el flete) · `verificar_pais_no_es_puerta.sh` 4/4 ·
+  `autoprueba_vocabulario` 299/299 (los 23 países del roster ANCLADO por nombre —PAISES_MAPA—, cita literal,
+  derivación, contenido contra el pack COMPLETO —no solo la cita—, origen de un conjunto cerrado, la excepción
+  de campos_memoria atada al país, un país borrado se nombra en vez de reventar, techos, y los cinco sabotajes
+  que midió el CdM reproducidos y en rojo).
+- **Estandar 9:** todo cambio relevante de esta skill se reporta al Centro de Mando.
+- **`division.limite` = 2 y no se sube a 3.** Con 3 la IA responde en rafagas de robot; 2 cubre
+  imagen-URL mas texto. El valor vive en `assets/template-botfield-2-comportamiento.json`.
+
+Historial de versiones (19 actas de sello, verbatim): `references/changelog.md`.
+
+## Países — para saber CÓMO enfocarlo, nunca para prohibir
+
+🔴 **Mandato de FER (2026-09-06):** *"Hoy son diez, mañana doce, pasado treinta. El país se pide
+para saber cómo enfocarlo, cuál es la jerga, cuál es la validación de direcciones, pero no para
+prohibir."* Hasta la v4.7 esta skill tenía la puerta **viva y ejecutable**: `build_config.py`
+rechazaba `el salvador` y `bolivia` por escrito, con exit ≠ 0 y sin generar nada. **Ya no.**
+
+**Por qué se retiró en vez de corregir la cifra.** Una lista de países dentro de una skill es un
+dato que **caduca solo**, y esta ya caducó una vez: decía 7 cuando eran 10 y rechazaba por escrito
+a Guatemala, Argentina y Brasil. Vigilar la cifra deja el trabajo abierto para siempre; retirar la
+puerta se lleva la clase entera de defecto. El guardarraíl es
+`scripts/verificar_pais_no_es_puerta.sh` — **no comprueba que la lista esté completa: comprueba
+que no vuelva a ser una puerta**, ejerciendo, y trae contraprueba que muerde si alguien la repone.
+
+**Los que HOY tienen pack conocido** (remedido 2026-08-29 contra el bundle vivo): **COLOMBIA ·
+ECUADOR · CHILE · MEXICO · PANAMA · PERU · PARAGUAY · GUATEMALA · ARGENTINA · BRASIL**. Eso es
+todo lo que significa esa lista: **dónde ya no hay que investigar**. Para cualquier otro país
+`build_config.py` avisa y **sigue**; lo único que pide es `--moneda`, y esa **se INVESTIGA (el
+código ISO-4217), no se le pregunta al negocio.** Esta lista es distinta del mapa de
+**vocabulario de dirección** (23 países, ver "Prompts del motor" arriba): Argentina y Brasil SÍ
+tienen vocabulario derivado desde v4.13, aunque no eran de los "7 originales" de esta lista de
+plataforma. Brasil va en portugués. En el JSON,
+`conexion_con_dropi.pais` va en minúscula pero debe ser uno de los 10. Lo que cambia por país
 —división geográfica, código postal, oficina, zonificación, regulador, vocabulario— está en
 `references/paises.md`. **México:** código postal **REQUERIDO**, **no existe** recolección en
 oficina (todo a domicilio), y "domicilio" = la CASA (en Colombia es el pedido). No copies el
@@ -366,7 +445,9 @@ del dueño anterior):
 - 💬 Asistente de comentarios → `golden-chatea-pro-config-comentarios`
 - 📦 Asistente logístico → `golden-chatea-pro-config-logistico`
 - 🔁 Asistente de carritos → `golden-chatea-pro-config-carritos`
-- 🎬 Coordinar los 4 asistentes → `golden-chatea-pro-full-configuracion`
+- 🗂️ Producto del asistente de COMENTARIOS (otro campo, otras 5 llaves) → `golden-chatea-pro-producto-comentarios`
+- 📍 Prompt de validación de direcciones (hijo del logístico) → `golden-chatea-pro-validacion-direcciones`
+- 🎬 Coordinar los asistentes del espacio → `golden-chatea-pro-full-configuracion`
 
 ## Privacidad (skill compartible)
 Nunca hornees datos reales de un negocio (números de WhatsApp, cuentas de pago, API keys,
@@ -376,7 +457,15 @@ diseño; los ejemplos reales viven fuera de la skill, en la carpeta del proyecto
 
 ## Fronteras y desambiguacion
 
-Descripcion completa anterior (se conserva para no perder ningun matiz de frontera):
+🔴 **Aquí NO se guarda una copia de la description.** Se guardaba "para no perder ningún
+matiz", y esa clase de copia ya mordió dos veces en el arsenal: **envejece y acaba
+contradiciendo a la description viva** — así se coló el dato falso de "7 países" en una
+hermana. Lo que sí es frontera se escribe como frontera, aquí abajo, y se mantiene.
 
-> Golden Group — Configura el asistente de VENTAS POR WHATSAPP de Chatea Pro (la "Experta en ventas por WhatsApp", el bot/agente de ventas) de punta a punta con los Bot Fields JSON NATIVOS listos para COPIAR Y PEGAR — 2 campos de configuración general (Dropi, validaciones de orden, Producto en Segundos con prompt maestro, notificaciones, comportamiento de la IA), 1 campo por producto ([Producto Ventas Wp] N) y su entrada en el Disparador de productos Extendido — con los prompts del motor afinados, parametrización por los 10 países que acepta la plataforma, y validadores de los DOS techos reales. Úsala SIEMPRE que el usuario quiera montar, configurar o replicar el asistente/agente/bot de ventas de WhatsApp de Chatea Pro para una tienda o cliente, "configurar ventas whatsapp", "montar el asistente de ventas", "el JSON del asistente de ventas", "genera los bot fields de ventas", "configura la experta en ventas", o cargar/validar un producto nuevo en ese asistente. La promo/prompt de venta de cada producto se genera con golden-chatea-pro-prompt-ventas; para comentarios, logístico o carritos usa sus skills hermanas; para los 4 a la vez, golden-chatea-pro-full-configuracion.
+**Esta skill INSTALA el asistente de ventas. No monta productos.**
 
+· El **producto** —su campo y su prompt de venta juntos— lo monta `golden-chatea-pro-prompt-ventas`.
+  Quien diga "monta este producto", "hazme el prompt de X" o "mejora este prompt" va ahí, no aquí.
+· **Comentarios, logístico y carritos** tienen cada uno su propia skill hermana.
+· **Los cuatro a la vez** los orquesta `golden-chatea-pro-full-configuracion`.
+· Auditar lo instalado → `golden-chatea-auditoria`. Auditar cómo va operando → `golden-chatea-operacion`.

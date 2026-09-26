@@ -58,6 +58,40 @@ def get_token(cli_token):
     sys.exit("Falta el token: usa --token, CHATEAPRO_TOKEN o ~/.chatea_pro_token")
 
 
+# 🔴 CUPO DE LA API · 1.000 peticiones por HORA, y pasarse BLOQUEA una hora entera.
+# Medido contra la API viva el 2026-09-07: cada respuesta trae `x-ratelimit-remaining: N`
+# (en ingles X-RateLimit-Remaining) y `x-ratelimit-limit: 1000`. Hasta hoy este script no la
+# leia. **Aqui importa mas que en ningun otro sitio de la familia: este es el que ESCRIBE.**
+# Un 429 a mitad de un push deja la configuracion escrita POR LA MITAD -- unos campos nuevos y
+# otros viejos, que es peor que no haber escrito nada, y el panel se ve normal.
+# EL RESET: cada hora (dato del desarrollador via FER). Pero NO viene `x-ratelimit-reset`,
+# asi que el servidor no dice A QUE MINUTO empezo la ventana: si te bloqueas, espera una
+# hora COMPLETA desde ese momento, y para saber si ya se repuso MIRA el contador (1
+# peticion), no lo calcules.
+CUPO = {"quedan": None, "limite": None}
+
+
+def _anotar_cupo(resp):
+    try:
+        q = resp.headers.get("x-ratelimit-remaining")
+        if q is not None:
+            CUPO["quedan"] = int(q)
+            CUPO["limite"] = int(resp.headers.get("x-ratelimit-limit") or 0) or CUPO["limite"]
+    except Exception:                                          # noqa: BLE001
+        pass
+
+
+def aviso_cupo():
+    if CUPO["quedan"] is None:
+        return ("⚠️ el servidor no devolvio 'x-ratelimit-remaining': NO se sabe cuanto cupo "
+                "queda. Eso NO es lo mismo que 'queda de sobra'.")
+    q = CUPO["quedan"]
+    if q < 20:
+        return (f"🔴 CUPO API: quedan {q} de {CUPO['limite'] or 1000} esta hora. NO empieces "
+                "otro push: un 429 a mitad deja la config escrita POR LA MITAD.")
+    return f"CUPO API: quedan {q} de {CUPO['limite'] or 1000} peticiones esta hora"
+
+
 def call(method, path, token, base, body=None, query=None):
     url = base + path
     if query:
@@ -77,9 +111,18 @@ def call(method, path, token, base, body=None, query=None):
         req.add_header("Content-Type", "application/json")
     try:
         with urllib.request.urlopen(req, timeout=30) as r:
+            _anotar_cupo(r)
             raw = r.read().decode("utf-8")
             return r.status, (json.loads(raw) if raw.strip() else {})
     except urllib.error.HTTPError as e:
+        _anotar_cupo(e)      # el 429 tambien trae la cabecera: es cuando mas importa leerla
+        if e.code == 429:
+            # No se reintenta: reintentar sobre un bloqueo lo alarga. Y se dice CLARO que la
+            # escritura pudo quedar a medias, porque el panel no lo va a delatar.
+            return 429, {"error": "CUPO AGOTADO (1.000 peticiones/hora). El bloqueo dura una "
+                                  "hora. 🔴 Si esto salio a mitad de un push, la configuracion "
+                                  "puede haber quedado ESCRITA A MEDIAS: relee los campos del "
+                                  "servidor y comparalos antes de dar nada por bueno."}
         return e.code, {"error": e.read().decode("utf-8", "ignore")[:500]}
 
 
@@ -112,6 +155,16 @@ def main():
         for n in nombres:
             st, resp = call("GET", "/flow/bot-fields", token, a.base, query={"name": n})
             items = resp.get("data", resp) if isinstance(resp, dict) else resp
+            # 🔴 MEDIDO CONTRA LA API REAL (2026-09-08): el filtro `name` casa por
+            # coincidencia PARCIAL. Pedir "[Ventas Wp] Configuracion general" devuelve
+            # TAMBIEN "...general 2". Quien tome el primero de la lista se lleva el campo
+            # equivocado. El banco simulado no podia verlo: hacia coincidencia exacta.
+            if isinstance(items, list) and len(items) > 1:
+                exacto = [i.get("name") for i in items if i.get("name") == n]
+                print(f"  ⚠️  OJO: el nombre '{n}' casa con {len(items)} campos "
+                      f"(la API busca por coincidencia parcial). "
+                      + (f"El exacto es '{exacto[0]}'." if exacto
+                         else "NINGUNO coincide exactamente: revisa el nombre."))
             print(f"[{st}] {n}")
             if isinstance(items, list):
                 for it in items:
@@ -158,7 +211,19 @@ def main():
                 continue
             guardado = str(campo.get("value") or "")
             tipo = campo.get("var_type")
-            if guardado == d["value"]:
+            # 🔴 SE COMPARA EL JSON PARSEADO, NUNCA EL TEXTO CRUDO (hallazgo de
+            # golden-skill-auditor, 2026-09-22): la API recorta el salto de línea final
+            # y otros espacios de cortesía al guardar, así que un texto igual en
+            # CONTENIDO puede diferir en BYTES — comparar guardado == d["value"] daba un
+            # falso "TRUNCADA" sobre un guardado íntegro. references/espacio-existente.md
+            # lo documenta desde antes de que este código lo respetara: "comparar el JSON
+            # PARSEADO... si se compara el texto da un falso TRUNCADA". Si guardado no
+            # parsea como JSON, ESO sí es una truncada real (el corte partió la sintaxis).
+            try:
+                integro = json.loads(guardado) == json.loads(d["value"])
+            except json.JSONDecodeError:
+                integro = False
+            if integro:
                 print(f"  ✅ {d['name']}  {len(guardado)} chars  ({tipo}) íntegro")
             else:
                 perdidos = len(d["value"]) - len(guardado)

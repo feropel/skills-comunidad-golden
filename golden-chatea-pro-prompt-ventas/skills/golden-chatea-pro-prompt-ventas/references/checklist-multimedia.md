@@ -1,11 +1,14 @@
 # Checklist de Multimedia (URLs a pedir al usuario)
 
-Pídelas en lista simple. No todas son obligatorias. Las más importantes para vender son la 1, 2, 3 y 8.
+> 🔴 **ESTE ARCHIVO ESTABA DESACTUALIZADO** (reparado v3.46.0). Es el más viejo de la skill y no recibió ninguna corrección de doctrina desde v3.14: prescribía **3 piezas en el disparo inicial**, justo lo que `recursos-visuales.md` prohíbe "sin excepción". Manda `recursos-visuales.md` — aquí solo se PIDEN las URLs, no se decide cuándo se envían. Y la biblioteca real son los **18 activos** de ese archivo, con su disparador cada uno; esta lista es la versión corta para el intake.
 
-**Disparo inicial**
-1. Imagen de los productos/variantes juntos
-2. Video presentación / cómo se aplica
-3. Imagen de prueba social (reseñas, testimonios, "+N clientes")
+Pídelas en lista simple. No todas son obligatorias.
+
+**Disparo inicial — se manda UNA sola (regla anti-catálogo), aunque pidas las tres para tener de dónde elegir**
+1. HERO: imagen de producto + propuesta de valor, **sin precio** ← el default
+2. Video corto de 8-15s (alternativa al hero cuando el producto se entiende mejor en movimiento)
+3. Imagen REAL del producto (para cuando la pauta viene muy editada)
+⛔ Pedir tres no es mandar tres. Y la vía de cero piezas también es válida.
 
 **Cada variante (si aplica)**
 4. Imagen de variante 1

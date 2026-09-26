@@ -21,6 +21,7 @@ proyecto, sobre el mismo archivo si es del mismo día (estado vivo, nunca respal
 | Ranuras de producto ocupadas | N |
 | Subflujos | N |
 | Integraciones con credencial cargada | N |
+| **Apartados por decisión de FER** | N campos y N agentes de IA de Remarketing IA: se traen, no se auditan. Si es 0, se escribe 0 |
 
 ## 2. Qué cambió desde la corrida anterior
 Solo si se corrió con `--anterior`. Campos creados, borrados y editados con su delta de

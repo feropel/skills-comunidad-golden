@@ -1,0 +1,686 @@
+{
+  "_que_es": "Lexico por pais para el control L4b. Un marcador ACUSA solo si el pais declarado del espacio NO esta entre sus paises. Los compartidos (Servientrega en Colombia y Ecuador, USD en varios) no acusan a ninguno de los suyos.",
+  "_medido": "2026-09-08",
+  "_🔴_CADUCA": "Las familias 'pagos' y 'transportadoras' cambian con el mercado y por eso los hallazgos que salen SOLO de ellas bajan a FUGA, no MUERTO. Las familias 'moneda' y 'ley_consumidor' son estables: PROFECO en un espacio de Guatemala no envejece.",
+  "_🔴_LO_QUE_NO_ESTA_NO_SE_JUZGA": "Un pais que no aparezca aqui NO se audita en L4b y se declara en la cobertura. El pais es PARAMETRO, no puerta: no tener su lexico no autoriza a decir que su configuracion esta sana.",
+  "_regla_de_admision": "5 caracteres o mas y no ser palabra corriente del espanol. Una transportadora que se llama como un verbo ('Envia', 'Domina') no sirve de marcador. EXCEPCION: las siglas de la lista blanca (COP, MXN, CLP, GTQ, ARS, OXXO, SPEI) se admiten cortas pero se buscan SENSIBLES A MAYUSCULAS -- por eso 'sigla': true. USD, EUR, PEN y PAB quedan fuera a proposito: son compartidas o ambiguas.",
+  "_rechazados_por_la_regla": [
+    "COLOMBIA/ley_consumidor/SIC: menos de 5 caracteres y no es una sigla admitida",
+    "ECUADOR/moneda/USD: menos de 5 caracteres y no es una sigla admitida",
+    "ESPANA/moneda/EUR: menos de 5 caracteres y no es una sigla admitida",
+    "PANAMA/moneda/PAB: menos de 5 caracteres y no es una sigla admitida",
+    "PERU/moneda/PEN: menos de 5 caracteres y no es una sigla admitida",
+    "PERU/pagos/BCP: menos de 5 caracteres y no es una sigla admitida",
+    "PERU/pagos/Yape: menos de 5 caracteres y no es una sigla admitida"
+  ],
+  "familias_que_caducan": {
+    "moneda": false,
+    "ley_consumidor": false,
+    "pagos": true,
+    "transportadoras": true
+  },
+  "alias_de_pais": {
+    "COLOMBIA": [
+      "colombia",
+      "co",
+      "col"
+    ],
+    "MEXICO": [
+      "mexico",
+      "mx",
+      "mex"
+    ],
+    "CHILE": [
+      "chile",
+      "cl",
+      "chi"
+    ],
+    "ECUADOR": [
+      "ecuador",
+      "ec"
+    ],
+    "PERU": [
+      "peru",
+      "pe"
+    ],
+    "ARGENTINA": [
+      "argentina",
+      "ar",
+      "arg"
+    ],
+    "GUATEMALA": [
+      "guatemala",
+      "gt",
+      "gua"
+    ],
+    "PANAMA": [
+      "panama",
+      "pa",
+      "pan"
+    ],
+    "ESPANA": [
+      "espana",
+      "es",
+      "esp"
+    ]
+  },
+  "marcadores": {
+    "ARS": {
+      "paises": [
+        "ARGENTINA"
+      ],
+      "familia": "moneda",
+      "literal": "ARS",
+      "sigla": true
+    },
+    "CLP": {
+      "paises": [
+        "CHILE"
+      ],
+      "familia": "moneda",
+      "literal": "CLP",
+      "sigla": true
+    },
+    "COP": {
+      "paises": [
+        "COLOMBIA"
+      ],
+      "familia": "moneda",
+      "literal": "COP",
+      "sigla": true
+    },
+    "GTQ": {
+      "paises": [
+        "GUATEMALA"
+      ],
+      "familia": "moneda",
+      "literal": "GTQ",
+      "sigla": true
+    },
+    "MXN": {
+      "paises": [
+        "MEXICO"
+      ],
+      "familia": "moneda",
+      "literal": "MXN",
+      "sigla": true
+    },
+    "OXXO": {
+      "paises": [
+        "MEXICO"
+      ],
+      "familia": "pagos",
+      "literal": "OXXO",
+      "sigla": true
+    },
+    "SPEI": {
+      "paises": [
+        "MEXICO"
+      ],
+      "familia": "pagos",
+      "literal": "SPEI",
+      "sigla": true
+    },
+    "acodeco": {
+      "paises": [
+        "PANAMA"
+      ],
+      "familia": "ley_consumidor",
+      "literal": "ACODECO",
+      "sigla": false
+    },
+    "andreani": {
+      "paises": [
+        "ARGENTINA"
+      ],
+      "familia": "transportadoras",
+      "literal": "Andreani",
+      "sigla": false
+    },
+    "balboas": {
+      "paises": [
+        "PANAMA"
+      ],
+      "familia": "moneda",
+      "literal": "balboas",
+      "sigla": false
+    },
+    "banco estado": {
+      "paises": [
+        "CHILE"
+      ],
+      "familia": "pagos",
+      "literal": "Banco Estado",
+      "sigla": false
+    },
+    "banco general": {
+      "paises": [
+        "PANAMA"
+      ],
+      "familia": "pagos",
+      "literal": "Banco General",
+      "sigla": false
+    },
+    "banco guayaquil": {
+      "paises": [
+        "ECUADOR"
+      ],
+      "familia": "pagos",
+      "literal": "Banco Guayaquil",
+      "sigla": false
+    },
+    "banco industrial": {
+      "paises": [
+        "GUATEMALA"
+      ],
+      "familia": "pagos",
+      "literal": "Banco Industrial",
+      "sigla": false
+    },
+    "banco nacion": {
+      "paises": [
+        "ARGENTINA"
+      ],
+      "familia": "pagos",
+      "literal": "Banco Nacion",
+      "sigla": false
+    },
+    "banco pichincha": {
+      "paises": [
+        "ECUADOR"
+      ],
+      "familia": "pagos",
+      "literal": "Banco Pichincha",
+      "sigla": false
+    },
+    "bancoestado": {
+      "paises": [
+        "CHILE"
+      ],
+      "familia": "pagos",
+      "literal": "BancoEstado",
+      "sigla": false
+    },
+    "bancolombia": {
+      "paises": [
+        "COLOMBIA"
+      ],
+      "familia": "pagos",
+      "literal": "Bancolombia",
+      "sigla": false
+    },
+    "banorte": {
+      "paises": [
+        "MEXICO"
+      ],
+      "familia": "pagos",
+      "literal": "Banorte",
+      "sigla": false
+    },
+    "banrural": {
+      "paises": [
+        "GUATEMALA"
+      ],
+      "familia": "pagos",
+      "literal": "Banrural",
+      "sigla": false
+    },
+    "bbva bancomer": {
+      "paises": [
+        "MEXICO"
+      ],
+      "familia": "pagos",
+      "literal": "BBVA Bancomer",
+      "sigla": false
+    },
+    "bizum": {
+      "paises": [
+        "ESPANA"
+      ],
+      "familia": "pagos",
+      "literal": "Bizum",
+      "sigla": false
+    },
+    "bluexpress": {
+      "paises": [
+        "CHILE"
+      ],
+      "familia": "transportadoras",
+      "literal": "Bluexpress",
+      "sigla": false
+    },
+    "caixabank": {
+      "paises": [
+        "ESPANA"
+      ],
+      "familia": "pagos",
+      "literal": "CaixaBank",
+      "sigla": false
+    },
+    "cargo expreso": {
+      "paises": [
+        "GUATEMALA"
+      ],
+      "familia": "transportadoras",
+      "literal": "Cargo Expreso",
+      "sigla": false
+    },
+    "chilexpress": {
+      "paises": [
+        "CHILE"
+      ],
+      "familia": "transportadoras",
+      "literal": "Chilexpress",
+      "sigla": false
+    },
+    "coordinadora": {
+      "paises": [
+        "COLOMBIA"
+      ],
+      "familia": "transportadoras",
+      "literal": "Coordinadora",
+      "sigla": false
+    },
+    "correo argentino": {
+      "paises": [
+        "ARGENTINA"
+      ],
+      "familia": "transportadoras",
+      "literal": "Correo Argentino",
+      "sigla": false
+    },
+    "daviplata": {
+      "paises": [
+        "COLOMBIA"
+      ],
+      "familia": "pagos",
+      "literal": "Daviplata",
+      "sigla": false
+    },
+    "davivienda": {
+      "paises": [
+        "COLOMBIA"
+      ],
+      "familia": "pagos",
+      "literal": "Davivienda",
+      "sigla": false
+    },
+    "defensa del consumidor": {
+      "paises": [
+        "ARGENTINA"
+      ],
+      "familia": "ley_consumidor",
+      "literal": "Defensa del Consumidor",
+      "sigla": false
+    },
+    "defensoria del pueblo": {
+      "paises": [
+        "ECUADOR"
+      ],
+      "familia": "ley_consumidor",
+      "literal": "Defensoria del Pueblo",
+      "sigla": false
+    },
+    "deprisa": {
+      "paises": [
+        "COLOMBIA"
+      ],
+      "familia": "transportadoras",
+      "literal": "Deprisa",
+      "sigla": false
+    },
+    "diaco": {
+      "paises": [
+        "GUATEMALA"
+      ],
+      "familia": "ley_consumidor",
+      "literal": "DIACO",
+      "sigla": false
+    },
+    "efecty": {
+      "paises": [
+        "COLOMBIA"
+      ],
+      "familia": "pagos",
+      "literal": "Efecty",
+      "sigla": false
+    },
+    "envia colvanes": {
+      "paises": [
+        "COLOMBIA"
+      ],
+      "familia": "transportadoras",
+      "literal": "Envia Colvanes",
+      "sigla": false
+    },
+    "estafeta": {
+      "paises": [
+        "MEXICO"
+      ],
+      "familia": "transportadoras",
+      "literal": "Estafeta",
+      "sigla": false
+    },
+    "estatuto del consumidor": {
+      "paises": [
+        "COLOMBIA"
+      ],
+      "familia": "ley_consumidor",
+      "literal": "Estatuto del Consumidor",
+      "sigla": false
+    },
+    "euros": {
+      "paises": [
+        "ESPANA"
+      ],
+      "familia": "moneda",
+      "literal": "euros",
+      "sigla": false
+    },
+    "guatex": {
+      "paises": [
+        "GUATEMALA"
+      ],
+      "familia": "transportadoras",
+      "literal": "Guatex",
+      "sigla": false
+    },
+    "indecopi": {
+      "paises": [
+        "PERU"
+      ],
+      "familia": "ley_consumidor",
+      "literal": "INDECOPI",
+      "sigla": false
+    },
+    "interbank": {
+      "paises": [
+        "PERU"
+      ],
+      "familia": "pagos",
+      "literal": "Interbank",
+      "sigla": false
+    },
+    "interrapidisimo": {
+      "paises": [
+        "COLOMBIA"
+      ],
+      "familia": "transportadoras",
+      "literal": "Interrapidisimo",
+      "sigla": false
+    },
+    "laar courier": {
+      "paises": [
+        "ECUADOR"
+      ],
+      "familia": "transportadoras",
+      "literal": "Laar Courier",
+      "sigla": false
+    },
+    "ley 1480": {
+      "paises": [
+        "COLOMBIA"
+      ],
+      "familia": "ley_consumidor",
+      "literal": "Ley 1480",
+      "sigla": false
+    },
+    "ley 19496": {
+      "paises": [
+        "CHILE"
+      ],
+      "familia": "ley_consumidor",
+      "literal": "Ley 19.496",
+      "sigla": false
+    },
+    "ley 24240": {
+      "paises": [
+        "ARGENTINA"
+      ],
+      "familia": "ley_consumidor",
+      "literal": "Ley 24.240",
+      "sigla": false
+    },
+    "ley federal de proteccion al consumidor": {
+      "paises": [
+        "MEXICO"
+      ],
+      "familia": "ley_consumidor",
+      "literal": "Ley Federal de Proteccion al Consumidor",
+      "sigla": false
+    },
+    "ley general para la defensa de los consumidores": {
+      "paises": [
+        "ESPANA"
+      ],
+      "familia": "ley_consumidor",
+      "literal": "Ley General para la Defensa de los Consumidores",
+      "sigla": false
+    },
+    "ley organica de defensa del consumidor": {
+      "paises": [
+        "ECUADOR"
+      ],
+      "familia": "ley_consumidor",
+      "literal": "Ley Organica de Defensa del Consumidor",
+      "sigla": false
+    },
+    "marvisur": {
+      "paises": [
+        "PERU"
+      ],
+      "familia": "transportadoras",
+      "literal": "Marvisur",
+      "sigla": false
+    },
+    "mercado pago": {
+      "paises": [
+        "ARGENTINA"
+      ],
+      "familia": "pagos",
+      "literal": "Mercado Pago",
+      "sigla": false
+    },
+    "nacex": {
+      "paises": [
+        "ESPANA"
+      ],
+      "familia": "transportadoras",
+      "literal": "Nacex",
+      "sigla": false
+    },
+    "nequi": {
+      "paises": [
+        "COLOMBIA"
+      ],
+      "familia": "pagos",
+      "literal": "Nequi",
+      "sigla": false
+    },
+    "olva courier": {
+      "paises": [
+        "PERU"
+      ],
+      "familia": "transportadoras",
+      "literal": "Olva Courier",
+      "sigla": false
+    },
+    "paquete azul": {
+      "paises": [
+        "ESPANA"
+      ],
+      "familia": "transportadoras",
+      "literal": "Paquete Azul",
+      "sigla": false
+    },
+    "paquetexpress": {
+      "paises": [
+        "MEXICO"
+      ],
+      "familia": "transportadoras",
+      "literal": "Paquetexpress",
+      "sigla": false
+    },
+    "pesos argentinos": {
+      "paises": [
+        "ARGENTINA"
+      ],
+      "familia": "moneda",
+      "literal": "pesos argentinos",
+      "sigla": false
+    },
+    "pesos chilenos": {
+      "paises": [
+        "CHILE"
+      ],
+      "familia": "moneda",
+      "literal": "pesos chilenos",
+      "sigla": false
+    },
+    "pesos colombianos": {
+      "paises": [
+        "COLOMBIA"
+      ],
+      "familia": "moneda",
+      "literal": "pesos colombianos",
+      "sigla": false
+    },
+    "pesos mexicanos": {
+      "paises": [
+        "MEXICO"
+      ],
+      "familia": "moneda",
+      "literal": "pesos mexicanos",
+      "sigla": false
+    },
+    "produbanco": {
+      "paises": [
+        "ECUADOR"
+      ],
+      "familia": "pagos",
+      "literal": "Produbanco",
+      "sigla": false
+    },
+    "profeco": {
+      "paises": [
+        "MEXICO"
+      ],
+      "familia": "ley_consumidor",
+      "literal": "PROFECO",
+      "sigla": false
+    },
+    "quetzal": {
+      "paises": [
+        "GUATEMALA"
+      ],
+      "familia": "moneda",
+      "literal": "quetzal",
+      "sigla": false
+    },
+    "quetzales": {
+      "paises": [
+        "GUATEMALA"
+      ],
+      "familia": "moneda",
+      "literal": "quetzales",
+      "sigla": false
+    },
+    "redpack": {
+      "paises": [
+        "MEXICO"
+      ],
+      "familia": "transportadoras",
+      "literal": "Redpack",
+      "sigla": false
+    },
+    "sendex": {
+      "paises": [
+        "MEXICO"
+      ],
+      "familia": "transportadoras",
+      "literal": "Sendex",
+      "sigla": false
+    },
+    "sernac": {
+      "paises": [
+        "CHILE"
+      ],
+      "familia": "ley_consumidor",
+      "literal": "SERNAC",
+      "sigla": false
+    },
+    "servientrega": {
+      "paises": [
+        "COLOMBIA",
+        "ECUADOR"
+      ],
+      "familia": "transportadoras",
+      "literal": "Servientrega",
+      "sigla": false
+    },
+    "soles": {
+      "paises": [
+        "PERU"
+      ],
+      "familia": "moneda",
+      "literal": "soles",
+      "sigla": false
+    },
+    "starken": {
+      "paises": [
+        "CHILE"
+      ],
+      "familia": "transportadoras",
+      "literal": "Starken",
+      "sigla": false
+    },
+    "superintendencia de industria y comercio": {
+      "paises": [
+        "COLOMBIA"
+      ],
+      "familia": "ley_consumidor",
+      "literal": "Superintendencia de Industria y Comercio",
+      "sigla": false
+    },
+    "tramaco": {
+      "paises": [
+        "ECUADOR"
+      ],
+      "familia": "transportadoras",
+      "literal": "Tramaco",
+      "sigla": false
+    },
+    "tres guerras": {
+      "paises": [
+        "MEXICO"
+      ],
+      "familia": "transportadoras",
+      "literal": "Tres Guerras",
+      "sigla": false
+    },
+    "uno express": {
+      "paises": [
+        "PANAMA"
+      ],
+      "familia": "transportadoras",
+      "literal": "Uno Express",
+      "sigla": false
+    },
+    "webpay": {
+      "paises": [
+        "CHILE"
+      ],
+      "familia": "pagos",
+      "literal": "Webpay",
+      "sigla": false
+    },
+    "yappy": {
+      "paises": [
+        "PANAMA"
+      ],
+      "familia": "pagos",
+      "literal": "Yappy",
+      "sigla": false
+    }
+  }
+}

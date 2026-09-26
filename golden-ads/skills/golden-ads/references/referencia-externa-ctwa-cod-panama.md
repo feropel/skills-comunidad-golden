@@ -1,7 +1,7 @@
 # REFERENCIA EXTERNA · Click to WhatsApp y COD (masterclass Panama 2026-07-30)
 
 > **ESTATUS: REFERENCIA OPCIONAL, NO REGLA.**
-> Esto NO es doctrina Golden y NO sustituye ninguna regla dura de esta skill (las 17 de `reglas-de-oro.md`: no inventar metricas, breakeven por modelo de pago, confirmar antes de gastar, compliance, copys 5+5+5 normalizados, topes en vez de apagados...). Tampoco releva de las leyes de pauta de la casa que viven en la memoria Golden fuera de esta skill (multianunciante OFF, estandar de copys medido, naming de campanas, UTM).
+> Esto NO es doctrina Golden y NO sustituye ninguna regla dura de esta skill (las de `reglas-de-oro.md`: no inventar metricas, breakeven por modelo de pago, confirmar antes de gastar, compliance, copys 5+5+5 normalizados, topes en vez de apagados...). Tampoco releva de las leyes de pauta de la casa que viven en la memoria Golden fuera de esta skill (multianunciante OFF, estandar de copys medido, naming de campanas, UTM).
 > Son benchmarks y estructuras de un tercero (Leyendas E.C.O.M + Ecom Founders, con data de Dropi Panama), capturados para contrastar. Usar como insumo de criterio cuando el contexto encaje, jamas como automatismo.
 
 ## 1. Cuando este material es relevante

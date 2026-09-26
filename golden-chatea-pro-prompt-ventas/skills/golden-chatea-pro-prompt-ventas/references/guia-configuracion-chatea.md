@@ -54,15 +54,15 @@ Por eso el prompt siempre debe incluir las URLs conversacionales adentro. La mul
 ## Tiempos (fijos)
 
 - Recordatorio 1: 2 horas — sin plantilla (solo el mensaje).
-- Recordatorio 2: 2 horas — sin plantilla.
+- Recordatorio 2: 6 horas — sin plantilla.
 - Remarketing 1: 3 horas — plantilla de Meta.
-- Remarketing 2: 6 horas — plantilla de Meta.
+- Remarketing 2: 8 horas — plantilla de Meta.
 - Rango horario de envío sugerido: ajústalo a la operación del negocio (ej. 8:00 a.m. a 8:00 p.m.).
 
 ## Cómo se configura el Remarketing (3 campos)
 
 Cada "Configuración Remarketing" tiene un interruptor (activar) y tres campos:
-1. **Tiempo Remarketing:** número + unidad (3 Horas / 6 Horas).
+1. **Tiempo Remarketing:** número + unidad (3 Horas / 8 Horas).
 2. **Plantilla Mensaje:** desplegable donde eliges una **plantilla de Meta ya aprobada**, o "No enviar plantilla". La plantilla se crea en el Administrador de WhatsApp/Meta (nombre en minúsculas_con_guion_bajo, categoría Marketing, idioma Español, imagen del producto, cuerpo con variable `{{1}}` = nombre del cliente, pie de página, y botón — el botón se mapea en Chatea como "botón de remarketing").
 3. **Instrucción especial del remarketing:** un solo campo (máx. 1000 caracteres) donde va TODO junto: el mensaje con que el bot reabre + la instrucción para la IA entre corchetes.
 

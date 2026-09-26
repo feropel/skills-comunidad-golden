@@ -14,7 +14,8 @@ User-Agent: <de navegador>     ← sin esto, Cloudflare 1010
 **El token está atado a UN flujo.** Un token no ve otro espacio. Y el **nombre del archivo del
 token no prueba a qué espacio pertenece**: la identidad se pregunta al servidor.
 
-Depósito de tokens de Golden: `PROYECTOS/CHATEA-PRO-ASISTENTES-MAPA/.secrets/`, `chmod 600`.
+El token del espacio se guarda FUERA de la skill, en el depósito de secretos del proyecto que
+lleve esa cuenta, con `chmod 600`. Aquí no se escribe ninguno, ni de ejemplo.
 Se apunta al depósito; una copia vieja que devuelve 401 no se resucita.
 
 ## Lectura · lo que usa la auditoría

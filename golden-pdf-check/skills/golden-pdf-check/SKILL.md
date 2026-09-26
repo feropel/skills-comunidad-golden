@@ -1,101 +1,52 @@
 ---
 name: golden-pdf-check
 description: >-
-  Golden Group — estándar de PDF de Comunidad Golden. Audita y ARREGLA PDFs
-  (o los construye desde cero) para que salgan con la identidad Golden y, sobre
-  todo, para que NINGÚN prompt/bloque copiable se parta entre páginas: cada
-  prompt ocupa una sola página y, si hace falta, se reduce para caber entero
-  (copy-paste limpio). Revisa identidad de marca, colores, márgenes, paginación
-  y estructura. Úsala SIEMPRE que el usuario quiera: crear, revisar, auditar,
-  arreglar, maquetar o "dejar perfecto" un PDF para la comunidad o los alumnos;
-  un PDF de prompts para copiar y pegar; un documento con la marca Golden Group;
-  cuando diga "revisa este PDF", "este PDF se ve feo", "hazme un PDF de prompts",
-  "que no se corten los bloques", "márgenes/colores/paginación del PDF", o pegue
-  o mencione un archivo .pdf que haya que verificar o producir. También aplica
-  cada vez que Claude vaya a generar un PDF entregable para Golden: ese PDF debe
-  pasar por este estándar. NO es para editar temas Shopify ni analizar anuncios.
+  Golden Group — estándar de PDF para material que la gente copia, pega y lee en
+  serio. Construye PDFs desde cero, audita los existentes y los ARREGLA
+  reconstruyéndolos. Ningún prompt ni bloque copiable se parte entre páginas:
+  cada uno cabe entero en una sola. Hace informes VISUALES (KPI, barras, escalas
+  contra meta, comparativas, pasos, QR) y le pone a cada documento la identidad
+  de quien lo firma. Úsala SIEMPRE que se quiera crear, revisar, auditar o
+  "dejar perfecto" un PDF; un PDF de prompts para copiar y pegar; un informe con
+  gráficas, estadísticas o esquemas; o cuando digan "revisa este PDF", "se ve
+  feo", "hazme un PDF de prompts", "que no se corten los bloques", "un informe
+  con datos que se vea profesional", "ponle la marca de X", o peguen un .pdf que
+  haya que verificar o producir. También cada vez que Claude vaya a generar un
+  PDF entregable para Golden. NO edita temas Shopify ni analiza anuncios.
 ---
 
-<!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
-     QUE SE LE HIZO A ESTA SKILL: (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 1005 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse.
-     POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
-     QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
-     COMO COMPROBARLO TU MISMO: python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py <ruta-de-esta-skill>   (salida 0 = en norma)
-     SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # golden-pdf-check · el estándar de PDF de Comunidad Golden
 
-<!-- skill v6.1 · 2026-09-02 (reporte del chat del Cartel, verificado línea por línea, encaminado por el CdM) · LA IDENTIDAD SE PIDE, NO SE HEREDA. La skill sale de casa, y hasta v6.0 el valor POR DEFECTO de la marca era la de FER: quien la usara sin `--tema` firmaba SUS documentos como Comunidad Golden. No es un fallo de código — el código hacía exactamente lo que decía; el problema era lo que decía. Un documento sin sello es neutro; un documento con el sello de otro es una ATRIBUCIÓN FALSA, y esa no la caza ninguna prueba de maquetación porque el PDF sale perfecto.
-     El reporte señalaba UN punto (el kicker, línea 377). Al ir al código eran CINCO: kicker, autor, dos defaults de `footer_label`, el flag `--footer`… y el LOGO, que no venía en el reporte y es el peor de todos, porque un pie vacío con el emblema Golden encima sigue firmando por FER. Vale la pena decirlo tal cual: el reporte era correcto y aun así se quedaba corto, y la diferencia la hizo ir a mirar el árbol entero en vez de arreglar la línea que me daban.
-     Todo pasa a NEUTRO. Sin identidad no se rellena: se AVISA por stderr y se dice cómo pedirla (`--tema comunidad-golden`). La marca de Golden no se perdió, se mudó a su tema, que es justo lo que v6.0 construyó. Los huecos se OMITEN en vez de quedar vacíos: un `<div class="logo">` vacío reservaba su alto igual y un autor vacío con fecha imprimía un "·" suelto.
-     PRUEBA 21 · NEUTRALIDAD POR DEFECTO, guardián de CLASE: construye SIN tema y falla si aparece cualquier marca de la casa, texto o logo. Y aquí la regla de higiene de FER cobró de verdad: la primera versión de esa prueba PASÓ EN VERDE con el defecto repuesto a propósito. Estaba ciega — el kicker se imprime en VERSALITAS, así que el PDF dice "COMUNIDAD GOLDEN" y yo comparaba contra "Comunidad Golden". Un guardián que parece trabajar es peor que ninguno. Corregida a comparación en mayúsculas y re-probada rompiendo los CUATRO vectores por separado: 4 de 4 cazados.
-     DAÑO COLATERAL QUE DESTAPÓ EL ARREGLO: la prueba 12 (figuras) exigía ">= 2 imágenes" y pasaba porque contaba el logo que se colaba solo. Su umbral medía dos cosas distintas: la figura del documento y una marca del motor. Ahora mide lo suyo.
-     LÍMITE DECLARADO, no lo tapo: lo que se neutralizó es la ATRIBUCIÓN (logo, kicker, autor, pie). La HOJA DE ESTILO por defecto sigue siendo la de Golden — fondo crema y dorados. Eso ya no dice de quién es el documento, pero sigue pareciéndose a Golden. Neutralizar también la paleta significa diseñar un tema base neutro y cambiaría el aspecto de todo PDF construido sin `--tema`: es decisión de FER, no mía, y queda planteada. Autoprueba 23/23. -->
+<!-- skill v6.7 · 2026-09-06 · autoprueba 26/26 · EL ACTA COMPLETA VIVE EN references/changelog.md.
+     Auditoría golden-skill-auditor: `scripts/visuales.py` (el motor de los componentes
+     visuales — KPI, barras, escala, comparativa, pasos, QR — que `build_pdf.py` importa
+     en la línea 39) no aparecía citado en ningún lugar del cuerpo, así que el inventario
+     lo marcaba como huérfano potencial. Añadida su fila en "Archivos de apoyo" abajo.
+     Ningún comportamiento cambió.
 
-<!-- skill v6.0 · 2026-09-02 (encargo de FER: "no fue la estructura del PDF, sino el CONTENIDO") · Hasta v5.18 la skill sabía maquetar sin cortar y copiar sin corromper, y eso ya estaba medido. Lo que NO sabía era DIBUJAR: entregaba párrafos correctos donde hacía falta un esquema. Tres frentes nuevos.
-     (1) COMPONENTES VISUALES (`scripts/visuales.py`): KPI, barras, escala contra meta, comparativa, pasos y QR, escritos con el método de la skill `dataviz` — la forma se elige por el TRABAJO del dato, el color se asigna después y la paleta se VALIDA con script, nunca a ojo. Una desviación deliberada del método y su razón: en pantalla la etiqueta directa es SELECTIVA porque el hover rescata lo demás; en un PDF impreso no hay hover, ni tooltip, ni vista de tabla, así que aquí la etiqueta directa es OBLIGATORIA en todo componente. Serie `--s1..--s6` validada; ningún dato queda a merced de distinguir dos tonos.
-     (2) IDENTIDAD POR CHAT (`assets/temas/*.json` + `--tema`): el mismo .md sale con la marca de quien lo firma — colores, pie, rótulos. Con un cerrojo: cada tema declara `source_of_truth` (de qué archivo real salieron los valores) y, si no lo trae, la construcción AVISA A GRITOS. `comunidad-golden` está anclado a `GASTO-GOLDEN/app/globals.css`; `cartel-del-chat` va marcado PROVISIONAL con `source_of_truth: null` porque sus valores los inventé yo para demostrar el mecanismo — sirven de demo, no de marca, y hay que pedírselos a su chat por el CdM.
-     (3) EL ÍNDICE DEJA DE SER OBLIGATORIO. La v5.4 mandaba abrir TODO PDF con una página CONTENIDO; FER la revocó midiendo lo que nadie mide, al lector: "la gente no lee los índices, eso no es un libro". Ahora es opt-in (`--mapa`), solo primer nivel, una columna y se llama "EN ESTE DOCUMENTO". Un mapa dice dónde estás; un índice de dos niveles a tres columnas es una pared de texto en la portada.
-     DEFECTO CAZADO EN ESTE MISMO TURNO, y es de clase, no de caso: el rótulo del mapa estaba escrito A MANO en DOS sitios — el que lo dibuja y el que lo busca en la segunda pasada. Al renombrarlo aquí mismo ("ÍNDICE DEL DOCUMENTO" -> "EN ESTE DOCUMENTO") el detector dejó de reconocer su propia página EN SILENCIO: la búsqueda arrancaba en la hoja del mapa y la primera entrada salía con el número de esa hoja. Medido 1 de 8 mal, y solo 1 porque el cursor monotónico tapaba las otras 7 — un fallo que se disfraza de casi-acierto. Arreglo: `MAPA_TITULO`, una sola constante para las dos puntas, más el bucle acotado a la RACHA INICIAL de páginas (antes tomaba la ÚLTIMA página con la firma, así que un documento cuyo CUERPO mencionara esas palabras se habría llevado el cursor al final). Prueba diferencial: con la firma vieja 1 de 8 mal, con la constante 0 de 8.
-     Autoprueba 22/22 (dos nuevas: componentes visuales con etiqueta directa, e identidad por tema comprobando que el MISMO .md sale distinto). Sin verificar todavía: la ruta de arreglar un PDF ajeno (Canva/Word) nunca se ha ejercitado, y los valores del tema del Cartel no son suyos. -->
+     Se movió de aquí por la ley del acta que no se activa: el cuerpo se paga en CADA activación
+     y la historia no hace falta para construir un PDF. Medido al migrarla: 24.025 caracteres,
+     el 58% de este archivo. Esta línea se queda en el formato de siempre a propósito, porque la
+     prueba 22 y el censo del arsenal leen el sello justo de aquí: al migrar el acta se perdió y
+     la autoprueba imprimió "disco ?" — el número de versión es interfaz, no decoración. -->
 
-<!-- skill v5.18 · 2026-09-02 (fila del CdM tras correr la autoprueba en una máquina sin pypdf) · TRES ESTADOS, no dos: `ok=None` = NO SE PUDO VERIFICAR. Antes, correr la autoprueba en un intérprete sin pypdf imprimía [FAIL] y cerraba con 'HAY FALLOS' — quien la corriera concluía que el estándar de PDF estaba roto cuando lo que faltaba era una librería. Es el FALSO ROJO, que por la regla de la casa es el que nadie audita porque parece que el detector trabaja. Ahora imprime [N/D] y cierra con 'TODO OK en lo medido · N sin verificar (falta dependencia, no es un fallo)', declarando el denominador. FRONTERA IMPORTANTE, que NO contradice el fallar-cerrado: si un chequeo no resuelve algo DEL ARTEFACTO (token renombrado, fondo no declarado) eso sigue siendo FALLO — es señal sobre lo que mide; `None` es solo cuando el ENTORNO no permite medir, y ahí el chequeo no tiene nada que decir del PDF. Verificado en los dos intérpretes: con pypdf 20/20 TODO OK; sin pypdf, [N/D] en la prueba de fuentes y veredicto honesto, exit 0. ADEMÁS: audit_pdf.py daba un TRACEBACK crudo de Python cuando el PDF no existía (medido al correrlo contra una ruta borrada); ahora dice qué archivo no encuentra y recuerda mirar el directorio, exit 2. -->
-<!-- skill v5.17 · 2026-09-02 (cierre del turno v5.16 · aviso del CdM sobre la CUARTA CARA) · La versión de una skill vive también FUERA de su árbol: la fila del REGISTRO-FABRICAS, que leen los otros chats y que ningún bump ni ritual de blindaje alcanza. Medido al recibir el aviso: registro v5.15 contra disco v5.16 — desfasada, tal cual advirtieron (a golden-shopify le pasó dos veces el mismo día y una vez RETROCEDIÓ). No la edito: el registro dice 'no editar a mano' y tiene dos escritores; se REPORTA al CdM y él regenera. PRUEBA 19 (informativa, no bloqueante): la autoprueba compara su sello con la fila del registro y lo dice — informativa a propósito porque entre sellar y regenerar hay una ventana de desfase legítima, y hacerla fallar ahí sería el detector agresivo que la prueba 18 existe para evitar. PRUEBA 20 · COHERENCIA DEL SELLO: compara las comprobaciones DECLARADAS en la docstring contra las que la corrida imprime de verdad. Existe porque ya falló dos veces (decía 13 corriendo 14; decía 15 corriendo 14) y las dos las cazó un ojo externo, no yo. Y en su primera versión salió DESFASADA POR UNO ella misma — declaraba 19 sobre una salida de 20 porque no se contaba la línea informativa: se movió al FINAL para que cuente todo, incluida ella. La comprobación de coherencia saliendo incoherente es la mejor prueba de que hacía falta. Autoprueba 20/20. -->
-<!-- skill v5.16 · 2026-09-02 (fila del CdM · higiene del arsenal) · RENOMBRADO scripts/selftest.py → scripts/autoprueba.py y assets/selftest-sample.md → assets/autoprueba-muestra.md. El porqué es MEDIDO, no estético: de las 5 skills del arsenal con autoprueba, 4 ya usaban el nombre en español y esta era la última en inglés — mientras siguiera así, todo censo del arsenal tenía que ser bilingüe o perdía una skill (le pasó a golden-shopify, que no se veía en su propio censo). El instrumento se arregla antes que el dato. Actualizadas TODAS las caras vivas: los comandos del SKILL.md, la docstring, la cabecera que imprime (=== AUTOPRUEBA ===), el prefijo del tmpdir, el nombre del PDF de trabajo, brand.md y golden-brand.json. El CHANGELOG HISTÓRICO NO se reescribe: las entradas v4 a v5.15 nombran `selftest.py` porque así se llamaba cuando ocurrieron, y falsificar el acta para que cuadre con el presente sería peor que la incomodidad — quien lea una entrada vieja debe saber que **selftest.py es el nombre anterior de autoprueba.py**. PRUEBA 18 NUEVA (refinación de la ley del validador que se prueba, aportada por golden-shopify): probar en las DOS direcciones. Tenía cubierto el 'no dispara con lo bueno' en paginación y en el aviso de líneas largas, pero el detector de COLOR solo se probaba contra un PDF feo — si alguien apretaba la tolerancia, mis propios PDFs saldrían marcados y ninguna prueba lo cazaría. Un detector demasiado agresivo daña tanto como uno ciego y es más difícil de notar, porque parece que trabaja. Autoprueba 18/18. -->
-<!-- skill v5.15 · 2026-08-30 (fila del chat APUNTES GOFEST; REPRODUCIDA antes de aceptar el diagnóstico) · Una bitácora de 53 págs pasó mi auditoría (APROBADO) y FER la rechazó al leerla: "no se entiende, se ve muy pequeño, no tiene un mapa para entender el paso a paso, toca uno adivinar". El chat de origen lo diagnosticó como hueco de guía de contenido; al reproducirlo (bitácora equivalente, 132 líneas de índice, 23 págs) aparecieron DOS defectos MÍOS que su diagnóstico no nombraba: (1) el índice automático NO tenía números de página — con 132 líneas no es un mapa, es una lista, y eso es literalmente "toca adivinar"; (2) el nivel .toc.dense-4 comprimía el índice a 4 columnas de 7.4pt con insignias de 6.2pt: ilegible, eso era "se ve muy pequeño". ARREGLADO: números de página REALES por doble pasada con PUNTO FIJO (localiza cada encabezado en el PDF construido y repite hasta converger — añadir los números puede empujar el índice a otra hoja y correr todo el cuerpo: el error clásico de las TOC; si no converge, avisa y no sella); saltando las páginas del propio índice al buscar (sin eso todos los números salían '1', bug medido y corregido); dense-4 eliminado y piso de tipo del índice subido; el PIE pasa de 6.0pt a 7.5pt porque era el ÚNICO texto del PDF bajo el piso — se sube en vez de exceptuarlo, un piso con un violador no es un piso. Prueba 17: documento largo → números del índice CORRECTOS contra las páginas reales + ningún texto bajo 7pt en NINGUNA página (clase completa, por nota del CdM). Verificado: 12 de 12 secciones con el número correcto. DESCARTADO CON MOTIVO: el heurístico bullets/prosa que proponía la fila — sería policía de estilo con alto falso positivo, y convertir notas telegráficas en prosa es AUTORÍA de quien escribe, no de la skill; en su lugar, guía de los DOS tipos de documento (entregable de prompts vs informe narrativo) en content-format.md. DOS BUGS QUE CAZÓ LA PROPIA PRUEBA antes de sellar: (a) la 2ª pasada no reiniciaba FIG_COUNTER y un documento de dos figuras sacaba los pies como 'Figura 3 / Figura 4' — el reinicio vive ahora DENTRO de build_html, no en main(), para que no dependa de recordarlo en cada llamada; (b) mi propia prueba 17 asumía que el índice ocupa 2 páginas y reportaba mal 2 de 8 secciones que estaban bien — la extensión del índice se DERIVA por su firma: un test que asume el layout miente en los dos sentidos. Piso de legibilidad medido en TODAS las páginas, sin excepciones (nota del CdM: cazar la clase, no el caso). Selftest 17/17. -->
-<!-- skill v5.14 · 2026-08-26 (fila del chat FILTRO DE HERRAMIENTAS; método tomado de la skill dataviz: verificar contraste con NÚMERO, no a ojo) · CONTRASTE: los dorados de marca no pasan WCAG para texto — #d4af37=2.00:1 y #b8912a=2.80:1 sobre el fondo #faf9f5 (mínimo 4.5:1), verificado con aritmética propia. No era regla faltante sino DEFECTO VIVO: el CSS pintaba texto dorado en 6 sitios que la gente lee (kicker de portada, TODOS los enlaces, kicker e insignias del índice, títulos de bloque, y el pie con #9a7b1e=3.81:1). Token nuevo --gold-text #8a6d1f (4.65:1) SOLO para texto; el dorado de marca queda intacto en todo uso GRÁFICO (filetes, gradientes, bordes, banda de tarjeta): la identidad se ve igual, verificado con render antes/después. Regla medida en brand.md + brand.json, y PRUEBA 16 en el selftest que calcula el ratio de cada color de texto contra su fondo y FALLA bajo 4.5:1 — la regla queda ejecutable, no declarativa. Selftest 16/16. Corrección al reporte de origen: decían 14.97:1 sobre negro; contra el negro REAL de la paleta (#1a1508) son 8.65:1 (pasa igual). La prueba 16 FALLA-CERRADO por condición del CdM: si un token no se resuelve (renombrado, color heredado, fondo no declarado) eso es FALLO, no un par que se salta en silencio — un chequeo que se apaga cuando no entiende lo que mira da un verde mentiroso. Probado rompiendo el token a propósito: la prueba muerde con 'NO SE PUDO CALCULAR'. Informe antes/después para FER en ~/Desktop/INFORMES/2026-08-26-contraste-dorado-golden-pdf-check/ (los dos PDFs + comparación + LEEME). LLAVE DE FER: cambia el tono visible del dorado en textos pequeños; revertible con un token si prefiere el brillo. -->
-<!-- skill v5.13 · 2026-08-23 (barrido D del CdM, ojo externo solo-lectura) · CIFRA SELLADA NO REPRODUCIBLE: el sello v5.12 decía 15/15 pero una corrida sana imprimía 14 — la prueba "Salida JSON válida" solo hacía results.append DENTRO del except, así que en el camino feliz no se registraba. Una prueba que solo existe cuando falla no se puede contar. Arreglado: el PASS se registra en los DOS caminos → 15/15 medido y reproducible, el sello v5.12 pasa a ser cierto. De paso la docstring decía "13 comprobaciones" (le faltaban esta y la del fixture ejemplar): corregida a 15 con la lista completa y la regla de contar en la salida, nunca de memoria. Ley de la casa aplicada a sí misma: una cifra mal contada es peor que ninguna. -->
-<!-- skill v5.12 · 2026-08-23 (auditoría golden-skill-auditor v1.16, corrida desde el chat de Chatea Pro comentarios) · HALLAZGO CRÍTICO ENCONTRADO CORRIENDO LA SKILL COMO ESTÁ DOCUMENTADA (`python scripts/selftest.py`): el `from pypdf import PdfReader` de la prueba 6 vivía FUERA del try, así que un intérprete sin esa dependencia OPCIONAL mataba el self-test con un ModuleNotFoundError y se perdían las otras 14 comprobaciones — el reporte no salía nunca. Ahora los imports opcionales (pypdf, pdfplumber de la prueba de figuras) van DENTRO del try: la prueba que no se puede correr sale [FAIL] con el motivo y el resto sigue. MEDIDO en los dos intérpretes: sin pypdf → 14 PASS + 1 FAIL con motivo (antes: traceback, 0 resultados); con todas las deps → 15/15 TODO OK. Además: dependencias declaradas por script en la sección de self-test (cuál necesita qué y que todas degradan), `assets/selftest-sample.md` citada por nombre con la advertencia de no editar el fixture, y se retiró una prueba de líneas largas que quedó DUPLICADA por trabajo simultáneo de otra sesión el mismo día. -->
-<!-- skill v5.11 · 2026-08-23 (auditoría golden-skill-auditor, segunda pasada del día) · CRÍTICO: los 5 comandos documentados decían `python`, binario que NO existe en el Mac de Golden — un chat limpio recibía `command not found`. Ahora la skill declara el intérprete ($PY = ~/.golden/pdfenv/bin/python con fallback a python3, sección 'Antes de correr nada') y todos los comandos lo usan: el conocimiento vivía en la memoria del ecosistema, no en la skill. Además: golden-brand.json declaraba card_max_mm=250 (el real lo DERIVA build_pdf.py = 246) y la tipografía del sistema en vez de las fuentes incrustadas — dos datos desfasados en el archivo que el SKILL.md señala como el sitio de tokens; se corrigieron con nota de quién manda. CSS muerto .note-card retirado (v5.7 la reemplazó por .block). El fixture propio violaba la regla ≤76 y disparaba el aviso en CADA corrida (efecto 'cry wolf'): re-envuelto con las MISMAS palabras + 2 casos nuevos en selftest (el aviso dispara cuando debe / la muestra oficial no lo dispara) = 13 pruebas. Conexión con el Centro de Mando declarada (estándar 9). -->
-<!-- skill v5.10 · 2026-08-23 (auditoría golden-skill-auditor v1.16, 919→ORO) · (1) v5.9 quedaba SIN DECLARAR: sus dos cambios vivían solo en comentarios del CSS — se declaran abajo; (2) `::: nombre Título` (bloques con estilo, v5.7) faltaba en references/content-format.md, el archivo que enseña el formato: agregado a la tabla y con sección propia; (3) geometry.card_max_mm de golden-brand.json decía 250 cuando el valor real derivado es 246 (área útil − colchón de 20mm) — corregido y marcado como derivado; (4) `.note-card` era CSS muerto desde v5.7 (nada lo genera; lo reemplazó `.block`) — retirado; (5) el puntero al logo naranja `PROYECTOS/SKOOL/logo-comunidad-golden.svg` estaba MUERTO (esa carpeta ya no existe) en 3 archivos — corregido; (6) selftest 11→13: prueba de bloque con estilo (v5.7) y prueba de que el aviso de líneas largas (v5.8) se dispara — antes esas versiones no tenían red de regresión; (7) ORDEN FER declarado en Verificación: auditar el PDF CANDIDATO y solo instalarlo si dice APROBADO; (8) docstrings al día (selftest 1-4→13 pruebas, audit_pdf --palette). Conexión: los cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO. -->
-<!-- skill v5.9 · 2026-08 (declarada retroactivamente en v5.10; vivía solo en el CSS) · (a) `code.inline` con break-inside:avoid + white-space:nowrap — un span de código en línea que caía en el borde se partía a la mitad de la palabra (medido: informe de un cliente, pág 12→13, "SIN MOVIMIENTOS" rebanado); (b) rediseño de tablas: el oro pasa de RELLENO de cada th a ACENTO (borde inferior 2px) + filas alternas y más padding — 24 tablas de un informe inundaban la hoja de amarillo y se veía aglomerado (medido por FER sobre el PDF real) -->
-<!-- skill v5.8 · 2026-08-07 (centro de mando, cosecha del chat ESTUDIO 360 DENTAL un producto de cliente Chile) · LÍNEAS LARGAS EN TARJETAS: dentro de una tarjeta monoespaciada, una línea de más de ~76 caracteres se ENVUELVE al renderizar y la compuerta verbatim la reporta como "espaciado/orden alterado" (pasó con dos prompts de imagen; se resolvió reescribiéndolos a 72-84 chars/línea). Regla de redacción "líneas de tarjeta ≤ 76 caracteres" en content-format.md + build_pdf.py AVISA antes de renderizar con tarjeta y línea exactas (⚠️ LÍNEAS LARGAS EN TARJETAS por stderr) -->
-<!-- adenda 2026-08-20 (centro de mando, autoevalúo del ecosistema): references/brand.md quedó citada desde el SKILL.md — era el único componente de la skill sin cita (hueco genuino confirmado por el inventario v1.8 del auditor); util, se cita, no se retira. -->
-<!-- skill v5.7 · TEMAS: `--css tema.css` anexa una hoja que solo redefine variables/colores (la identidad Golden queda intacta por defecto) y `--palette paleta.json` hace que audit_pdf.py juzgue con OTRA paleta permitida. Ademas bloques con estilo `::: nombre Titulo … :::` -> <div class="block nombre"> con el contenido procesado como Markdown (para que un documento largo respire: destacados, avisos, tablas de datos). Origen: manual M3 del MBA con la identidad naranja/cian del programa -->
-<!-- skill v5.6 · FIGURAS: `![Pie](ruta.svg){60%}` en una línea sola = figura atómica (imagen + pie numerado que nunca se separan ni se parten entre páginas), incrustada en base64, ruta relativa al .md, SVG como vector. Origen: manual M3 del MBA (Meta Business Manager, 2026-08-04) — un manual de pasos sin pantallas no enseña. Cubierto por 2 pruebas nuevas en selftest.py (11/11) -->
-<!-- skill v5.5 · 4 defectos medidos en producción (guía logística 27 págs, 2026-08-03): (1) CRÍTICO ligaduras de JetBrains Mono corrompían el copy-paste (>> salía como <>, // como </) → font-variant-ligatures:none + "liga" 0,"calt" 0 en .prompt-body y code.inline, trampas >> // https:// <<X>> horneadas en selftest-sample; (2) norma FER portada COMPACTA: título+índice en la MISMA hoja (adiós hoja 70% vacía que "da pereza leer"); (3) tablas largas SÍ se parten con thead repetido y filas enteras; (4) colchón de tarjeta 8→20mm (el encabezado precedente comía el margen y el propio auditor tumbaba PDFs del motor); extra: compuertas ignoran selectores de variación de emoji U+FE0F (falso "no idéntico" con ⚠️) -->
-<!-- skill v5.4 · norma FER: TODO PDF Golden abre con página de CONTENIDO (índice línea por línea de todo lo que trae el documento + cuántos textos copiables tiene cada parte). Se genera SOLA desde los encabezados en build_pdf.py (outline + build_index, CSS .toc, flag --no-index para la excepción). Origen: PDF Dental un producto de cliente 2026-07-25 -->
-<!-- skill v5.3 · norma FER: copys/prompts múltiples = tarjetas numeradas separadas (jamás párrafo corrido); marcadores [PENDIENTE] en negrita, no backticks (mono inline cruza páginas). Origen: PDF Libido UP 2026-07-25 -->
-<!-- skill v5.2 · verbatim_check ahora despoja front matter/encabezados/pipes para comparar bien contra .md (adiós falsos positivos); referencia a logo-golden.svg.orig eliminada (no existía) — si se re-sube un logo nuevo, redimensionarlo igual antes de incrustarlo -->
-<!-- skill v5.1 · logo oficial optimizado 1.4MB→195KB (PNG 444px cuantizado con alfa, idéntico a la vista a 74px) -->
-<!-- skill v5 · auditor sin falsos positivos (dos tarjetas seguidas ≠ corte; texto normal al borde = aviso, no tumba veredicto), normalización tipográfica compartida en las dos compuertas (elipsis/comillas/guiones), logo oficial = emblema Golden Group Community, selftest 9/9 -->
-<!-- v4 · fuentes OFL incrustadas (estáticas anti-Type3), compuerta verbatim con doble chequeo, PDF etiquetado, tablas, selftest adversarial -->
+Este skill garantiza que todo PDF que Golden entrega se vea profesional, lleve la
+identidad de quien lo firma y — lo más importante — que los **prompts copiables
+nunca se partan entre páginas**. La gente copia y pega esos prompts; un bloque
+cortado a la mitad es inaceptable.
 
-Este skill garantiza que todo PDF que Golden entrega a su comunidad se vea
-profesional, tenga la identidad de marca y — lo más importante — que los
-**prompts copiables nunca se partan entre páginas**. La gente copia y pega
-esos prompts; un bloque cortado a la mitad es inaceptable.
-
-Regla operativa: **siempre que leas o generes un PDF para Golden, déjalo con
-esta perfección.** No entregues un PDF "a mano" si este skill puede hacerlo bien.
-
-## NORMA FER · todo PDF abre con una página de CONTENIDO (v5.4)
-
-Después de la portada va **SIEMPRE** una página de **CONTENIDO** que dice, **línea por línea, todo
-lo que hay en el documento**: cada sección y cada subsección en el orden en que aparecen, con un
-número al lado que indica **cuántos textos copiables** trae esa parte. Quien abre el PDF entiende de
-un vistazo todo lo que compró: investigación, precios, estructura de ads, prompts de imágenes,
-prompt de Chatea, y lo que sea que traiga.
-
-- **Se genera SOLA** en `build_pdf.py` (`outline()` + `build_index()`), leyendo los `##` y `###` del
-  Markdown y contando las tarjetas de prompt de cada sección. **Nadie la escribe a mano** y por eso
-  nunca queda desactualizada cuando el contenido cambia.
-- Por eso los encabezados del contenido tienen que ser **descriptivos y en orden de ejecución**:
-  ese texto es exactamente el que se ve en el índice. Un `### Copy 7 · Bloque de honestidad` se lee
-  perfecto en el índice; un `### Otro más` no.
-- Cabe en **una página** en la mayoría de documentos (dos columnas, tipo compacto). Si el documento
-  es enorme, fluye a la siguiente página sin cortar ninguna línea.
-- **Excepción única:** `--no-index` para documentos de una sola pieza (un PDF de un solo prompt,
-  una carta). En entregables de proyecto, informes, paquetes de lanzamiento y PDFs de prompts, va.
+Regla operativa: **siempre que leas o generes un PDF para Golden, déjalo con esta
+perfección.** No entregues un PDF "a mano" si este skill puede hacerlo bien.
 
 ## REGLA INVIOLABLE · el texto no se toca
 
 Este skill **solo cambia la estructura, la maquetación y la arquitectura visual**
-del PDF para que se vea perfecto. **NUNCA modifica el contenido.** El texto del
-usuario es sagrado y va tal cual: mismas palabras, misma ortografía, misma
-puntuación, mismo orden, mismos saltos de línea dentro de cada prompt. No se
-corrige, no se "mejora", no se resume, no se reescribe, no se traduce, no se le
-quitan ni añaden signos. Lo único permitido es envolverlo en tarjetas, secciones
-y portada, y ajustar tamaños/márgenes/paginación.
+del PDF. **NUNCA modifica el contenido.** El texto del usuario es sagrado y va tal
+cual: mismas palabras, misma ortografía, misma puntuación, mismo orden, mismos
+saltos de línea dentro de cada prompt. No se corrige, no se "mejora", no se
+resume, no se reescribe, no se traduce, no se le quitan ni añaden signos. Lo único
+permitido es envolverlo en tarjetas, secciones y portada, y ajustar
+tamaños/márgenes/paginación.
 
 La única excepción es texto que el usuario te pida **crear desde cero** (p.ej. un
 subtítulo de portada si no lo dio). Eso sí sigue el estilo Golden. Pero el
@@ -104,13 +55,12 @@ carácter. Ante la duda, no lo cambies.
 
 ## Qué hace
 
-1. **Construye** un PDF Golden desde contenido (Markdown-Golden) — para cuando
-   aún no hay PDF o cuando el existente hay que rehacerlo. Incluye **portada +
-   página de CONTENIDO automática** (norma FER v5.4) + tarjetas atómicas.
+1. **Construye** un PDF desde contenido (Markdown-Golden), con portada, tarjetas
+   atómicas, figuras, tablas y **componentes visuales** (gráficas, KPI, escalas).
 2. **Audita** un PDF existente y reporta fallos de marca, márgenes, colores y
    paginación (bloques al filo del borde = riesgo de corte).
-3. **Arregla**: extrae el contenido del PDF viejo, lo pasa al formato Golden y
-   lo regenera con bloques atómicos. Así el arreglo es garantizado, no cosmético.
+3. **Arregla**: extrae el contenido del PDF viejo, lo pasa al formato Golden y lo
+   regenera con bloques atómicos. Así el arreglo es garantizado, no cosmético.
 
 ## Cuándo usar cada camino
 
@@ -151,79 +101,132 @@ resolver el dueño, y los actores de auditoría masiva la respetan). Se declara 
 archivo, y no solo en memoria: una fábrica que vive solo en la memoria del ecosistema
 desaparece si alguien reformula esa nota.
 
-Los cambios relevantes de esta skill (defectos medidos en producción, normas
-nuevas de FER sobre la maquetación) se reportan a **🧠 GOLDEN - CENTRO DE MANDO**,
-que es quien decide si la lección se retransmite a otros chats. Varias versiones
-de esta skill nacieron así: un chat construyendo un entregable real midió el
-defecto y lo mandó a la fábrica. Ese circuito es el que la mantiene viva.
+Los cambios relevantes (defectos medidos en producción, normas nuevas de FER sobre
+la maquetación) se reportan a **🧠 GOLDEN - CENTRO DE MANDO**, que decide si la
+lección se retransmite. Varias versiones nacieron así: un chat construyendo un
+entregable real midió el defecto y lo mandó a la fábrica.
 
 ---
 
-## Paso A · Construir un PDF Golden
+## LA IDENTIDAD SE PIDE, NO SE HEREDA
 
-1. Prepara el contenido en **Markdown-Golden**. Lee `references/content-format.md`.
+**Sin `--tema`, el documento sale NEUTRO**: sin logo, sin kicker, sin autor y sin
+pie. La marca de Comunidad Golden vive en su tema y se pide:
+
+```bash
+$PY scripts/build_pdf.py contenido.md salida.pdf --tema comunidad-golden
+```
+
+El porqué, que vale para cualquier herramienta que salga de casa: hasta v6.0 la
+marca de Golden era el valor por defecto, así que **cualquiera que usara la skill
+firmaba SUS documentos con la marca de FER sin enterarse**. Un documento sin sello
+es neutro; **un documento con el sello de otro es una atribución falsa**, y esa no
+la caza ninguna prueba de maquetación porque el PDF sale perfecto. Cuando no hay
+identidad, el motor no rellena: **avisa** por stderr y dice cómo pedirla.
+
+Cada identidad es un archivo en `assets/temas/<id>.json` con colores, kicker,
+autor, pie, logo y paleta de series. **Todo tema debe declarar `source_of_truth`**
+(de qué archivo real salieron esos valores) o la construcción avisa a gritos.
+
+| Tema | Estado |
+|---|---|
+| `comunidad-golden` | anclado a `GASTO-GOLDEN/app/globals.css` |
+| `cartel-del-chat` | 🔴 **PROVISIONAL**, `source_of_truth: null` — valores inventados para demostrar el mecanismo, sirven de demo y NO de marca |
+
+Para crear un tema nuevo, copia uno existente, cambia los valores y **rellena
+`source_of_truth` con el archivo del que salieron**. Si no tienes ese archivo,
+pídeselo al chat dueño de esa marca por el Centro de Mando: inventar colores de
+otro es el mismo defecto que heredarlos.
+
+**Reserva declarada:** lo neutralizado es la ATRIBUCIÓN (logo, kicker, autor,
+pie). La hoja de estilo por defecto sigue siendo la de Golden — fondo crema y
+dorados. Un documento ajeno ya no dice de quién es, pero se le parece.
+
+---
+
+## Paso A · Construir un PDF
+
+1. Prepara el contenido en **Markdown-Golden**. Lee `references/content-format.md`
+   antes de escribir el primer bloque: ahí está la tabla completa de sintaxis.
    Lo esencial: cada prompt que se copia va dentro de una tarjeta:
    - bloque ` ``` ` … ` ``` ` (monoespaciado), o
    - bloque `::: prompt Título` … `:::` (prosa).
-   Añade un front matter con `title`, `subtitle`, `kicker`, `author` para la portada.
+   Añade front matter con `title`, `subtitle`, `kicker`, `author` para la portada.
 
 2. Genera el PDF:
    ```bash
-   $PY scripts/build_pdf.py contenido.md salida.pdf
+   $PY scripts/build_pdf.py contenido.md salida.pdf --tema comunidad-golden
    ```
-   El script arma el HTML con la identidad Golden (`assets/golden-print.css`),
-   corre el auto-fit (`assets/autofit.js`) y renderiza a PDF. Al terminar corre
-   una **compuerta verbatim**: re-extrae el texto del PDF y confirma que cada
-   prompt salió idéntico. El JSON de salida trae `engine`, `cards`,
-   `verbatim: {ok, fails}` y `fit_warnings` (prompts que quedaron muy reducidos
-   o escalados: conviene partirlos en el contenido; salen también por stderr).
-   Con `--strict` el script falla (exit 3) si el texto no coincide 100%; con
-   `--no-verify` se omite la comprobación.
+   El script arma el HTML con `assets/golden-print.css`, corre el auto-fit
+   (`assets/autofit.js`) y renderiza. Al terminar corre una **compuerta verbatim**:
+   re-extrae el texto del PDF y confirma que cada prompt salió idéntico. El JSON de
+   salida trae `engine`, `cards`, `verbatim: {ok, fails}` y `fit_warnings` (prompts
+   que quedaron muy reducidos: conviene partirlos en el contenido). Con `--strict`
+   falla (exit 3) si el texto no coincide; con `--no-verify` se omite.
 
-   **Bloques con estilo (v5.7):** `::: nota Título` … `:::` produce un
-   contenedor atómico con clase propia. Sirve para que un documento largo no
-   se lea apelmazado: destacados, avisos, tarjetas de datos. A diferencia de
-   la tarjeta de prompt, el contenido de adentro SÍ se procesa como Markdown.
+3. Verifica el resultado (ver "Verificación"). Si un prompt salió con el tipo muy
+   reducido, probablemente convenga **partirlo en dos** (decisión de contenido) —
+   avísale al usuario en vez de dejarlo microscópico.
 
-   **Documentos que NO se emiten bajo la marca Comunidad Golden** (el MBA es el
-   caso: su emisor formal es la empresa, y la comunidad no se nombra en material
-   externo) usan `--logo ruta/al/sello.png` para la portada y `--footer "Texto"`
-   para el pie, y `--css tema.css` para la paleta. El tema es una hoja que se
-   anexa DESPUÉS de la de marca y solo redefine variables y colores, así que la
-   identidad Golden nunca se toca. Para auditarlos, `audit_pdf.py --palette
-   paleta.json` con los hex permitidos de esa marca. Sin esos flags, todo sigue
-   siendo Golden.
+### Contenido que se ve, no solo que se lee
 
-   El PDF sale **etiquetado/accesible** (StructTreeRoot) con Playwright. El
-   contenido soporta encabezados, listas, separadores, **tablas** (`| a | b |`
-   con línea `| --- |`), **figuras** (`![Pie](ruta.svg){60%}` en una línea sola:
-   imagen incrustada + pie numerado, atómicos como las tarjetas) y las dos
-   formas de tarjeta de prompt. El texto de las
-   tarjetas se escapa literal SIEMPRE (nunca se aplica markdown al prompt).
+Un informe de párrafos no se lee. Estos bloques producen gráficos vectoriales
+dentro del PDF, y **todos llevan la cifra escrita al lado** — en papel no hay
+cursor que pasar por encima, así que la etiqueta directa es obligatoria, no
+opcional. La sintaxis completa de cada uno está en `references/content-format.md`.
 
-   **Fuentes de marca incrustadas:** el documento usa Inter (títulos/cuerpo) y
-   JetBrains Mono (prompts), incrustadas en base64 desde `assets/fonts/` (OFL),
-   así se ve idéntico en cualquier equipo. Son estáticas y con el Área Privada
-   del cmap eliminada a propósito: si se usara la versión variable, Chrome las
-   convierte en Type 3 y mapea mal caracteres como los corchetes `[ ]`,
-   corrompiendo el copiar-pegar. No reemplaces estas fuentes por las variables.
+| Bloque | Para qué |
+|---|---|
+| `::: kpi` | 3-4 cifras de cabecera con su variación |
+| `::: barras` | comparar magnitudes entre categorías |
+| `::: escala` | avance real contra una meta |
+| `::: comparativa` | antes y después por fila |
+| `::: pasos` | un proceso numerado |
+| `::: qr` | código QR a un enlace, con su pie |
 
-3. Verifica el resultado (ver "Verificación" abajo). Si un prompt salió con el
-   tipo muy reducido, probablemente convenga **partirlo en dos** (decisión de
-   contenido) — avísale al usuario en vez de dejarlo microscópico.
+Además: **figuras** (`![Pie](ruta.svg){60%}` en una línea sola — imagen incrustada
+más pie numerado, atómicos como las tarjetas), **tablas** (`| a | b |` con línea
+`| --- |`, se parten con la cabecera repetida), **enlaces** que quedan clicables, y
+**bloques con estilo** `::: nota Título` … `:::` para que un documento largo no se
+lea apelmazado (a diferencia de la tarjeta de prompt, el contenido de adentro SÍ se
+procesa como Markdown).
+
+Elige la forma por el TRABAJO del dato, no por gusto: magnitud entre categorías →
+barras; avance contra objetivo → escala; una cifra sola que es el titular → KPI;
+un proceso → pasos. Si el dato no tiene trabajo, no lleva gráfico.
+
+### El mapa es opt-in
+
+El documento **no lleva índice** salvo que se pida con `--mapa`, y entonces sale
+solo el primer nivel, a una columna, titulado "EN ESTE DOCUMENTO".
+
+La norma anterior (v5.4) mandaba abrir todo PDF con una página de CONTENIDO que
+listara cada sección y subsección. **FER la revocó** midiendo al lector, no al
+documento: *"la gente no lee los índices, eso no es un libro"*. Un mapa dice dónde
+estás; un índice de dos niveles a tres columnas es una pared de texto en la
+portada. Úsalo solo en documentos largos de consulta salteada; en un entregable
+que se lee de corrido, no.
+
+Los números de página del mapa son **reales**: se calculan en una segunda pasada
+sobre el PDF ya construido y se repite hasta que el mapa se estabiliza.
 
 ### Motor de render
 
-- **Preferido y ya instalado: Playwright (Chromium).** Da numeración de página
-  en el pie ("Comunidad Golden · Página X de Y") y ejecuta el auto-fit midiendo
-  al ancho exacto del PDF. Es el motor por defecto. Si algún día falta:
+- **Preferido y ya instalado: Playwright (Chromium).** Da numeración de página en
+  el pie y ejecuta el auto-fit midiendo al ancho exacto del PDF. Si algún día falta:
   ```bash
   $PY -m pip install playwright && $PY -m playwright install chromium
   ```
 - **Fallback: Chrome headless** (el script lo detecta solo). Mantiene bloques
-  atómicos y ahora mide al ancho correcto (`--window-size`), pero sin numeración
-  en el pie. Si solo hay este, avísale al usuario que para la numeración conviene
-  Playwright.
+  atómicos y mide al ancho correcto (`--window-size`), pero **sin numeración en el
+  pie**. Si solo hay este, dilo: para la numeración conviene Playwright.
+
+**Fuentes de marca incrustadas:** Inter (títulos/cuerpo) y JetBrains Mono
+(prompts), en base64 desde `assets/fonts/` (OFL), para que se vea idéntico en
+cualquier equipo. Son estáticas y con el Área Privada del cmap eliminada **a
+propósito**: la versión variable la convierte Chrome en Type 3 y mapea mal los
+corchetes `[ ]`, corrompiendo el copiar-pegar. **No las reemplaces por las
+variables.** El PDF sale etiquetado/accesible (StructTreeRoot).
 
 ---
 
@@ -235,31 +238,29 @@ $PY scripts/audit_pdf.py documento.pdf --json informe.json
 
 Revisa:
 - **Márgenes** invadidos.
-- **Bloques cortados**: (a) contenido pegado al borde inferior del área útil en
-  una página que no es la última; (b) **detección de bloques monoespaciados
-  (prompts/código) que continúan de una página a la siguiente** — lo peor para
-  copiar y pegar. Esto sí atrapa un prompt partido en un PDF ajeno.
-- **Colores fuera de marca** por **muestreo de píxeles** (renderiza el PDF a
-  imagen y mide el % de área con color fuera de la paleta). Funciona con
-  cualquier PDF (Canva, Word, Chrome), no depende de cómo se codificó el color.
-  Reporta los tonos foráneos dominantes.
+- **Bloques cortados**: (a) contenido pegado al borde inferior del área útil en una
+  página que no es la última; (b) **bloques monoespaciados (prompts/código) que
+  continúan de una página a la siguiente** — lo peor para copiar y pegar. Esto sí
+  atrapa un prompt partido en un PDF ajeno.
+- **Colores fuera de marca** por **muestreo de píxeles** (renderiza a imagen y mide
+  el % de área con color fuera de la paleta). Funciona con cualquier PDF (Canva,
+  Word, Chrome), no depende de cómo se codificó el color. Para auditar material de
+  otra marca, `--palette paleta.json` con sus hex permitidos.
 
-Imprime un informe en Markdown y guarda el JSON. Requiere `pdfplumber`; la
-auditoría de color por píxeles usa `Pillow` + `pdftoppm` (poppler) — si faltan,
-cae al análisis por objeto. Con solo `pypdf` hace un análisis básico.
+Requiere `pdfplumber`; la auditoría de color usa `Pillow` + `pdftoppm` (poppler) —
+si faltan, cae al análisis por objeto. Con solo `pypdf` hace un análisis básico. Si
+el archivo no existe, dice cuál no encuentra y sale con código 2, sin traza cruda.
 
 **Semántica del veredicto:** solo tumban el veredicto los problemas REALES de
 copy-paste — un bloque mono cortado entre páginas (`mono_split`) o un bloque de
-prompt al filo del borde (`bottom_risk` con `mono: true`). El texto normal
-(párrafos) que termina cerca del margen es paginación normal y sale como
-**aviso no bloqueante**. Dos tarjetas en páginas seguidas NO son un corte: el
-auditor detecta la cabecera "PROMPT · COPIAR" de la página siguiente y las
-distingue.
+prompt al filo del borde (`bottom_risk` con `mono: true`). El texto normal que
+termina cerca del margen es paginación normal y sale como **aviso no bloqueante**.
+Dos tarjetas en páginas seguidas NO son un corte: el auditor detecta la cabecera
+"PROMPT · COPIAR" de la siguiente y las distingue.
 
-El auditor es **heurístico y advisory**: señala síntomas. No puede garantizar
-por sí solo que un bloque no se corte — eso solo se garantiza reconstruyendo.
-Preséntale al usuario el veredicto y las 2-3 cosas más importantes a arreglar,
-no un volcado crudo del JSON.
+El auditor es **heurístico y advisory**: señala síntomas. No puede garantizar por sí
+solo que un bloque no se corte — eso solo se garantiza reconstruyendo. Preséntale al
+usuario el veredicto y las 2-3 cosas más importantes, no un volcado del JSON.
 
 ---
 
@@ -267,104 +268,151 @@ no un volcado crudo del JSON.
 
 Cuando la auditoría marca problemas o el usuario quiere el resultado perfecto:
 
-1. Extrae el contenido del PDF viejo (texto por página). Usa `pdfplumber`
+1. Extrae el contenido del PDF viejo (texto por página) con `pdfplumber`
    (`page.extract_text()`) o, si el usuario tiene la fuente original, pídela.
-2. Reescríbelo en Markdown-Golden: identifica qué partes son **prompts
-   copiables** y enciérralas en tarjetas ` ``` ` / `:::`. Respeta el contenido
-   textual del usuario — no lo reinventes, solo lo reestructuras.
+2. Reescríbelo en Markdown-Golden: identifica qué partes son **prompts copiables**
+   y enciérralas en tarjetas ` ``` ` / `:::`. Respeta el contenido textual — no lo
+   reinventes, solo lo reestructuras.
 3. Reconstruye con `build_pdf.py` (Paso A) y verifica.
-4. **Compuerta verbatim obligatoria:** compara el texto del PDF viejo contra el
-   nuevo para garantizar que no cambió ni una palabra:
+4. **Compuerta verbatim obligatoria:** compara el texto del PDF viejo contra el nuevo:
    ```bash
    $PY scripts/verbatim_check.py --old viejo.pdf --new nuevo.pdf
    ```
    Exit 0 = idéntico; exit 3 = hay diferencias (te lista qué segmentos). Si hay
-   diferencias, NO entregues: revisa la extracción y corrige. Nunca alteres el
+   diferencias, **NO entregues**: revisa la extracción y corrige. Nunca alteres el
    texto para "cuadrar" la comparación.
-5. Entrega el PDF nuevo junto a un resumen corto de qué se corrigió (solo
+5. Entrega el PDF nuevo con un resumen corto de qué se corrigió (solo
    estructura/maquetación, nunca contenido).
+
+### 🔴 EL PUNTO CIEGO DEL PASO C · léelo antes de arreglar un PDF ajeno
+
+**La compuerta verbatim compara EXTRACCIÓN contra EXTRACCIÓN.** Garantiza *"no
+cambié lo que leí"*, **NO** *"lo que leí es lo que el documento decía"*. Es cierto
+por construcción: si el extractor se equivoca, los dos lados traen el mismo error
+y la comparación da OK con el daño dentro.
+
+**Honestidad sobre esto:** el caso que se creyó haber medido en v6.2 resultó ser
+un error del fixture, no del extractor (ver v6.4 en el changelog). **No hay
+ninguna corrupción de extracción medida en esta skill.** El riesgo es real por
+construcción, no por observación, y por eso se cubre con una instrucción y no con
+un detector: un guardián contra un fallo imaginario acusa a quien escribe bien.
+
+Qué hacer, en orden:
+
+1. **Pide la fuente original** (el .docx, el Google Doc, el Canva). Si existe,
+   reconstruye desde ahí y la pregunta ni se plantea.
+2. Si solo hay el PDF, **abre el PDF viejo y el nuevo y compara con los ojos los
+   bloques copiables**, sobre todo los que traen símbolos: corchetes, comillas,
+   operadores. Es donde falla la extracción cuando falla.
+3. Si el documento original existe pero no puedes verlo, **dilo al entregar**:
+   qué no pudiste comprobar y por qué. No lo des por bueno en silencio.
+
+**Reserva que sigue abierta:** este camino se ha ejercido de punta a punta contra
+un PDF ajeno **fabricado para la prueba** (Chrome, Georgia + Courier, prompt
+partido entre páginas: el auditor lo cazó, la reconstrucción salió APROBADA y los
+56 segmentos se conservaron). **No se ha ejercido contra un PDF real de un cliente**
+salido de Canva, Word o InDesign, que traen columnas, tablas y cajas de texto que
+el extractor puede devolver en otro orden. La primera vez que ocurra, verifica con
+más cuidado del normal y reporta lo que falle a la fábrica.
 
 ---
 
 ## Verificación (siempre antes de entregar)
 
 **ORDEN OBLIGATORIO (norma FER):** *la skill revisa, aprueba, y ahí mismo sí se
-entrega.* La auditoría va **ANTES** de instalar el PDF en su destino, no después
-de anunciarlo. El flujo correcto es: `autoprueba.py` (la skill está sana) →
-renderizar a un **PDF candidato** en una carpeta temporal → `audit_pdf.py` sobre
-ese candidato → **solo si dice APROBADO** se copia al destino final y se avisa.
-Nunca sobrescribas el PDF bueno con uno sin auditar, ni digas "listo" antes del
-veredicto.
+entrega.* La auditoría va **ANTES** de instalar el PDF en su destino, no después de
+anunciarlo. El flujo correcto es: `autoprueba.py` (la skill está sana) → renderizar
+a un **PDF candidato** en carpeta temporal → `audit_pdf.py` sobre ese candidato →
+**solo si dice APROBADO** se copia al destino y se avisa. Nunca sobrescribas el PDF
+bueno con uno sin auditar, ni digas "listo" antes del veredicto.
 
-Confirma que el PDF quedó bien:
+Confirma que quedó bien:
 
-- **Bloques atómicos:** audita el PDF nuevo con `audit_pdf.py`; el veredicto
-  debe ser APROBADO (`mono_split` vacío y sin bloques de prompt al filo). Los
-  avisos de texto normal cerca del borde no bloquean. Si un PROMPT sí roza el
-  borde, sube su prioridad para partirlo en contenido.
-- **Marca:** portada con logo y kicker "Comunidad Golden", dorado presente,
-  fondo claro, pie "Comunidad Golden … Página X de Y".
+- **Bloques atómicos:** el veredicto de `audit_pdf.py` debe ser APROBADO
+  (`mono_split` vacío y sin bloques de prompt al filo). Los avisos de texto normal
+  cerca del borde no bloquean. Si un PROMPT roza el borde, súbelo a prioridad para
+  partirlo en contenido.
+- **Identidad:** la que se pidió, no la que se supone. Con `--tema comunidad-golden`
+  se espera logo, kicker y pie de Comunidad Golden; **sin tema se espera que NO
+  haya ninguno de los tres** — un documento neutro con marca es el defecto, no el
+  documento neutro.
 - **Márgenes:** nada tocando el borde.
-- Si puedes, abre el PDF (o su HTML intermedio con `--save-html`) para una
-  revisión visual rápida.
+- **ÁBRELO Y MÍRALO.** Renderiza al menos la primera página a imagen
+  (`pdftoppm -png -r 60 -f 1 -l 1 salida.pdf /tmp/v`) y obsérvala. Los defectos que
+  más duelen — un logo gigante, un hueco a media portada, un gráfico ilegible — no
+  los caza ningún script, y ninguno de los que se colaron en producción se habría
+  colado si alguien hubiera abierto el archivo.
 
-### Prueba de regresión (self-test)
+### Prueba de regresión
 
-Si tocas el CSS, el parser o el auto-fit, corre el self-test antes de dar por
-buena la skill. Construye una muestra y verifica build + verbatim + anti-corte:
+Si tocas el CSS, el parser, el auto-fit o los componentes, corre esto antes de dar
+por buena la skill:
 
 ```bash
 $PY scripts/autoprueba.py
 ```
 
-Debe imprimir `TODO OK`. Si algo sale FAIL, arréglalo antes de usar la skill en
-material real. La muestra que construye es `assets/autoprueba-muestra.md`, que trae
-horneadas las trampas de copy-paste (`>>`, `//`, `https://`, `<<X>>`, un emoji y
-una tarjeta larga): **no edites ese texto**, es el fixture de regresión.
+Debe imprimir `TODO OK` con **26 de 26**. La muestra que construye es
+`assets/autoprueba-muestra.md`, que trae horneadas las trampas de copy-paste
+(`>>`, `//`, `https://`, `<<X>>`, un emoji y una tarjeta larga): **no edites ese
+texto**, es el fixture de regresión.
+
+**Toda versión que cambie comportamiento entra con su prueba**, y la prueba se
+verifica **rompiendo a propósito lo que vigila**. No es ceremonia: un guardián de
+esta misma skill pasó en verde con el defecto repuesto porque comparaba la caja del
+texto y el PDF lo imprime en versalitas. **Un guardián que parece trabajar es peor
+que ninguno**, porque da permiso para dejar de mirar.
 
 **Dependencias por script** (para que un FAIL se lea bien): `build_pdf.py` y
-`audit_pdf.py` necesitan `pdfplumber` (compuerta verbatim y auditoría) y
-`playwright` (motor con numeración); la auditoría de color usa `Pillow` +
-`pdftoppm`; `autoprueba.py` además usa `pypdf` para leer las fuentes incrustadas.
-Todas son **opcionales con degradación**: si falta una, esa comprobación sale
-FAIL con el motivo y el resto sigue — ninguna tumba la corrida. Si el intérprete
-del sistema no las tiene, corre los scripts con uno que sí (un venv propio) en
-vez de asumir que la skill quedó mal.
+`audit_pdf.py` necesitan `pdfplumber` y `playwright`; la auditoría de color usa
+`Pillow` + `pdftoppm`; `autoprueba.py` además usa `pypdf`. Todas son **opcionales
+con degradación**: si falta una, esa comprobación sale **N/D** (no verificable por
+el entorno) y el resto sigue. **N/D no es FAIL**: un rojo falso hace que quien lo
+lea concluya que el estándar está roto cuando lo que falta es una librería. Pero si
+lo que no se resuelve es algo **del artefacto** (un token renombrado, un fondo no
+declarado), eso sí es FALLO.
 
 ## Personalización de marca
 
 Todo vive en `assets/`:
-- `golden-brand.json` — tokens (colores, geometría, paleta permitida para el auditor). El porqué de cada valor y la fuente de verdad de la identidad están en `references/brand.md`.
-- `golden-print.css` — estilo de impresión (portada, tarjetas, tablas).
-- `logo-golden.svg` — **emblema oficial Golden Group Community** (el círculo
-  dorado/negro con las GG; es el PNG oficial incrustado en un envoltorio SVG).
-  (El naranja de comunidad que se usó de origen ya NO está en disco: la carpeta
-  `PROYECTOS/SKOOL/` fue retirada. Si algún día se quiere volver a él, hay que
-  re-subir el archivo; no queda copia dentro de la skill.)
-- `autofit.js` — lógica anti-corte. El alto máximo por tarjeta (`--card-max-mm`,
-  variable CSS) lo **deriva build_pdf.py de la geometría real** (única fuente de
-  verdad: área útil − colchón) y lo inyecta; el valor escrito en el CSS es solo
-  el fallback si el HTML se usa suelto. No es un flag de línea de comandos.
+- `temas/<id>.json` — las identidades (ver "La identidad se pide").
+- `golden-brand.json` — tokens de Golden (colores, geometría, paleta permitida para
+  el auditor). El porqué de cada valor y la fuente de verdad están en
+  `references/brand.md`.
+- `golden-print.css` — estilo de impresión (portada, tarjetas, tablas, componentes).
+- `logo-golden.svg` — emblema oficial Golden Group Community. Solo se usa si un
+  tema o `--logo` lo pide.
+- `autofit.js` — lógica anti-corte. El alto máximo por tarjeta (`--card-max-mm`) lo
+  **deriva build_pdf.py de la geometría real** y lo inyecta; el valor del CSS es
+  solo el fallback si el HTML se usa suelto. No es un flag de línea de comandos.
+
+**Contraste:** los dorados de marca NO pasan WCAG para texto; existe
+`--gold-text` solo para texto y el dorado queda intacto en uso gráfico. Los
+números y el porqué, en `references/brand.md`. La prueba 16 lo calcula y falla
+por debajo de 4.5:1, así que la regla es ejecutable.
 
 ## Estilo de textos (marca Golden)
 
 Cualquier texto que redactes para estos PDFs sigue las reglas de Golden:
-- **Nunca** signos de apertura `¿` ni `¡`; solo el de cierre. Suena más humano.
+- **Nunca** signos de apertura de interrogación ni de exclamación; solo el de
+  cierre. Suena más humano.
 - Tono claro y directo, sin relleno.
 - El contenido de los prompts es del usuario: respétalo literal, no lo adornes.
 
-## Norma de FER: copys y prompts SIEMPRE numerados en tarjetas separadas (2026-07-25)
+## Norma de FER · una tarjeta por copy
 
-Cuando el contenido trae VARIOS elementos copiables de la misma familia (5 copys de anuncio,
-5 titulares, varios prompts de imagen, guiones), la maquetación obligatoria es:
-- **Cada texto principal = SU PROPIA tarjeta numerada** con título en el fence
-  (` ``` Texto principal 1 `, ` ``` Texto principal 2 `…). Uno abajo del otro, bien separados.
-- Elementos de una línea (titulares, descripciones) SÍ pueden ir juntos en UNA tarjeta,
-  pero **uno por línea, numerados** (`1. …` `2. …`), jamás en párrafo corrido.
-- **PROHIBIDO** el párrafo que une varios copys con "· 1. … 2. … 3. …": mata el copy-paste,
-  ahoga los números y da pereza leerlo. Si el autor del contenido lo trae así, la skill lo
-  reestructura en tarjetas (es maquetación, no cambio de texto — el contenido queda idéntico).
-- Marcadores tipo `[PENDIENTE …]` en texto corrido van en **negrita**, no en backticks: el
-  monoespaciado en línea puede cruzar de página y el auditor lo marca como prompt cortado.
-- Ojo autor: la skill garantiza tarjetas atómicas, pero QUÉ es tarjeta lo decide quien escribe
-  el Markdown-Golden. Ante lista de copys, la decisión correcta es SIEMPRE una tarjeta por copy.
+Cuando el contenido trae VARIOS elementos copiables de la misma familia (5 copys,
+5 titulares, varios prompts), **cada texto principal va en SU PROPIA tarjeta
+numerada**, jamás varios en un párrafo corrido: eso mata el copy-paste. Las reglas
+completas, con los casos borde, están en `references/content-format.md` bajo
+"Norma de FER · una tarjeta por copy". Reestructurar así es maquetación, no cambio
+de texto: el contenido queda idéntico.
+
+## Archivos de apoyo
+
+| Archivo | Cuándo leerlo |
+|---|---|
+| `references/content-format.md` | **antes de escribir el Markdown**: sintaxis completa de tarjetas, figuras, tablas, componentes visuales y temas |
+| `references/brand.md` | antes de tocar colores, fuentes o geometría: de dónde sale cada valor |
+| `references/changelog.md` | para saber por qué una regla existe, o antes de deshacer algo que parece raro |
+| `scripts/visuales.py` | no se invoca directo: es el motor que `build_pdf.py` importa para dibujar los componentes visuales (KPI, barras, escala, comparativa, pasos, QR) |

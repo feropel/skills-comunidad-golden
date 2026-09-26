@@ -1,6 +1,20 @@
 # Cómo sacar la cola y las huellas del panel de Dropi
 
-## Por qué no hay API
+## Qué tiene API y qué no
+
+**La Torre Logística y los fletes SÍ se bajan por API, sin navegador**, con la llave CONFIO del
+negocio (`DROPI-LOGISTICA/.secrets/token-dropi-<negocio>.txt`) contra `api-v2.dropi.co/logistic/...`
+usando `X-Authorization: Bearer <llave>`. Ojo con la cabecera, son dos distintas según el host:
+contra `api.dropi.co/integrations/...` va `dropi-integration-key`, y ese mismo encabezado contra
+`api-v2` devuelve 500.
+
+Dos cuidados al pedir la Torre: el bloque global **se congela en el último mes publicado** (pedir
+más allá no falla ni viene vacío, simplemente no suma), y **ese mes frontera llega inmaduro y no
+madura nunca**. La ventana válida termina el último día del mes ANTERIOR a la frontera. Para
+hallarla se piden meses calendario puros cada vez más recientes hasta que `data.dropi` venga
+`null`: el último NO-null es la frontera, y se excluye.
+
+**La COLA DE PEDIDOS es lo que no tiene API.**
 
 El panel pide los pedidos a `GET https://api.dropi.co/api/orders/myorders/v2` (host `api.dropi.co`,
 **no** `api-v2`) con params `status`, `from`, `until`, `result_number`, `start`, `textToSearch`,

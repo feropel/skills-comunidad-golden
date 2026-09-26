@@ -41,7 +41,7 @@ La ejecución — página, creativos, pauta, bot, montaje — vive en `golden360
 ## 3. Apoyos de investigación (leídos EN VIVO, última versión)
 | Necesidad | Apoyo | Si falta |
 |---|---|---|
-| Validar demanda | `golden-productos-ganadores` | Ad Library + TikTok Creative Center a mano |
+| Validar demanda | `golden-dropkiller-productos-ganadores` | Ad Library + TikTok Creative Center a mano |
 | Pauta previa del dueño | `golden-meta-ads-analysis` | leer el export a mano, marcar `(estimado)` |
 | Pedidos reales (COD) | `golden-dropi-analisis` | pedir el export y leerlo directo |
 | Inventario de archivos | `golden-archivos` | listar la carpeta a mano |
@@ -134,8 +134,9 @@ el contenido. **Nadie lo hubiera detectado sin abrir el XML y contar menciones p
 (`yt-dlp --write-comments`) y la transcripción local (`whisper-cli`) con la frase *"el entorno no
 tiene acceso a esas herramientas de scraping"* — **sin ejecutar `which yt-dlp` ni `which
 whisper-cli` primero**. Verificado en la máquina real: **ambas SÍ están instaladas** —
-`yt-dlp` en `/opt/homebrew/bin/yt-dlp` (v2026.07.04) y `whisper-cli` en
-`/opt/homebrew/bin/whisper-cli` (paquete `whisper-cpp` 1.9.1), con el modelo ya cacheado en
+`yt-dlp` en `/opt/homebrew/bin/yt-dlp` y `whisper-cli` en
+`/opt/homebrew/bin/whisper-cli` (paquete `whisper-cpp`; las versiones se comprueban en el
+momento con `--version`, no se escriben aquí porque caducan solas), con el modelo ya cacheado en
 `~/.cache/hyperframes/whisper/models/ggml-small.bin`. El hueco no era de la máquina: era que el
 agente **asumió** en vez de **verificar**.
 - **CANDADO OBLIGATORIO:** antes de escribir `[PENDIENTE]` por "herramienta no disponible", correr
@@ -174,3 +175,45 @@ rentable" y "Golden NO puede abastecer HOY", pero el veredicto de la sección 10
   EXIGE `02-documento-maestro.md` (10), no el número de secciones que el documento efectivamente
   escribió. Declarar "9 de 9" cuando el estándar exige 10 y faltan Buyer Personas o Estrategia de
   Mensaje es cobertura falsa — cambiar el denominador para que cierre en 100% no es honestidad.
+
+## 11. 🚨 LA FICHA SALE DE LA ETIQUETA, NUNCA DEL COMPETIDOR (incidente real, 2026-09-05)
+Se publicaron **5 ingredientes falsos y un ALÉRGENO oculto** (nuez negra) por copiar los
+ingredientes de la página de un competidor con **el mismo nombre comercial y otra fórmula**.
+- El **nombre comercial NO identifica la fórmula**: dos tiendas venden el mismo nombre con
+  composiciones distintas. Un competidor sirve para precio/oferta/ángulo; **jamás** para
+  ingredientes, gramaje, activos ni advertencias.
+- **Todo alérgeno del envase se transcribe literal y se publica** (`producto_real.alergenos` +
+  sección 2 del documento). Es lo único de una ficha que puede hacerle **daño físico** a alguien.
+  Sin foto legible del panel: `[ALÉRGENOS NO VERIFICADOS]`, nunca "no tiene".
+- **Ampliar el envase es un paso, no un extra:** `scripts/etiqueta_desde_video.py` saca fotogramas
+  del video del cliente y los amplía para leerlos. Se agota el material del dueño ANTES de un
+  `[PENDIENTE]` (esto es la regla 10.5 llevada a su forma dura: el dato estaba en la foto).
+- **Si el material del cliente contradice tu trabajo, la hipótesis por defecto es que el error es
+  TUYO.** Dos veces el proveedor tuvo razón y dos veces se asumió que el equivocado era él.
+
+## 12. 🚨 UN CERO SE PRUEBA, NO SE CREE
+"No se hallaron reseñas", "no hay competidores", "no tiene alérgenos", "no está en Dropi": un CERO
+exige **la misma evidencia que un hallazgo** — qué se buscó, dónde, con qué término, qué devolvió.
+Un cero sin método detrás es una suposición disfrazada de dato, y es peor que un `[PENDIENTE]`
+porque cierra la puerta a seguir buscando. Se escribe siempre así:
+*"0 resultados · buscado en X, Y, Z con los términos A y B, el <fecha> · cobertura: <qué NO se pudo mirar>."*
+
+## 13. 🚨 UN DATO MEDIDO CADUCA
+Toda cifra del estudio (precio de competidor, volumen, saturación, matriz de fuentes, tasa de
+entrega) lleva **fecha de medición** y **quién la mide**. Al reutilizar un estudio viejo se revisa
+la fecha antes de decidir con él: los precios y la saturación de un nicho COD se mueven en semanas.
+La matriz de scraping tiene su propio detector (`scripts/verificar_fuentes.py`, avisa a los 60 días);
+para el resto, la fecha al lado de la cifra es el mínimo. Donde haya cifra, va la fuente que la mide.
+
+## 14. El DISPARADOR tiene tope: la `description` se trunca y deja de disparar
+El `description` del frontmatter es lo ÚNICO que decide si la skill se activa. Tiene límite duro:
+- **1024 caracteres** es el tope que valida `agentskills validate` (medido por el Centro de Mando y
+  por la fábrica de `golden360`, 2026-09).
+- **~1536** es donde se observó el TRUNCADO en el listado: pasado ese punto las frases del final
+  simplemente **no disparan**, sin error visible. Ese fue el fallo real del 2026-08-07 aquí: la
+  description medía 1956 caracteres y las últimas frases no activaban nada. Se recortó a 831.
+- **Estado hoy: 879 caracteres**, con margen. Al editarla: medir antes y después, y dejar en la
+  description las FRASES REALES del usuario (lo que dispara), moviendo rutas y explicaciones al
+  cuerpo. Verificación: `python3 -c "print(len(open('SKILL.md').read().split('---')[1]))"` o el
+  inventario del auditor, que ya reporta el conteo real.
+

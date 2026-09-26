@@ -38,7 +38,7 @@ válida es el fabricante, no un revendedor.
 ## 🚧 COMPUERTA DE IDENTIDAD DEL PRODUCTO (paso duro, ANTES de cualquier claim de ingrediente)
 
 **La versión local puede declarar OTRA FÓRMULA que la marca original.** Caso real (chat Dental
-un producto de cliente, Chile, 2026-08-07): los revendedores chilenos del mismo frasco declaraban
+Cavity Healing, Chile, 2026-08-07): los revendedores chilenos del mismo frasco declaraban
 **glicerina, pantenol y PCA de sodio** — humectantes — mientras la marca original (Amazon
 B0DB2ZBXZD, US$69) declara **nano-hidroxiapatita** como activo. El ingrediente estrella podría
 no estar en el frasco que se despacha.
@@ -58,7 +58,7 @@ tiene que ser la fuente del frasco que de verdad viaja en el paquete.
 
 ## 🚧 El NOMBRE del producto es un ítem de COMPLIANCE (evaluarlo en esta fase)
 
-Un nombre puede prometer cura: **"Dental un producto de cliente" promete curación** — era el mayor
+Un nombre puede prometer cura: **"Dental Cavity Healing" promete curación** — era el mayor
 pasivo legal del negocio y ninguna revisión lo detectaba, porque el mapa de compliance mira el
 copy, no el nombre. Regla: evaluar el nombre en Fase 0/1 y, si promete cura o resultado médico,
 **proponer renombre** (en el caso real se propuso "Dental Shield / Escudo Dental"). El veredicto
@@ -79,6 +79,57 @@ se copia sin darse cuenta: así se heredan claims que nadie verificó nunca.
   agresivas, 30 ml" heredados de la descripción vieja — la etiqueta real no decía NADA de eso.
   La compuerta de veracidad lo cazó al crear el expediente. Dejar `_incidente` anotado en el
   PRODUCTO.json para que el próximo no reintroduzca los claims eliminados.
+
+## 🚨 TRAMPA DEL HOMÓNIMO: mismo NOMBRE COMERCIAL ≠ mismo PRODUCTO (incidente real, 2026-09-05)
+
+**Qué pasó:** se publicó una ficha de suplemento con **cinco ingredientes falsos** y un
+**ALÉRGENO sin declarar** (nuez negra), durante horas. Causa: los ingredientes se copiaron de la
+**página de un COMPETIDOR** que vendía otra formulación **con el mismo nombre comercial**. La
+fuente buena llevaba días en el material del cliente: impresa en la **etiqueta del frasco**,
+legible ampliando un fotograma de un video del proveedor. Nadie amplió el fotograma.
+
+- **LEY: la ficha técnica sale de la ETIQUETA DEL PRODUCTO QUE SE DESPACHA.** Jamás de la
+  descripción de un competidor, aunque venda "lo mismo" con el mismo nombre. Dos tiendas pueden
+  vender el mismo nombre comercial con fórmulas distintas: el nombre no identifica la fórmula.
+- Un competidor solo es fuente válida para **precio, oferta, ángulo y posicionamiento** — nunca
+  para ingredientes, gramaje, activos, contraindicaciones ni advertencias.
+- Si la única fuente de un ingrediente es una página ajena, ese ingrediente entra como
+  `claims.no_verificables` y **NO se publica**, por muy convincente que se lea.
+
+## 🚨 ALÉRGENOS: lo único de una ficha que puede hacer DAÑO FÍSICO
+
+- **Toda advertencia de alérgeno del envase se transcribe y se publica**, literal: "CONTAINS…",
+  "Contiene…", "Elaborado en instalaciones que también procesan…", trazas.
+- Se copian a `producto_real.alergenos` del expediente **y** a la sección 2 del documento maestro.
+- Un alérgeno **no encontrado NO es un alérgeno ausente**: sin foto legible del panel completo se
+  escribe `[ALÉRGENOS NO VERIFICADOS — falta foto del panel]`, nunca "no tiene".
+- Frutos secos (nuez negra, almendra), lácteos, soya, gluten, marisco, huevo, sulfitos: los más
+  frecuentes en suplementos y los que más daño hacen callados.
+
+## 🔬 AMPLIAR EL ENVASE ES UN PASO DE LA INVESTIGACIÓN, no un extra
+
+El dato que faltaba no estaba en el texto, ni en el copy, ni en el estudio: **estaba en la foto**.
+Antes de declarar `[PENDIENTE]` cualquier dato de etiqueta, se agota el material del cliente:
+
+```bash
+# video del proveedor/cliente → fotogramas ampliados y legibles
+python3 ~/.claude/skills/golden-investigacion-mercado/scripts/etiqueta_desde_video.py \
+  "material/video-proveedor.mp4" --n 12 --zoom 4
+# foto suelta, aislando el panel de ingredientes
+python3 .../etiqueta_desde_video.py "foto.jpg" --zoom 6 --crop 0.13,0.36,0.72,0.55
+```
+Luego **se ABREN los PNG con Read** y se transcribe literal. *Medido el 2026-09-05: de un video de
+640×480 se leyó sin ambigüedad "CONTAINS: BLACK WALNUT (nuez negra)" tras recortar y ampliar ×6.*
+Ampliar **no inventa nitidez**: lo que siga ilegible se marca `[ILEGIBLE]` y se pide otra foto.
+
+## ⚖️ Si el material del CLIENTE contradice tu trabajo, el error es TUYO hasta probar lo contrario
+
+En el incidente, **dos veces el proveedor tuvo razón y dos veces se asumió que el equivocado era
+él**. Regla: ante una contradicción entre lo que tú investigaste y lo que muestra el material del
+dueño (foto, video, etiqueta, factura), la **hipótesis por defecto es que el error es tuyo**. Se
+vuelve a la fuente física ANTES de discutir. El cliente tiene el frasco en la mano; tú tienes una
+página web.
+
 
 ## Paso 3 · Existencia en el ecosistema
 
@@ -118,7 +169,10 @@ sustituir el producto por otro parecido.
 - [ ] Compuerta de identidad: producto original rastreado (costo, ml, ingredientes) y fórmula
       local contrastada; ningún claim de ingrediente sin foto macro de la etiqueta que se despacha
 - [ ] Nombre evaluado como ítem de compliance (promete cura? → proponer renombre)
-- [ ] INCI completo con URL del fabricante
+- [ ] INCI completo con URL del fabricante (de la ETIQUETA que se despacha, NUNCA de un competidor)
+- [ ] **ALÉRGENOS del envase transcritos literal** (o `[ALÉRGENOS NO VERIFICADOS]` con la razón)
+- [ ] Material del cliente AGOTADO: videos/fotos ampliados con `etiqueta_desde_video.py` antes de
+      declarar `[PENDIENTE]` cualquier dato de etiqueta
 - [ ] Modo de uso y tiempos oficiales
 - [ ] Alias de Dropi mapeados (o "no está en Dropi")
 - [ ] Existe o no en el catálogo Shopify → decide rama A o B

@@ -25,12 +25,32 @@ Soy [NOMBRE], tu asesora personal 😊
 Dame un momentico mientras te comparto algo que te va a encantar 👇
 ```
 
-## 2. Multimedia (UNA pieza: el hero sin precio — ver regla anti-catálogo en `recursos-visuales.md`)
-1. Imagen de producto + propuesta de valor (con envío gratis / contraentrega visible)
-2. Video corto (15-30s) mostrando producto y uso — el que más convierte
-3. Imagen de prueba social (reseñas / testimonios / "+N clientes")
+### 🔴 EL SALUDO NO LE ASIGNA GÉNERO AL CLIENTE (orden de FER, 2026-09-22)
+Encontrado en vivo: un producto de cosmética antiedad abría con **"Bienvenida"**. Lo compran hombres, y además se compra de regalo. **Es la fuga más silenciosa que existe:** el que se siente en la conversación equivocada no reclama ni pregunta, simplemente no contesta — y eso no aparece en ninguna métrica, porque se ve igual que un cliente frío.
 
-Si solo se puede una pieza, usar el video. No hace falta texto entre foto y foto si las imágenes ya traen texto.
+Palabras de FER: *"si es hombre o mujer, puedes tener un saludo neutro o puedes saludar con el @"*. Tres salidas válidas, en orden de preferencia:
+
+1. **Saluda al PRODUCTO, no a la persona.** Es la doctrina de Juanma —el saludo va a lo único que comparten comprador y vendedor— y de paso el problema desaparece: *"Hola! Soy Valentina, de <negocio>. Dame un momentico que te muestro el <producto> 👇"*. No hay género que asignar porque no se saluda a nadie por su condición.
+2. **Salúdalo por su NOMBRE**, que es lo más cálido y también neutro. ⚠️ Ojo: ninguno de los 12 productos del espacio de referencia usa variables hoy (medido 2026-09-22, cero ocurrencias en los 12 campos), así que **el token exacto se confirma en el panel antes de usarlo** — no se copia de otra plataforma ni se supone.
+3. **Forma neutra explícita:** "Bienvenido/a", "Bienvenid@". Funciona, pero se lee a formulario; úsala si las dos anteriores no aplican.
+
+⛔ Lo mismo vale para "querido/a", "estimado/a" y "señor/señora" en cualquier campo que abra la conversación.
+
+**Compuerta:** `validar.sh --campo saludo` bloquea el género asignado y deja pasar las tres salidas. Probada en los dos sentidos, 6 de 6.
+
+## 2. Multimedia (la ESCALERA de apertura, sin precio — ver `recursos-visuales.md`)
+**No son candidatas sueltas ni una lista de la que eliges una: son tres peldaños que se contestan en cadena.** Cada uno responde una pregunta distinta, en el orden en que el cliente se las hace:
+
+1. **EL RESULTADO** — ¿de verdad se nota? Antes/después, o el producto haciendo lo que promete. Si el producto se entiende mejor en movimiento (un aparato, algo que se arma), aquí va un video de 8-15 s en vez de la imagen.
+2. **EL MECANISMO** — ¿por qué funcionaría en mí? Qué es y cómo actúa, en concreto, con dos o tres beneficios cortos. Es el peldaño que casi nunca existe y el que más falta hace: si no está, se compone.
+3. **LA PRUEBA** — ¿y si me estafan? Clientes reales, y la banda que quita el riesgo (envío gratis, pagas al recibir).
+
+Un cuarto peldaño **solo** si el producto tiene variantes que hay que ver (tonos, tallas, fragancias). Y si el cliente llega de una pauta muy editada, el peldaño de la prueba puede ser la **imagen real del producto**, que ataca justo esa duda.
+
+⛔ **Lo que NO entra en la apertura:** modo de uso, ficha técnica, tablas y listas de siete beneficios. Eso es material de consulta y va bajo disparador. Apilarlo al abrir es el catálogo que satura.
+⛔ **Si no tienes los tres, manda los que tengas.** Dos peldaños reales valen más que tres con uno de relleno. La vía de CERO piezas también sigue siendo legítima y es la que más te diferencia.
+🔴 **Con la escalera montada, el bloque anti-fuga del prompt deja de ser opcional:** Chatea reenvía la multimedia INICIAL COMPLETA cuando el cliente pide una imagen y el prompt no dice qué mandar (ver `plantilla-prompt.md`). Con una pieza eso era un ruido; con tres es el catálogo entero de golpe.
+No hace falta texto entre pieza y pieza si la imagen ya trae texto.
 
 ⛔ El texto que acompaña la multimedia TAMPOCO lleva una pregunta que espere respuesta (no compitas con la pregunta de entrada). Puede ser una frase de expectativa ("mira esto 👇"), pero la única pregunta va en el paso 3.
 
@@ -56,6 +76,27 @@ Esa frase decide si un recordatorio sirve o es ruido. Porque el diagnóstico del
 - "Nos quedan solo las últimas 5 unidades, te gustaría apartar la tuya?" ← además suele ser urgencia inventada (ver LEY DE LA URGENCIA REAL)
 - Repetir el precio o la oferta que ya mandaste.
 Todos dicen lo mismo: *existimos, míranos, aquí estamos*. Ninguno le da al cliente algo NUEVO por lo que valga la pena escribir.
+
+### 🔴 EL RECORDATORIO SE ESCRIBE COMO INSTRUCCIÓN, NO COMO TEXTO FIJO (aprendido en corrida real, 2026-09-22)
+
+El campo de recordatorio de Chatea admite **dos formas**, y la skill venía entregando la peor:
+
+- **Texto fijo** — se envía tal cual. Es lo que casi todo el mundo pone.
+- **Instrucción para la IA** — se escribe como `EVENTO: … ` y el modelo COMPONE el mensaje en el momento.
+
+**La instrucción gana, y no por estilo: por una razón estructural.** La ley del recordatorio exige darle al cliente una *razón nueva* para contestar, y buena parte de esa razón es **retomar el punto exacto donde se quedó la conversación**. Un texto fijo no puede saber dónde se quedó — se escribió antes de que la conversación existiera. Una instrucción sí. Un texto fijo solo puede hablar del producto en abstracto; por eso termina siempre en "sigo por aquí por si te quedó alguna duda", que es el antipatrón.
+
+**Cómo se escribe una instrucción de recordatorio:**
+```
+EVENTO: [qué pasó — el cliente dejó de responder, es el segundo intento, etc.]
+[Qué NO hacer, porque es lo que hace todo el mundo]
+[Los movimientos, numerados y en orden]
+[El límite: palabras, emojis, una sola pregunta]
+[Y siempre: retoma donde quedó, sin repetir lo ya dicho]
+```
+
+⛔ **EL PRESUPUESTO, MEDIDO EN CAMPO Y NO ESTIMADO.** El campo tiene **800 caracteres** y una instrucción bien escrita come casi todos. En la corrida de 11 productos, una plantilla de 790 caracteres **reventó el tope en uno de ellos** (810) solo porque el gancho de ese producto era una frase más larga.
+**Presupuesta ~650 y deja 150 de margen.** La parte variable por producto es la que crece, y crece justo donde no la estás mirando. Compruébalo siempre con `validar.sh --campo recordatorio <archivo>`.
 
 ### RECORDATORIO 1 (2 horas) — LA SEGUNDA CONEXIÓN
 No es un recordatorio: es volver a conectar. **La premisa: si se fue, es porque le quedó una duda** — casi siempre de confianza, no de precio. Así que en vez de empujar, pregunta cuál es esa duda y ofrece demostrar.
@@ -101,7 +142,7 @@ Uishhh, ni mi ex me había ignorado así 😅
 ## 5. Remarketing (reabre la conversación tras varias horas)
 Cada "Configuración Remarketing" en Chatea tiene un interruptor (activar) y TRES campos. La skill entrega los tres, listos:
 
-**Campo 1 — Tiempo Remarketing:** número + unidad. FIJO: **Remarketing 1 = 3 Horas · Remarketing 2 = 6 Horas.**
+**Campo 1 — Tiempo Remarketing:** número + unidad. FIJO: **Remarketing 1 = 3 Horas · Remarketing 2 = 8 Horas.**
 
 **Campo 2 — Plantilla Mensaje:** es un desplegable donde se elige una **plantilla de Meta ya APROBADA**, o "No enviar plantilla". La plantilla se crea aparte en el Administrador de WhatsApp/Meta. La skill DISEÑA esa plantilla completa para que el vendedor la registre en Meta y luego la seleccione aquí. Anatomía de la plantilla de Meta:
 - **Nombre:** minúsculas, SIN espacios, con guion bajo `_`. Ej.: `remarketing_1_[producto]`.
@@ -179,6 +220,21 @@ comentarios. Reglas duras:
 Entrega las DOS líneas, como texto crudo para copiar y pegar, sin prefijos ni comillas. NO
 agregues más palabras sueltas aparte de la palabra corta única del producto.
 
+### 🔴 EL DISPARADOR CASA BYTE A BYTE, Y ESO TIENE UNA TRAMPA DE CLASE (ley de la casa, horneada v3.49.0)
+Esta regla vivía solo en la memoria del ecosistema, y una regla que vive en la memoria **no es un guardarraíl: es un recuerdo.** Aquí queda dentro de la skill que produce el activador.
+
+**El botón o enlace de WhatsApp que apunta al bot NO lleva texto: lleva un DISPARADOR, y casa BYTE A BYTE.** Fórmula canónica verificada:
+```
+Hola quiero información y precio de <PRODUCTO>
+```
+Sin coma después de "Hola". CON "y precio". Un carácter de diferencia y no casa.
+
+**Qué pasa cuando no casa, y por qué nadie se entera:** el mensaje cae en *"Producto/Servicio no encontrado"* y aterriza en el tablero **"No automatizado"**, que no mira nadie. No hay error, no hay alerta: hay clientes que escribieron y a los que nunca contestó nadie.
+
+⛔ **LA TRAMPA, y es de clase, no un descuido.** El nombre que dispara es **el registrado en el bot field**, y casi nunca coincide con el título comercial de la tienda. Disparador `Marca` contra `product.title` = *"Marca Spray | Frescura que Dura 48 Horas"*. **Tomar el título del producto automáticamente parece lo elegante y es EXACTAMENTE lo que rompe el byte a byte.** El disparador se copia A MANO del bot field. El título comercial solo sirve para mensajes que lee una persona (atención al cliente), nunca para el trigger.
+
+Esto no es teoría: una skill hermana generó `"Hola, quiero informacion de X"` —coma de más, "y precio" de menos— y habría mandado a sus clientes al vacío.
+
 ⛔ SIN EMOJIS EN LA PALABRA CLAVE (regla de FER, 2026-07-25): la frase del activador y del botón va
 SIN emoji al final. Dos razones de campo: (1) quien escribe la frase A MANO (vio el anuncio y abrió
 WhatsApp directo) jamás teclea el emoji → el bot no dispara y la venta se pierde en silencio;
@@ -188,6 +244,31 @@ Si la página ya tiene un botón con emoji, se corrige el botón — no se le po
 
 VALIDACIÓN DURA DEL ACTIVADOR (antes de entregar): LA validación es `bash scripts/validar.sh --activador <archivo>` — usa una LISTA PERMITIDA (solo letras, números y puntuación básica) que bloquea CUALQUIER emoji o símbolo raro, de 3 o de 4 bytes. Contexto: los 4 bytes están PROBADOS corrompiendo el trigger (incidente real 2026-07-26 con un 👋); los de 3 bytes (✨ ✅ ‼ ⁉ ℹ) no están probados contra la base, así que el default seguro es cero. La fórmula `[c for c in t if ord(c) >= 0x10000]` solo caza los 4 bytes y NO basta como validación manual.
 Corre `bash scripts/validar.sh --activador <archivo-con-el-activador>`: el veredicto exige 0 emojis de CUALQUIER tipo (4 bytes Y 3 bytes como ✨ ⛔ ✅) y sin BOM; si falla, bloquea con exit distinto de 0.
+
+### 🔴 CREAR UN PRODUCTO NUEVO: LA RUTA QUE PARECE FUNCIONAR NO CREA NADA
+Medido el 2026-09-22 por el Centro de Mando y confirmado aquí. **`set-bot-fields-by-name` NO CREA.** Si le mandas un producto entero a un nombre que no existe, devuelve **HTTP 200 con cara de éxito y no escribe nada**. Tres reintentos, tres 200, el campo nunca apareció. Un 200 de esa ruta sobre un nombre nuevo no significa absolutamente nada.
+
+**La ruta que sí crea:** `POST /flow/create-bot-field` con `{"name": …, "var_type": …, "value": …}` → **201** con el `var_ns` nuevo.
+- `var_type` es **obligatorio**: sin él, 422 *"The var type field is required"*.
+- **Solo minúsculas**, y solo dos valen: `text` y `longtext`. `LONG_JSON`, `long_json`, `JSON`, `json` y `TEXT` devuelven 422 *invalid*.
+- Para un producto va **`longtext`**, que es el que tienen los productos vivos.
+- Para borrar: `DELETE /flow/delete-bot-field` con **`var_ns`**, nunca con `name` (422), y solo por DELETE (POST da 405).
+
+⛔ **Y si el nombre ya existe, el create devuelve 400 "Bot field exists".** Eso NO es un error tuyo: es otro chat trabajando en el mismo espacio. Sube al siguiente número y reintenta (ver la regla de la medición que caduca).
+
+### 🔴 LA MEDICIÓN DE UN ESPACIO COMPARTIDO CADUCA AL INSTANTE
+Medido el 2026-09-22: a las 10:00 se midió que el slot 13 estaba libre y se informó así. A las 12:40 el servidor respondió *"Bot field exists"* — otro chat había montado ahí un producto distinto a las 12:21, en la ventana entre la medición y la escritura.
+
+El POST falló como debía y no se pisó nada. **Pero un PUT sobre el `var_ns` lo habría borrado, sin error y sin aviso.**
+
+**Cómo se escribe entonces:**
+1. **Medir y crear en la MISMA corrida.** Nunca medir, preparar contenido una hora, y escribir después con el número viejo.
+2. **Tratar el "ya existe" como otro chat trabajando**, no como fallo: subir al siguiente número y reintentar, hasta agotar un rango razonable.
+3. **Cuando el sistema deja crear duplicados EN SILENCIO** (no hay colisión de nombre que te frene), releer el contenedor después de escribir y **CONTAR**. Sin releer reportas lo que creaste, no lo que quedó.
+
+⛔ **El disparador extendido es UNA SOLA cadena con TODOS los productos**, así que escribirlo es reescribirlo entero: si otro chat añade su entrada entre tu lectura y tu PUT, se la borras. **Verificación obligatoria después de escribir:** releer y comprobar que siguen estando todas las entradas previas **más** la tuya. Reportar ese número no es un extra, es la prueba.
+
+⛔ **Y la palabra corta vive en DOS sitios que tienen que coincidir:** el `keyW` de la entrada del disparador y el `palabras_clave` del propio producto. Escrita en uno solo, el disparo queda a medias según por dónde entre el cliente. Antes de elegirla, compárala contra todas las vivas en los dos sentidos —que la tuya no contenga a otra y que ninguna te contenga a ti—, porque si chocan el match se vuelve lotería y contesta el bot equivocado.
 
 ## 7. URLs dentro del prompt (recursos visuales conversacionales)
 Las URLs que el AGENTE envía durante la conversación (no la multimedia inicial) van ESCRITAS dentro del prompt, con instrucción de cuándo enviarlas. Patrón:

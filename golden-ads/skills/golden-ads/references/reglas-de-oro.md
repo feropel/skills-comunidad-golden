@@ -118,7 +118,8 @@
     campaña", entrega igual la lista de creativos requeridos con sus prompts, o marca cuáles ya
     existen. Un plan de pauta sin sus creativos definidos está INCOMPLETO.
 
-15. **Entrega de copys NORMALIZADA (formato FER).** Los 5+5+5 se entregan SIEMPRE uno por uno, cada
+15. **Entrega de copys NORMALIZADA (formato FER).** Los 5+5+5 (se ESCRIBEN 5 de cada rubro; el
+    techo MEDIDO de carga en el panel es **5+5+1** — `29-compuerta-de-copys.md`) se entregan SIEMPRE uno por uno, cada
     texto principal numerado en su PROPIO bloque copiable ("Texto principal 1" → bloque; "Texto
     principal 2" → bloque…), titulares y descripciones uno por línea numerada dentro de su bloque.
     PROHIBIDO el párrafo corrido con los 5 copys pegados ("1. … · 2. … · 3. …"): mata el copy-paste
@@ -144,3 +145,38 @@
     (anuncio directo a WhatsApp) no lo necesita, Meta entrega el ad id dentro del primer mensaje.
     Se reporta COBERTURA (cuántos anuncios de cuántos lo llevan), nunca "quedó puesto".
     Esquema, verificación y consumidores en `references/24-utm-atribucion.md`.
+
+19. **No DEGRADES de API a navegador sin haber EJECUTADO el intento.** Prohibido deducir el bloqueo
+    leyendo el schema: se **lanza la llamada**, se **pega el error del servidor**, y recién ahí se
+    baja al navegador — **declarándoselo al usuario**, nunca en silencio. Medido el 2026-09-05: se
+    afirmó "el conector no expone `asset_feed_spec`" **sin ejecutar nada** y se pasó al navegador.
+    Un atajo no declarado convierte una limitación SUPUESTA en un hecho que nadie vuelve a
+    cuestionar. (Ver `feedback_degradar_de_mcp_a_navegador_se_declara`.)
+
+20. **ESCRITOR ÚNICO también del NAVEGADOR, no solo de la cuenta.** El turno es de **DOS tiempos, y
+    el segundo es el que se olvida**:
+    1. **Antes de abrir Chrome** sobre una cuenta publicitaria: preguntar si otra sesión lo está
+       usando y esperar respuesta.
+    2. 🔴 **Al terminar: DECIR que se suelta.** Sin ese aviso el turno nunca se cierra y la otra
+       sesión entra a ciegas — que es exactamente como ocurrió el choque.
+
+    En el navegador duele más que en ninguna parte porque **no hay bloqueo ni aviso del sistema**:
+    la otra sesión simplemente se queda sin pestañas. Medido el 2026-09-05: dos sesiones en el mismo
+    Chrome destruyeron el grupo de pestañas **4 veces**, costaron **2 borradores** de anuncio, y en
+    un reintento un texto se insertó DENTRO de otro dejando la frase partida — **un anuncio quedó
+    sin copys**.
+
+    🔑 **LA CLASE (vale mucho más que este caso):** *el reparto se hace sobre el recurso que tiene
+    NOMBRE, y el que no lo tiene queda sin repartir.* Ahí se repartió "la cuenta de pauta" —que
+    tiene id y nombre— y nadie repartió "el navegador", que no lo tiene. **Antes de trabajar en
+    paralelo, lista los recursos compartidos SIN nombre propio** y repártelos igual: el navegador,
+    la sesión de Shopify, el token de un workspace, la terminal, el archivo que dos rutinas
+    escriben. Si un recurso no aparece en el reparto, no es que esté libre: **es que nadie lo miró**.
+
+21. **Los copys pasan por la COMPUERTA (`29-compuerta-de-copys.md`).** `golden-copywriting` es paso
+    OBLIGATORIO (si falta, se escribe igual pero SE DECLARA) · **emojis obligatorios** en el texto
+    principal (cero emojis = no entregable) · el **hook en los primeros ~40 caracteres** (lo que se
+    ve antes del "ver más") · **125/40/25 es un TECHO, no un objetivo**: escribir corto para cumplir
+    es el error · **inventariar** los copys que el anuncio YA tiene antes de escribir encima · y el
+    techo de CARGA por anuncio se **mide en la interfaz de ESE tipo** (medido 5+5+1 en "Crear
+    anuncio y mensaje"), declarando qué queda fuera.

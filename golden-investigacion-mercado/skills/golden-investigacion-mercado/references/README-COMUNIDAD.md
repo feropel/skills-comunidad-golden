@@ -21,7 +21,7 @@ Dispara sola. Si falta un dato te lo pide con campo y **sigue sin frenarse** (`[
 
 ## Requisitos
 - MCP `firecrawl` (si falta, usa búsqueda nativa) · skill `docx`.
-- Apoyos opcionales: `golden-productos-ganadores`, `golden-meta-ads-analysis`, `golden-dropi-analisis`, `golden-archivos`.
+- Apoyos opcionales: `golden-dropkiller-productos-ganadores`, `golden-meta-ads-analysis`, `golden-dropi-analisis`, `golden-archivos`.
 - **Lanzamiento completo** (página + creativos + pauta + bot + QA) → instala `golden360`.
 
 ## Reglas que la hacen confiable

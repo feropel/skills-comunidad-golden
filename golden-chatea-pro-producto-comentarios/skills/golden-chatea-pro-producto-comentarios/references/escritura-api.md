@@ -48,7 +48,7 @@ entre ellos es un trazador gratis. Buscando esos trozos dentro del TOON (Le'côt
 **En la cuenta de Golden el TOON refleja el `array`.** Y el `extendido` es el que quedó atrás.
 
 ⚠️ **Pero esto NO cierra la incógnita, y conviene ver por qué.** En la cuenta de Kevin
-(f251977, **versión 2.1.2**, una por delante de Golden) la foto es distinta: el `array` está
+(un espacio de referencia, **versión 2.1.2**, una por delante de Golden) la foto es distinta: el `array` está
 **vacío**, el `extendido` tiene el producto, el TOON tiene contenido **y no coincide con ninguno
 de los dos**. Además existe un campo que Golden no tiene: `[Comentarios] Nombres de los productos`.
 O sea: **el esquema cambia entre versiones**, y lo medido en 2.1.1 no se puede extrapolar. Datar

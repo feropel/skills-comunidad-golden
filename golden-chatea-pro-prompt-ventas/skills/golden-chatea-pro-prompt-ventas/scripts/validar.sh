@@ -177,7 +177,7 @@ else:
                 "necesita genero ('Hola! Te muestro el <producto>'); "
                 "(2) usa el NOMBRE del cliente; "
                 "(3) forma neutra explicita ('Bienvenido/a', 'Bienvenid@').")
-    # 🔴 CORREGIDO v3.46.0 CON MEDICIÓN EN VIVO (espacio f218311, 2026-09-05, escribiendo y releyendo
+    # 🔴 CORREGIDO v3.46.0 CON MEDICIÓN EN VIVO (espacio un espacio de referencia, 2026-09-05, escribiendo y releyendo
     # del servidor). Lo anterior decía "techo ESCAPADO <19.000, probado en vivo" y era FALSO en la
     # unidad Y en el número: 20.000 tildes (=120.000 escapados) sobrevivieron intactas, y 20.000 emojis
     # (=80.000 bytes) también. El tope real son 20.000 PUNTOS DE CÓDIGO y nada más cuenta.

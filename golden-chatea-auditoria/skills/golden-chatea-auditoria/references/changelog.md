@@ -667,7 +667,7 @@ hallazgo de configuración es donde se cayeron los dos chats** — y no hacía f
 ### 5 · La regla del asset, CABLEADA (antes existía y no hacía nada)
 
 `campos-de-configuracion.json` nació el 08-sep y **nada lo leía**: los campos huérfanos seguían
-saliendo como una duda B3 genérica *"no pertenecen a ningún asistente"*. Lo señaló el chat de Dolce
+saliendo como una duda B3 genérica *"no pertenecen a ningún asistente"*. Lo señaló el chat de otra empresa del grupo
 sobre su corrida real: 7 campos (`Pedidos_Diarios`, `TODAY_PROV`, `TOKEN DROPI`, `Tipo de
 referencia`, `Today_previo`, `YA PAGUE`, `recordatorio_general`).
 
@@ -678,7 +678,7 @@ nadie lee es documentación, no un guardarraíl.
 
 ### Confirmación en campo del arreglo del filtro
 
-El chat de Dolce rehizo la corrida **sobre el mismo DUMP, sin gastar cupo**: de **25 hallazgos a
+El chat de otra empresa del grupo rehizo la corrida **sobre el mismo DUMP, sin gastar cupo**: de **25 hallazgos a
 36**, y de **12 apartados a 1**. Lo que estaba archivado y era cableado: un **C1** con
 `[Producto Ventas Wp] 2` en **20.163 escapados** contra los 19.895 que matan al asistente, y la
 ranura **registrada y ACTIVA en el disparador**; C2/C4 de tres ranuras al 96%, 97% y 106%; C3 con

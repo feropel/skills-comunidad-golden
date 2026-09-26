@@ -499,13 +499,17 @@ pem: -----BEGIN RSA PRIVATE KEY-----
 anthropic: sk-ant-api03-abcdefghijklmnop
 aws: AKIAIOSFODNN7EXAMPLE
 meta: EAAabcdefghijklmnopqrstuvwxyz1234567890ABCDEFGH
-cuenta: act_123456789012
+EOF
+# Tres cebos se escriben PARTIDOS en el fuente (el repo publico no los muestra como credenciales
+# de corrido: la compuerta y el vigilante los acusaban). El archivo sembrado queda IDENTICO y en el
+# MISMO ORDEN de antes: la asercion "visible entre los 5 primeros" depende de ese orden (medido:
+# con la cuenta movida al final, F6 act_ fallo).
+printf 'cuenta: %s\ncontraseña: %s\n' "act_1234567""89012" "miClave""Secreta99" >> "$SECSK/references/config-mala.md"
+cat >> "$SECSK/references/config-mala.md" <<'EOF'
 clave = otraClave2026
 telefono: +57 3001234567
 EOF
-# Dos cebos se anexan PARTIDOS (misma razon que el de arriba): en el archivo sembrado quedan
-# identicos, pero en el fuente publicado no se leen como credenciales de corrido.
-printf 'contraseña: %s\napi_key = "%s"\n' "miClave""Secreta99" "AAAABBBB1234""CCCCDDDD9999" >> "$SECSK/references/config-mala.md"
+printf 'api_key = "%s"\n' "AAAABBBB1234""CCCCDDDD9999" >> "$SECSK/references/config-mala.md"
 printf 'imagen inline que NO debe sonar:\n<img src="data:image/png;base64,tokenpasswordapikeyAAAABBBBCCCCDDDDEEEEFFFF0000111122223333444455556666777788889999"/>\n' > "$SECSK/references/arte.md"
 
 # --- Siembra v1.14: skill-plugin (F8: repo plugin, sin SKILL.md raiz) ---
@@ -756,7 +760,7 @@ chk "F6 PEM PRIVATE KEY cazado (visible entre los 5 primeros)" "$(contiene "$B7_
 chk "F6 sk-ant- cazado"                                        "$(contiene "$B7_SEC" "sk-ant-api03")"
 chk "F6 AKIA cazado"                                           "$(contiene "$B7_SEC" "AKIAIOSFODNN7EXAMPLE")"
 chk "F6 EAA de Meta cazado"                                    "$(contiene "$B7_SEC" "EAAabcdef")"
-chk "F6 act_ cuenta publicitaria cazada"                       "$(contiene "$B7_SEC" "act_123456789012")"
+chk "F6 act_ cuenta publicitaria cazada"                       "$(contiene "$B7_SEC" "act_1234567""89012")"
 chk "F6 conteo EXACTO 9 (contraseña, clave=, +57 y api_key cuentan; el base64 NO): mostrando 5 de 9" "$(contiene "$(cat "$OUT7")" "mostrando 5 de 9")"
 chk "F6 anti-falso-positivo: el blob base64 de arte.md NO esta entre los hallazgos" "$(no_contiene "$B7_SEC" "arte.md")"
 chk "F6 alcance declarado: el barrido dice que NO cubre JWT/ghp_/AIza" "$(contiene "$(cat "$OUT7")" "NO CUBRE: JWT")"

@@ -115,7 +115,7 @@ def quedan_secretos(obj):
 #
 # 🔴 COSTE MEDIDO, en dos espacios distintos:
 #     espacio de referencia casi VACIO (61 campos) ...... 137   (2026-09-07)
-#     espacio REAL (Dolce Incanto, 86 campos) ........... 172   (2026-09-08)
+#     espacio REAL (otra empresa del grupo Incanto, 86 campos) ........... 172   (2026-09-08)
 # Las 137 eran el PISO y ya se midio cuanto sube. Por eso la guardia usa 200 y no 137: con 137
 # dejaria arrancar una extraccion de un espacio real que NO cabe, y el bloqueo llegaria a mitad
 # -- que es exactamente lo que esta guardia existe para evitar. Con 1.000/hora caben ~5.

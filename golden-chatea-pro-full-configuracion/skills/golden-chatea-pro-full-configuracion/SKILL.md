@@ -43,7 +43,7 @@ Qué cambia en la práctica:
 6. **La autoridad es FER → Centro de Mando → esta skill.** Ser arquitecta es tener el plano y el
    turno, no el mando: una fila nunca se vuelve bloqueo, y un rechazo mío tiene que ser técnico y
    medido, nunca preferencia.
-<!-- skill v1.12 · 2026-09-22 · FILA del CdM: el remarketing salió del ecosistema (FER 21-sep). Se cae la 5ª hija del mapa (config-remarketing) y su fila en la tabla de la ficha Dropi; se deja doctrina de excepción para los 2 espacios donde FER decidió dejarlo instalado (Dolce Incanto, Le'côterra). Producto Remarketing de Ventas WP NO se tocó, es otra cosa. Acta completa en references/changelog.md. -->
+<!-- skill v1.12 · 2026-09-22 · FILA del CdM: el remarketing salió del ecosistema (FER 21-sep). Se cae la 5ª hija del mapa (config-remarketing) y su fila en la tabla de la ficha Dropi; se deja doctrina de excepción para los 2 espacios donde FER decidió dejarlo instalado (otra empresa del grupo Incanto, Le'côterra). Producto Remarketing de Ventas WP NO se tocó, es otra cosa. Acta completa en references/changelog.md. -->
 
 ## LEY: NUNCA HEREDAR DATOS ENTRE ESPACIOS (FER 2026-08-08)
 
@@ -559,7 +559,7 @@ asistente propio, no se inventa ni se busca una skill que no está. **Lo que SÍ
 esto:** el campo `Producto Remarketing` dentro del asistente de **Ventas WhatsApp** y sus
 recordatorios asociados — eso es otra cosa, vive en `config-ventas-wp`, y no se toca por esta
 orden. **Excepción medida el 2026-09-21:** el asistente retirado sigue instalado en los espacios
-de **Dolce Incanto** y **Le'côterra** (9 campos cada uno) porque FER decidió dejarlo así. Si un
+de **otra empresa del grupo Incanto** y **Le'côterra** (9 campos cada uno) porque FER decidió dejarlo así. Si un
 MODO B cae sobre uno de esos dos espacios, esos campos se IGNORAN — no se desinstalan ni se
 configuran, no son parte de esta instalación.
 

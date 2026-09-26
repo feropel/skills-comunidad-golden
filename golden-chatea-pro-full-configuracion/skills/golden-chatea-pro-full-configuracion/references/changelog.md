@@ -62,13 +62,13 @@ skill v1.3 · 2026-08-23 (Estándar 9, golden-skill-auditor) · Estándar 9 (Cen
 
 skill v1.2 · 2026-08-21 (auditoría golden-skill-auditor 918/1000 PLATA → reparada) · 🔴 el mapa de hijas declaraba "Dos asistentes tienen skill hija" y omitía por completo `golden-chatea-pro-producto-comentarios` (el hijo de Comentarios, equivalente a prompt-ventas para Ventas: existe, está instalado, y config-comentarios ya lo cita como su propio hijo) — el orquestador dejaba huérfano el paso de cargar la ficha de cada producto en el asistente de Comentarios. Corregido en la tabla de asistentes, en el párrafo de hijas (ahora TRES), en PASO 1 (Comentarios invoca a producto-comentarios por cada producto) y en el mapa de derivación; sumado un chequeo de coherencia de producto entre Ventas/Carritos/Comentarios en PASO 2.
 
-## skill v1.1.1 · 2026-08-08 (centro de mando, chat CHATEA DOLCE COL 2026-08-08 (2ª ronda: 5ª cate
+## skill v1.1.1 · 2026-08-08 (centro de mando, chat CHATEA otra empresa del grupo COL 2026-08-08 (2ª ronda: 5ª cate
 
-skill v1.1.1 · 2026-08-08 (centro de mando, chat CHATEA DOLCE COL 2026-08-08 (2ª ronda: 5ª categoría + prosa libre)) · QUINTA CATEGORÍA VETADA en la ley: claims y cifras de negocio (años en el mercado, clientes atendidos, porcentajes de entrega, premios) — no rompen nada técnico ni los caza un barrido de llaves, pero el bot termina mintiendo con datos de otra empresa (caso real: "Más de 100.000 clientes atendidos en Colombia" a punto de heredarse). Y regla operativa LA MARCA VIVE TAMBIÉN EN PROSA LIBRE: al barrido se añade grep -i por el nombre de la marca origen sobre todo el texto a escribir (cazó 10 menciones en 3 campos que el mapeo de llaves no vio).
+skill v1.1.1 · 2026-08-08 (centro de mando, chat CHATEA otra empresa del grupo COL 2026-08-08 (2ª ronda: 5ª categoría + prosa libre)) · QUINTA CATEGORÍA VETADA en la ley: claims y cifras de negocio (años en el mercado, clientes atendidos, porcentajes de entrega, premios) — no rompen nada técnico ni los caza un barrido de llaves, pero el bot termina mintiendo con datos de otra empresa (caso real: "Más de 100.000 clientes atendidos en Colombia" a punto de heredarse). Y regla operativa LA MARCA VIVE TAMBIÉN EN PROSA LIBRE: al barrido se añade grep -i por el nombre de la marca origen sobre todo el texto a escribir (cazó 10 menciones en 3 campos que el mapeo de llaves no vio).
 
-## skill v1.1 · 2026-08-08 (centro de mando, chat CHATEA DOLCE COL 2026-08-08) · horneada la LEY "
+## skill v1.1 · 2026-08-08 (centro de mando, chat CHATEA otra empresa del grupo COL 2026-08-08) · horneada la LEY "
 
-skill v1.1 · 2026-08-08 (centro de mando, chat CHATEA DOLCE COL 2026-08-08) · horneada la LEY "NUNCA HEREDAR DATOS ENTRE ESPACIOS": al basarse en una cuenta guía se hereda estructura/prompts/config, JAMÁS datos (APIs, plantillas de WhatsApp, teléfonos, correos, dominios, marca, productos y disparadores); única excepción Le'côterra como producto-ejemplo; método de barrido obligatorio antes y después de escribir en espacio ajeno. Origen: incidente Golden → Dolce Incanto 2026-08-08 (se colaron llave ElevenLabs, teléfono, plantilla de notificación y firmas de la marca origen; revertido el mismo día). La ley entra como PREVENCIÓN, no reparación: línea base pre-horneado verificada por verificador externo — 8/8 skills sin credenciales (CRITICA=0); únicos hallazgos 3 teléfonos de relleno legítimos (+57 300 de ejemplo) que se conservan. ADEMÁS (chat CHATEA DOLCE COL 2026-08-08, retractación pixel): regla CAMPOS [Meta] = VALORES CALIENTES — los eventos de pixel los mueve el flujo en vivo, prohibido diagnosticar con una lectura suelta.
+skill v1.1 · 2026-08-08 (centro de mando, chat CHATEA otra empresa del grupo COL 2026-08-08) · horneada la LEY "NUNCA HEREDAR DATOS ENTRE ESPACIOS": al basarse en una cuenta guía se hereda estructura/prompts/config, JAMÁS datos (APIs, plantillas de WhatsApp, teléfonos, correos, dominios, marca, productos y disparadores); única excepción Le'côterra como producto-ejemplo; método de barrido obligatorio antes y después de escribir en espacio ajeno. Origen: incidente Golden → otra empresa del grupo Incanto 2026-08-08 (se colaron llave ElevenLabs, teléfono, plantilla de notificación y firmas de la marca origen; revertido el mismo día). La ley entra como PREVENCIÓN, no reparación: línea base pre-horneado verificada por verificador externo — 8/8 skills sin credenciales (CRITICA=0); únicos hallazgos 3 teléfonos de relleno legítimos (+57 300 de ejemplo) que se conservan. ADEMÁS (chat CHATEA otra empresa del grupo COL 2026-08-08, retractación pixel): regla CAMPOS [Meta] = VALORES CALIENTES — los eventos de pixel los mueve el flujo en vivo, prohibido diagnosticar con una lectura suelta.
 
 ## v1.0 · sin sello previo
 
@@ -345,7 +345,7 @@ tropiece la próxima vez que alguien la use sobre un espacio que aún tiene el r
 2. El campo `Producto Remarketing` del asistente de **Ventas WhatsApp** y sus recordatorios NO
    son esto — se aclaró la frontera para que nadie los confunda ni los toque por error.
 3. **Excepción viva, medida el 2026-09-21 por el CdM:** el asistente retirado sigue instalado en
-   **Dolce Incanto** y **Le'côterra**, 9 campos cada uno, por decisión de FER. Si un MODO B de
+   **otra empresa del grupo Incanto** y **Le'côterra**, 9 campos cada uno, por decisión de FER. Si un MODO B de
    esta skill cae sobre uno de esos dos espacios, esos campos se IGNORAN: no se desinstalan ni se
    configuran. Sin esta línea, un MODO B futuro sobre esos dos espacios habría tratado esos
    campos como basura de plantilla a limpiar o como un asistente a configurar — ninguna de las
@@ -354,7 +354,7 @@ tropiece la próxima vez que alguien la use sobre un espacio que aún tiene el r
 **Compuertas:** `agentskills validate` → exit 0. `validar_arsenal.py` → 1 de 1, cero fallos
 (cuerpo ahora 570 líneas, mismo aviso de peso de siempre). md5 se captura al cerrar blindaje.
 
-**Sin verificar:** no hubo forma de ejecutar esto contra un espacio real de Dolce Incanto o
+**Sin verificar:** no hubo forma de ejecutar esto contra un espacio real de otra empresa del grupo Incanto o
 Le'côterra en esta ronda — la excepción de "se ignoran" queda escrita pero no probada contra un
 MODO B real sobre esos dos espacios. Sigue pendiente también lo de siempre: una conversación real
 contra un bot instalado con esta skill.

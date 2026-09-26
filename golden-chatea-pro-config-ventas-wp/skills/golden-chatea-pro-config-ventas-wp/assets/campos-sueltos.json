@@ -1,5 +1,5 @@
 {
-    "_fuente": "INTERRUPTORES DEL FLUJO de Ventas WhatsApp. NO son la configuracion del asistente: la CONFIGURACION son los 2 campos JSON ([Ventas Wp] Configuracion general y general 2), que entre los dos llevan 24 llaves (medido contra el espacio vivo: 24 de 24 coincidencia exacta) y son las cuatro secciones del panel (Modelo de la IA, Acciones especiales, Notificaciones, Comportamiento de la IA). Estos 16 son bot fields SUELTOS, cada uno en su propio campo, y el panel no los muestra en esa pantalla. Medidos en vivo contra el espacio de Golden (f218311) el 2026-09-08 sobre sus 95 bot fields.",
+    "_fuente": "INTERRUPTORES DEL FLUJO de Ventas WhatsApp. NO son la configuracion del asistente: la CONFIGURACION son los 2 campos JSON ([Ventas Wp] Configuracion general y general 2), que entre los dos llevan 24 llaves (medido contra el espacio vivo: 24 de 24 coincidencia exacta) y son las cuatro secciones del panel (Modelo de la IA, Acciones especiales, Notificaciones, Comportamiento de la IA). Estos 16 son bot fields SUELTOS, cada uno en su propio campo, y el panel no los muestra en esa pantalla. Medidos en vivo contra el espacio de Golden (un espacio de referencia) el 2026-09-08 sobre sus 95 bot fields.",
     "_por_que": "Se documentan porque la plantilla de fabrica de Chatea es COLOMBIANA y estos interruptores viajan con ella: un espacio de Mexico hereda 'Oficina' encendida donde no existe recogida en oficina. No se tocan al configurar salvo que el pais o el modelo lo exijan.",
     "booleanos": {
         "[Ventas Wp] Desactivar Skill Datos producto físico": {
@@ -77,7 +77,7 @@
     },
     "_vocabulario_por_pais": "Los 3 textos van en el vocabulario del pais. Colombia usa 'pedido' y 'agendar'; en Mexico se dice 'paquete' o 'pedido' y 'repartidor', nunca 'domicilio' para el pedido. Ver references/paises.md.",
     "interruptores_operativos_whatsapp_ia": {
-        "_fuente": "Prefijo [WhatsApp IA] ([Whatsapp IA] en un caso: inconsistencia real de Chatea, no de esta skill). Medidos en vivo contra Golden (f218311) el 2026-09-08: 10 campos en total bajo este prefijo. De los 10, solo estos 2 son decision real del negocio; los otros 8 son ESTADO que escribe el bot (ver estado_del_bot_NO_TOCAR).",
+        "_fuente": "Prefijo [WhatsApp IA] ([Whatsapp IA] en un caso: inconsistencia real de Chatea, no de esta skill). Medidos en vivo contra Golden (un espacio de referencia) el 2026-09-08: 10 campos en total bajo este prefijo. De los 10, solo estos 2 son decision real del negocio; los otros 8 son ESTADO que escribe el bot (ver estado_del_bot_NO_TOCAR).",
         "[WhatsApp IA] Desactivar consulta de recordatorios": {
             "valor_por_defecto": "false",
             "por_que": "si es true, el recordatorio NO revisa el estado actual del producto antes de enviarse: mas rapido, pero puede recordar un producto que ya cambio de precio o se agoto. Por defecto false: mas lento, pero exacto.",

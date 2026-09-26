@@ -641,7 +641,7 @@ def main():
 
     # --- prueba HO3: la RAMA GEMELA. El arreglo de HO2 se hizo solo para MUERTO/ANUNCIADA
     # y nadie busco su hermana: la rama de FUGA (🟡) conservaba el `if not accion: continue`
-    # y se comia 11 hallazgos abiertos mas (medido en Dolce el 2026-09-08: F14, F2, G2, los
+    # y se comia 11 hallazgos abiertos mas (medido en otra empresa del grupo el 2026-09-08: F14, F2, G2, los
     # 6 de G3 y los 2 de F13). Una FUGA es lo que LLEGA AL CLIENTE, asi que caerse del
     # paquete es lo peor que le puede pasar. Clase, no caso: al tocar un filtro, buscar sus
     # hermanas. Por eso esta prueba es hermana literal de HO2.

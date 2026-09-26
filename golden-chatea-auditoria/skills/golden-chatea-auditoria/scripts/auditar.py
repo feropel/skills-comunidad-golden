@@ -1446,7 +1446,7 @@ class Auditoria:
         # 🔴 EL DENOMINADOR NO ES "objetos": es "objetos QUE TRAIAN TEXTO". Un agente o una
         # tarea que el extractor baja `locked` llega sin una sola cadena, asi que ningun
         # control lo mira -- y aun asi engordaba el numero que F13 declaraba como cobertura.
-        # Medido por el verificador el 2026-09-08 sobre Dolce: 72 objetos declarados, 40 sin
+        # Medido por el verificador el 2026-09-08 sobre otra empresa del grupo: 72 objetos declarados, 40 sin
         # texto. Eso es cobertura FALSA, la clase de mentira que este auditor existe para no
         # cometer: "N de N revisados" donde 40 nunca se revisaron porque no habia que ver.
         # Se cuentan aparte y se declaran; no se esconden ni se suman.
@@ -1556,7 +1556,7 @@ class Auditoria:
             if hashlib.md5(texto.encode("utf-8")).hexdigest() == huella[nombre]["md5"]:
                 de_fabrica.append(nombre)
 
-        # 🔴 DOS SEVERIDADES, y la separacion vino de campo (chat de Dolce Incanto, 2026-09-08).
+        # 🔴 DOS SEVERIDADES, y la separacion vino de campo (chat de otra empresa del grupo Incanto, 2026-09-08).
         # La primera version de F14 metia los 32 hallazgos en un solo saco y todos pesaban igual.
         # Medido en un espacio real: **27 de 32 eran interruptores, versiones o valores triviales**
         # (false / true / 1 / 2.1.3) -- default legitimo que nadie tiene que tocar. Solo **5**

@@ -229,7 +229,7 @@
       "name": "prompt-master",
       "source": "./prompt-master",
       "description": "Convierte una idea suelta en un prompt que la IA obedece.",
-      "version": "1.0.0",
+      "version": "1.6.0",
       "category": "education"
     },
     {

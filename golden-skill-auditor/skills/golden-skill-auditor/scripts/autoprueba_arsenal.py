@@ -80,6 +80,14 @@ def main():
                       skill(tmp, "referencia-estilo", BUENA, cuerpo="# Flujo\nUn look limpio, como una plantilla de Canva o una página de Notion.\n"), 0, None))
         casos.append(("no dispara: titulo impersonal QUE NECESITA ESTA SKILL (falso cazado por el auditor, 27-sep)",
                       skill(tmp, "impersonal", BUENA, cuerpo="## 📋 QUÉ NECESITA ESTA SKILL\nEl token de Meta. Si falta, para y pídelo.\n\n# Flujo\nUsa mcp__meta__ads.\n"), 0, None))
+        casos.append(("no dispara: credencial NOMBRADA en una historia o prohibición (no se pide)",
+                      skill(tmp, "historia-llave", BUENA, cuerpo="# Flujo\nAl clonar se colaron la llave de ElevenLabs y el token del espacio de origen. Nunca heredar el token de la cuenta.\n"), 0, None))
+        casos.append(("no avisa: '## Requisitos' que SÍ dice qué hacer si falta (el fallo del 27-sep daba aviso)",
+                      skill(tmp, "doble-almohadilla", BUENA, cuerpo="## Requisitos\nEl token del espacio. Si falta, para y pídelo.\n\n## Flujo\nLee .secrets/t.txt\n"), 0, "!no dice que hacer si falta"))
+        casos.append(("avisa: '## Requisitos' que NO dice qué hacer si falta",
+                      skill(tmp, "sin-plan", BUENA, cuerpo="## Requisitos\nEl token del espacio.\n\n## Flujo\nLee .secrets/t.txt\n"), 0, "no dice que hacer si falta"))
+        casos.append(("avisa: 'no se pregunta' NO cuenta como pedir al correr (verde barato cazado el 27-sep)",
+                      skill(tmp, "negada", BUENA, cuerpo="## Requisitos\nEl token del espacio. El nicho no se pregunta.\n\n## Flujo\nLee .secrets/t.txt\n"), 0, "no dice que hacer si falta"))
         casos.append(("no dispara: la palabra token suelta en prosa no es dependencia",
                       skill(tmp, "prosa", BUENA, cuerpo="# Flujo\nCuenta cada token del texto.\n"), 0, None))
         os.makedirs(os.path.join(tmp, "vacia"), exist_ok=True)
@@ -168,7 +176,10 @@ def main():
         ok = 0
         for etiqueta, d, esperado, debe_decir in casos:
             rc, salida = corre(d)
-            bien = (rc == esperado) and (debe_decir is None or debe_decir in salida)
+            if debe_decir and debe_decir.startswith("!"):
+                bien = (rc == esperado) and (debe_decir[1:] not in salida)
+            else:
+                bien = (rc == esperado) and (debe_decir is None or debe_decir in salida)
             print(f"  {'OK  ' if bien else 'MAL '} {etiqueta}  (salida {rc}, esperada {esperado})")
             if not bien and debe_decir:
                 print(f"        esperaba ver: {debe_decir}")

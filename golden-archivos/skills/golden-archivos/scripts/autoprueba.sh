@@ -10,7 +10,15 @@
 # La lección: un cero hay que probarlo, no creerlo.
 set -u
 DIR="$(cd "$(dirname "$0")" && pwd)"
-T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
+T="$(mktemp -d 2>/dev/null)" || T=""
+# Si mktemp falla (sandbox sin acceso a TMPDIR, disco lleno) T queda VACIO y
+# "$T/a" se vuelve "/a": el sembrado muere, pero las aserciones siguen corriendo
+# sobre carpetas que no existen y salen en VERDE por vacio. Medido 2026-09-27:
+# 3 verdes mentirosos (deshacer "restaura" comparando vacio con vacio, eliminar
+# "se niega" porque los archivos no existen, separar-web "respeta" porque no hay
+# nada que grepear). Un banco que miente en verde es peor que no tenerlo.
+[ -n "$T" ] && [ -d "$T" ] || { echo "🔴 No se pudo crear el sandbox temporal (mktemp fallo). El banco NO corre: sin sembrado sus verdes no valen." >&2; exit 1; }
+trap 'rm -rf "$T"' EXIT
 OK=0; FALLA=0
 ok(){ OK=$((OK+1)); echo "  ✅ $1"; }
 no(){ FALLA=$((FALLA+1)); echo "  🔴 $1"; }
@@ -31,6 +39,13 @@ sembrar(){ # sembrar <raiz>
   # webp: basta el contenido mínimo reconocible por extensión, no se renderiza en este banco.
   printf 'RIFF$\000\000\000WEBPVP8L\027\000\000\000/\000\000\000\020\007\020\021\021\210\210\376\007\000' > "$1/PROD/IMÁGENES/web.webp"
   cp "$1/PROD/IMÁGENES/master.png" "$1/PROD/ANTES Y DESPUES/VIDEO/deliberado.webp"
+  # El sembrado se COMPRUEBA: si no, una asercion sobre una carpeta vacia pasa
+  # por vacio y el banco declara sano lo que ni siquiera se probo.
+  for obligatorio in "$1/PROD/suelto.png" "$1/PROD/datos.xlsx" \
+                     "$1/PROD/IMÁGENES/web.webp" \
+                     "$1/PROD/ANTES Y DESPUES/VIDEO/deliberado.webp"; do
+    [ -s "$obligatorio" ] || { echo "🔴 El sembrado fallo: falta $obligatorio. El banco NO puede dar veredicto." >&2; exit 1; }
+  done
 }
 
 echo "== 1. Barra final: mismo resultado con y sin ella =="

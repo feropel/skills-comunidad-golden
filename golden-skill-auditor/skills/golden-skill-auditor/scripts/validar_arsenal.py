@@ -76,7 +76,10 @@ RX_DEP = [
 # 27-sep: el auditor semanal cazó un falso del CdM. golden-ads titula "QUÉ NECESITA ESTA SKILL" y el patrón
 # solo aceptaba "necesitas". Se acepta la forma impersonal.
 RX_SECCION = re.compile(r"^#{1,3}\s.*\b(requisitos?|qu[eé] necesitas?|lo que necesit\w*|antes de (?:empezar|correr|usar|arrancar))\b", re.I | re.M)
-RX_PEDIR = re.compile(r"si (?:falta|no (?:est[aá]|hay|tienes|existe))|p[ií]de(?:lo|la|los)?\b|para y pide|pregunta", re.I)
+# Calibración 7 (27-sep, la cazó el chat del Arsenal): "pregunta" casaba también NEGADO ("el nicho no se pregunta")
+# y daba por cumplido el "pedir al correr" con una frase que dice lo contrario. Verde barato. Se exige la forma
+# afirmativa y se descarta la negada.
+RX_PEDIR = re.compile(r"si (?:falta|no (?:est[aá]|hay|tienes|existe))|(?<!no )(?<!no se )\b(?:p[ií]de(?:lo|la|los)?|se (?:le )?pregunta|preg[uú]ntal[oae]s?)\b|para y pide", re.I)
 LINEAS_CABECERA = 80
 
 
@@ -88,7 +91,11 @@ LINEAS_CABECERA = 80
 #    caza a si mismo).
 #  · FALTANTE que se escapaba: la credencial pedida EN PROSA ("el token del workspace"), que es justo
 #    como la piden las skills de Chatea. Cuenta si esta en el SKILL.md.
+# Calibración 5 (27-sep): la credencial NOMBRADA en una historia o en una prohibición ("se colaron la llave de
+# ElevenLabs", "nunca heredar el token del propio bot") no es un pedido: marcaba en falso a skills que solo
+# generan JSON. Cuenta solo si el texto la PIDE (entrega, pide, pega, comparte, dame, trae, necesita...) cerca.
 RX_PROSA_CREDENCIAL = re.compile(
+    r"\b(?:entreg\w*|pid\w*|pide\w*|peg[au]\w*|comparte\w*|dame|trae\w*|necesit\w*|recib\w*|aqu[ií] est[aá])\b[^.\n]{0,60}?"
     r"\b(?:token|api[ _-]?key|llave|credenciales?)\s+(?:del?|de la)\s+(?:propio\s+)?"
     r"(?:espacio|workspace|cliente|api|chatea|shopify|meta|dropi|heygen|higgsfield|elevenlabs|google|openai|cuenta)\b", re.I)
 RX_HISTORIA = re.compile(r"(changelog|bit[aá]cora|historial)", re.I)
@@ -131,9 +138,13 @@ def requisitos(dir_skill, cuerpo):
         return [f"REQUISITOS SIN DECLARAR: la skill necesita algo del usuario ({', '.join(senales)}) y no tiene "
                 f"seccion de requisitos en sus primeras {LINEAS_CABECERA} lineas (ley de FER del 02-sep: declarar "
                 f"antes y pedir al correr)"], []
+    # 27-sep, fallo del CdM medido: con `seccion[1:]` un título "## ..." quedaba "# ..." y casaba él mismo como
+    # el título SIGUIENTE, así que la sección salía VACÍA y toda skill con "## Requisitos" daba aviso aunque
+    # dijera qué hacer si falta. Se busca el siguiente título DESPUÉS de la primera línea.
     seccion = cabecera[m.start():]
-    sig = re.search(r"^#{1,3}\s", seccion[1:], re.M)
-    seccion = seccion[:sig.start() + 1] if sig else seccion
+    primera, _, resto = seccion.partition("\n")
+    sig = re.search(r"^#{1,3}\s", resto, re.M)
+    seccion = primera + "\n" + (resto[:sig.start()] if sig else resto)
     if not RX_PEDIR.search(seccion):
         return [], ["la seccion de requisitos no dice que hacer si falta algo (pedir al correr: parar y pedirlo con nombre propio)"]
     return [], []

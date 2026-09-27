@@ -78,6 +78,8 @@ def main():
                       skill(tmp, "calendario", BUENA, cuerpo="# Flujo\nConsulta la disponibilidad real en Google Calendar.\n"), 1, "REQUISITOS SIN DECLARAR"))
         casos.append(("no dispara: Canva o Notion nombrados como referencia de estilo",
                       skill(tmp, "referencia-estilo", BUENA, cuerpo="# Flujo\nUn look limpio, como una plantilla de Canva o una página de Notion.\n"), 0, None))
+        casos.append(("no dispara: titulo impersonal QUE NECESITA ESTA SKILL (falso cazado por el auditor, 27-sep)",
+                      skill(tmp, "impersonal", BUENA, cuerpo="## 📋 QUÉ NECESITA ESTA SKILL\nEl token de Meta. Si falta, para y pídelo.\n\n# Flujo\nUsa mcp__meta__ads.\n"), 0, None))
         casos.append(("no dispara: la palabra token suelta en prosa no es dependencia",
                       skill(tmp, "prosa", BUENA, cuerpo="# Flujo\nCuenta cada token del texto.\n"), 0, None))
         os.makedirs(os.path.join(tmp, "vacia"), exist_ok=True)

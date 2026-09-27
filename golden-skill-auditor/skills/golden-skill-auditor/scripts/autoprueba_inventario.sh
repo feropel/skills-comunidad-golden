@@ -54,6 +54,14 @@
 # Uso: bash autoprueba_inventario.sh [sabotajes [regex]]   (idéntico bajo zsh y sh: guardia)
 
 # C9-guardia: el mismo tratamiento que el detector.
+# 27-sep: misma clase que inventario.sh. `mktemp -d` sin plantilla ignora TMPDIR y en el sandbox de las rutinas
+# fallaba dejando rutas vacías ("cat: /salida-plugin.txt"). Toda llamada va a TMPDIR.
+mktemp() {
+  if [ $# -eq 0 ]; then command mktemp "${TMPDIR:-/tmp}/autoprueba-inv.XXXXXX"
+  elif [ $# -eq 1 ] && [ "$1" = "-d" ]; then command mktemp -d "${TMPDIR:-/tmp}/autoprueba-inv.XXXXXX"
+  else command mktemp "$@"; fi
+}
+
 if [ -z "${BASH_VERSION:-}" ]; then
   if command -v bash >/dev/null 2>&1; then
     exec bash "$0" "$@"

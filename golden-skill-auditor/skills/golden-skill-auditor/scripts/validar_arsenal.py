@@ -73,7 +73,9 @@ RX_DEP = [
     ("cabecera de autenticacion", re.compile(r"Authorization['\"]?\s*[:,]\s*f?['\"]Bearer|X-Shopify-Access-Token|dropi-integration-key", re.I)),
     ("programa local", re.compile(r"\b(?:ffmpeg|ffprobe|yt-dlp|whisper)\b")),
 ]
-RX_SECCION = re.compile(r"^#{1,3}\s.*\b(requisitos?|qu[eé] necesitas|antes de (?:empezar|correr|usar))\b", re.I | re.M)
+# 27-sep: el auditor semanal cazó un falso del CdM. golden-ads titula "QUÉ NECESITA ESTA SKILL" y el patrón
+# solo aceptaba "necesitas". Se acepta la forma impersonal.
+RX_SECCION = re.compile(r"^#{1,3}\s.*\b(requisitos?|qu[eé] necesitas?|lo que necesit\w*|antes de (?:empezar|correr|usar|arrancar))\b", re.I | re.M)
 RX_PEDIR = re.compile(r"si (?:falta|no (?:est[aá]|hay|tienes|existe))|p[ií]de(?:lo|la|los)?\b|para y pide|pregunta", re.I)
 LINEAS_CABECERA = 80
 

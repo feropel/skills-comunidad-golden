@@ -134,6 +134,19 @@ for l in sys.stdin:
 # Lo que no se pudo leer se REGISTRA y el informe lo declara; un verde sobre datos
 # a medio leer es un veredicto, no cobertura.
 # =====================================================================
+# 27-sep (el auditor semanal lo cazó en su primera corrida desatendida y el CdM lo reprodujo): `mktemp` SIN
+# plantilla escribe en la carpeta temporal del SISTEMA e ignora TMPDIR, que es la única que el sandbox de
+# las rutinas deja escribir. Daba 20 "mkstemp failed" y AUN ASÍ cerraba con "✅ Todos los archivos del árbol
+# se pudieron leer · Inventario completo": un verde barato. Toda llamada pasa por aquí, y si no se puede
+# escribir, se ABORTA con el motivo en vez de seguir con variables vacías.
+mktemp() {
+  if [ $# -eq 0 ]; then command mktemp "${TMPDIR:-/tmp}/inventario.XXXXXX"
+  elif [ $# -eq 1 ] && [ "$1" = "-d" ]; then command mktemp -d "${TMPDIR:-/tmp}/inventario.XXXXXX"
+  else command mktemp "$@"; fi
+}
+_prueba_tmp=$(mktemp) || { echo "🔴 ABORTA: no se puede escribir en TMPDIR (${TMPDIR:-/tmp}). El inventario NO se hizo." >&2; exit 2; }
+rm -f "$_prueba_tmp"
+
 NO_LEIDOS_F=$(mktemp)     # archivos que la ruta de datos no pudo leer (chmod 000, etc.)
 ERR_RECORRIDO=$(mktemp)   # stderr acumulado de los find (bucles de symlinks, permisos)
 EXTRACT_ERR=$(mktemp)     # fallas del extractor perl — el informe las grita

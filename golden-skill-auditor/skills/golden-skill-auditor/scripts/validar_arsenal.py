@@ -58,6 +58,85 @@ def frontmatter(ruta):
 _UNIV = None
 
 
+# --- LEY DE LOS REQUISITOS DEL USUARIO (FER, 02-sep-2026; casilla instalada por el CdM el 27-sep) ---
+# "Todo lo que necesite intervencion del usuario, ponlo dentro de cada skill, y cuando la vayan a correr
+# que le diga: ok, aqui va tu API, ponla aqui, dame estos datos." Vivio 25 dias solo en prosa y paso de
+# 20 a 28 skills sin declararlo: lo que no tiene casilla no se cumple. Dos obligaciones:
+#   1) DECLARAR ANTES: una seccion de requisitos cerca del principio del SKILL.md  -> si falta, FALLO
+#   2) PEDIR AL CORRER: esa seccion dice que hacer si falta algo (parar y pedirlo)  -> si no, AVISO
+# Senales de dependencia, estrechas a proposito (una palabra suelta como "token" en prosa NO cuenta):
+RX_DEP = [
+    # mcp__ccd_* son herramientas de la propia app de escritorio: vienen con ella, el usuario no trae nada
+    ("herramientas MCP", re.compile(r"\bmcp__(?!ccd_)[a-z0-9]")),
+    ("llave en .secrets/", re.compile(r"\.secrets/")),
+    ("credencial por variable de entorno", re.compile(r"environ(?:\.get)?\(\s*['\"][A-Z0-9_]*(?:TOKEN|KEY|SECRET)[A-Z0-9_]*['\"]")),
+    ("cabecera de autenticacion", re.compile(r"Authorization['\"]?\s*[:,]\s*f?['\"]Bearer|X-Shopify-Access-Token|dropi-integration-key", re.I)),
+    ("programa local", re.compile(r"\b(?:ffmpeg|ffprobe|yt-dlp|whisper)\b")),
+]
+RX_SECCION = re.compile(r"^#{1,3}\s.*\b(requisitos?|qu[eé] necesitas|antes de (?:empezar|correr|usar))\b", re.I | re.M)
+RX_PEDIR = re.compile(r"si (?:falta|no (?:est[aá]|hay|tienes|existe))|p[ií]de(?:lo|la|los)?\b|para y pide|pregunta", re.I)
+LINEAS_CABECERA = 80
+
+
+# Calibracion medida el 27-sep sobre las 43 skills (falsos en las dos direcciones):
+#  · un programa local NARRADO en una referencia ("ElevenLabs pone la voz y ffmpeg...") no es dependencia:
+#    los programas cuentan solo si los usa el CUERPO de la skill o sus scripts.
+#  · los registros de historia (changelog, bitacora) nunca cuentan: citan lo que fue, no lo que se usa.
+#  · el archivo que DEFINE este detector lleva sus propios patrones: no se barre (el instrumento no se
+#    caza a si mismo).
+#  · FALTANTE que se escapaba: la credencial pedida EN PROSA ("el token del workspace"), que es justo
+#    como la piden las skills de Chatea. Cuenta si esta en el SKILL.md.
+RX_PROSA_CREDENCIAL = re.compile(
+    r"\b(?:token|api[ _-]?key|llave|credenciales?)\s+(?:del?|de la)\s+(?:propio\s+)?"
+    r"(?:espacio|workspace|cliente|api|chatea|shopify|meta|dropi|heygen|higgsfield|elevenlabs|google|openai|cuenta)\b", re.I)
+RX_HISTORIA = re.compile(r"(changelog|bit[aá]cora|historial)", re.I)
+
+
+def requisitos(dir_skill, cuerpo):
+    senales = []
+    skill_md = os.path.join(dir_skill, "SKILL.md")
+    for ruta in [skill_md] + glob.glob(os.path.join(dir_skill, "scripts", "**", "*"), recursive=True) \
+            + glob.glob(os.path.join(dir_skill, "references", "*.md")):
+        if not os.path.isfile(ruta) or "__pycache__" in ruta or RX_HISTORIA.search(os.path.basename(ruta)):
+            continue
+        try:
+            t = open(ruta, encoding="utf-8", errors="replace").read()
+        except OSError:
+            continue
+        if "RX_DEP = [" in t or "REQUISITOS SIN DECLARAR" in t:
+            continue   # el detector y su autoprueba llevan los patrones a proposito
+        if ruta == skill_md:
+            # los sellos de version (comentario html) son historia, no uso
+            t = "\n".join(l for l in t.split("\n") if not l.strip().startswith("<!--"))
+        es_referencia = os.sep + "references" + os.sep in ruta
+        for nombre, rx in RX_DEP:
+            if nombre == "programa local" and es_referencia:
+                continue
+            if nombre not in senales and rx.search(t):
+                senales.append(nombre)
+        # FALTANTE medido el 27-sep (golden-agenda-citas: Google Calendar). Solo servicios que exigen la CUENTA
+        # del usuario; Canva, Notion, Slack o Stripe nombrados como referencia daban 4 falsos de 8.
+        if ruta == skill_md and "cuenta de un servicio" not in senales and re.search(
+                r"\b(Google Calendar|Gmail|Google Drive|Google Sheets|Mercado Pago)\b", t):
+            senales.append("cuenta de un servicio")
+        if ruta == skill_md and "credencial pedida en prosa" not in senales and RX_PROSA_CREDENCIAL.search(t):
+            senales.append("credencial pedida en prosa")
+    if not senales:
+        return [], []
+    cabecera = "\n".join(cuerpo.split("\n")[:LINEAS_CABECERA])
+    m = RX_SECCION.search(cabecera)
+    if not m:
+        return [f"REQUISITOS SIN DECLARAR: la skill necesita algo del usuario ({', '.join(senales)}) y no tiene "
+                f"seccion de requisitos en sus primeras {LINEAS_CABECERA} lineas (ley de FER del 02-sep: declarar "
+                f"antes y pedir al correr)"], []
+    seccion = cabecera[m.start():]
+    sig = re.search(r"^#{1,3}\s", seccion[1:], re.M)
+    seccion = seccion[:sig.start() + 1] if sig else seccion
+    if not RX_PEDIR.search(seccion):
+        return [], ["la seccion de requisitos no dice que hacer si falta algo (pedir al correr: parar y pedirlo con nombre propio)"]
+    return [], []
+
+
 def revisar(dir_skill):
     """Devuelve (fallos, avisos). Fallos rompen; avisos informan."""
     nombre = os.path.basename(dir_skill.rstrip("/"))
@@ -119,6 +198,11 @@ def revisar(dir_skill):
         fc, ac = revisar_conexiones(dir_skill, _UNIV)
         fallos += fc
         avisos += ac
+
+    # --- ley de los requisitos del usuario ---
+    fr, ar = requisitos(dir_skill, cuerpo)
+    fallos += fr
+    avisos += ar
 
     # --- recomendaciones ---
     lineas = cuerpo.count("\n") + 1

@@ -58,6 +58,28 @@ def main():
         casos.append(("caza: compatibility de 600 chars",
                       skill(tmp, "compat", BUENA, extra_fm="compatibility: " + "y" * 600 + "\n"), 1, "compatibility"))
         casos.append(("caza: sin SKILL.md", os.path.join(tmp, "vacia"), 1, "falta SKILL.md"))
+        # ---- LEY DE LOS REQUISITOS (27-sep): las dos direcciones y la frontera ----
+        casos.append(("caza: usa mcp__ y no declara requisitos",
+                      skill(tmp, "sin-requisitos", BUENA, cuerpo="# Flujo\nLlama a mcp__shopify__get-order.\n"), 1, "REQUISITOS SIN DECLARAR"))
+        casos.append(("caza: llave en .secrets/ con la seccion enterrada al final",
+                      skill(tmp, "enterrada", BUENA, cuerpo="# Flujo\nLee .secrets/token.txt\n" + "x\n" * 120 + "## Requisitos\nSi falta, pidela.\n"), 1, "REQUISITOS SIN DECLARAR"))
+        casos.append(("no dispara: declara requisitos y dice que hacer si falta",
+                      skill(tmp, "con-requisitos", BUENA, cuerpo="## Requisitos\nEl token del espacio. Si falta, para y pidelo: que es, donde se saca, donde se pega.\n\n# Flujo\nLee .secrets/token.txt\n"), 0, None))
+        casos.append(("caza: pide el token del workspace EN PROSA (el caso de Chatea)",
+                      skill(tmp, "prosa-credencial", BUENA, cuerpo="# Flujo\nEl usuario entrega los datos del negocio y el token del workspace.\n"), 1, "REQUISITOS SIN DECLARAR"))
+        _d = skill(tmp, "narrado", BUENA, cuerpo="# Flujo\nEscribe el guion.\n")
+        os.makedirs(os.path.join(_d, "references"), exist_ok=True)
+        open(os.path.join(_d, "references", "ejemplo.md"), "w").write("En ese estudio, ElevenLabs pone la voz y ffmpeg une los clips.\n")
+        open(os.path.join(_d, "references", "changelog.md"), "w").write("v1: antes usaba mcp__viejo y .secrets/x\n")
+        casos.append(("no dispara: programa NARRADO en una referencia y dependencias viejas en el changelog", _d, 0, None))
+        casos.append(("no dispara: herramientas propias de la app (mcp__ccd_) y un sello de version",
+                      skill(tmp, "app-propia", BUENA, cuerpo="<!-- v1: antes usaba mcp__shopify__x -->\n# Flujo\nAvisa con mcp__ccd_session_mgmt__send_message.\n"), 0, None))
+        casos.append(("caza: usa la cuenta de Google Calendar del usuario sin declararla",
+                      skill(tmp, "calendario", BUENA, cuerpo="# Flujo\nConsulta la disponibilidad real en Google Calendar.\n"), 1, "REQUISITOS SIN DECLARAR"))
+        casos.append(("no dispara: Canva o Notion nombrados como referencia de estilo",
+                      skill(tmp, "referencia-estilo", BUENA, cuerpo="# Flujo\nUn look limpio, como una plantilla de Canva o una página de Notion.\n"), 0, None))
+        casos.append(("no dispara: la palabra token suelta en prosa no es dependencia",
+                      skill(tmp, "prosa", BUENA, cuerpo="# Flujo\nCuenta cada token del texto.\n"), 0, None))
         os.makedirs(os.path.join(tmp, "vacia"), exist_ok=True)
 
         # ---- BUENOS: deben salir 0 (aqui vive el riesgo del check agresivo) ----

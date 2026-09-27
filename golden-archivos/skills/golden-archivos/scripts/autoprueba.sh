@@ -77,6 +77,114 @@ MEDIA=$(grep '^MEDIA_EXTS=' "$DIR/hoja-contactos.sh" | sed 's/.*"\(.*\)".*/\1/' 
 HM=$(comm -23 <(echo "$CLAS_IMG") <(echo "$MEDIA") | tr '\n' ' ')
 [ -z "${HM// /}" ] && ok "todo lo que clasifica a IMÁGENES/GIFS/VIDEOS entra al mosaico" || no "clasifica pero el mosaico lo calla: $HM"
 
+echo "== 7. Temporales con guarda: ningun mktemp a pelo =="
+# La CLASE, no el caso. Medido 2026-09-27: con un mktemp falso, nombrar.sh y
+# separar-web.sh salian con EXIT 0 habiendo hecho CERO trabajo, y duplicados.sh
+# reportaba cero duplicados sobre cero archivos. Un mktemp sin `||` es esa bomba
+# esperando: la variable queda vacia, "$VAR/x" se vuelve "/x" y la herramienta
+# sigue como si nada. Esta asercion cubre los scripts que existan hoy y los que
+# se agreguen manana, porque recorre el directorio en vez de una lista fija.
+sin_guarda=""
+for f in "$DIR"/*.sh; do
+  grep -q 'mktemp' "$f" || continue
+  # Se normaliza antes de juzgar: fuera comentarios y se unen las lineas
+  # partidas con "\" (duplicados.sh encadena dos mktemp con && en dos lineas).
+  # Despues, TODA linea viva que llame a mktemp debe tener su `||` ANTES del
+  # siguiente `;`. Medido 2026-09-27: la version laxa `mktemp[^|]*\|\|` daba por
+  # bueno `TMP="$(mktemp)"; : || {`, donde el `||` protege a otra cosa — un
+  # candado que acepta eso no es candado, es adorno.
+  malas=$(sed -e 's/[[:space:]]*#.*$//' -e ':a' -e '/\\$/N; s/\\\n//; ta' "$f" \
+    | grep 'mktemp' | grep -vE 'mktemp[^;]*\|\|' \
+    | grep -vE '^[[:space:]]*$' | wc -l | tr -d ' ')
+  # autoprueba.sh se protege con un chequeo de la variable en la linea siguiente
+  grep -q 'No se pudo crear el sandbox temporal' "$f" && malas=0
+  [ "$malas" -eq 0 ] || sin_guarda="$sin_guarda $(basename "$f")"
+done
+[ -z "${sin_guarda// /}" ] && ok "todos los mktemp abortan si fallan" \
+  || no "mktemp sin guarda (darian exit 0 sin trabajo):$sin_guarda"
+
+echo "== 8. Compuerta de nube: todo script que escribe la llama =="
+# Regla del CdM (27-sep): una skill que MUEVE, RENOMBRA o BORRA declara si su
+# raiz esta sincronizada antes de la primera operacion, porque ahi el cambio no
+# se queda en el equipo: viaja a la nube y a quien tenga acceso compartido.
+# El detector busca la LLAMADA en codigo vivo, no la palabra: se quitan los
+# comentarios primero. Un script que solo NOMBRE la compuerta en una nota sigue
+# siendo un script que mueve archivos a ciegas.
+sin_compuerta=""
+for f in "$DIR"/*.sh; do
+  base=$(basename "$f")
+  [ "$base" = "autoprueba.sh" ] && continue   # no mueve nada: es el banco
+  [ "$base" = "_comun.sh" ] && continue       # es quien DEFINE la compuerta
+  vivo=$(sed -e 's/[[:space:]]*#.*$//' "$f")
+  # "Escribe" significa tocar archivos DEL USUARIO. Un `rm -f "$TMP"` o un
+  # `rm -rf "$WORK"` son limpieza de temporales propios y no necesitan compuerta:
+  # contarlos daba dos falsos positivos (duplicados.sh, hoja-contactos.sh), y un
+  # detector que grita de mas acaba ignorandose, que es la forma educada de no
+  # existir. `rmdir` tampoco cuenta: solo quita carpetas ya vacias.
+  toca=$(printf '%s' "$vivo" | grep -E '(^|[^[:alnum:]_])(mv|rm)[[:space:]]' \
+         | grep -vcE '\$\{?(TMP|WORK|SIZES|HASHES)')
+  [ "${toca:-0}" -gt 0 ] || continue
+  printf '%s' "$vivo" | grep -q 'exigir_local' || sin_compuerta="$sin_compuerta $base"
+done
+[ -z "${sin_compuerta// /}" ] && ok "todo script que escribe avisa si la ruta es de nube" \
+  || no "escriben sin comprobar si es carpeta sincronizada:$sin_compuerta"
+
+echo "== 9. Espejo de iCloud: se detecta por INODO, no por nombre =="
+# La asercion 8 comprueba que la compuerta se LLAMA. Esta comprueba que ACIERTA,
+# que es otra cosa: la v1.16 nacio de una compuerta que se llamaba en los cinco
+# scripts y declaraba local el disco de trabajo entero.
+# Todo sintetico a proposito, para que no dependa de como tenga iCloud la maquina
+# donde corra. El caso positivo de la rama del inodo no se puede fabricar (APFS
+# no permite enlaces duros de directorio): ese se mide sobre el equipo real.
+# `pwd -P` da /private/var donde mktemp da /var, asi que la raiz se resuelve de
+# entrada o las comparaciones de prefijo no casan y esto sale verde por el
+# motivo equivocado.
+ESPEJO_OK=1
+EB="$(cd "$T" && pwd -P)"
+
+juzgar() { # juzgar <HOME sintetico> <ruta>  ->  imprime NUBE o LOCAL
+  HOME="$1" bash -c '. "'"$DIR"'/_comun.sh"; if espejo_icloud "$1" >/dev/null; then echo NUBE; else echo LOCAL; fi' _ "$2" 2>/dev/null
+}
+
+# Senuelo: mismo nombre, objetos DISTINTOS. Por nombre diria nube.
+H="$EB/esp-distinto"
+mkdir -p "$H/Desktop/CARPETA" "$H/Library/Mobile Documents/com~apple~CloudDocs/Desktop/CARPETA"
+[ "$(juzgar "$H" "$H/Desktop/CARPETA")" = "LOCAL" ] || ESPEJO_OK=0
+
+# Sin gemelo en la nube: local.
+H="$EB/esp-sinespejo"
+mkdir -p "$H/Desktop/CARPETA" "$H/Library/Mobile Documents/com~apple~CloudDocs/OtraCosa"
+[ "$(juzgar "$H" "$H/Desktop/CARPETA")" = "LOCAL" ] || ESPEJO_OK=0
+
+# Llegar por el lado de iCloud: nube.
+H="$EB/esp-porlanube"
+mkdir -p "$H/Desktop" "$H/Library/Mobile Documents/com~apple~CloudDocs/Desktop/CARPETA"
+[ "$(juzgar "$H" "$H/Library/Mobile Documents/com~apple~CloudDocs/Desktop/CARPETA")" = "NUBE" ] || ESPEJO_OK=0
+
+[ "$ESPEJO_OK" -eq 1 ] && ok "el espejo de iCloud se juzga por inodo, no por nombre" \
+  || no "la deteccion del espejo de iCloud falla: revisa espejo_icloud en _comun.sh"
+
+echo "== 10. Sin ffmpeg: la skill y el script dicen lo MISMO, y ninguno miente =="
+# El hallazgo de la v1.17: los dos declaraban que sin ffmpeg "los videos se
+# verifican abriendolos uno a uno con Read", y Read NO abre MP4 — abre imagenes
+# y PDF. Estaba en los DOS sitios porque uno se copio del otro, que es como se
+# propaga esta clase. Por eso el candado exige las dos cosas a la vez: que
+# ninguno prometa lo imposible, y que los dos nombren el mismo metodo de
+# reserva (`qlmanage`), para que no vuelvan a divergir en silencio.
+SKMD="$(dirname "$DIR")/SKILL.md"
+MSG=$(grep -h 'Falta ffmpeg' "$DIR/hoja-contactos.sh")
+FF_OK=1
+[ -n "$MSG" ] || FF_OK=0
+printf '%s' "$MSG"  | grep -q 'qlmanage' || FF_OK=0
+grep -q 'qlmanage' "$SKMD"                || FF_OK=0
+# la promesa falsa: "video ... Read" en la misma frase, en cualquiera de los dos
+for archivo in "$SKMD" "$DIR/hoja-contactos.sh"; do
+  grep -iE '[Vv]ideos?[^.]{0,80}con Read' "$archivo" | grep -viE 'no los abre|no abre|no se pueden abrir' \
+    | grep -q . && FF_OK=0
+done
+[ "$FF_OK" -eq 1 ] && ok "el metodo sin ffmpeg es el mismo en los dos sitios y no promete abrir video con Read" \
+  || no "SKILL.md y hoja-contactos.sh no coinciden sobre que hacer sin ffmpeg, o alguno dice que un video se abre con Read"
+
 echo "== 4. El log manda: sin log no se mueve =="
 sembrar "$T/c"
 bash "$DIR/clasificar.sh" "$T/c/PROD" "/ruta/imposible/x.log" >/dev/null 2>&1 \

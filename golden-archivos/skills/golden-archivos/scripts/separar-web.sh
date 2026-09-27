@@ -24,6 +24,8 @@ MODE="${3:-}"
 # devolvia 0 SIN error (medido 2026-09-05: 1 pieza sin barra, 0 con barra).
 while [ "$UNIT" != "/" ] && [ "${UNIT%/}" != "$UNIT" ]; do UNIT="${UNIT%/}"; done
 [ -d "$UNIT" ] || { echo "  (no existe: $UNIT)"; exit 0; }
+. "$(dirname "$0")/_comun.sh"
+exigir_local "$UNIT" "Mover material a 🌐 WEB SHOPIFY"
 
 # Carpetas-librería genéricas: donde el material se acumula sin criterio y
 # por eso web y master terminan revueltos.
@@ -63,7 +65,13 @@ if [ "$MODE" = "APLICAR" ]; then
     || { echo "🔴 Log no escribible: $LOG — no se mueve nada" >&2; exit 1; }
 fi
 
-TMP="$(mktemp)"
+# Un mktemp que falla (sandbox sin TMPDIR, disco lleno) deja la variable VACIA
+# y "$VAR/x" se vuelve "/x". Medido 2026-09-27 con un mktemp falso: sin esta
+# guarda esta herramienta salia con EXIT 0 sin hacer nada — el peor de los
+# ceros falsos, porque quien la llama en un bucle ve exito y da el trabajo por
+# hecho. Se aborta en vez de seguir.
+TMP="$(mktemp "${TMPDIR:-/tmp}/golden-archivos.XXXXXX")" || {
+  echo "🔴 No se pudo crear el temporal: no se mueve nada." >&2; exit 1; }
 find "$UNIT" -type f ! -name '.*' 2>/dev/null > "$TMP"   # snapshot antes de mover
 n=0
 while IFS= read -r f; do

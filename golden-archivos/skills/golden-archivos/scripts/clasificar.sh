@@ -13,6 +13,8 @@ LOG="${2:?Falta el log. Uso: clasificar.sh \"<carpeta>\" \"<movimientos.log>\"}"
 # devolvia 0 SIN error (medido 2026-09-05: 1 pieza sin barra, 0 con barra).
 while [ "$DIR" != "/" ] && [ "${DIR%/}" != "$DIR" ]; do DIR="${DIR%/}"; done
 [ -d "$DIR" ] || { echo "  (no existe: $DIR)"; exit 0; }
+. "$(dirname "$0")/_comun.sh"
+exigir_local "$DIR" "Clasificar (mover archivos)"
 # El log debe poder escribirse ANTES de mover nada
 mkdir -p "$(dirname "$LOG")" && touch "$LOG" && [ -w "$LOG" ] || { echo "🔴 Log no escribible: $LOG — no se mueve nada" >&2; exit 1; }
 

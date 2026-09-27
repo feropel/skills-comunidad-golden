@@ -17,6 +17,8 @@ DRY="${3:-}"
 # devolvia 0 SIN error (medido 2026-09-05: 1 pieza sin barra, 0 con barra).
 while [ "$UNIT" != "/" ] && [ "${UNIT%/}" != "$UNIT" ]; do UNIT="${UNIT%/}"; done
 [ -d "$UNIT" ] || exit 0
+. "$(dirname "$0")/_comun.sh"
+exigir_local "$UNIT" "Renombrar archivos"
 if [ "$DRY" != "DRY" ]; then
   [ -n "$LOG" ] || { echo "🔴 Falta el log. Uso: nombrar.sh \"<carpeta>\" \"<log>\" [DRY]" >&2; exit 1; }
   mkdir -p "$(dirname "$LOG")" && touch "$LOG" && [ -w "$LOG" ] || { echo "🔴 Log no escribible: $LOG — no se renombra nada" >&2; exit 1; }
@@ -24,7 +26,13 @@ fi
 raw="$(basename "$UNIT")"
 PREFIX="$(printf '%s' "$raw" | sed 's/™//g; s/®//g; s/ - / /g; s/  */ /g' | sed 's/^ *//; s/ *$//')"
 ALLOW="jpg jpeg png webp heic heif gif tiff tif bmp svg psd ai eps mp4 mov webm m4v avi mkv hevc pdf docx doc rtf txt md xlsx xls csv tsv numbers pptx ppt key pages zip rar 7z"
-TMP="$(mktemp)"
+# Un mktemp que falla (sandbox sin TMPDIR, disco lleno) deja la variable VACIA
+# y "$VAR/x" se vuelve "/x". Medido 2026-09-27 con un mktemp falso: sin esta
+# guarda esta herramienta salia con EXIT 0 sin hacer nada — el peor de los
+# ceros falsos, porque quien la llama en un bucle ve exito y da el trabajo por
+# hecho. Se aborta en vez de seguir.
+TMP="$(mktemp "${TMPDIR:-/tmp}/golden-archivos.XXXXXX")" || {
+  echo "🔴 No se pudo crear el temporal: no se renombra nada." >&2; exit 1; }
 find "$UNIT" -type f ! -name '.*' 2>/dev/null > "$TMP"   # snapshot PRIMERO (renombrar mientras find recorre salta archivos)
 while IFS= read -r f; do
   [ -f "$f" ] || continue

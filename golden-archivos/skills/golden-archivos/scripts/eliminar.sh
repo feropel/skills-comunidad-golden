@@ -21,6 +21,8 @@ MODE="${4:-}"
 [ -f "$DEL" ]  || { echo "🔴 No existe el archivo a borrar: $DEL" >&2; exit 1; }
 [ -f "$KEEP" ] || { echo "🔴 No existe el sobreviviente: $KEEP — sin sobreviviente NO se borra" >&2; exit 1; }
 [ "$DEL" != "$KEEP" ] || { echo "🔴 Origen y sobreviviente son el mismo archivo" >&2; exit 1; }
+. "$(dirname "$0")/_comun.sh"
+exigir_local "$DEL" "BORRAR un archivo"
 mkdir -p "$(dirname "$LOG")" && touch "$LOG" && [ -w "$LOG" ] \
   || { echo "🔴 Log no escribible: $LOG — no se borra nada" >&2; exit 1; }
 

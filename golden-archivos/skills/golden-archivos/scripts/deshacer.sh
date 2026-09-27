@@ -5,6 +5,8 @@
 set -u
 LOG="${1:?Uso: deshacer.sh \"<movimientos.log>\"}"
 [ -f "$LOG" ] || { echo "No hay log: $LOG"; exit 1; }
+. "$(dirname "$0")/_comun.sh"
+exigir_local "$LOG" "Revertir movimientos"
 
 reverse() { if command -v tac >/dev/null 2>&1; then tac "$1"; else tail -r "$1"; fi; }
 

@@ -21,9 +21,15 @@ DIR="${1:?carpeta}"; OUT="${2:?salida.png}"; COLS="${3:-5}"; ROWS="${4:-}"
 # "$DIR/archivo" no se puede recortar contra "$DIR", asi que el script
 # devolvia 0 SIN error (medido 2026-09-05: 1 pieza sin barra, 0 con barra).
 while [ "$DIR" != "/" ] && [ "${DIR%/}" != "$DIR" ]; do DIR="${DIR%/}"; done
-command -v ffmpeg >/dev/null 2>&1 || { echo "🔴 Falta ffmpeg (instalar: brew install ffmpeg). Sin mosaico, verifica abriendo los archivos uno a uno con Read." >&2; exit 1; }
+command -v ffmpeg >/dev/null 2>&1 || { echo "🔴 Falta ffmpeg (instalar: brew install ffmpeg). Sin mosaico: las imagenes y los PDF se miran uno a uno con Read; los VIDEOS no los abre Read, sacales un fotograma con 'qlmanage -t -s 400 -o <salida> \"<video>\"' y mira ese PNG. Lo que aun asi no se vea, no se clasifica por el nombre." >&2; exit 1; }
 S=230
-WORK=$(mktemp -d)
+# Un mktemp que falla (sandbox sin TMPDIR, disco lleno) deja la variable VACIA
+# y "$VAR/x" se vuelve "/x". Medido 2026-09-27 con un mktemp falso: sin esta
+# guarda esta herramienta salia con EXIT 0 sin hacer nada — el peor de los
+# ceros falsos, porque quien la llama en un bucle ve exito y da el trabajo por
+# hecho. Se aborta en vez de seguir.
+WORK=$(mktemp -d "${TMPDIR:-/tmp}/golden-archivos.XXXXXX") || {
+  echo "🔴 No se pudo crear el temporal: no se puede armar el mosaico." >&2; exit 1; }
 
 # La lista debe cubrir TODO lo que clasificar.sh manda a IMÁGENES/GIFS/VIDEOS.
 # Si un formato falta aquí, su archivo no se intenta siquiera: no sale en el

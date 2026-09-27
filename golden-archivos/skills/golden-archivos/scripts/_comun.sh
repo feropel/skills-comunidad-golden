@@ -30,7 +30,7 @@ ruta_real() {
 # PEOR: daba verde sobre el disco de trabajo entero.
 #
 # Por que no lo veia: `pwd -P` no lo delata. Medido el 27-sep en este equipo,
-# ~/Desktop resuelve a /Users/<usuario>/Desktop — a si mismo, sin enlace que
+# ~/Desktop resuelve a si mismo, /Users/<usuario>/Desktop, sin enlace que
 # seguir — y aun asi su contenido ESTA en iCloud. macOS no usa un symlink: los
 # hijos son el MISMO objeto de disco que los de
 # ~/Library/Mobile Documents/com~apple~CloudDocs/Desktop.

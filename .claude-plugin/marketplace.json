@@ -75,7 +75,7 @@
       "name": "golden-archivos",
       "source": "./golden-archivos",
       "description": "Toma control de carpetas caóticas y las deja con nombres y orden coherentes.",
-      "version": "1.17.0",
+      "version": "1.18.0",
       "category": "operations"
     },
     {

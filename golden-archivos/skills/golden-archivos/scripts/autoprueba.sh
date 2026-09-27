@@ -185,6 +185,24 @@ done
 [ "$FF_OK" -eq 1 ] && ok "el metodo sin ffmpeg es el mismo en los dos sitios y no promete abrir video con Read" \
   || no "SKILL.md y hoja-contactos.sh no coinciden sobre que hacer sin ffmpeg, o alguno dice que un video se abre con Read"
 
+echo "== 11. Sin rutas absolutas de usuario: nada que identifique al dueno del Mac =="
+# Fila del chat ARSENAL Y SKILLS (27-sep): su barrido de publicacion encontro
+# `/Users/<usuario>/Desktop` en un COMENTARIO de _comun.sh. El repo es PUBLICO y
+# eso no se borra despues: ni del historial de git ni de los clones que ya se
+# hicieron. Lo redactaron en la copia publica, pero redactar al publicar es una
+# red que solo existe mientras alguien use esa herramienta; el dia que se
+# sincronice sin ella, se publica. Por eso la comprobacion vive AQUI, en origen.
+# Cubre cualquier usuario, no solo el de este equipo.
+fugas=""
+for f in "$DIR"/*.sh "$(dirname "$DIR")"/SKILL.md "$(dirname "$DIR")"/references/*.md; do
+  [ -f "$f" ] || continue
+  if grep -qE '/Users/[A-Za-z0-9._-]+/' "$f"; then
+    fugas="$fugas $(basename "$f")"
+  fi
+done
+[ -z "${fugas// /}" ] && ok "ningun archivo trae una ruta absoluta de usuario" \
+  || no "traen /Users/<alguien>/ y el repo es publico:$fugas"
+
 echo "== 4. El log manda: sin log no se mueve =="
 sembrar "$T/c"
 bash "$DIR/clasificar.sh" "$T/c/PROD" "/ruta/imposible/x.log" >/dev/null 2>&1 \

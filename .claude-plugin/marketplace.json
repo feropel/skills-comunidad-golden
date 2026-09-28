@@ -257,7 +257,7 @@
       "name": "golden-presenta",
       "source": "./golden-presenta",
       "description": "Presentaciones cinematograficas en UN archivo HTML: fondo vivo, camara que viaja por el lienzo, modo presentador y salida a PDF. Sin suscripcion ni dependencias externas.",
-      "version": "2.1.0",
+      "version": "2.2.0",
       "category": "design"
     },
     {

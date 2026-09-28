@@ -3,7 +3,11 @@
 Aquí vive el acta. `SKILL.md` es instrucción; esto es memoria.
 
 
-## GP2.1i · 2026-09-27 · P59 · lo que se descartaba sin decirlo
+## GP2.2 · 2026-09-28 · Ley de versiones: sin letras
+
+El Centro de Mando fijó el 28-sep que toda versión se escribe X.Y.Z, porque el vigilante, el plugin.json y el marketplace solo leen eso. Esta skill numeraba con letras (GP2.1a…GP2.1h), así que la ronda de numeración del 27-sep la dejó en GP2.1i, pero el repo la seguía viendo como 2.1.0, y quien la tenía instalada no se enteraba del cambio. La numeración queda en **GP2.2**. Las actas GP2.1a…h de abajo conservan su número histórico. El contenido de la versión es el mismo que se publicó el 27-sep como GP2.1i: arreglos P59 y la ruta completa de style-recipes. Aplicado por el chat 🧰 ARSENAL Y SKILLS por decisión del Centro de Mando.
+
+## GP2.2 · 2026-09-27 · P59 · lo que se descartaba sin decirlo
 
 Aplicado por el chat 🧰 ARSENAL Y SKILLS por orden directa de FER («que todas las skills estén perfectamente corregidas»), informado al Centro de Mando. No se encontró una sesión viva de esta fábrica. **No se numeró.**
 
@@ -15,7 +19,7 @@ Aplicado por el chat 🧰 ARSENAL Y SKILLS por orden directa de FER («que todas
   - La frase larga ahora sale en «sin verificar», y el chequeo sigue cazando «Hola?» sin ¿.
   - Con 5 archivos borrados y un `.json` cambiado, la versión anterior decía «**0** artefactos cambiados», y la nueva dice 6 y los nombra.
 
-## GP2.1i · 2026-09-27 · Ley de los requisitos del usuario (aplicó el CENTRO DE MANDO)
+## GP2.2 · 2026-09-27 · Ley de los requisitos del usuario (aplicó el CENTRO DE MANDO)
 
 Se añadió el bloque «Antes de empezar» del SKILL.md: qué tiene que tener el usuario antes de arrancar, cada requisito marcado BLOQUEANTE o DEGRADABLE y qué pasa si falta (doctrina del CdM del 27-sep). Lo redactó el chat 🧰 ARSENAL Y SKILLS (4 pasadas del golden-verificador adversarial, 0 fallas nuevas en la última) y lo aplicó el CdM sin numerar: el número lo pone la fábrica al ratificar. Solo inserción: 0 líneas quitadas.
 

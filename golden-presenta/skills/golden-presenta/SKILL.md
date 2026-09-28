@@ -16,7 +16,7 @@ description: >-
 ---
 # Golden Presenta — el deck como activo propio, no como suscripción
 
-**Versión:** `GP2.1i` · **Fábrica: chat `✅ SKILL golden-presenta`.**
+**Versión:** `GP2.2` · **Fábrica: chat `✅ SKILL golden-presenta`.**
 
 Ahí se construye y se repara esta skill. Los demás chats la USAN y mandan fila a la fábrica;
 no la editan por su cuenta. Si un chat necesita un cambio, lo pide, no lo hace.

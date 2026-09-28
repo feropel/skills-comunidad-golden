@@ -17,6 +17,19 @@ description: >-
 
 **Fábrica:** chat «✅ SKILL golden-chatea-pro-config-logistico»
 # Golden · Chatea Pro — Asistente Logístico (padre)
+
+## 📋 Requisitos: qué necesita del usuario antes de arrancar
+
+- **Token API del espacio de Chatea Pro** · BLOQUEANTE. Se crea en el panel del espacio (*Settings → API Keys*, según el propio código) y va **atado al Bot**; si no, la API responde 404 "Flow not found". Se guarda en `<carpeta del cliente>/.secrets/<espacio>.token`. Cupo: 1.000 llamadas por hora (no está medido si es por token o por espacio; se mira con `golden-chatea-cupo`).
+- **País del espacio** · BLOQUEANTE y SE PREGUNTA SIEMPRE: la plantilla nace colombiana sin importar el país. Sin pack del país se optimiza igual, investigando lo que falte.
+- **Lo que se pregunta** (transportadoras de domicilio y prohibidas, identidad: tienda, WhatsApp y web) · DEGRADABLES: un campo sin dato se declara pendiente.
+- **Monto del anticipo** · DEGRADABLE: si no lo da, se propone el flete completo. **Datos de pago con titular**, si hay anticipado · BLOQUEANTES para ese campo: se preguntan; nunca se inventan.
+- **Validaciones de la orden** · no se preguntan: se relevan del espacio y **se respetan las que puso el cliente**.
+- **La hija `golden-chatea-pro-validacion-direcciones`** y acceso a internet para el PASO 1-bis · DEGRADABLE: sin ella se entrega con el pendiente declarado.
+
+**Si falta algo BLOQUEANTE: no se hace lo que depende de él** (si es de toda la skill, se PARA antes de tocar nada) y se pide con nombre propio: qué es, dónde se saca y dónde se pone. **Si falta algo DEGRADABLE: se pide y se sigue**, dejando declarado como pendiente en todo lo que depende de él. Nunca se presenta como completo.
+
+<!-- skill v1.15 — 2026-09-28 — sello unificado. Recoge: el bloque de Requisitos del CdM (27-sep, ley de FER del 02-sep), la sección LA PARTE DINÁMICA (v1.13) y la fila P59 del CdM (v1.14: exclusiones silenciosas nombradas en los dos scripts, 429 y 401 explicados). 🔴 El número 1.12 quedó usado DOS veces —la fábrica el 22-sep y el CdM el 27-sep— y por eso el cuerpo decía 1.12 mientras el changelog iba por 1.14: se sella por encima de ambas y se numera una sola vez. Historial: references/changelog.md. -->
 <!-- skill v1.11 — 2026-09-18 — fábrica en su chat (optimización de Golden): cuatro campos JSON, tiempos y recordatorios estándar de FER, intake del anticipo, escritor por API con autoprueba 7/7, regla del techo y del pago anticipado. Historial completo: references/changelog.md (2 actas, mudadas el 2026-09-05; el cuerpo se paga en cada activación, el acta no). Auditoría golden-skill-auditor 2026-09-20: agregada esta línea de versión bajo el H1, que faltaba (inventario.sh la marcaba ausente); sin otros hallazgos con evidencia. Cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO. -->
 
 ## QUÉ ES CONFIGURAR ESTE ASISTENTE, en palabras de FER (2026-09-08)

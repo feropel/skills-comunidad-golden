@@ -61,8 +61,17 @@ class Api:
         req = urllib.request.Request(BASE + ruta, data=datos, method=metodo, headers={
             "Authorization": "Bearer " + self.token, "User-Agent": UA,
             "Accept": "application/json", "Content-Type": "application/json"})
-        with urllib.request.urlopen(req, timeout=60) as r:
-            return json.loads(r.read().decode())
+        try:
+            with urllib.request.urlopen(req, timeout=60) as r:
+                return json.loads(r.read().decode())
+        except urllib.error.HTTPError as e:
+            if e.code == 429:
+                raise SystemExit("🔴 CUPO AGOTADO (429): Chatea permite 1.000 peticiones por hora "
+                                 "y ya se pasaron. Espera a la hora siguiente; nada se escribio.")
+            if e.code == 401:
+                raise SystemExit("🔴 TOKEN NO VALIDO (401): fue rotado o es de otro espacio. "
+                                 "Nada se escribio.")
+            raise
     def campos(self):
         todos, vistos, page = {}, set(), 1
         while page <= 40:          # GET pagina y per_page se ignora: recorrer hasta que no haya nuevos
@@ -93,6 +102,19 @@ def cargar_vivo(api, nombre_esperado, salida=print):
     return campos, vivo, 0
 
 def calcular_diff(vivo, prop_dir, salida=print):
+    # 🔴 FILA P59 (CdM, 2026-09-27): un campo sin archivo de propuesta —o con el nombre mal
+    # escrito— se saltaba en silencio, y "llaves que cambian: N" no decia que ese campo ni se
+    # leyo. Un .json de mas en la carpeta tampoco se nombraba. Lo que no se mide, se NOMBRA.
+    esperados = {os.path.join(prop_dir, a + ".json"): (c, a) for c, a in CAMPOS.items()}
+    sin_propuesta = [c for c, a in CAMPOS.items()
+                     if c in vivo and not os.path.exists(os.path.join(prop_dir, a + ".json"))]
+    try:
+        hay = {os.path.join(prop_dir, f) for f in os.listdir(prop_dir) if f.endswith(".json")}
+    except OSError:
+        hay = set()
+    no_reconocidos = sorted(os.path.basename(x) for x in hay - set(esperados))
+    salida(f"campos sin propuesta (no se tocan): {sin_propuesta or 'ninguno'}")
+    salida(f"archivos no reconocidos en --prop-dir (se ignoran): {no_reconocidos or 'ninguno'}")
     llaves = []
     for c, arch in CAMPOS.items():
         ruta = os.path.join(prop_dir, arch + ".json")
@@ -199,6 +221,24 @@ def autoprueba():
     a = ApiFalsa("Emp", guarda=False); c, v, _ = cargar_vivo(a, "Emp", mudo)
     ll, _ = calcular_diff(v, prop(a, {(CG, ("comportamiento_de_la_ia", "restricciones")): "R2"}), mudo)
     casos.append(("detecta 200 ok que no guardo", escribir(a, c, v, ll, mudo, 0) == 1))
+    # 8 · FILA P59: un campo sin propuesta y un .json de mas se NOMBRAN
+    import io as _io, contextlib as _c
+    a = ApiFalsa("Emp"); c, v, _ = cargar_vivo(a, "Emp", mudo)
+    dprop = prop(a, {})
+    os.remove(os.path.join(dprop, "seguimiento.json"))
+    open(os.path.join(dprop, "sobra.json"), "w").write("{}")
+    _buf = _io.StringIO()
+    with _c.redirect_stdout(_buf):
+        calcular_diff(v, dprop)
+    _s = _buf.getvalue()
+    casos.append(("nombra el campo sin propuesta y el archivo de mas",
+                  "Seguimiento" in _s and "sobra.json" in _s))
+    _buf2 = _io.StringIO()
+    with _c.redirect_stdout(_buf2):
+        calcular_diff(v, prop(a, {}))
+    casos.append(("con la carpeta completa dice 'ninguno' en las dos listas",
+                  _buf2.getvalue().count("ninguno") == 2))
+
     # 7 bueno: sin cambios -> 0 llaves
     a = ApiFalsa("Emp"); c, v, _ = cargar_vivo(a, "Emp", mudo)
     casos.append(("propuesta igual a lo vivo = 0 llaves", calcular_diff(v, prop(a, {}), mudo)[0] == []))

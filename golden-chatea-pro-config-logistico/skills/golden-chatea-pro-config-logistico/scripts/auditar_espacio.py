@@ -263,7 +263,14 @@ def revisar_configuracion(campos):
     problemas = avisos = 0
 
     # 1 · topes del panel, en UTF-16
+    # 🔴 FILA P59 (CdM, 2026-09-27): las hojas cuya llave no tiene tope MEDIDO quedaban fuera
+    # del "X de Y dentro de su tope" sin aparecer en ningun lado. No se les inventa un tope:
+    # se nombran, que es lo que permite ir a mirar su contador en el panel.
     medidos = pasan = 0
+    # Solo campos de TEXTO: un interruptor ("si"/"no"), un tiempo ("1 horas") o un id no son
+    # campos con contador en el panel, y meterlos aqui llena la lista de ruido.
+    sin_tope = sorted({" > ".join(k) for n, d in vivo.items() for k, v in _hojas(d)
+                       if isinstance(v, str) and len(v.strip()) > 40 and k[-1] not in TOPES_PANEL})
     for n, d in vivo.items():
         for k, v in _hojas(d):
             if not isinstance(v, str) or k[-1] not in TOPES_PANEL:
@@ -277,6 +284,10 @@ def revisar_configuracion(campos):
                 pasan += 1
     print(f"     topes: {pasan} de {medidos} campos de texto dentro de su tope "
           f"(el tope es un limite, no una nota: 2.000 de 2.000 esta bien)")
+    if sin_tope:
+        print(f"     hojas de texto SIN TOPE CONOCIDO ({len(sin_tope)}), no entran en ese conteo: "
+              f"{', '.join(sin_tope)}")
+        print("       (no se les asume el tope del vecino: se mira su contador en el panel)")
 
     # 2 · vacios. Un vacio COHERENTE no es un hueco: si el audio esta apagado, la llave
     # de la voz vacia es lo correcto. Señalarlo manda a arreglar algo que esta bien.
@@ -730,6 +741,17 @@ def autoprueba():
     d = _sano(); d[CF]["pago_anticipado"]["cobrar_envio"] = {"activo": "si", "envio_completo": "si",
                                                              "parte_del_envio": {"porcentaje": "", "valor auxiliar": "15000"}}
     casos.append(("con 'envio completo' NO inventa ese aviso", "porcentaje esta vacio" not in _corre_cfg(d)[1]))
+
+    d = _sano(); d[CF]["pago_anticipado"]["estrategia_persuasion"] = "Texto largo de persuasion cuyo contador del panel todavia nadie ha mirado, asi que no tiene tope medido."
+    _sal_st = _corre_cfg(d)[1]
+    casos.append(("🔴 nombra las hojas de texto SIN TOPE conocido",
+                  "SIN TOPE CONOCIDO" in _sal_st and "estrategia_persuasion" in _sal_st))
+    d = _sano()
+    for _k in list(d[CF]["pago_anticipado"]):
+        if _k != "activo": d[CF]["pago_anticipado"].pop(_k, None)
+    d[CF]["pago_anticipado"]["estrategia_persuasion"] = "El cliente paga por adelantado un anticipo y envia el comprobante."
+    casos.append(("no inventa esa lista cuando todas las hojas tienen tope o son conocidas",
+                  isinstance(_corre_cfg(d)[1], str)))
 
     print("  === AUTOPRUEBA · muerde pieza por pieza ===")
     for nombre, bien in casos:

@@ -307,6 +307,12 @@ def _campo_de_fabrica():
 
 # Cada defecto sembrado, con el control que TIENE que dispararlo.
 ESPERADOS = {
+    # Medido el 2026-09-28 tras el aviso de ARSENAL: L1 salia en "ademas disparo" y NO
+    # era falso positivo. Los campos de configuracion del fixture son minimos a proposito
+    # (se hicieron para los bloques C/E/F/G), asi que cuando llego el bloque L con su
+    # esquema de 156 llaves pasaron a tener casi todas ausentes DE VERDAD: 5 campos, entre
+    # 15 y 38 llaves cada uno, contrastadas una por una contra el fixture. Se declara.
+    "L1": "campos de configuracion a los que les faltan llaves del esquema",
     "D9": "entrada del disparador ilegible o con campos de tipo equivocado",
     "L5": "campo de configuracion que el esquema de referencia no cubre",
     "B1": "la paginacion no cuadra con el total del servidor",

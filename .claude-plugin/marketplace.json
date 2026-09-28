@@ -243,7 +243,7 @@
       "name": "golden-chatea-auditoria",
       "source": "./golden-chatea-auditoria",
       "description": "Revisa tu espacio de Chatea entero y te dice campo por campo qué está sano y qué está roto.",
-      "version": "3.5.0",
+      "version": "3.6.0",
       "category": "marketing"
     },
     {

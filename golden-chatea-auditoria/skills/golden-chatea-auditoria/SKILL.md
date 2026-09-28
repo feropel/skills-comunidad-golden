@@ -33,6 +33,18 @@ description: >-
 
 **Si falta algo BLOQUEANTE: no se hace lo que depende de él** (si es de toda la skill, se PARA antes de tocar nada) y se pide con nombre propio: qué es, dónde se saca y dónde se pone. **Si falta algo DEGRADABLE: se pide y se sigue**, dejando marcado como NO CORRIDO en todo lo que depende de él. Nunca se presenta como completo.
 
+<!-- skill v3.6 (GCA3.6) — 2026-09-28 — EL AVISO DE L1: NI FALSO POSITIVO NI DEFECTO, UN
+VERDADERO POSITIVO SIN DECLARAR. ARSENAL dejo en la cola que el banco imprimia «ademas disparo (no
+sembrado, revisar si es falso positivo): ['L1']», y que la 3.4 publicada hacia lo mismo. Medido
+antes de decidir: L1 acusa 5 campos de configuracion con entre 15 y 38 llaves ausentes cada uno, y
+al contrastar campo por campo contra el fixture las llaves faltan DE VERDAD. La causa es de
+historia: los campos de configuracion del banco se construyeron minimos para ejercer los bloques
+C, E, F y G, y cuando en GCA2.7 llego el bloque L con su esquema de 156 llaves, esos mismos campos
+pasaron a tener casi todo ausente. Se cierra DECLARANDOLO en ESPERADOS con su motivo escrito, no
+silenciandolo, y el aviso «ademas disparo» se queda intacto para que el proximo control que
+aparezca sin declarar vuelva a saltar: apagar el aviso lo convertiria en la alfombra que esta casa
+ya tiene nombrada. Medido al cerrar: autoprueba 35 defectos + 30 pruebas, sin linea de «ademas
+disparo»; extractor 2 de 2; simulador 7 de 7; compuerta 0. -->
 <!-- skill v3.5 (GCA3.5) — 2026-09-28 — FILA P66: LA EXTRACCION SE CORTABA Y EL DIFF
 INVENTABA CAMBIOS. El CdM lo midio en una corrida real: `/flow/bot-fields` se cayo DOS veces con
 IncompleteRead a mitad de la paginacion (30 de 89 campos y 10 de 89). Tal como estaba, esas 30
@@ -52,7 +64,7 @@ hace fallar a curl con el codigo 23, y el proxy añade su propio bloque de cabec
 Probado en las dos direcciones y EN VIVO, no solo en el simulador: banco propio del extractor con
 un corte simulado a mitad (y su control negativo, que una paginacion completa no se marque
 parcial), y 3 comprobaciones contra la API real por 2 peticiones del cupo. Medido al cerrar:
-autoprueba 34 defectos + 30 pruebas, extractor 2 de 2, simulador 7 de 7, compuerta 0. -->
+autoprueba 35 defectos + 30 pruebas, extractor 2 de 2, simulador 7 de 7, compuerta 0. -->
 <!-- skill v3.4 (GCA3.4) — 2026-09-28 — LA COMPUERTA DEL REPO PARO LA PUBLICACION, Y EL HUECO
 DE LOS NOMBRES SE CERRO. La compuerta `golden-barrido-publicacion` freno GCA3.3 con 4 hallazgos en
 3 ficheros: el nombre de una empresa usado como prosa de comentario y de changelog ("medido sobre
@@ -95,7 +107,7 @@ guardia dio "El guardia esta roto"), arreglo despues. Una prueba propia estaba m
 la evidencia cuando el nombre del campo va en el titulo -- y fue el tercer instrumento mio que fallo
 en esta corrida: se corrigio antes de concluir. Medido al cerrar: autoprueba 34 defectos + 29
 pruebas, simulador 7 de 7, guardia de privacidad muerde y da 0, validador sin fallos ni avisos. -->
-**Versión:** `GCA3.5`  ·  historia completa en `references/changelog.md`
+**Versión:** `GCA3.6`  ·  historia completa en `references/changelog.md`
 
 Auditar aquí significa **medir el estado real del servidor contra el estándar**, no leer la
 configuración y opinar. Nada se da por bueno sin haberlo contado, y el informe se entrega en

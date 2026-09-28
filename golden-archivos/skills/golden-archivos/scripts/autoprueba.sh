@@ -292,6 +292,31 @@ printf '%s' "$sal" | grep -q 'TAG RECEDE - demo cuello' && cr_ok=0
 [ "$cr_ok" -eq 1 ] && ok "el detector de cripticos encuentra las 14 formas reales y respeta el nombre sano" \
   || no "el detector de cripticos se deja formas reales (encontro ${n_cr:-0} de 14) o acusa a un nombre bueno"
 
+echo "== 15. Un md5 que FALLA no es una coincidencia =="
+# El peor fallo que ha tenido esta skill, medido el 27-09-2026 y reproducido aqui:
+# dos archivos con contenido DISTINTO ("bbbb" y "cccc") en chmod 000 hacian que
+# `md5 -q` devolviera VACIO para los dos, `"" = ""` daba IGUAL, y `eliminar.sh`
+# BORRO uno declarandolo "identico byte a byte".
+# La verificacion md5 es TODA la garantia de seguridad del borrado. Cuando el
+# instrumento falla, su silencio se lee como conformidad — y aqui esa lectura
+# cuesta un archivo que no se recupera.
+# Se exigen las DOS mitades: que eliminar.sh se niegue, y que duplicados.sh no
+# los presente como grupo.
+MD="$T/md5vacio"; mkdir -p "$MD"
+printf 'bbbb' > "$MD/i1.bin"; printf 'cccc' > "$MD/i2.bin"
+printf 'aaaa' > "$MD/l1.txt"; printf 'aaaa' > "$MD/l2.txt"
+chmod 000 "$MD/i1.bin" "$MD/i2.bin"
+: > "$MD/el.log"
+md5_ok=1
+bash "$DIR/eliminar.sh" "$MD/i1.bin" "$MD/i2.bin" "$MD/el.log" >/dev/null 2>&1
+[ -e "$MD/i1.bin" ] || md5_ok=0                       # NO puede haberlo borrado
+sal=$(bash "$DIR/duplicados.sh" "$MD" 2>&1)
+printf '%s' "$sal" | grep -qi 'no se pudieron leer' || md5_ok=0   # los nombra
+printf '%s' "$sal" | grep -q 'Grupos de duplicados exactos: 1' || md5_ok=0  # 1, no 2
+chmod 644 "$MD/i1.bin" "$MD/i2.bin" 2>/dev/null
+[ "$md5_ok" -eq 1 ] && ok "un md5 ilegible no borra archivos ni inventa grupos de duplicados" \
+  || no "un md5 que falla se esta leyendo como coincidencia: eliminar.sh borra, o duplicados.sh agrupa ilegibles"
+
 echo "== 4. El log manda: sin log no se mueve =="
 sembrar "$T/c"
 bash "$DIR/clasificar.sh" "$T/c/PROD" "/ruta/imposible/x.log" >/dev/null 2>&1 \

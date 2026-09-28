@@ -18,7 +18,12 @@ cut -f1 "$SIZES" | sort -n | uniq -d > "${SIZES}.dup"
 while IFS= read -r s; do
   awk -F'\t' -v S="$s" '$1==S{print $2}' "$SIZES"
 done < "${SIZES}.dup" | while IFS= read -r f; do
-  printf '%s\t%s\n' "$(md5 -q "$f" 2>/dev/null)" "$f" >> "$HASHES"
+  h=$(md5 -q "$f" 2>/dev/null)
+  # Un md5 que falla devuelve VACIO, y todos los vacios se agrupan entre si:
+  # dos archivos ILEGIBLES del mismo tamaño salian juntos como "duplicados"
+  # aunque su contenido fuera distinto. Se apartan y se nombran.
+  if [ -z "$h" ]; then printf '%s\n' "$f" >> "${HASHES}.ilegibles"; continue; fi
+  printf '%s\t%s\n' "$h" "$f" >> "$HASHES"
 done
 
 VACIOS=$(find "$@" -type f ! -name '.*' -size 0 2>/dev/null | wc -l | tr -d ' ')
@@ -34,6 +39,11 @@ if [ "$VACIOS" -gt 0 ]; then
   find "$@" -type f ! -name '.*' -size 0 2>/dev/null | sed 's/^/   /'
 fi
 cut -f1 "$HASHES" | sort | uniq -d > "${HASHES}.dup"
+if [ -s "${HASHES}.ilegibles" ]; then
+  echo "⚠️  $(wc -l < "${HASHES}.ilegibles" | tr -d ' ') archivo(s) que NO se pudieron leer, fuera del analisis:"
+  sed 's/^/   /' "${HASHES}.ilegibles"
+  echo "   (sin huella no se puede afirmar que sean copias de nada)"
+fi
 echo "Grupos de duplicados exactos: $(wc -l < "${HASHES}.dup" | tr -d ' ')"
 echo ""
 i=0
@@ -42,5 +52,5 @@ while IFS= read -r h; do
   grep "^$h	" "$HASHES" | cut -f2 | sed 's/^/   /'
   echo ""
 done < "${HASHES}.dup"
-rm -f "$SIZES" "${SIZES}.dup" "${HASHES}.dup"   # se conserva solo el TSV de hashes
+rm -f "$SIZES" "${SIZES}.dup" "${HASHES}.dup" "${HASHES}.ilegibles"   # se conserva solo el TSV de hashes
 echo "TSV completo de hashes: $HASHES"

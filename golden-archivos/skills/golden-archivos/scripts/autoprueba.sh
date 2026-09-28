@@ -203,6 +203,31 @@ done
 [ -z "${fugas// /}" ] && ok "ningun archivo trae una ruta absoluta de usuario" \
   || no "traen /Users/<alguien>/ y el repo es publico:$fugas"
 
+echo "== 12. ffmpeg con -nostdin: que no se coma la lista del bucle =="
+# Sin `-nostdin`, ffmpeg DRENA la entrada estandar. Cuando corre dentro de un
+# `while read` cuya entrada es la lista de archivos, se come lineas y esas
+# piezas no se procesan. Medido el 27-09-2026 en una biblioteca real: 85
+# renderizadas de 92 candidatas, sin un solo mensaje de error.
+# Mecanico y generalizable, asi que va como candado: cubre los scripts de hoy y
+# los que se agreguen. Se quitan los comentarios antes de buscar.
+sin_nostdin=""
+for f in "$DIR"/*.sh; do
+  # El banco se excluye: su PROPIO detector contiene la palabra que busca, asi
+  # que sin esto se acusa a si mismo. Un detector que no puede mirarse sin
+  # morderse no esta midiendo el disco, se esta mirando al espejo.
+  [ "$(basename "$f")" = "autoprueba.sh" ] && continue
+  vivo=$(sed -e 's/[[:space:]]*#.*$//' "$f")
+  printf '%s' "$vivo" | grep -qE '(^|[^[:alnum:]_-])ffmpeg[[:space:]]' || continue
+  # `command -v ffmpeg` y `which ffmpeg` NO son llamadas: comprueban si existe.
+  # Contarlas acusaba al script que hace justo lo correcto, comprobar antes de usar.
+  crudas=$(printf '%s' "$vivo" | grep -E '(^|[^[:alnum:]_-])ffmpeg[[:space:]]' \
+           | grep -vE '(command -v|which|type)[[:space:]]+ffmpeg' \
+           | grep -vc -- '-nostdin')
+  [ "${crudas:-0}" -eq 0 ] || sin_nostdin="$sin_nostdin $(basename "$f")"
+done
+[ -z "${sin_nostdin// /}" ] && ok "todo ffmpeg lleva -nostdin y no se come la lista" \
+  || no "llaman a ffmpeg sin -nostdin y pueden comerse piezas del bucle:$sin_nostdin"
+
 echo "== 4. El log manda: sin log no se mueve =="
 sembrar "$T/c"
 bash "$DIR/clasificar.sh" "$T/c/PROD" "/ruta/imposible/x.log" >/dev/null 2>&1 \

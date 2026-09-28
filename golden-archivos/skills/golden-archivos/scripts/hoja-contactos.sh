@@ -48,9 +48,31 @@ TOTAL_ARCHIVOS=$(find "$DIR" -maxdepth 1 -type f ! -name '.*' 2>/dev/null | wc -
 NO_MEDIA=$(( TOTAL_ARCHIVOS - ${#CANDIDATOS[@]} ))
 i=1
 while IFS= read -r f; do
-  ffmpeg -y -loglevel error -i "$f" \
+  # `-nostdin` NO es adorno: sin el, ffmpeg DRENA la entrada estandar, que aqui
+  # es la lista de archivos del propio bucle, y se come lineas. Medido el
+  # 27-09-2026 sobre una biblioteca real: 85 renderizadas de 92 candidatas, sin
+  # un solo error. Las piezas comidas no se clasifican y nadie sabe cuales son.
+  #
+  # Y el escalado va en DOS PASOS cuando el directo falla. Un HEIC es una imagen
+  # en MOSAICOS: ffmpeg le arma por dentro un filtergraph complejo y un `-vf`
+  # simple choca con el ("Simple and complex filtering cannot be used together
+  # for the same stream"). Se decodifica primero y se escala despues.
+  # El camino directo se intenta igual porque es mas rapido y sirve para todo lo
+  # demas; el segundo paso solo corre si el primero no produjo nada.
+  destino="$WORK/$(printf '%03d' $i).png"
+  ffmpeg -nostdin -y -loglevel error -i "$f" \
     -vf "scale=$S:$S:force_original_aspect_ratio=decrease,pad=$S:$S:(ow-iw)/2:(oh-ih)/2:white,format=rgb24" \
-    -frames:v 1 "$WORK/$(printf '%03d' $i).png" 2>/dev/null
+    -frames:v 1 "$destino" 2>/dev/null
+  if [ ! -s "$destino" ]; then
+    TMPCRUDO="$WORK/crudo-$(printf '%03d' $i).png"
+    ffmpeg -nostdin -y -loglevel error -i "$f" -frames:v 1 "$TMPCRUDO" 2>/dev/null
+    if [ -s "$TMPCRUDO" ]; then
+      ffmpeg -nostdin -y -loglevel error -i "$TMPCRUDO" \
+        -vf "scale=$S:$S:force_original_aspect_ratio=decrease,pad=$S:$S:(ow-iw)/2:(oh-ih)/2:white,format=rgb24" \
+        -frames:v 1 "$destino" 2>/dev/null
+    fi
+    rm -f "$TMPCRUDO"
+  fi
   if [ -f "$WORK/$(printf '%03d' $i).png" ]; then
     echo "$i = $(basename "$f")"
     i=$((i+1))
@@ -73,7 +95,7 @@ if [ "$ROWS" -gt "$MAX_ROWS" ]; then
   echo "⚠️ $n piezas → ${ROWS} filas: demasiado alto para revisar de un vistazo." >&2
   echo "   Corre por tandas (ej. subcarpetas) o sube columnas: hoja-contactos.sh \"\$DIR\" salida.png $(( (n + MAX_ROWS - 1) / MAX_ROWS ))" >&2
 fi
-(cd "$WORK" && ffmpeg -y -loglevel error -framerate 1 -start_number 1 -i "%03d.png" \
+(cd "$WORK" && ffmpeg -nostdin -y -loglevel error -framerate 1 -start_number 1 -i "%03d.png" \
   -filter_complex "tile=${COLS}x${ROWS}:padding=6:color=gray" -frames:v 1 "$OUT")
 rm -rf "$WORK"
 echo ""

@@ -101,6 +101,48 @@ def _solo_como_variable_css(texto, token):
     return total > 0 and total == css
 
 
+# P65 (28-sep, CdM, reportado por la fabrica de golden-logistica-diaria): una skill que
+# documenta una TRAMPA citando una ruta que a proposito NO debe existir ("cuidado:
+# `scripts/__pycache__/` no debe existir en el repo publicado") salia con "referencia
+# rota" — penaliza documentar bien. PERO este archivo ya mato DOS listas de excusas en
+# prosa por la misma razon: un `any(palabra in frase)` sin comprobacion deja tapar una
+# cita muerta real con cualquier frase que contenga la palabra magica (ver DECLARA_
+# INEXISTENCIA y EXCUSAS_CONDICIONALES arriba). La leccion de la casa no es "no hagas
+# excepciones por prosa", es "una excepcion por prosa nunca es SILENCIOSA": se REPORTA
+# igual, solo que como AVISO en vez de FALLO — visible, no tapado — y el marcador es una
+# lista CERRADA de frases que afirman un ESTADO comprobable ("no debe existir", "se
+# borra"), nunca un adjetivo de intencion ("planeado", "opcional") que ya se demostro
+# manipulable. Sigue mordiendo una referencia rota real: solo baja su severidad cuando
+# la propia frase, y nada mas que la frase que contiene la cita, declara la ausencia.
+_RX_LIMITE_FRASE = re.compile(r"[.!?](?:\s|$)|\n[ \t]*\n|\n[ \t]*[-*][ \t]|\n[ \t]*\d+[.)][ \t]")
+RX_NEGACION_RUTA = re.compile(
+    r"no\s+debe\s+existir|nunca\s+debe\s+(?:existir|estar)|no\s+exist[ei]|"
+    r"si\s+aparece|se\s+borra|se\s+elimina|jam[aá]s\s+debe\s+existir", re.I)
+
+
+def _limites_frase(vivo, inicio, fin):
+    """(ini, final): posiciones absolutas de la frase (o vineta, o parrafo) que contiene
+    el tramo [inicio, fin), ni una letra mas."""
+    ini = 0
+    for m in _RX_LIMITE_FRASE.finditer(vivo, 0, inicio):
+        ini = m.end()
+    m = _RX_LIMITE_FRASE.search(vivo, fin)
+    final = m.start() if m else len(vivo)
+    return ini, final
+
+
+def _niega_esta_cita(vivo, inicio, fin):
+    """True solo si el marcador de negacion esta CERCA de ESTA cita en particular, no de
+    cualquier otra que comparta la misma frase. Medido (28-sep): sin esta ventana local,
+    "`temporal.py` no debe existir, y aparte corre `real.py` siempre" callaba las DOS —
+    el mismo contagio por proximidad que ya se cazo dos veces en este archivo, ahora
+    dentro de una frase en vez de entre frases. La frase sigue siendo el TECHO: la
+    ventana nunca cruza a la frase vecina."""
+    frase_ini, frase_fin = _limites_frase(vivo, inicio, fin)
+    ventana = vivo[max(frase_ini, inicio - 20):min(frase_fin, fin + 20)]
+    return bool(RX_NEGACION_RUTA.search(ventana))
+
+
 def _dueno_ajeno(dir_skill, skills, nombre, vivo, inicio, fin, r):
     """Regla 2 del modulo: una ruta calificada con la skill dueña CERCA (antes o DESPUES)
     es correcta aunque el archivo no exista AQUI — pero solo si de verdad esta ALLA.
@@ -148,6 +190,10 @@ def revisar_conexiones(dir_skill, univ):
                 continue  # apunta a archivo de OTRA skill, y el archivo SI esta ahi
             fallos.append(
                 f"referencia rota: {r} (dice ser de {'/'.join(ajena)} pero el archivo no existe ahi)")
+            continue
+        if _niega_esta_cita(vivo, m.start(), m.end()):
+            avisos.append(f"cita '{r}' que su propia frase declara que NO debe existir "
+                          f"(confirmar a mano que es una trampa documentada, no una cita muerta)")
             continue
         fallos.append(f"referencia rota: {r} (no existe y no dice de quien es)")
 
@@ -206,6 +252,10 @@ def revisar_conexiones(dir_skill, univ):
             if confirmada:
                 continue
             fallos.append(f"script declarado y ausente: {r} (dice ser de {'/'.join(ajena)} pero no esta ahi)")
+            continue
+        if _niega_esta_cita(vivo, m.start(), m.end()):
+            avisos.append(f"cita '{r}' que su propia frase declara que NO debe existir "
+                          f"(confirmar a mano que es una trampa documentada, no un script ausente de verdad)")
             continue
         fallos.append(f"script declarado y ausente: {r}")
 

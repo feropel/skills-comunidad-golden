@@ -139,6 +139,23 @@ def main():
         d = skill(tmp, "ref-en-historia", BUENA,
                   cuerpo="<!-- v1.0: se renombro references/viejo.md a nuevo.md -->\ncuerpo\n")
         casos.append(("no dispara: referencia dentro de un comentario (historia)", d, 0, None))
+
+        # P65 (28-sep, CdM): documentar una TRAMPA ("esta ruta no debe existir") no puede
+        # penalizar igual que una cita muerta de verdad. Se baja a aviso, no se calla.
+        d = skill(tmp, "ref-trampa-negada", BUENA,
+                  cuerpo="Cuidado: `scripts/__pycache__/` no debe existir en el repo publicado.\n")
+        casos.append(("no dispara: ruta con trampa documentada (no debe existir)", d, 0, None))
+        d = skill(tmp, "script-trampa-se-borra", BUENA,
+                  cuerpo="Antes de publicar, `scripts/temporal.py` se borra del paquete.\n")
+        casos.append(("no dispara: script con trampa documentada (se borra)", d, 0, None))
+        # Gemelo del contagio (la MISMA clase que ya se cazo dos veces en conexiones.py,
+        # ahora DENTRO de una frase): la negacion de una ruta no puede rescatar a la OTRA
+        # ruta que comparte la frase y de verdad esta rota.
+        d = skill(tmp, "trampa-no-contagia-a-la-real", BUENA,
+                  cuerpo="`scripts/temporal-trampa.py` no debe existir, y aparte corre "
+                        "`scripts/real-sin-negacion.py` siempre al cerrar.\n")
+        casos.append(("caza: la negacion de UNA ruta no contagia a la OTRA en la misma frase",
+                      d, 1, "referencia rota"))
         d = skill(tmp, "cita-familia", BUENA,
                   cuerpo="Para el bot usa la familia golden-chatea-pro completa.\n")
         casos.append(("no dispara: cita a un PREFIJO de familia", d, 0, None))

@@ -54,7 +54,7 @@
       "name": "golden-chatea-pro-config-carritos",
       "source": "./golden-chatea-pro-config-carritos",
       "description": "Configura el asistente de carritos abandonados de Chatea Pro: recupera por WhatsApp los checkouts que el cliente dejo a medias.",
-      "version": "3.7.0",
+      "version": "3.8.0",
       "category": "marketing"
     },
     {
@@ -250,7 +250,7 @@
       "name": "golden-chatea-operacion",
       "source": "./golden-chatea-operacion",
       "description": "Revisa las conversaciones del día y te dice dónde se murió cada venta y qué no supo responder el bot.",
-      "version": "1.13.1",
+      "version": "1.14.0",
       "category": "marketing"
     },
     {

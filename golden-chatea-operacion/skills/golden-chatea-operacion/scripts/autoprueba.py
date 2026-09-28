@@ -1536,6 +1536,120 @@ def test_pais_resuelve_zona_horas_en_cli_real():
           f"(debe ser -5) · ruta={ruta!r} modo={modo!r}")
 
 
+def test_listado_corte_por_error_no_es_fin_de_datos():
+    """FILA P59 (par via CdM, confirmado leyendo `extraer.py` en vivo, 2026-09-28): `pedir()`
+    devuelve `{"_ERROR_HTTP": codigo, "_detalle": "..."}` -- SIN clave "data" -- en cualquier
+    error HTTP, incluido un 429 de cupo agotado A MITAD de la paginacion del LISTADO de
+    contactos. Antes del fix, `lote2 = r2.get("data")` daba `None` en ese caso, caia en la
+    MISMA rama de `break` que "se acabaron los contactos reales", y el DUMP quedaba
+    indistinguible de un listado que de verdad termino ahi -- sin ningun aviso.
+
+    Se prueba el CAMINO REAL: se monkeypatchea `extraer.pedir` para que la pagina 1 del
+    listado responda 200 con datos y la pagina 2 responda un 429 a mitad de camino, y se
+    llama a `extraer.listar_contactos_del_dia` de verdad (no un dump sintetico armado a
+    mano). Se exige que `_listado_paginacion` declare `parcial_por_error` con la pagina y el
+    codigo, DISTINTO de `truncado_por_tope_500` (que sigue en False: no fue el tope el que
+    corto la paginacion). Despues se confirma que `clasificar.py` convierte eso en un
+    hallazgo `P-listado-truncado` con severidad MUERTO (mas alta que el RIESGO de un
+    truncado normal por tope), porque un corte por error real deja el universo del dia
+    CONFIRMADO incompleto, no solo "puede estar incompleto"."""
+    pedir_original = _extraer_modulo.pedir
+    llamadas = []
+
+    def pedir_falso(token, path, **params):
+        llamadas.append((path, params.get("page")))
+        if params.get("page") == 1:
+            return {"data": [{"user_ns": f"f{i}", "last_message_at": "2026-08-19 10:00:00"}
+                             for i in range(10)],
+                   "meta": {"total": 30, "last_page": 3}}
+        if params.get("page") == 2:
+            return {"_ERROR_HTTP": 429,
+                   "_detalle": "CUPO AGOTADO (1.000/hora) -- prueba sembrada"}
+        return {"_ERROR": "pagina inesperada en la prueba"}
+
+    _extraer_modulo.pedir = pedir_falso
+    try:
+        (contactos, ep, total, campo_por_ns, universo,
+         paginacion) = _extraer_modulo.listar_contactos_del_dia("tok-falso", "2026-08-19")
+    finally:
+        _extraer_modulo.pedir = pedir_original
+
+    parcial = (paginacion or {}).get("parcial_por_error")
+    corte_declarado = (isinstance(parcial, dict) and parcial.get("pagina") == 2
+                      and parcial.get("codigo_http") == 429)
+    no_es_tope_500 = (paginacion or {}).get("truncado_por_tope_500") is False
+    paso_extraccion = corte_declarado and no_es_tope_500 and ep == "/subscribers"
+
+    dump = {"contactos": [{"user_ns": "fsano", "get_info": {},
+                          "mensajes": [{"type": "in", "content": "hola",
+                                       "ts": "2026-08-19 09:00:00"}]}],
+           "_fecha": "2026-08-19",
+           "_listado_paginacion": paginacion}
+    c = Clasificador(dump).correr()
+    hallazgo = next((h for h in c.hallazgos
+                     if h["control"] == "P-listado-truncado"
+                     and h["severidad"] == "MUERTO"), None)
+    paso = paso_extraccion and hallazgo is not None
+    marcar("LISTADO-CORTE-POR-ERROR", paso,
+          f"llamadas a pedir(): {llamadas} · parcial_por_error declarado: {corte_declarado} "
+          f"({parcial!r}) · truncado_por_tope_500 sigue False: {no_es_tope_500} · hallazgo "
+          f"P-listado-truncado/MUERTO disparado: {hallazgo is not None}")
+
+
+def test_hilo_corte_por_error_no_es_fin_de_datos():
+    """FILA P59 (par via CdM), mismo hallazgo que arriba pero para `descargar_hilo`: un
+    error HTTP a mitad de la paginacion de UN hilo (429 de cupo, u otro) se veia igual que
+    "el hilo ya no tiene mas paginas" -- mismo `break`, sin aviso que lo distinguiera de un
+    hilo que de verdad termino.
+
+    Se prueba el CAMINO REAL: se monkeypatchea `extraer.pedir` para que la primera peticion
+    del hilo responda 200 con 1 mensaje y `meta.last_page=3`, y la pagina 2 responda un 429 a
+    mitad de camino, y se llama a `extraer.descargar_hilo` de verdad. Se exige que el aviso
+    devuelto declare `parcial_por_error` con la pagina y el codigo, y que `clasificar.py`
+    convierta ese aviso en un hallazgo `P-hilo-truncado` con severidad MUERTO (mas alta que
+    el RIESGO de un hilo truncado por MAX_PAG_HILO, mas alta que el DUDA de un aviso por
+    `ts` faltante): un hilo cortado por error puede faltar evidencia de un pedido a medio
+    confirmar, no solo del orden de los mensajes."""
+    pedir_original = _extraer_modulo.pedir
+    llamadas = []
+
+    def pedir_falso(token, path, **params):
+        llamadas.append((path, params.get("page")))
+        if params.get("page") is None:
+            return {"data": [{"type": "in", "content": "hola", "ts": "2026-08-19 09:00:00"}],
+                   "meta": {"last_page": 3}}
+        if params.get("page") == 2:
+            return {"_ERROR_HTTP": 429,
+                   "_detalle": "CUPO AGOTADO (1.000/hora) -- prueba sembrada"}
+        return {"_ERROR": "pagina inesperada en la prueba"}
+
+    _extraer_modulo.pedir = pedir_falso
+    try:
+        mensajes, error, aviso = _extraer_modulo.descargar_hilo("tok-falso", "fcortado")
+    finally:
+        _extraer_modulo.pedir = pedir_original
+
+    parcial = (aviso or {}).get("parcial_por_error")
+    corte_declarado = (isinstance(parcial, dict) and parcial.get("pagina") == 2
+                      and parcial.get("codigo_http") == 429)
+    paso_extraccion = corte_declarado and error is None and len(mensajes) == 1
+
+    dump = {"contactos": [{"user_ns": "fcortado", "get_info": {},
+                          "mensajes": [{"type": "in", "content": "hola",
+                                       "ts": "2026-08-19 09:00:00"}]}],
+           "_fecha": "2026-08-19",
+           "_avisos_de_hilo": [aviso]}
+    c = Clasificador(dump).correr()
+    hallazgo = next((h for h in c.hallazgos
+                     if h["control"] == "P-hilo-truncado"
+                     and h["severidad"] == "MUERTO"), None)
+    paso = paso_extraccion and hallazgo is not None
+    marcar("HILO-CORTE-POR-ERROR", paso,
+          f"llamadas a pedir(): {llamadas} · parcial_por_error declarado: {corte_declarado} "
+          f"({parcial!r}) · mensajes traidos antes del corte: {len(mensajes) if mensajes else 0} "
+          f"· hallazgo P-hilo-truncado/MUERTO disparado: {hallazgo is not None}")
+
+
 TRAMPAS_DEL_ENCARGO = ["P1", "P2", "P3", "P4", "P5", "P6", "P7", "P8", "P9", "P10", "P11",
                       "P12", "P13"]
 EXTRA_CALIDAD = ["R1", "R2", "R3", "R4", "Q4"]
@@ -1579,6 +1693,10 @@ FIXES_REAUDITORIA_2 = ["COBERTURA-SIEMPRE-DECLARA", "EMPATE-TS-NO-INVIERTE",
 # SKILL.md): sigue sin confirmarse si Chatea reporta la hora local de cada espacio.
 FIXES_PAIS_2026_09_05 = ["PAIS-RESUELVE-OFFSET", "PAIS-DESCONOCIDO-NO-INVENTA",
                          "PAIS-ZONA-HORAS-EXCLUYENTES", "PAIS-CLI-CABLEADO-REAL"]
+# FILA P59 (par via CdM, 2026-09-28): un error HTTP a mitad de la paginacion (listado de
+# contactos o hilo individual) se leia igual que "se acabaron los datos" -- `pedir()` no
+# trae "data" en ningun error, y el `break` de ambos bucles no distinguia las dos causas.
+FIXES_P59_2026_09_28 = ["LISTADO-CORTE-POR-ERROR", "HILO-CORTE-POR-ERROR"]
 
 
 def main():
@@ -1651,6 +1769,9 @@ def main():
     test_pais_desconocido_no_inventa_offset()
     test_pais_y_zona_horas_excluyentes_por_cli()
     test_pais_resuelve_zona_horas_en_cli_real()
+
+    test_listado_corte_por_error_no_es_fin_de_datos()
+    test_hilo_corte_por_error_no_es_fin_de_datos()
 
     print("Las 13 trampas del encargo (ENCARGO-golden-chatea-operacion.md):")
     fallidas = []
@@ -1770,9 +1891,19 @@ def main():
         if not paso:
             fallidas_pais.append(codigo)
 
+    print("\nFixes de la FILA P59 (par via CdM, 2026-09-28) -- un error HTTP a mitad de "
+         "paginacion (listado o hilo) se leia igual que 'se acabaron los datos':")
+    fallidas_p59 = []
+    for codigo in FIXES_P59_2026_09_28:
+        paso, detalle = RESULTADOS.get(codigo, (False, "no se corrio ninguna prueba"))
+        marca = "OK   " if paso else "FALLA"
+        print(f"  {marca} {codigo:30} {detalle}")
+        if not paso:
+            fallidas_p59.append(codigo)
+
     if (fallidas or fallidas_extra or fallidas_fixes or fallidas_ronda2 or fallidas_r6 or
             fallidas_r6_verif or fallidas_gco14 or fallidas_gco14_r2 or fallidas_gco14_r3 or
-            fallidas_reaud2 or fallidas_pais):
+            fallidas_reaud2 or fallidas_pais or fallidas_p59):
         print(f"\nAUTOPRUEBA FALLIDA. Trampas del encargo sin detectar: {fallidas or 'ninguna'}. "
              f"Controles de calidad sin detectar: {fallidas_extra or 'ninguno'}. "
              f"Fixes adversariales (ronda 1) sin confirmar: {fallidas_fixes or 'ninguno'}. "
@@ -1783,7 +1914,8 @@ def main():
              f"Fixes GCO1.4 (ronda 2) sin confirmar: {fallidas_gco14_r2 or 'ninguno'}. "
              f"Fixes GCO1.4 (ronda 3) sin confirmar: {fallidas_gco14_r3 or 'ninguno'}. "
              f"Fixes re-auditoria 2 sin confirmar: {fallidas_reaud2 or 'ninguno'}. "
-             f"Fixes --pais sin confirmar: {fallidas_pais or 'ninguno'}.")
+             f"Fixes --pais sin confirmar: {fallidas_pais or 'ninguno'}. "
+             f"Fixes fila P59 sin confirmar: {fallidas_p59 or 'ninguno'}.")
         print("El clasificador esta roto. No se corre contra un DUMP real hasta arreglarlo.")
         return 1
 
@@ -1791,14 +1923,15 @@ def main():
                        len(FIXES_ADVERSARIALES) + len(FIXES_RONDA_2) + len(CONTROL_R6) +
                        len(FIXES_R6_VERIFICACION) + len(FIXES_GCO14) + len(FIXES_GCO14_RONDA2) +
                        len(FIXES_GCO14_RONDA3) + len(FIXES_REAUDITORIA_2) +
-                       len(FIXES_PAIS_2026_09_05))
+                       len(FIXES_PAIS_2026_09_05) + len(FIXES_P59_2026_09_28))
     print(f"\n  {total_controles} de {total_controles} controles confirmados en total "
          f"({len(TRAMPAS_DEL_ENCARGO)} trampas del encargo + {len(EXTRA_CALIDAD)} calidad + "
          f"{len(FIXES_ADVERSARIALES)} fixes ronda 1 + {len(FIXES_RONDA_2)} fixes ronda 2 + "
          f"{len(CONTROL_R6)} control R6 + {len(FIXES_R6_VERIFICACION)} fixes verificacion R6 + "
          f"{len(FIXES_GCO14)} fixes GCO1.4 + {len(FIXES_GCO14_RONDA2)} fixes GCO1.4 ronda 2 + "
          f"{len(FIXES_GCO14_RONDA3)} fixes GCO1.4 ronda 3 + {len(FIXES_REAUDITORIA_2)} fixes "
-         f"re-auditoria 2 + {len(FIXES_PAIS_2026_09_05)} fixes --pais)")
+         f"re-auditoria 2 + {len(FIXES_PAIS_2026_09_05)} fixes --pais + "
+         f"{len(FIXES_P59_2026_09_28)} fixes fila P59)")
     print("\nAutoprueba pasada. Esto valida el DETECTOR contra casos que se SABEN rotos, no "
          "valida ningun dia real.")
     return 0

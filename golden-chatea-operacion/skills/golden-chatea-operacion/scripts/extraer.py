@@ -252,6 +252,15 @@ def listar_contactos_del_dia(token, fecha):
             # se llego al tope, para que `clasificar.py` pueda emitir un hallazgo.
             paginas_traidas = 1
             trunco_por_tope_500 = False
+            # FILA P59 (par, confirmado leyendo el codigo en vivo): `pedir()` devuelve
+            # `{"_ERROR_HTTP": codigo, "_detalle": "..."}` -- SIN clave "data" -- en
+            # cualquier error HTTP, incluido un 429 de cupo agotado A MITAD de esta
+            # paginacion. Antes, `lote2 = r2.get("data")` daba `None`, caia en la misma
+            # rama que "se acabaron los contactos reales" y el `break` quedaba INDISTINGUIBLE
+            # de un listado que de verdad termino ahi. Ahora se detecta el error ANTES de
+            # mirar "data": se declara `parcial_por_error` con la pagina y el detalle, y NO
+            # se lee como "no hay mas paginas".
+            parcial_por_error = None
             while ultima and pagina <= ultima:
                 if pagina > 500:
                     trunco_por_tope_500 = True
@@ -259,6 +268,13 @@ def listar_contactos_del_dia(token, fecha):
                 params2 = {"page": pagina} if sin_filtro_de_servidor else {
                     "from_date": fecha, "to_date": fecha, "page": pagina}
                 r2 = pedir(token, ep, **params2)
+                if isinstance(r2, dict) and ("_ERROR" in r2 or "_ERROR_HTTP" in r2):
+                    parcial_por_error = {
+                        "pagina": pagina,
+                        "codigo_http": r2.get("_ERROR_HTTP"),
+                        "detalle": r2.get("_detalle") or r2.get("_ERROR") or "error sin detalle",
+                    }
+                    break
                 lote2 = r2.get("data") if isinstance(r2, dict) else None
                 if not isinstance(lote2, list) or not lote2:
                     break
@@ -274,6 +290,10 @@ def listar_contactos_del_dia(token, fecha):
                 # pagina (la condicion `while ultima and ...` es falsy sin `ultima`) --
                 # se trae solo lo que venga en la primera respuesta.
                 "sin_meta_last_page_no_pagina": not bool(ultima),
+                # FILA P59: distinto de "se acabaron los datos reales" -- si esto no es None,
+                # el listado se cortó por un ERROR HTTP real a mitad de la paginación, y
+                # `paginas_traidas` NO es el universo completo del día.
+                "parcial_por_error": parcial_por_error,
             }
             if not sin_filtro_de_servidor:
                 return filas, ep, total, {}, total, paginacion
@@ -322,15 +342,35 @@ def descargar_hilo(token, user_ns):
     sin_last_page = not bool(ultima_pagina_declarada)
     ultima_pagina = ultima_pagina_declarada or 1
     truncado = bool(ultima_pagina_declarada) and ultima_pagina > MAX_PAG_HILO
+    # FILA P59 (par, mismo hallazgo que en `listar_contactos_del_dia`): un error HTTP a
+    # mitad de la paginacion de ESTE hilo (429 de cupo, u otro) devuelve
+    # `{"_ERROR_HTTP": ..., "_detalle": ...}` sin "data" -- se detecta ANTES de leer "data"
+    # para no confundirlo con "el hilo ya no tiene mas paginas".
+    parcial_por_error = None
     for pagina in range(2, min(ultima_pagina, MAX_PAG_HILO) + 1):
         r = pedir(token, "/subscriber/chat-messages", user_ns=user_ns,
                  include_bot=1, include_note=1, include_system=1, page=pagina)
+        if isinstance(r, dict) and ("_ERROR" in r or "_ERROR_HTTP" in r):
+            parcial_por_error = {
+                "pagina": pagina,
+                "codigo_http": r.get("_ERROR_HTTP"),
+                "detalle": r.get("_detalle") or r.get("_ERROR") or "error sin detalle",
+            }
+            break
         lote = r.get("data") if isinstance(r, dict) else None
         if not isinstance(lote, list) or not lote:
             break
         mensajes += lote
     aviso = None
-    if truncado:
+    if parcial_por_error:
+        aviso = {"ns": user_ns,
+                 "parcial_por_error": parcial_por_error,
+                 "razon": f"la paginacion de este hilo se corto por un ERROR real en la "
+                          f"pagina {parcial_por_error['pagina']} "
+                          f"(HTTP {parcial_por_error['codigo_http']}: "
+                          f"{parcial_por_error['detalle']}) -- esto NO es 'el hilo termino "
+                          "ahi', el hilo puede seguir y quedo INCOMPLETO a mitad de camino"}
+    elif truncado:
         aviso = {"ns": user_ns,
                  "razon": f"conversacion de {ultima_pagina} paginas, se leyeron "
                           f"{MAX_PAG_HILO}: el hilo quedo TRUNCADO"}

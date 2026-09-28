@@ -28,21 +28,22 @@ description: >-
 
 **Si falta algo BLOQUEANTE: no se hace lo que depende de él** (si es de toda la skill, se PARA antes de tocar nada) y se pide con nombre propio: qué es, dónde se saca y dónde se pone. **Si falta algo DEGRADABLE: se pide y se sigue**, dejando marcado como DUDA en todo lo que depende de él. Nunca se presenta como completo.
 
+<!-- skill v1.14 · 2026-09-28 · golden-skill-auditor (AUDITA+ARREGLA), hallazgo FILA P59 (par vía CdM, confirmado leyendo el código en vivo): `extraer.py` `pedir()` devuelve `{"_ERROR_HTTP": codigo, "_detalle": "..."}` — SIN clave "data" — en cualquier error HTTP, incluido un 429 de cupo agotado A MITAD de una paginación. `listar_contactos_del_dia` y `descargar_hilo` compartían el mismo patrón (`lote = r.get("data"); if not lote: break`) y no distinguían "error real a mitad de camino" de "se acabaron los datos reales" — el corte quedaba indistinguible de un listado/hilo que de verdad terminó ahí, sin ningún aviso. Corregido: ambos bucles detectan `_ERROR`/`_ERROR_HTTP` ANTES de leer "data" y declaran `parcial_por_error` (página + código + detalle) en `_listado_paginacion` y en el aviso de `_avisos_de_hilo`, respectivamente — distinto de `trunco_por_tope_500`/`sin_meta_last_page_no_pagina` (listado) y de `truncado` (hilo). `clasificar.py` convierte ese campo en un hallazgo `P-listado-truncado`/`P-hilo-truncado` con severidad 🔴 MUERTO (más alta que el 🟠 RIESGO de un truncado normal): un corte por error real deja el universo del día CONFIRMADO incompleto, no solo "puede estar incompleto". 2 pruebas nuevas agregadas a `autoprueba.py` (`LISTADO-CORTE-POR-ERROR`, `HILO-CORTE-POR-ERROR`), ambas contra el camino REAL de `extraer.py` (con `pedir` monkeypatcheado, no un DUMP sintético armado a mano), sabotaje manual confirmado en ambas capas (extraer.py y clasificar.py) antes de darlas por buenas. Autoprueba real: 69/69 (antes 67/67). Verificado: inventario.sh sin rotas/huérfanas, validar_arsenal.py sano sin aviso. Historial completo en references/changelog.md. -->
 <!-- skill v1.13 · 2026-09-27 · CdM: bloque de REQUISITOS al principio (ley de FER del 02-sep). -->
 <!-- skill v1.12 · 2026-09-22 · auditoría golden-skill-auditor (AUDITA+ARREGLA): único hallazgo real — este comentario H1 seguía marcado "v1.10" pese a que `references/changelog.md` ya tenía una acta v1.11 (2026-09-13) que corrigió la línea **Versión:** de aquí abajo (GCO1.9 → GCO1.10); el propio comentario que sirve de puntero de versión no se había actualizado tras esa corrección — la misma clase de fallo que esa acta v1.11 ya había corregido una vez, reaparecida en el OTRO marcador de versión del mismo archivo. Corregido: este comentario ahora cita v1.12. Verificado tras el arreglo: inventario.sh sin rotas/huérfanas/dudosos, validar_arsenal.py sano sin aviso, autoprueba.py 67/67 (cambio de solo texto, sin tocar código). Sin blindar — sigue abierto el pendiente de zona horaria con dueño (FER/Golden). Historial completo en references/changelog.md. -->
 <!-- skill v1.10 · 2026-09-07 · auditoría golden-skill-auditor (AUDITA+ARREGLA, orden de FER): retirado el nombre de un orquestador PLANEADO que se citaba como si existiera —el validador de la casa lo marcaba como aviso desde días, y un nombre en el cuerpo se lee como una skill que existe—; el hueco pasa a declararse como hueco, con dueño en el CdM. Y el changelog (6 actas, 21.526 B, el 58% del archivo, el peor caso de la familia) baja a references/changelog.md. Historial completo allí. -->
 
-**Versión:** `GCO1.13.1` (2026-09-07, auditoría golden-skill-auditor: retira el nombre del
-orquestador de diagnóstico PLANEADO —el hueco queda declarado sin bautizar, con dueño en el
-Centro de Mando— y baja el changelog completo a `references/changelog.md`, 21.526 B que se
-pagaban en cada activación) — historial completo de `GCO1.0` a `GCO1.9` en
-`references/changelog.md`. El contenido de esta skill no cambió desde GCO1.10; las auditorías
-`v1.11` (2026-09-13) y `v1.12` (2026-09-22, ver comentario H1 arriba y `references/changelog.md`)
-solo corrigieron sus propios punteros de versión. Autoprueba real: **67 de 67** controles
+**Versión:** `GCO1.14` (2026-09-28, auditoría golden-skill-auditor: corrige la FILA P59 — un
+error HTTP a mitad de la paginación del listado de contactos o de un hilo individual se leía
+igual que "se acabaron los datos reales"; ahora se declara `parcial_por_error` y se reporta con
+severidad MUERTO, ver comentario H1 arriba) — historial completo de `GCO1.0` a `GCO1.9` en
+`references/changelog.md`. Las auditorías `v1.11` (2026-09-13), `v1.12` (2026-09-22) y `v1.13`
+(2026-09-27) solo tocaron punteros de versión o estructura; `v1.14` sí cambia comportamiento de
+`extraer.py` y `clasificar.py` (ver comentario H1). Autoprueba real: **69 de 69** controles
 confirmados (13 trampas del encargo + 5 calidad + 9 fixes ronda 1 + 8 fixes ronda 2 + 5 control
 R6 + 3 fixes verificación R6 + 7 fixes GCO1.4 + 4 fixes GCO1.4 ronda 2 + 2 fixes GCO1.4 ronda 3 +
-7 fixes segunda auditoría + 4 fixes `--pais`) — cifra sin cambios respecto a GCO1.9, confirmada
-de nuevo en vivo el 2026-09-22.
+7 fixes segunda auditoría + 4 fixes `--pais` + 2 fixes fila P59) — confirmada en vivo el
+2026-09-28.
 
 🔴 **CUPO DE LA API: 1.000 peticiones por HORA, y pasarse BLOQUEA una hora entera.**
 Medido contra la API viva el 2026-09-07: cada respuesta trae **`x-ratelimit-remaining`** (en

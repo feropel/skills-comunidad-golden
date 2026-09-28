@@ -32,7 +32,7 @@ description: >-
      marcaba "huérfana potencial" (solo vivía citada por nombre en references/changelog.md,
      que es historia y no cuenta como cita viva). Se agregó una línea en la sección de
      validar_config.py explicando qué es y quién la usa. Sin cambios de comportamiento. -->
-**Versión:** v3.7 · 2026-09-27 · blindada (chflags uchg + chmod 0444, estándar de la casa)
+**Versión:** v3.8 · 2026-09-28 · blindada (chflags uchg + chmod 0444, estándar de la casa)
 **Fábrica:** chat ✅ SKILL golden-chatea-pro-config-carritos
 <!-- v3.0: la skill deja de ser "redactora de plantillas" y pasa a CONFIGURAR el espacio, con lo
 aprendido afinando carritos de Golden el 18-sep. Historial completo en references/changelog.md. -->
@@ -294,6 +294,12 @@ la esperada**, respalda, cambia **solo** las llaves que difieren, mide UTF-16 co
 escribe, **relee del servidor** y comprueba que el resto del campo no se movió (la API recorta el
 salto de línea final: se compara el JSON parseado). El token vive en `.secrets/` del proyecto,
 **nunca en el chat ni en la skill**.
+
+🔴 **Dentro del sandbox, `urllib` devuelve respuestas CORTADAS** en lecturas grandes (los bot
+fields de un espacio real lo disparan) y la corrida muere a mitad. `chatea_api.py` lo detecta y
+repite la petición con `curl`, que sí las trae completas, consumiendo además el bloque de cabecera
+que antepone el proxy. Sin ese respaldo la skill funciona a mano y falla en cualquier rutina
+desatendida, que es justo donde nadie la está mirando.
 
 🔴 **Después de escribir, el dueño recarga la pestaña del panel antes de guardar ahí.** Si guarda
 con la vista vieja, pisa lo escrito.

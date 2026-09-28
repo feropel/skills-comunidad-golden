@@ -1288,10 +1288,38 @@ class Clasificador:
         # aviso en un hallazgo declarado -- RIESGO si el hilo quedo truncado (puede faltar
         # evidencia real de "quien hablo de ultimo"), DUDA si el aviso es por mensajes sin
         # `ts` (el orden de ese hilo especifico no es de fiar).
+        # FILA P59 (par via CdM, confirmado leyendo `extraer.py` en vivo): `pedir()`
+        # devuelve `{"_ERROR_HTTP": codigo, "_detalle": "..."}` -- sin "data" -- en
+        # cualquier error HTTP, incluido un 429 de cupo agotado A MITAD de la paginación de
+        # un hilo. Antes, ese corte quedaba INDISTINGUIBLE de "el hilo ya terminó" (mismo
+        # `break`, mismo aviso genérico o ninguno). `extraer.py` ahora declara
+        # `parcial_por_error` en el aviso cuando el corte fue por un error real, no por
+        # falta de más páginas -- y ESO se reporta con severidad más alta que un truncado
+        # normal (RIESGO): un corte por error de cupo/red significa que el día quedó
+        # incompleto DE VERDAD, posiblemente a mitad de un hilo importante -- el mismo
+        # criterio que ya usa `pedir()` para el 429 general ("este barrido está
+        # INCOMPLETO, no lo informes como el día entero"), pero aquí puntual por hilo.
         avisos_de_hilo = self.d.get("_avisos_de_hilo") or []
+        avisos_por_error = 0
         for aviso in avisos_de_hilo:
             razon = (aviso or {}).get("razon", "")
             ns_aviso = (aviso or {}).get("ns", "?")
+            parcial_por_error = (aviso or {}).get("parcial_por_error")
+            if parcial_por_error:
+                avisos_por_error += 1
+                self.falla("P-hilo-truncado", "MUERTO",
+                           f"`{ns_aviso}` - la extracción de este hilo se cortó por un "
+                           "ERROR real, no porque el hilo terminara",
+                           razon,
+                           "Este hilo quedó INCOMPLETO a mitad de camino por un error HTTP "
+                           f"(código {parcial_por_error.get('codigo_http')}) -- puede faltar "
+                           "evidencia real de 'quién habló de último', o de un pedido a "
+                           "medio confirmar. Un corte por error NUNCA se lee igual que un "
+                           "hilo que de verdad no tenía más páginas.",
+                           "Repetir la extracción de este contacto cuando el cupo/la red se "
+                           "recupere (ver `informe_cupo()` de extraer.py) antes de confiar "
+                           "en lo que este hilo reporta.")
+                continue
             sev_aviso = "RIESGO" if "TRUNC" in razon.upper() else "DUDA"
             self.falla("P-hilo-truncado", sev_aviso,
                        f"`{ns_aviso}` - aviso de extracción del hilo",
@@ -1305,7 +1333,8 @@ class Clasificador:
                        "espacio tiene hilos consistentemente largos (extraer.py).")
         self.cubre("P-hilo-truncado", "corrido", len(avisos_de_hilo),
                   nota=f"{len(avisos_de_hilo)} aviso(s) de extracción de hilo declarados "
-                       "por extraer.py (`_avisos_de_hilo`)")
+                       f"por extraer.py (`_avisos_de_hilo`), {avisos_por_error} de ellos "
+                       "por un error real a mitad de la paginación (MUERTO)")
 
         if paginacion_no_medible:
             self.falla("P-listado-truncado", "DUDA",
@@ -1331,6 +1360,32 @@ class Clasificador:
                        "en páginas posteriores al tope no entraron a esta corrida.",
                        "Espacio con un volumen de contactos fuera de lo medido hasta ahora "
                        "-- confirmar con el panel si el universo real es mayor al traído.")
+        # FILA P59 (par via CdM, confirmado leyendo `extraer.py` en vivo): un error HTTP a
+        # mitad de la paginación del LISTADO (429 de cupo agotado u otro) se veía IGUAL que
+        # "el listado ya no tiene más contactos" -- mismo `break`, cero diferencia en el
+        # DUMP. `extraer.py` ahora declara `parcial_por_error` en `_listado_paginacion`
+        # cuando el corte fue por un error real, distinto de `truncado_por_tope_500` (que es
+        # "seguimos pero avisamos, se puso un tope a propósito") y de
+        # `sin_meta_last_page_no_pagina` (el servidor nunca declaró más de una página). Un
+        # corte por error real es peor que cualquiera de los dos: el universo del día NO
+        # solo "puede estar incompleto", está confirmado incompleto a partir de esa página
+        # -- severidad MUERTO, mismo criterio que ya usa `pedir()` para el 429
+        # ("este barrido está INCOMPLETO, no lo informes como el día entero").
+        parcial_por_error_listado = paginacion_listado.get("parcial_por_error")
+        if parcial_por_error_listado:
+            self.falla("P-listado-truncado", "MUERTO",
+                       "El listado de contactos se cortó por un ERROR real, no porque se "
+                       "acabaran los contactos",
+                       f"se trajeron {paginacion_listado.get('paginas_traidas')} páginas "
+                       f"completas y la página {parcial_por_error_listado.get('pagina')} "
+                       f"falló con HTTP {parcial_por_error_listado.get('codigo_http')}: "
+                       f"{parcial_por_error_listado.get('detalle')}",
+                       "El universo del día está CONFIRMADO incompleto desde esa página en "
+                       "adelante -- contactos reales de ese día pueden faltar por completo "
+                       "en este informe, no solo 'pueden estar' como en el tope de 500.",
+                       "Repetir la extracción cuando el cupo/la red se recupere (ver "
+                       "`informe_cupo()` de extraer.py) antes de confiar en el universo del "
+                       "día que reporta esta corrida.")
         # Re-auditoria 2026-08-22 (segunda pasada, en frio), mismo criterio que el fix de
         # arriba para P-sin-fecha-auditada: este control SIEMPRE se evalua, pero antes solo
         # dejaba rastro en `self.cobertura` cuando disparaba un hallazgo -- un listado que NO
@@ -1340,7 +1395,9 @@ class Clasificador:
                   nota=("no se pudo confirmar si el listado se trunco -- ver hallazgo "
                         "P-listado-truncado/DUDA" if paginacion_no_medible
                         else f"truncado_por_tope_500="
-                             f"{paginacion_listado.get('truncado_por_tope_500', False)}"))
+                             f"{paginacion_listado.get('truncado_por_tope_500', False)} · "
+                             f"parcial_por_error="
+                             f"{bool(parcial_por_error_listado)}"))
         if paginacion_listado.get("sin_meta_last_page_no_pagina"):
             self.cubre("P-listado-paginacion", "LIMITACION_CONOCIDA",
                       nota="el servidor no declaró meta.last_page en esta corrida: "

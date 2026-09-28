@@ -1,3 +1,82 @@
+## v1.14 · 2026-09-28 · auditoría golden-skill-auditor (AUDITA+ARREGLA) — FILA P59 (par vía CdM)
+
+**Hallazgo, ya confirmado por el par leyendo el código en vivo antes de encargar el arreglo:**
+`scripts/extraer.py`, función `pedir()` (línea ~170): en cualquier error HTTP (incluido un 429
+de cupo agotado a mitad de una paginación) devuelve `{"_ERROR_HTTP": codigo, "_detalle": "..."}`
+— un dict SIN clave `"data"`. Dos bucles de paginación usaban el mismo patrón y no distinguían
+"error HTTP a mitad de camino" de "se acabaron los datos reales":
+
+1. `listar_contactos_del_dia` (bucle de páginas 2+ del listado): `lote2 = r2.get("data")`,
+   `if not isinstance(lote2, list) or not lote2: break` — un error a mitad de la paginación del
+   LISTADO se veía exactamente igual que "no hay más contactos". Solo se declaraban
+   `trunco_por_tope_500` y `sin_meta_last_page_no_pagina`, ninguno de los dos cubría "se cortó
+   por un error real".
+2. `descargar_hilo` (bucle `for pagina in range(2, ...)`): mismo patrón de corte. Un hilo cortado
+   por un error HTTP se veía igual que un hilo que ya terminó; solo se declaraba `truncado`
+   (comparado contra `MAX_PAG_HILO`), no un error real.
+
+**Arreglo (antes → después, con evidencia archivo:línea):**
+
+- `scripts/extraer.py:255-286` (`listar_contactos_del_dia`): ANTES el bucle solo miraba
+  `r2.get("data")`. AHORA, antes de leer `"data"`, se comprueba
+  `isinstance(r2, dict) and ("_ERROR" in r2 or "_ERROR_HTTP" in r2)`; si es cierto, se declara
+  `parcial_por_error = {"pagina": ..., "codigo_http": ..., "detalle": ...}` y se rompe el bucle
+  SIN sumarlo a "paginas_traidas". Ese campo se agrega a `_listado_paginacion` (nueva clave
+  `parcial_por_error`, `None` cuando no aplica), distinto de `truncado_por_tope_500` y de
+  `sin_meta_last_page_no_pagina`.
+- `scripts/extraer.py:349-372` (`descargar_hilo`): mismo patrón. ANTES `lote = r.get("data")`
+  sin distinguir error de fin de datos. AHORA se detecta el error antes de leer `"data"` y se
+  declara `parcial_por_error` en el aviso devuelto (`_avisos_de_hilo`), con razón explícita
+  ("esto NO es 'el hilo terminó ahí'").
+- `scripts/clasificar.py:1291-1324` (bloque `_avisos_de_hilo`): ANTES `sev_aviso = "RIESGO" if
+  "TRUNC" in razon.upper() else "DUDA"`, sin caso para error real. AHORA, si el aviso trae
+  `parcial_por_error`, el hallazgo `P-hilo-truncado` sale con severidad `MUERTO` (más alta que
+  el `RIESGO` de un truncado normal por `MAX_PAG_HILO`), con evidencia del código HTTP y la
+  página donde se cortó.
+- `scripts/clasificar.py:1370-1399` (bloque `_listado_paginacion`): se agrega un bloque nuevo que
+  lee `paginacion_listado.get("parcial_por_error")` y, si está presente, emite
+  `P-listado-truncado`/`MUERTO` — distinto del `RIESGO` que ya existía para
+  `truncado_por_tope_500`. La nota de `self.cubre("P-listado-truncado", ...)` ahora declara
+  también `parcial_por_error=True/False`.
+
+**Severidad elegida (criterio propio, pedido explícitamente por el encargo):** un truncado
+normal (tope de 500 páginas, o `MAX_PAG_HILO` en un hilo) es 🟠 RIESGO — "seguimos pero
+avisamos". Un corte por error real es 🔴 MUERTO — el mismo criterio que ya usa `pedir()` para el
+429 general ("este barrido está INCOMPLETO, no lo informes como el día entero"), aplicado aquí
+puntual por listado o por hilo: el universo/hilo queda CONFIRMADO incompleto desde esa página en
+adelante, no solo "puede estar incompleto".
+
+**2 pruebas nuevas en `scripts/autoprueba.py`** (`LISTADO-CORTE-POR-ERROR`,
+`HILO-CORTE-POR-ERROR`, familia `FIXES_P59_2026_09_28`): ambas llaman al CAMINO REAL de
+`extraer.listar_contactos_del_dia` / `extraer.descargar_hilo` con `extraer.pedir` monkeypatcheado
+(página 1 responde 200 con datos, página 2 responde `{"_ERROR_HTTP": 429, ...}`) — no un DUMP
+sintético armado a mano. Cada una confirma: (a) `parcial_por_error` se declara con la página y el
+código correctos, (b) `truncado_por_tope_500`/`truncado` siguen en `False` (no fue el tope el que
+cortó), (c) el hallazgo `P-listado-truncado`/`P-hilo-truncado` sale con severidad `MUERTO`.
+
+**Sabotaje manual confirmado en las DOS capas antes de dar las pruebas por buenas:**
+1. Se desactivó la detección de error en `extraer.py` (`if False and ...`) en ambos bucles →
+   las 2 pruebas nuevas FALLARON (`parcial_por_error` quedaba `None`, hallazgo MUERTO no salía).
+2. Restaurado `extraer.py`; se desactivó la elevación de severidad en `clasificar.py` (`if False
+   and parcial_por_error`) en ambos bloques → las 2 pruebas volvieron a FALLAR (`extraer.py` sí
+   detectaba el error, pero `clasificar.py` no lo convertía en MUERTO) — confirma que las pruebas
+   ejercen las dos capas, no solo una.
+3. Restaurado todo. Autoprueba real: **69 de 69** (antes del fix: 67/67; con cualquiera de los
+   dos sabotajes activo: 67/69, ambas nuevas en FALLA).
+
+**Matiz sobre el hallazgo original del par:** el hallazgo estaba correcto en ambos puntos citados
+(función, línea, patrón). Un matiz que el encargo dejaba a criterio: para el listado, el error se
+puede dar tanto en el bucle de páginas 2+ (cubierto aquí) como, en teoría, en la primera página —
+pero esa primera falla ya la maneja `main()` con `sys.exit` antes de llegar a construir el DUMP
+(no hay universo que declarar incompleto: no hay universo). Este fix cubre el caso real que el
+par señaló: el corte A MITAD de una paginación que ya había empezado a traer datos reales.
+
+**Verificado:** `python3 -c "import ast; ast.parse(...)"` limpio en los 4 scripts ·
+`inventario.sh` sin rotas/huérfanas/dudosos · `validar_arsenal.py` (compuerta dura): **1 de 1
+revisada, sana, 0 con fallo**. Backup antes de tocar nada:
+`~/.claude/skill-backups/golden-chatea-operacion-20260928-010058/`. Sin blindar — sigue abierto
+el pendiente de zona horaria con dueño (FER/Golden), política de esta skill.
+
 ## v1.12 · 2026-09-22 · auditoría golden-skill-auditor (AUDITA+ARREGLA)
 
 **Único hallazgo real, con evidencia:** el comentario H1 de `SKILL.md` (el puntero de versión

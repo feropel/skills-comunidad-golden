@@ -1,5 +1,21 @@
 # Changelog · golden-chatea-pro-config-carritos
 
+## v3.8 · 2026-09-28 · la skill se caía dentro del sandbox y nadie lo había visto
+
+Al correr el arreglo de la P59 contra el espacio vivo, la lectura de bot fields murió con
+`IncompleteRead`: dentro del sandbox `urllib` corta las respuestas grandes. Es una trampa ya
+medida en la casa, y la skill la heredaba entera: **funcionaba a mano y fallaba en cualquier
+sesión con sandbox o rutina desatendida.**
+
+`chatea_api.pedir()` ahora detecta la respuesta cortada y repite con `curl`. Al hacerlo apareció
+un segundo detalle: el proxy antepone su propio bloque `HTTP/1.1 200 Connection Established`, así
+que se consumen TODOS los bloques de cabecera y no solo el primero; partir por el primer separador
+dejaba el cuerpo empezando en `HTTP/2 200` y el JSON no se podía leer. De paso, el cupo de la API
+se sigue leyendo de la cabecera venga por donde venga.
+
+Verificado corriendo dentro del sandbox: limpiador, auditoría completa (7 de 7 frentes) y las tres
+autopruebas, todas en verde.
+
 ## v3.7 · 2026-09-27 · FILA P59: el limpiador de caché miraba una lista fija y borraba en silencio
 
 Dos fallas reportadas por el chat del arsenal, las dos confirmadas leyendo el código y ahora con

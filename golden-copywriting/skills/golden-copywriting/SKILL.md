@@ -17,6 +17,18 @@ description: >-
 <!-- Historial completo de esta skill: references/changelog.md (1 actas, mudadas el 2026-09-05). El cuerpo se paga en cada activación; el acta no. -->
 # Golden Group — Copywriting Multicanal
 
+## Antes de empezar — lo que TÚ tienes que tener
+
+Para escribir copy **no necesitas nada instalado ni ninguna cuenta**: basta con el producto, el país, la oferta, el avatar y cómo cobras. Solo una tarea pide herramientas, y es **degradable**:
+
+| Qué necesitas | Tipo | Solo si | Cómo se consigue |
+|---|---|---|---|
+| **yt-dlp** | Degradable | Vas a bajar videos de la competencia para sacar sus hooks | `brew install yt-dlp` |
+| **whisper-cpp** con el modelo `ggml-small.bin`, y **ffmpeg** | Degradable | Vas a transcribir el audio de videos que ya venden (sección de minería de audio) | `brew install ffmpeg whisper-cpp`. El modelo: mira si ya está en `~/.cache/hyperframes/whisper/models/`; si no, de huggingface.co/ggerganov/whisper.cpp |
+| O bien **Node.js**, para `npx hyperframes transcribe` | Degradable | Lo mismo, sin instalar whisper, más lento | En nodejs.org, o `brew install node` |
+
+**Si falta el transcriptor, se pide el guion hablado de cada video y se sigue.** No se lee del fotograma para suplirlo: en reels el subtítulo va una palabra por cuadro y leerlo de la imagen devuelve basura. Si no tienes algo, dime y te guío paso a paso.
+
 ## Paso 0 · Cerebro de marca (obligatorio antes de generar)
 
 Si la marca tiene CEREBRO creado por `golden-brand-brain` (marca.md, productos.md, avatares.md,
@@ -26,7 +38,7 @@ antes de continuar; si el usuario pide seguir sin cerebro, se declara en la entr
 se generó sin voz de marca cargada.
 
 
-**Versión:** `GCW1.6.0` · **Fábrica:** chat «✅ SKILL golden-copywriting».
+**Versión:** `GCW1.6.1` · **Fábrica:** chat «✅ SKILL golden-copywriting».
 
 > 🔓 **Política de blindaje (CdM, 2026-08-24): esta skill va SIN blindar.** La tarea
 > `copywriting-tendencias-8-dias` le escribe cada 8 días; el flag `uchg` solo producía choques de

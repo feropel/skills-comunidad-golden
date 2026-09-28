@@ -33,7 +33,7 @@
       "name": "golden-chatea-pro-config-comentarios",
       "source": "./golden-chatea-pro-config-comentarios",
       "description": "Configura el asistente de comentarios de Chatea Pro: responde y convierte comentarios de anuncios en ventas por mensaje directo.",
-      "version": "1.18.0",
+      "version": "1.21.1",
       "category": "marketing"
     },
     {
@@ -61,7 +61,7 @@
       "name": "golden-ads",
       "source": "./golden-ads",
       "description": "Centro de comando de pauta en Meta, TikTok y Google, con o sin métricas.",
-      "version": "6.10.0",
+      "version": "6.10.1",
       "category": "marketing"
     },
     {
@@ -103,7 +103,7 @@
       "name": "golden-copywriting",
       "source": "./golden-copywriting",
       "description": "Copy de respuesta directa para Meta, TikTok y mensajes orgánicos.",
-      "version": "1.6.0",
+      "version": "1.6.1",
       "category": "marketing"
     },
     {
@@ -138,14 +138,14 @@
       "name": "golden-imagen-arena",
       "source": "./golden-imagen-arena",
       "description": "La misma imagen generada en varios motores de IA y calificada por conversión.",
-      "version": "1.18.0",
+      "version": "1.18.1",
       "category": "design"
     },
     {
       "name": "golden-investigacion-mercado",
       "source": "./golden-investigacion-mercado",
       "description": "Estudio de mercado 360 y máquina de lanzamiento, de la investigación al montaje.",
-      "version": "5.21.1",
+      "version": "5.21.2",
       "category": "research"
     },
     {
@@ -180,7 +180,7 @@
       "name": "golden-shopify",
       "source": "./golden-shopify",
       "description": "Construye páginas de producto Shopify de alta conversión para contra entrega.",
-      "version": "4.27.0",
+      "version": "4.27.1",
       "category": "ecommerce"
     },
     {
@@ -194,7 +194,7 @@
       "name": "golden-ugc-avatar",
       "source": "./golden-ugc-avatar",
       "description": "Avatares con IA hiperrealistas y videos de testimonio hablando.",
-      "version": "1.17.0",
+      "version": "1.17.1",
       "category": "marketing"
     },
     {
@@ -236,7 +236,7 @@
       "name": "golden-chatea-pro-producto-comentarios",
       "source": "./golden-chatea-pro-producto-comentarios",
       "description": "Carga un producto en el asistente de comentarios con los disparadores para que el bot sepa de cuál hablan.",
-      "version": "1.11.0",
+      "version": "1.11.1",
       "category": "marketing"
     },
     {

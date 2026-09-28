@@ -252,7 +252,7 @@ Estructura de testeo (1 campaña, N conjuntos = N ángulos, público amplio, 2�
 ---
 
 ## Sello de versión
-**Versión:** `G6.10` · **Última modificación:** 2026-09-19 · **Validada en vivo** contra cuentas Meta
+**Versión:** `G6.10.1` · **Última modificación:** 2026-09-19 · **Validada en vivo** contra cuentas Meta
 reales (COP, COD) — GOLDEN PRO construido y replicado en vivo. El sello vive SOLO aquí y en el
 comentario `GAE_VERSION` bajo el H1; el historial completo, en `references/changelog.md`.
 

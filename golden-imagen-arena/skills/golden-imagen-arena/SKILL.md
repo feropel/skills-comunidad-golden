@@ -16,6 +16,7 @@ description: >-
 ---
 
 **Fábrica:** chat «✅ SKILL golden-imagen-arena»
+<!-- skill v1.18.1 · 2026-09-27 · ronda de numeracion del Centro de Mando (orden de FER: «que todas las skills esten perfectamente corregidas y actualizadas»): da numero a los cambios del 27-sep que quedaron sin numero. Detalle en references/changelog.md -->
 <!-- skill v1.18 · 2026-09-20 (auditoría golden-skill-auditor) · agregada la declaración de conexión con el Centro de Mando en el propio SKILL.md (antes solo vivía en references/changelog.md y references/prompt-maestro.md; la regla de la casa exige que el archivo que se activa en cada corrida cargue el dato, no solo el histórico). Sin cambios funcionales. -->
 <!-- skill v1.17 · 2026-09-08 (fábrica golden-imagen-arena, cierre del ciclo) · añadida la sección "Lo que NO está verificado", forma tomada de golden-ads / golden-copywriting / golden-chatea-pro-config-ventas-wp: las seis reservas tipo (B) vivían en el informe del chat y no en la skill, que es el mismo defecto que esta skill le achaca a los demás · y su propio modo de fallo cerrado por estructura (aviso del CdM): una sección de reservas VACÍA es peor que ninguna porque parece que alguien miró, así que CADA reserva nombra QUIÉN la cierra — una que no puede nombrar a su cerrador o ya está cerrada o nadie la pensó. Ver v1.16 para los tres defectos medidos del ciclo. Historial completo: references/changelog.md. Cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO. -->
 # golden-imagen-arena — Varias IAs compiten, una gana
@@ -26,6 +27,8 @@ y un brief, y en vez de apostar a un solo modelo de IA, **haces competir a vario
 mismo prompt maestro, comparas los resultados con criterio de conversión y entregas el
 ganador listo para `golden-shopify` (ficha) o `golden-ads` (pauta).
 
+## Antes de empezar — lo que TÚ tienes que poner
+
 Todo pasa por el **MCP de Higgsfield**, que expone bajo un solo conector los motores de
 Google, OpenAI, Bytedance, Black Forest Labs y Recraft. No se abre navegador y no se
 piden API keys sueltas.
@@ -35,6 +38,15 @@ pidiendo auth): no improvises otra vía. Informa que hay que autorizarlo (`/mcp`
 sesión interactiva) y detente ahí.
 Esta skill sin su MCP no genera nada — mejor decirlo en la primera línea que fallar en
 el paso 3.
+
+**Lo que tiene que estar, y qué pasa si falta.** Lo bloqueante se comprueba al arrancar, en el preflight, antes de gastar un crédito:
+- **MCP de Higgsfield**, autorizado con tu cuenta de Higgsfield y con créditos. *Bloqueante:* si falta, se dice y se pide autorizarlo (con `/mcp` en una sesión interactiva); no se genera nada por otra vía.
+- Una **foto real del producto**. *Bloqueante:* todos los motores parten de ella.
+- **Python 3 con Pillow**, que usa `scripts/optimizar-webp.py` para entregar cada imagen a la medida de su destino. *Bloqueante:* compruébalo con `python3 -c "import PIL"`; si falta, con el Python de python.org `pip3 install Pillow`, y con el de Homebrew `brew install pillow` (ahí `pip3` está bloqueado).
+- **numpy**, solo para `optimizar-webp.py --autoprueba`. *Degradable:* sin numpy la autoprueba no corre y la entrega lo dice ("optimizar-webp sin autoprueba en este equipo"). Se instala con `pip3 install numpy` (python.org) o `brew install numpy` (Homebrew).
+- *Opcional:* **rembg**, para quitar fondos en local sin gastar créditos (`scripts/quitar-fondo.py`). *Degradable:* va en su propio entorno, `python3 -m venv ~/.golden-rembg` y `~/.golden-rembg/bin/pip install "rembg[cpu]"`. Sin él, el recorte se hace con el motor, que sí cuesta créditos, y se dice antes de gastarlos.
+
+Si no tienes algo, dime y te guío paso a paso.
 
 ## 🔴 REGLA DURA — EL TAMAÑO DE SUBIDA ES UN TECHO PERMANENTE (medido 2026-09-08)
 

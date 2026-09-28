@@ -3,7 +3,7 @@
 <!-- Extraído de SKILL.md v1.14 (2026-09-05) para bajar el coste de activación. Fuente única: este archivo. -->
 
 ### Art rules for HEALTH verticals (dental and similar) — Centro de Mando norm, 2026-08-07
-Field-proven in the un producto de salud oral de terceros study (Chile). When the product's vertical is oral
+Field-proven in the Dental [producto de cliente] study (Chile). When the product's vertical is oral
 health or any sensitive health claim (supplements, skin, hair), apply these to every image AND
 video prompt (they also feed the negative prompt in Step 3):
 

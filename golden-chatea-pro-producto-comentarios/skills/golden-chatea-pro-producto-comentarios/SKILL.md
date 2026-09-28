@@ -19,6 +19,7 @@ description: >-
 
 <!-- Actas anteriores a la v1.7 en `references/bitacora.md`. Se mudaron porque el cuerpo pasaba
      de 500 líneas; sus artefactos ejecutables se comprobaron fuera del changelog antes de mover. -->
+<!-- skill v1.11.1 · 2026-09-27 · ronda de numeracion del Centro de Mando (orden de FER: «que todas las skills esten perfectamente corregidas y actualizadas»): da numero a los cambios del 27-sep que quedaron sin numero. Detalle en references/changelog.md -->
 <!-- skill v1.11 · 2026-09-22 (fábrica) · LA CONTRAPRUEBA TENIA EL MISMO FALLO QUE VINO A CAZAR.
      La fábrica de config-comentarios aplicó la lección a su banco, encontró 9 pruebas midiendo
      texto (3 con `not in`, que es el modo peor: un `in` roto da ROJO y se ve; un `not in` roto

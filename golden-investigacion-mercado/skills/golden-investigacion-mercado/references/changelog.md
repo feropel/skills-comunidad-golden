@@ -5,6 +5,10 @@ G5.21.1 · G5.21 · G5.20 · G5.19 · G5.18 · G5.17 · G5.16 · G5.15 · G5.14 
 · G4.2.1 · G4.2 · G4.1 · G4.0 · G3.10 · G3.9 · G3.8 · G3.7 · G3.6 · G3.5 · G3.4 · G3.3 · G3.2 · G3.1
 · G3.0 · G2.5 · G2.4 · G2.3 · G2.2 · G2.1 · G2.0 · G1.0
 
+## G5.21.2 — 2026-09-27 · Ley de los requisitos del usuario (aplicó el CENTRO DE MANDO)
+
+Se añadió el bloque «Antes de empezar» del SKILL.md: qué tiene que tener el usuario antes de arrancar, cada requisito marcado BLOQUEANTE o DEGRADABLE y qué pasa si falta (doctrina del CdM del 27-sep). Lo redactó el chat 🧰 ARSENAL Y SKILLS (4 pasadas del golden-verificador adversarial, 0 fallas nuevas en la última) y lo aplicó el CdM sin numerar: el número lo pone la fábrica al ratificar. Solo inserción: 0 líneas quitadas.
+
 ## G5.21.1 — 2026-09-24 — El candado de scraping deja de descartar páginas buenas por una tilde (CENTRO DE MANDO)
 
 **El fallo, medido por el chat de Colágeno el 23-sep:** `candado_scraping.py`, CHECK 4, solo hacía
@@ -514,7 +518,7 @@ eso **la locución de los videos no se minaba nunca**. Ahora es concreto y medid
 Porqué del hueco, para que no se repita: la capacidad ya existía en `golden-video-editor` desde
 antes y **nunca se propagó** a las skills que la necesitaban.
 
-## G5.7 — 2026-08-07 — Cosecha del chat "ESTUDIO 360 un producto de salud oral de terceros (Chile)" (6 ítems)
+## G5.7 — 2026-08-07 — Cosecha del chat "ESTUDIO 360 DENTAL [producto de cliente] (Chile)" (6 ítems)
 Repartido por el Centro de Mando desde la bandeja (orden de FER: "sin omitir detalle"). Todo salió
 de una corrida real de la skill sobre una tienda real de gotas dentales COD en Chile (dominio
 omitido a propósito — no es información que aporte a la lección técnica):
@@ -524,7 +528,7 @@ omitido a propósito — no es información que aporte a la lección técnica):
   declara nano-hidroxiapatita. Regla: rastrear el original (Amazon/eBay/AliExpress) para costo
   real, ml e ingredientes, y PROHIBIDO escribir un claim de ingrediente sin la foto macro de la
   etiqueta del frasco que el dueño va a despachar.
-- **El NOMBRE del producto es un ítem de compliance** (forense + compliance): "un producto de salud oral de terceros" promete curación y era el mayor pasivo legal del negocio; ninguna revisión lo detectaba
+- **El NOMBRE del producto es un ítem de compliance** (forense + compliance): "Dental [producto de cliente]" promete curación y era el mayor pasivo legal del negocio; ninguna revisión lo detectaba
   porque el mapa miraba el copy, no el nombre. Si promete cura → proponer renombre (caso real:
   "Dental Shield / Escudo Dental").
 - **Vertical SALUD BUCAL** en `compliance-por-vertical.md` con la redacción probada en campo

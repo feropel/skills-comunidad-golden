@@ -17,8 +17,25 @@ description: >-
 **Fábrica:** chat «✅ SKILL golden-ugc-avatar»
 
 # Golden UGC Avatar — Higgsfield Pipeline
+<!-- skill v1.17.1 · 2026-09-27 · ronda de numeracion del Centro de Mando (orden de FER: «que todas las skills esten perfectamente corregidas y actualizadas»): da numero a los cambios del 27-sep que quedaron sin numero. Detalle en references/changelog.md -->
 <!-- skill v1.17 · 2026-09-06 · auditoria golden-skill-auditor: cuerpo recortado bajo 500 lineas (techo desde v1.14) quitando del H2 "Version & changelog" el bullet v1.13, ya duplicado palabra por palabra en references/changelog.md — nada se borro, se dejo de repetir. Resto verificado en su techo: 0 rotas/huerfanos/secretos, blindaje doble intacto, validador 0/0/0. -->
 <!-- skill v1.16 · 2026-09-05 · sello mudado a references/changelog.md (fila del CdM); blindaje y validacion ahora son procedimiento vivo en el cuerpo; lista negra probada en los DOS sentidos. -->
+
+## Antes de empezar — lo que TÚ tienes que tener
+
+Esta skill genera con un servicio que cobra por uso. Lo bloqueante se comprueba en el Step 0, antes de gastar un solo crédito. Hoy el video en Higgsfield está en pausa (ver el aviso de congelación): la ruta Higgsfield entrega el avatar en imagen, y el que habla sale por Google Vids.
+
+| Qué necesitas | Tipo | Para qué | Cómo se consigue |
+|---|---|---|---|
+| Una **cuenta de Higgsfield con créditos**, con su **MCP conectado a Claude** | Bloqueante en la ruta Higgsfield | Generar el avatar en imagen (Step 2) y, cuando se levante la pausa, el video (Step 3) | Tu cuenta en Higgsfield, conectada como MCP. Si no aparecen sus herramientas (`generate_image`, `models_explore`), la ruta no arranca |
+| **Tu sí al costo exacto**, antes de cada generación | Bloqueante | Nada que gaste créditos se lanza sin que apruebes lo que cuesta (`get_cost`, cifra `credits_exact`) | Se te pregunta en cada generación, con la cifra |
+| Una **cuenta de Google Workspace que incluya Vids**, y **Claude en Chrome** | Bloqueante para un avatar que habla mientras siga la pausa · no hace falta para el avatar en imagen | La ruta de 0 créditos: un avatar hecho desde tu foto que lee el guion (`references/google_vids.md`, verificada hasta que arranca el render) | Tu cuenta de Workspace, abierta en tu Chrome; Claude la opera con la extensión |
+| **El guion** | Degradable | Lo que dice el avatar. En Vids caben 800 caracteres por escena | Lo traes tú; si no, se delega el copy a `golden-copywriting` |
+| **Fotos tuyas o de tu vocero** | Degradable | Un avatar con una cara real: 1 foto para un Reference Element, de 5 a 20 de la misma persona para entrenar un Soul | En Higgsfield, con su widget de carga (`media_upload_widget`) o por su enlace (`media_import_url`); un adjunto del chat no le llega. En Vids, como archivo de tu equipo. Sin fotos, la persona se genera |
+| **Plan Pro o Ultimate de Higgsfield** | Degradable, y solo cuando se levante la pausa del video | El video con `seedance_2_0`. Con el plan de entrada responde 403 y se usa `seedance_2_0_mini` (480p o 720p) | Se mira con `balance`. El 403 no cobra |
+| *Opcional:* el **cerebro de marca** (`golden-brand-brain`) | Degradable | La voz, el producto y los claims reales | Si no existe, se ofrece crearlo; si sigues sin él, la entrega lo declara |
+
+**Lo bloqueante para:** sin el MCP de Higgsfield no se genera nada ni se inventa un resultado; se dice y, si tienes Workspace, se ofrece la ruta de Vids. Sin tu sí al costo, no se lanza la generación. Mientras siga la pausa, sin Vids no hay avatar que hable, y no se busca un rodeo que gaste video. **Lo degradable se pide y se sigue:** sin guion se escribe, sin fotos la persona se genera y sin cerebro la entrega lo dice. Si no tienes algo, dime y te guío paso a paso.
 
 ## Paso previo · Cerebro de marca (obligatorio antes de generar)
 

@@ -32,6 +32,23 @@ producto.
 **El punto de partida normal es una FOTO.** Sin nombre, sin URL, sin fabricante. Identificarlo es tu
 trabajo (Fase -1), no un dato que el usuario debe traer.
 
+## Antes de empezar — lo que TÚ tienes que tener
+
+El estudio sale de fuentes reales. Casi todo es **degradable** (regla 5: el estudio no se para por algo que falta). El documento en Word se pide **en la Fase 0**: sin él el estudio sigue, pero la Fase 2 no cierra y queda `[PENDIENTE]`.
+
+| Qué necesitas | Tipo | Para qué | Cómo se consigue |
+|---|---|---|---|
+| La skill **docx**, o **python-docx** | Bloqueante para cerrar la Fase 2 (se pide en la Fase 0) | El documento maestro en Word: sin el `.docx`, la fase no cierra | La skill `docx` de Anthropic entre tus skills. O python-docx: compruébalo con `python3 -c "import docx"`; con el Python de python.org, `pip3 install python-docx`; con el de Homebrew no hay fórmula: `python3 -m venv ~/venv-docx`, `~/venv-docx/bin/pip install python-docx`, y el script que escribe el Word se corre con `~/venv-docx/bin/python3` |
+| El conector de **Firecrawl** | Degradable | Leer páginas de competidores, tiendas y marketplaces (unos 9 créditos por página con stealth) | Una cuenta en firecrawl.dev conectada a Claude. Sin él, se investiga con la búsqueda web nativa |
+| **yt-dlp** | Degradable | Videos y comentarios con sus votos | `brew install yt-dlp` |
+| **ffmpeg** | Degradable | Transcribir la locución y ampliar la etiqueta desde el video del cliente | `brew install ffmpeg` |
+| **whisper-cpp** con el modelo `ggml-small.bin` | Degradable | Transcribir la locución de los 3 a 5 videos top | `brew install whisper-cpp`. El modelo: mira si ya está en `~/.cache/hyperframes/whisper/models/`; si no, de huggingface.co/ggerganov/whisper.cpp |
+| **Python 3 con Pillow** | Degradable | Ampliar la etiqueta en los fotogramas (`scripts/etiqueta_desde_video.py`) | `python3 -c "import PIL"`; si falta, `pip3 install Pillow` (python.org) o `brew install pillow` (Homebrew) |
+| *Opcional:* la **conexión de Meta** | Degradable | La biblioteca de anuncios de Meta por MCP | Tu cuenta de Meta conectada a Claude |
+| *Opcional:* tus cuentas de **Ecom Magic** y **Higgsfield** | Degradable | La Fase 3.5, que compara motores de imagen para cada ángulo | Las tuyas, con créditos, conectadas a Claude |
+
+**Si falta algo, se pide con nombre propio.** Antes de declarar que una herramienta no está, se prueba con `which` y se pega la salida real (regla 9). Sin Word, la Fase 2 no cierra y queda `[PENDIENTE]`. Lo degradable se pide y el estudio sigue: lo que dependa de eso se marca `[PARCIAL]` o `[PENDIENTE]` y nunca se presenta como completo. Si no tienes algo, dime y te guío paso a paso.
+
 ## ⚠️ REGLAS DE ORO (innegociables — leer `references/reglas-de-oro.md`)
 1. **NUNCA inventar; CITAR la fuente de cada hallazgo.** Reseñas, competidores, precios, cifras,
    claims: cada dato con su URL/origen. Lo no verificable = *hipótesis*, nunca hecho.

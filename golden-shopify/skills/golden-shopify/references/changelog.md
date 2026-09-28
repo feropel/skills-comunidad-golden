@@ -3,6 +3,10 @@
 Registro de versiones de la skill. Cada vez que se absorbe una mejora de una página
 real, se sube una versión aquí (ver el ritual de auto-mejora en SKILL.md).
 
+## G4.27.1 · 2026-09-27 · Ley de los requisitos del usuario (aplicó el CENTRO DE MANDO)
+
+Se añadió el bloque «Antes de empezar» del SKILL.md: qué tiene que tener el usuario antes de arrancar, cada requisito marcado BLOQUEANTE o DEGRADABLE y qué pasa si falta (doctrina del CdM del 27-sep). Lo redactó el chat 🧰 ARSENAL Y SKILLS (4 pasadas del golden-verificador adversarial, 0 fallas nuevas en la última) y lo aplicó el CdM sin numerar: el número lo pone la fábrica al ratificar. Solo inserción: 0 líneas quitadas.
+
 ## G4.27 — 2026-09-05 — Falso negativo EN PRODUCCION que el banco no podia ver
 Ley del CdM aplicada a mi mismo: *una conclusion sacada con un criterio estrechado no es firme hasta
 revalidarla con un metodo de OTRA FAMILIA*. G4.26b la valide con **mi propio banco** — el mismo
@@ -1387,8 +1391,8 @@ faltaba eran las **secciones de persuasión narrativa** y la **estrategia de cop
 ## G4.1b — 2026-07-29 — Media: tema+descripción, poster obligatorio, GIF→MP4 (lección chat TOPPIK, parche 23,5→3,3 MB)
 ## G4.1c — 2026-07-29 — REGLA #3 con matiz PAUTA: display propio se queda; porcentajes-estudio, testimonios en imagen y atribución a terceros jamás (gaceta 4f p.3).
 
-## G4.2 — 2026-08-07 — Límites duros de Shopify + receta Horizon/Pitch + fallback del CTA (fuente: chat un cliente de suplementos)
-Paquete de hallazgos horneado por el Centro de Mando desde la entrada del chat un cliente de suplementos en la bandeja
+## G4.2 — 2026-08-07 — Límites duros de Shopify + receta Horizon/Pitch + fallback del CTA (fuente: chat [producto de cliente]/[producto de cliente])
+Paquete de hallazgos horneado por el Centro de Mando desde la entrada del chat [producto de cliente] en la bandeja
 (3 `FileSaveError` consecutivos en tienda real descubrieron límites que no están en la documentación oficial).
 - **TOPE 50 KB por setting `custom_liquid` (aplica a TODOS los temas):** el guardado del template revienta
   con *"Setting 'custom_liquid' is invalid. ['Liquid file size cannot exceed 50 kilobytes.']"*. Entró como
@@ -1409,7 +1413,7 @@ Paquete de hallazgos horneado por el Centro de Mando desde la entrada del chat u
   el orden de 17 secciones vs las 24 del embudo canónico G4.0 — pendiente de sesión dedicada. Hasta
   regenerarlo, el ORDEN canónico es la tabla del SKILL.md, no el base.
 
-## G4.3 — 2026-08-07 — Componente "LO QUE ESTE PRODUCTO NO HACE" (cosecha del chat ESTUDIO 360 un producto de salud oral de terceros, Chile)
+## G4.3 — 2026-08-07 — Componente "LO QUE ESTE PRODUCTO NO HACE" (cosecha del chat ESTUDIO 360 DENTAL [producto de cliente], Chile)
 Repartido por el Centro de Mando desde la bandeja (orden de FER: "sin omitir detalle"). Invención del
 estudio dental y probablemente lo más valioso que salió de él:
 - **Componente estándar para verticales de SALUD**, descrito en el SKILL.md junto a `sec-disclaimer` /

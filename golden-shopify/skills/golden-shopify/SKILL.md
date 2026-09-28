@@ -15,6 +15,7 @@ description: >-
   público y necesite diferenciarse por oferta y por página.
 ---
 # GOLDEN SHOPIFY (`golden-shopify`)
+<!-- skill G4.27.1 · 2026-09-27 · ronda de numeracion del Centro de Mando (orden de FER: «que todas las skills esten perfectamente corregidas y actualizadas»): da numero a los cambios del 27-sep que quedaron sin numero. Detalle en references/changelog.md -->
 <!-- skill G4.27 · 2026-09-05 (revalidacion con metodo de OTRA FAMILIA, ley del CdM): el check del disparador tenia un FALSO NEGATIVO EN PRODUCCION que el banco no podia ver. En la tienda viva los espacios del `text=` viajan como `+` (?text=Hola+quiero+informacion+...), y el patron con \s no casaba: un mensaje mal escrito pasaba invisible. El banco saboteaba con espacios LITERALES, o sea su formato no era el de produccion. Ahora se decodifica con unquote_plus antes de juzgar, y el banco lleva el caso real copiado del enlace vivo. -->
 <!-- skill G4.26b · 2026-09-05: el arreglo de G4.26 creo un falso NEGATIVO y lo cazo el banco. Al apuntar el check solo al enlace de WhatsApp, el patron cortaba en el primer ESPACIO — y el mensaje del disparador lleva espacios, asi que capturaba 'wa.me/...?text=Hola,' y perdia lo que habia que juzgar. El href se corta en la COMILLA, no en el espacio. Sin el caso malo en el banco, habria entregado un check que ya no cazaba nada. -->
 <!-- skill G4.26 · 2026-09-05 (disfraz de golden-presenta, medido con DELTA contra control): el check del disparador acusaba al texto por su FORMA y no por su AUTORIDAD. Un <pre><code> que documenta el error, un <script application/json> de config y un atributo data-* lo disparaban: los tres tienen la forma exacta y cero mando, y marcarlos castiga a quien documenta el fallo. Ahora solo mira dentro del enlace wa.me/api.whatsapp.com, que es donde el disparador MANDA de verdad. La pregunta no es como esta escrito, sino sobre quien manda. -->
@@ -42,6 +43,18 @@ description: >-
 > (REGISTRO-FABRICAS.md). Solo la fábrica numera esta skill (ley del número de versión).
 
 <!-- adenda 2026-08-23 (centro de mando, hallazgo del chat FILTRO DE HERRAMIENTAS): 7 de 12 skills de contenido no leian el cerebro de marca — esta entra a la familia que SI lo lee. Bloque identico en las 6 del CdM + fila a la fabrica de golden-web. Caso origen: carrusel HUSK 'every other skill reads this first'. -->
+## Antes de empezar — lo que TÚ tienes que poner
+
+| Qué necesitas | Tipo | Cómo se consigue |
+|---|---|---|
+| **Python 3**, para `scripts/autocheck.py` | Bloqueante: se comprueba en el Paso 0-A | `python3 --version`; si no está, en python.org |
+| La **URL de tu tienda** | Degradable: sin URL ni API, se pregunta el tema | La tuya |
+| La app **Releasit COD Form** | Degradable: sin ella, el botón pasa al carrito normal (`references/releasit-cod.md`) | Tienda de apps de Shopify |
+| Acceso para **subir la ficha al tema** | Degradable: si no se puede escribir, se entrega `product.<handle>.json` para pegarlo en Editar código o en un tema borrador (`references/imagenes.md`) | El conector de Shopify, o un token de la API de administración con permiso sobre temas |
+| *Opcional:* **llave de Gemini** y **Pillow**, para imágenes de secciones | Degradable | La llave en aistudio.google.com/apikey, en `~/.gemini_key` y nunca en el chat. Pillow: `python3 -c "import PIL"`; si falta, `pip3 install Pillow` (python.org) o `brew install pillow` (Homebrew) |
+
+Lo bloqueante para antes de construir; lo degradable se pide y se sigue. Nunca se asume Dawn (Paso 0-A). Si no tienes algo, dime y te guío paso a paso.
+
 ## Paso 0-A · QUE TEMA ES (compuerta: no se genera nada sin esto)
 Esta skill construye **sobre el tema de OTRA persona**. Si se asume Dawn y la tienda corre otra
 familia, lo que se entrega no encaja — y en el peor caso encaja a medias, que es peor porque parece
@@ -85,7 +98,7 @@ se generó sin voz de marca cargada.
 6. **CSS prohibido**: jamás `html,body{overflow-x:clip}` — mata el scroll vertical; el desborde se arregla en el elemento culpable.
 7. **Releasit**: el Sticky Bar NUNCA se desactiva en el panel (se oculta por CSS) y el botón se prueba PULSÁNDOLO (abrir el modal).
 8. **Media de la ficha vive en el TEMA y en la DESCRIPCIÓN del producto** (descriptionHtml) — un barrido/parche de media mira ambos. **Video de contenido: `poster` OBLIGATORIO** (sin poster + sin autoplay = recuadro en blanco que simula sección vacía) y el autoplay se comprueba con play() o teléfono real, nunca desde el panel del navegador. GIF pesado (>1 MB) → convertir a MP4 `<video autoplay muted loop playsinline>` (caso real: 23,5 MB → 3,3 MB).
-9. **TOPE DURO: cada setting `custom_liquid` admite máximo 50 KB** — aplica a TODOS los temas, no solo a Horizon/Pitch. Al pasarse, el guardado revienta con *"Setting 'custom_liquid' is invalid. ['Liquid file size cannot exceed 50 kilobytes.']"* (descubierto con `FileSaveError` en tienda real, chat un cliente de suplementos 2026-08-07). Medir CADA valor en **bytes UTF-8, no caracteres**, antes de entregar (verificación obligatoria en `references/auto-check.md`); si una pieza se acerca al tope, partirla en secciones más pequeñas (una sección por pieza, REGLA #5).
+9. **TOPE DURO: cada setting `custom_liquid` admite máximo 50 KB** — aplica a TODOS los temas, no solo a Horizon/Pitch. Al pasarse, el guardado revienta con *"Setting 'custom_liquid' is invalid. ['Liquid file size cannot exceed 50 kilobytes.']"* (descubierto con `FileSaveError` en tienda real, chat [producto de cliente] 2026-08-07). Medir CADA valor en **bytes UTF-8, no caracteres**, antes de entregar (verificación obligatoria en `references/auto-check.md`); si una pieza se acerca al tope, partirla en secciones más pequeñas (una sección por pieza, REGLA #5).
 
 Sistema para generar páginas de producto Shopify de alta conversión COD. Nació
 del proyecto interno "plantilla down" (tema **Dawn**) y se probó en dos productos

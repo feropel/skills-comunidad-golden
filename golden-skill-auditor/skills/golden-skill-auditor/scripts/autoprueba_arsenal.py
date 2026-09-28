@@ -212,8 +212,18 @@ def main():
             else:
                 bien = (rc == esperado) and (debe_decir is None or debe_decir in salida)
             print(f"  {'OK  ' if bien else 'MAL '} {etiqueta}  (salida {rc}, esperada {esperado})")
-            if not bien and debe_decir:
-                print(f"        esperaba ver: {debe_decir}")
+            if not bien:
+                if debe_decir:
+                    print(f"        esperaba ver: {debe_decir}")
+                # Medido por la fabrica de ARSENAL Y SKILLS (28-sep): correr este banco
+                # desde una copia en una carpeta con OTRO nombre (ej. "gsa127" en vez de
+                # "golden-skill-auditor") hace fallar "el AUDITOR se valida a SI MISMO" de
+                # verdad — validar_arsenal.py exige, con razon, que name == carpeta — pero
+                # sin la causa a la vista, un MAL sin mas parece un defecto del validador
+                # en vez de la copia mal nombrada que es. Se muestran las ultimas lineas
+                # de salida de CUALQUIER caso que falle, no solo este.
+                for linea in [l for l in salida.splitlines() if l.strip()][-6:]:
+                    print(f"        {linea}")
             ok += bien
         print(f"\n  {ok} de {len(casos)} pruebas pasan")
         return 0 if ok == len(casos) else 1

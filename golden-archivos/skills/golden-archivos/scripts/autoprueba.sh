@@ -225,8 +225,45 @@ for f in "$DIR"/*.sh; do
            | grep -vc -- '-nostdin')
   [ "${crudas:-0}" -eq 0 ] || sin_nostdin="$sin_nostdin $(basename "$f")"
 done
-[ -z "${sin_nostdin// /}" ] && ok "todo ffmpeg lleva -nostdin y no se come la lista" \
-  || no "llaman a ffmpeg sin -nostdin y pueden comerse piezas del bucle:$sin_nostdin"
+# GUARDA SIMETRICA, y es la mitad que importa: `ffprobe` NO acepta `-nostdin`.
+# Se TRAGA el argumento siguiente y hace otra cosa sin decir que el argumento
+# era malo. Medido el 27-09-2026 sobre un mp4 real: con `-nostdin` imprime el
+# banner de version; sin el y con `</dev/null` imprime 10667.375000. Un agente
+# lo sufrio en 178 videos: NA en los 178, sin un solo error.
+# Un candado que EXIGE algo tiene que prohibir ese algo mal aplicado, o se
+# convierte en la fuente del proximo fallo. La regla correcta es:
+#   ffmpeg  -> -nostdin
+#   ffprobe -> </dev/null, JAMAS -nostdin
+ffprobe_malo=""
+for f in "$DIR"/*.sh; do
+  [ "$(basename "$f")" = "autoprueba.sh" ] && continue
+  sed -e 's/[[:space:]]*#.*$//' "$f" | grep -qE 'ffprobe[[:space:]]+-nostdin' \
+    && ffprobe_malo="$ffprobe_malo $(basename "$f")"
+done
+
+if [ -n "${ffprobe_malo// /}" ]; then
+  no "le ponen -nostdin a ffprobe, que se traga el argumento siguiente y devuelve otra cosa:$ffprobe_malo"
+elif [ -z "${sin_nostdin// /}" ]; then
+  ok "ffmpeg lleva -nostdin, ffprobe no lo lleva: cada uno con lo suyo"
+else
+  no "llaman a ffmpeg sin -nostdin y pueden comerse piezas del bucle:$sin_nostdin"
+fi
+
+echo "== 13. Los de 0 bytes se CENSAN, no se tragan =="
+# `duplicados.sh` ya los excluia del hasheo, y eso esta bien: todos comparten el
+# md5 del vacio y agruparlos los presenta como copias de algo cuando son fallos
+# distintos. Lo que estaba mal era excluirlos CALLANDO. Aqui se exige lo mismo
+# que al mosaico desde la v1.6: si una pieza no entra al analisis, se dice.
+V="$T/vacios"; mkdir -p "$V"
+: > "$V/roto1.jpg"; : > "$V/roto2.jpg"; : > "$V/roto3.jpg"
+printf 'igual' > "$V/a.txt"; printf 'igual' > "$V/b.txt"
+sal=$(bash "$DIR/duplicados.sh" "$V" 2>&1)
+vac_ok=1
+printf '%s' "$sal" | grep -q '3 archivo(s) de 0 bytes' || vac_ok=0     # los cuenta
+printf '%s' "$sal" | grep -q 'roto2.jpg'                || vac_ok=0     # los nombra
+printf '%s' "$sal" | grep -q 'Grupos de duplicados exactos: 1' || vac_ok=0  # y no los agrupa
+[ "$vac_ok" -eq 1 ] && ok "los archivos de 0 bytes se cuentan, se nombran y no se agrupan como duplicados" \
+  || no "duplicados.sh no censa los archivos de 0 bytes, o los esta agrupando como si fueran copias"
 
 echo "== 4. El log manda: sin log no se mueve =="
 sembrar "$T/c"

@@ -21,7 +21,18 @@ done < "${SIZES}.dup" | while IFS= read -r f; do
   printf '%s\t%s\n' "$(md5 -q "$f" 2>/dev/null)" "$f" >> "$HASHES"
 done
 
+VACIOS=$(find "$@" -type f ! -name '.*' -size 0 2>/dev/null | wc -l | tr -d ' ')
 echo "Archivos analizados: $(wc -l < "$SIZES" | tr -d ' ')"
+# Los de CERO bytes se excluyen del hasheo a proposito: todos comparten el mismo
+# md5 (el del vacio) y un deduplicador los agrupa como si fueran la misma cosa,
+# cuando son fallos DISTINTOS — medido el 27-09-2026 en un respaldo real: 16
+# imagenes de WhatsApp que nunca terminaron de bajar, agrupadas como "16 copias".
+# Pero excluir en SILENCIO es la clase que esta skill persigue: 16 archivos rotos
+# en una biblioteca son un HALLAZGO, no ruido. Se cuentan y se nombran.
+if [ "$VACIOS" -gt 0 ]; then
+  echo "⚠️  $VACIOS archivo(s) de 0 bytes, fuera del analisis (todos comparten hash y NO son duplicados entre si):"
+  find "$@" -type f ! -name '.*' -size 0 2>/dev/null | sed 's/^/   /'
+fi
 cut -f1 "$HASHES" | sort | uniq -d > "${HASHES}.dup"
 echo "Grupos de duplicados exactos: $(wc -l < "${HASHES}.dup" | tr -d ' ')"
 echo ""

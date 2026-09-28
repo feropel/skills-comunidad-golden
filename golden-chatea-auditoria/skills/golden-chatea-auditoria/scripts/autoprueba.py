@@ -72,6 +72,13 @@ def espacio_roto():
                        "keyW": "Hola quiero informacion y precio de SANO,,,,,,",
                        "idAd": "1234567890,,,,,,", "estado": "activo"})
 
+    # --- P59: entradas del disparador ILEGIBLES. Una entrada que no es objeto se sumaba
+    # a "entradas revisadas" de D2/D5/D6 sin revisarse, y un keyW que no es texto se
+    # saltaba de D5. Las dos inflaban la cobertura sin decir nada.
+    disparador.append("esto no es un objeto")
+    disparador.append({"producto": "TIPOMALO", "name": "[Producto Ventas Wp] 27",
+                       "keyW": ["una", "lista"], "idAd": 12345, "estado": "activo"})
+
     # --- D1: la palabra clave difiere en UN ACENTO entre sus dos sitios
     campos.append(campo("[Producto Ventas Wp] 2", producto("ACENTO")))
     disparador.append({"producto": "ACENTO", "name": "[Producto Ventas Wp] 2",
@@ -261,7 +268,9 @@ def espacio_roto():
         # control viejo solo reconocia esa segunda forma inventada, que ningun canal real usa
         # -- lo unico que le disparaba era el `status:"ok"` del sobre HTTP. whatsapp=1 conectado,
         # facebook=0 caido.
-        "/workspace-settings/channels": {"data": {"whatsapp": 1, "facebook": 0,
+        # A4/P59: `whatsapp` en null y `whatsapp_cloud` AUSENTE. Medido por ARSENAL el
+        # 2026-09-27: los dos salian como "requeridos presentes 4 de 4".
+        "/workspace-settings/channels": {"data": {"whatsapp": None, "facebook": 0,
                                                    "instagram": 1}, "status": "ok"},
         # F7: la cuenta propia sale del servidor, no de suponer cual es la mayoritaria
         "/team-info": {"data": {"id": 236245, "name": "Autoprueba"}},
@@ -298,6 +307,7 @@ def _campo_de_fabrica():
 
 # Cada defecto sembrado, con el control que TIENE que dispararlo.
 ESPERADOS = {
+    "D9": "entrada del disparador ilegible o con campos de tipo equivocado",
     "L5": "campo de configuracion que el esquema de referencia no cubre",
     "B1": "la paginacion no cuadra con el total del servidor",
     "C1": "campo por encima del techo escapado",
@@ -378,6 +388,37 @@ def main():
     else:
         print(f"  FALLA L5   hallazgos={len(l5)} nombra={nombra} cobertura={len(cob_l5)}")
         faltan.append("campo-de-config-sin-declarar")
+
+    # --- prueba P59: lo descartado se CUENTA y se NOMBRA (fila P59 del CdM, 2026-09-27).
+    # Cuatro descartes silenciosos, cada uno con su comprobacion propia.
+    fallos_p59 = []
+
+    # A4 · un canal requerido en null o ausente NO puede contar como presente
+    linea_req = a.universo.get("canales", {}).get("requeridos presentes", "")
+    if linea_req.startswith("4 de 4"):
+        fallos_p59.append("A4 dice 4 de 4 con whatsapp en null y whatsapp_cloud ausente")
+    if not any(h["control"] == "A4" and ("whatsapp" in h["evidencia"])
+               for h in a.hallazgos):
+        fallos_p59.append("A4 no nombra el canal requerido que no pudo comprobar")
+
+    # D9 · la entrada que no es objeto y los tipos equivocados salen por su nombre
+    d9 = [h for h in a.hallazgos if h["control"] == "D9"]
+    if not any("no es un objeto" in h["titulo"] or "no es objeto" in h["titulo"] for h in d9):
+        fallos_p59.append("la entrada ilegible del disparador no se nombra")
+    if not any("keyW" in h["titulo"] or "idAd" in h["titulo"] for h in d9):
+        fallos_p59.append("keyW/idAd de tipo equivocado no se nombra")
+
+    # C3 · las rutas sin tope conocido se cuentan en la cobertura
+    nota_c3 = next((c["nota"] for c in a.cobertura if c["control"] == "C3"), "")
+    if "sin tope" not in nota_c3:
+        fallos_p59.append("C3 no declara cuantas rutas se quedaron sin tope conocido")
+
+    if not fallos_p59:
+        print("  OK    P59  todo descarte se cuenta y se nombra: canales, disparador y topes")
+    else:
+        for f in fallos_p59:
+            print(f"  FALLA P59  {f}")
+        faltan.append("descartes-silenciosos")
 
     # --- prueba ALC: el alcance por defecto es CONFIGURACION (ley de FER, 2026-09-05:
     # "esta skill es exclusivamente para analizar configuracion, no vemos productos").
@@ -641,7 +682,7 @@ def main():
 
     # --- prueba HO3: la RAMA GEMELA. El arreglo de HO2 se hizo solo para MUERTO/ANUNCIADA
     # y nadie busco su hermana: la rama de FUGA (🟡) conservaba el `if not accion: continue`
-    # y se comia 11 hallazgos abiertos mas (medido en otra empresa del grupo el 2026-09-08: F14, F2, G2, los
+    # y se comia 11 hallazgos abiertos mas (medido en un espacio en produccion el 2026-09-08: F14, F2, G2, los
     # 6 de G3 y los 2 de F13). Una FUGA es lo que LLEGA AL CLIENTE, asi que caerse del
     # paquete es lo peor que le puede pasar. Clase, no caso: al tocar un filtro, buscar sus
     # hermanas. Por eso esta prueba es hermana literal de HO2.

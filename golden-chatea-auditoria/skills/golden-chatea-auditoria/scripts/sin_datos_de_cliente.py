@@ -60,7 +60,12 @@ def revisar(raiz=RAIZ):
             continue
         try:
             texto = ruta.read_text(encoding="utf-8")
-        except (UnicodeDecodeError, OSError):
+        except (UnicodeDecodeError, OSError) as e:
+            # P59 (ARSENAL, 2026-09-27) · un archivo que NO SE PUDO LEER es un HALLAZGO, no
+            # un limpio. Medido: un .md en latin-1 con un correo adentro daba "0 datos" y el
+            # guardia devolvia 0. Un guardia que no puede mirar no puede absolver.
+            hallazgos.append((rel, 0, "no se pudo leer (no es UTF-8 o sin permiso)",
+                             type(e).__name__))
             continue
         for n, linea in enumerate(texto.splitlines(), 1):
             for que, rx in PATRONES:
@@ -68,6 +73,33 @@ def revisar(raiz=RAIZ):
                 if m:
                     hallazgos.append((rel, n, que, m.group(0)))
     return hallazgos
+
+
+VIGILANTE = Path.home() / ".golden/bin/golden-barrido-publicacion"
+
+
+def nombres_de_cliente(raiz=RAIZ, vigilante=VIGILANTE):
+    """Delega los NOMBRES en el vigilante de la casa, que es quien tiene la lista.
+
+    Devuelve (estado, detalle) donde estado es "limpio", "hallazgos" o "no_verificado".
+    La lista de marcas y clientes no se copia aqui a proposito: copiarla seria meter en la
+    skill justo el dato que la skill no debe llevar, y ademas nacería desactualizada.
+    """
+    import subprocess
+    if not vigilante.exists():
+        return "no_verificado", f"no esta {vigilante}"
+    try:
+        r = subprocess.run([str(vigilante), str(raiz)], capture_output=True, text=True,
+                           timeout=120)
+    except (OSError, subprocess.SubprocessError) as e:      # noqa: BLE001
+        return "no_verificado", f"{type(e).__name__} al correr el vigilante"
+    salida = (r.stdout or "") + (r.stderr or "")
+    if "CERO hallazgos" in salida:
+        return "limpio", "el vigilante no encontro nombres de marca ni de cliente"
+    lineas = [l.strip() for l in salida.splitlines() if "PRIVADO" in l or l.strip().startswith("🔴")]
+    if lineas:
+        return "hallazgos", " · ".join(lineas[:8])
+    return "no_verificado", "el vigilante corrio y su salida no se pudo interpretar"
 
 
 def autoprueba():
@@ -92,6 +124,19 @@ def autoprueba():
             print(f"  {marca} caza {que}")
             if que not in vistos:
                 fallos.append(que)
+    # P59 · un archivo que NO SE PUDO LEER es un hallazgo, no un limpio. Medido por
+    # ARSENAL el 2026-09-27: un .md en latin-1 con un correo adentro daba "0 datos".
+    with tempfile.TemporaryDirectory() as d:
+        (Path(d) / "references").mkdir()
+        (Path(d) / "references" / "roto.md").write_bytes(
+            ("el dueno es " + "nadie@ejemplo" + ".invalid y vive en Bogotá\n").encode("latin-1"))
+        vistos = [h for h in revisar(Path(d)) if "no se pudo leer" in h[2]]
+        if vistos:
+            print("  OK    declara el archivo que no se pudo leer")
+        else:
+            print("  FALLA un archivo ilegible se salto en silencio y dio limpio")
+            fallos.append("archivo ilegible")
+
     # y el control negativo: un texto sano NO puede disparar
     with tempfile.TemporaryDirectory() as d:
         (Path(d) / "references").mkdir()
@@ -102,6 +147,22 @@ def autoprueba():
             fallos.append("falso positivo")
         else:
             print("  OK    no dispara sobre texto sano")
+    # La delegacion de los NOMBRES, en sus dos direcciones. No se siembra ningun nombre real
+    # de cliente: eso seria escribir en la skill el dato que se quiere impedir. Se comprueba
+    # que el guardia SEPA que no sabe cuando el vigilante no esta.
+    est, _ = nombres_de_cliente(vigilante=Path("/no/existe/vigilante"))
+    if est == "no_verificado":
+        print("  OK    sin vigilante declara NO VERIFICADO, no limpio")
+    else:
+        print(f"  FALLA sin vigilante dijo '{est}' en vez de no_verificado")
+        fallos.append("delegacion de nombres")
+    if VIGILANTE.exists():
+        est2, det2 = nombres_de_cliente()
+        print(f"  OK    con vigilante presente devuelve '{est2}' ({det2[:60]})")
+    else:
+        print(f"  AVISO el vigilante no esta instalado en {VIGILANTE}: la mitad buena de "
+              "esta prueba no se pudo correr")
+
     return 1 if fallos else 0
 
 
@@ -115,13 +176,27 @@ def main():
     print(f"GUARDIA DE PRIVACIDAD · {RAIZ.name}")
     for rel, razon in EXCEPCIONES.items():
         print(f"  excepcion declarada: {rel} — {razon}")
-    if not hallazgos:
-        print("\n  0 datos de espacio, tienda, correo, telefono o credencial en la skill.")
-        print("  NO VERIFICADO por codigo: los NOMBRES de personas, marcas o negocios. "
-              "Eso se lee.")
+    estado, detalle = nombres_de_cliente()
+    etiqueta = {"limpio": "limpio", "hallazgos": "CON HALLAZGOS",
+                "no_verificado": "NO VERIFICADO"}[estado]
+    print(f"  nombres de marca y de cliente · delegado al vigilante: {etiqueta} — {detalle}")
+    if not hallazgos and estado == "limpio":
+        print("\n  0 datos de espacio, tienda, correo, telefono o credencial en la skill, "
+              "y 0 nombres de marca o de cliente.")
         return 0
-    print(f"\n  {len(hallazgos)} DATOS QUE NO DEBERIAN ESTAR EN LA SKILL:")
-    for rel, n, que, txt in hallazgos:
+    if not hallazgos:
+        print(f"\n  Sin datos de espacio, tienda, correo ni credencial, pero los NOMBRES "
+              f"quedaron en {etiqueta}: esta corrida NO da el OK.")
+        return 1
+    ilegibles = [h for h in hallazgos if h[2].startswith("no se pudo leer")]
+    datos = [h for h in hallazgos if h not in ilegibles]
+    if ilegibles:
+        print(f"\n  {len(ilegibles)} ARCHIVOS NO REVISADOS (y por eso NO hay OK):")
+        for rel, _, que, det in ilegibles:
+            print(f"    {rel}  {que}: {det}")
+    if datos:
+        print(f"\n  {len(datos)} DATOS QUE NO DEBERIAN ESTAR EN LA SKILL:")
+    for rel, n, que, txt in datos:
         print(f"    {rel}:{n}  {que}: {txt}")
     print("\n  El estandar se queda; lo que paso en un espacio concreto va al chat de ese "
           "cliente y al Centro de Mando.")

@@ -521,14 +521,34 @@ class Auditoria:
         # La conexion VIVA no la expone la API: se mira en el panel, y eso ya lo declara A5.
         REQUERIDOS = ("whatsapp", "whatsapp_cloud", "facebook", "instagram")
         canales = self.d.get("/workspace-settings/channels")
-        disponibles, no_disponibles = [], []
+        disponibles, no_disponibles, ilegibles = [], [], []
         if canales:
             for ruta, hoja in self.caminar(canales):
                 nombre = ruta.split(".")[-1]
-                if nombre in ("status",) or not isinstance(hoja, (int, bool)):
+                if nombre in ("status",):
+                    continue
+                if not isinstance(hoja, (int, bool)):
+                    # P59: la hoja se tiraba en silencio y, al calcular los requeridos por
+                    # los que estan en `no_disponibles`, un canal en null salia PRESENTE.
+                    # Medido por ARSENAL: whatsapp=None daba "requeridos presentes 4 de 4".
+                    ilegibles.append(f"{nombre} ({type(hoja).__name__})")
                     continue
                 (disponibles if hoja else no_disponibles).append(nombre)
+        # Dos cosas distintas, y antes se mezclaban en una: el plan que NO lo incluye (rojo,
+        # el asistente no puede operar) y el que no se pudo COMPROBAR (duda: ausente de la
+        # respuesta o con un valor que no es un interruptor).
         faltan_req = [c for c in REQUERIDOS if c in no_disponibles]
+        sin_comprobar = [c for c in REQUERIDOS
+                         if c not in no_disponibles and c not in disponibles]
+        if canales and sin_comprobar:
+            self.falla("A4", "DUDA",
+                       f"{len(sin_comprobar)} canales REQUERIDOS no se pudieron comprobar",
+                       f"{sin_comprobar} · hojas ilegibles: {ilegibles or 'ninguna'}",
+                       "No estan en la respuesta del endpoint o su valor no es un "
+                       "interruptor. No se sabe si el plan los incluye: antes contaban "
+                       "como presentes.",
+                       "Mirarlos en el panel del workspace.",
+                       objetivo="canal-requerido-sin-comprobar")
         if faltan_req:
             self.falla("A4", "MUERTO",
                        "Un canal que los asistentes NECESITAN no esta disponible en el plan",
@@ -539,7 +559,10 @@ class Auditoria:
         self.universo["canales"] = {
             "disponibles en el plan": len(disponibles),
             "no disponibles": ", ".join(no_disponibles) or "ninguno",
-            "requeridos presentes": f"{len(REQUERIDOS) - len(faltan_req)} de {len(REQUERIDOS)}"}
+            "requeridos presentes":
+                f"{len([c for c in REQUERIDOS if c in disponibles])} de {len(REQUERIDOS)}"
+                + (f" · {len(sin_comprobar)} sin comprobar" if sin_comprobar else ""),
+            "hojas ilegibles": ", ".join(ilegibles) or "ninguna"}
         self.cubre("A4", "corrido" if canales else "sin_datos",
                    len(disponibles) + len(no_disponibles),
                    "disponibilidad en el plan; la conexion VIVA se mira en el panel (A5)"
@@ -792,6 +815,7 @@ class Auditoria:
 
         # C3 · tope nativo del formulario, ruta por ruta
         rutas_revisadas = 0
+        rutas_sin_tope = 0
         sin_tope = tuple(TOPES["sin_tope_nativo"])
         for n, c in self.campos.items():
             if n.startswith(sin_tope):
@@ -804,6 +828,7 @@ class Auditoria:
                     continue
                 tope = self.tope_de(ruta)
                 if tope is None:
+                    rutas_sin_tope += 1        # P59: se cuentan y salen en la cobertura
                     continue
                 rutas_revisadas += 1
                 if len(hoja) > tope:
@@ -813,7 +838,9 @@ class Auditoria:
                                "Funciona hoy, pero el dia que alguien abra ese formulario en "
                                "el panel y guarde, el campo se corta y se pierde el texto.",
                                f"Recortar a {tope:,} con la skill de configuracion.")
-        self.cubre("C3", "corrido", rutas_revisadas)
+        self.cubre("C3", "corrido", rutas_revisadas,
+                   f"{rutas_sin_tope} rutas sin tope conocido, no juzgadas"
+                   if rutas_sin_tope else "todas las rutas tenian tope conocido")
 
         # C4 · tipo del campo — text y array topan igual en 20.000 (controles.md)
         candidatos = [(n, c) for n, c in self.campos.items()
@@ -898,6 +925,16 @@ class Auditoria:
             for i, e in enumerate(entradas):
                 entradas_totales += 1
                 if not isinstance(e, dict):
+                    # P59: se sumaba a las entradas "revisadas" de D2/D5/D6 y no se revisaba
+                    # ni se nombraba. Cobertura falsa: el denominador crecia sin denominar.
+                    self.falla("D9", "MUERTO",
+                               f"`{nombre_disp}`: la entrada {i} no es un objeto legible",
+                               f"tipo {type(e).__name__}: "
+                               f"{json.dumps(e, ensure_ascii=False)[:120]}",
+                               "Ningun control la puede leer, y aun asi contaba como "
+                               "entrada revisada.",
+                               "Corregir o borrar esa entrada del disparador en el panel.",
+                               objetivo=f"entrada-ilegible-{nombre_disp}-{i}")
                     continue
                 destino = (e.get("name") or "").strip()
                 if not destino:
@@ -914,6 +951,17 @@ class Auditoria:
                 for etiqueta in ("keyW", "idAd"):
                     valor = e.get(etiqueta) or ""
                     if not isinstance(valor, str):
+                        # P59: se saltaba de D5 y del chequeo de palabra clave vacia sin
+                        # decir nada. Un keyW que es lista no tiene ranuras que contar, pero
+                        # que NO se pueda contar es el hallazgo.
+                        self.falla("D9", "MUERTO",
+                                   f"`{nombre_disp}` → `{destino}`: `{etiqueta}` no es texto",
+                                   f"tipo {type(valor).__name__}: {valor!r:.120}",
+                                   "El disparador espera una cadena con siete ranuras "
+                                   "separadas por comas. Con otro tipo, ningun control lo "
+                                   "puede juzgar.",
+                                   "Corregir el tipo del campo en el panel.",
+                                   objetivo=f"tipo-{etiqueta}-{nombre_disp}-{destino}")
                         continue
                     ranuras = valor.count(",") + 1
                     if ranuras != 7:
@@ -1446,7 +1494,8 @@ class Auditoria:
         # 🔴 EL DENOMINADOR NO ES "objetos": es "objetos QUE TRAIAN TEXTO". Un agente o una
         # tarea que el extractor baja `locked` llega sin una sola cadena, asi que ningun
         # control lo mira -- y aun asi engordaba el numero que F13 declaraba como cobertura.
-        # Medido por el verificador el 2026-09-08 sobre otra empresa del grupo: 72 objetos declarados, 40 sin
+        # Medido por el verificador el 2026-09-08 sobre un espacio en produccion: 72 objetos
+        # declarados, 40 sin
         # texto. Eso es cobertura FALSA, la clase de mentira que este auditor existe para no
         # cometer: "N de N revisados" donde 40 nunca se revisaron porque no habia que ver.
         # Se cuentan aparte y se declaran; no se esconden ni se suman.
@@ -1556,7 +1605,7 @@ class Auditoria:
             if hashlib.md5(texto.encode("utf-8")).hexdigest() == huella[nombre]["md5"]:
                 de_fabrica.append(nombre)
 
-        # 🔴 DOS SEVERIDADES, y la separacion vino de campo (chat de otra empresa del grupo Incanto, 2026-09-08).
+        # 🔴 DOS SEVERIDADES, y la separacion vino de campo (chat de un espacio real, 2026-09-08).
         # La primera version de F14 metia los 32 hallazgos en un solo saco y todos pesaban igual.
         # Medido en un espacio real: **27 de 32 eran interruptores, versiones o valores triviales**
         # (false / true / 1 / 2.1.3) -- default legitimo que nadie tiene que tocar. Solo **5**
@@ -1809,6 +1858,13 @@ class Auditoria:
                     continue
                 v = hojas.get(k)
                 if not isinstance(v, str):
+                    # P59: una cadena vacia SI se acusaba y un null no. La llave existe, asi
+                    # que L1 no la ve; y al saltarla aqui tampoco entraba en `comparables`,
+                    # con lo que ademas falseaba la proporcion que usa L3 para el espejo.
+                    if k in hojas and meta[1] >= 120:
+                        comparables += 1
+                        cortos.append(f"{k} (valor {type(v).__name__}, no es texto; "
+                                      f"~{meta[1]} en el patron)")
                     continue
                 patron = meta[1]
                 # Solo se juzgan los campos que en el patron llevan CONTENIDO de verdad.

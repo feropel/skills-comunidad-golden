@@ -23,58 +23,59 @@ description: >-
      SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # golden-chatea-auditoria · la salud de un espacio de Chatea Pro
 
-<!-- skill v3.1 (GCA3.1) — 2026-09-24 — REMARKETING IA FUERA, Y LA BANDERA QUE NADIE LEIA.
-FER saco Remarketing IA del ecosistema el 21-sep y el 24-sep ordeno no configurarlo ni auditarlo.
-El 21 la fila llego al instalador (full-configuracion v1.12) y no a este auditor, que es hermano:
-por eso siguio gritando "Remarketing IA NO esta instalado" en un cliente. Y al medirlo salio lo peor:
-assets/asistentes-esperados.json YA lo marcaba `opcional: true` y auditar.py no leia esa bandera
-(0 usos). Regla escrita donde se lee y no donde se ejecuta. Arreglo: EXCLUIDOS_POR_FER en
-auditar.py aparta sus campos AL CARGAR el inventario (ningun control lo ve: ni B6, ni el pais de
-L4, ni topes, ni el disparador de D3/D5) y los declara contados en el universo; B6 respeta
-`opcional` y lo saca del denominador. Opt-in con --incluir-excluidos. Prueba EXCL nueva en los
-dos sentidos, con dos mutantes que la hacen fallar (vaciar la lista · quitar la lectura de
-`opcional`) y el control negativo (sin Carritos, B6 sigue mordiendo). El sabotaje de D3b que
-vivia en el disparador de Remarketing se mudo a uno de Ventas Wp para no perder su banco.
-NO se toco el remarketing POR PRODUCTO de Ventas WhatsApp (estandar-prompts.md): es otra cosa.
-Aplicado por el Centro de Mando. -->
+## 📋 Requisitos: qué necesita del usuario antes de arrancar
 
-<!-- skill v3.0 (GCA3.0) — 2026-09-22 — LA COBERTURA DEL ESQUEMA, MEDIDA CONTRA LAS SKILLS
-HERMANAS. Encargo de FER: autoevaluarse sabiendo "cuales son los criterios para auditar un
-espacio segun las skills de los asistentes". Eso no se opina: se mide. Se comparo el esquema de
-referencia del auditor contra la plantilla de configuracion de CADA hermana. Resultado:
-comentarios 15 de 15, ventas WhatsApp 24 de 24 y carritos 38 de 38 cubiertos, cero huecos; y el
-LOGISTICO con 9 campos configurados de los que el esquema conoce 2. Los otros siete caian en un
-`continue` SILENCIOSO dentro del bloque L, y la cobertura solo informaba cuantos campos reviso,
-nunca cuantos se salto. Medido contra el espacio de referencia: 7 campos y 116 llaves que ningun
-control estaba mirando y que nadie declaraba. Eso es cobertura falsa, el pecado que esta skill le
-persigue a las demas. Arreglo: control L5, que los DECLARA por su nombre con su conteo de llaves
-y severidad DUDA (no se sabe si estan sanos: se sabe que nadie los miro). Ademas, el esquema
-conocia Remarketing IA y la lista de asistentes esperados no, asi que B6 era ciego justo para el
-asistente que el esquema mide vacio: anadido como opcional. Y el cuerpo del SKILL.md, que el
-validador marcaba con aviso por pasar de 500 lineas, baja moviendo dos entradas de historia al
-changelog. Tres instrumentos propios fallaron durante la medicion y se corrigieron antes de
-concluir: el primer comparador dio 283 llaves "sin cubrir" que eran metadatos, el segundo 207 por
-comparar rutas crudas contra rutas aplanadas, y el tercero conto 315 llaves en el esquema donde
-hay 156 porque contaba tambien los pares [tipo, largo]. Ninguna de esas tres cifras llego a un
-informe. Orden respetado: caso sembrado primero en autoprueba, comprobado que FALLA, control
-despues. Medido al cerrar: autoprueba 33 defectos + 27 pruebas, simulador 7 de 7, guardia de
-privacidad 0, validador sin fallos ni avisos, L5 disparando en campo. -->
-<!-- skill v2.9 — 2026-09-20 — auditoria golden-skill-auditor (AUDITA+ARREGLA). Tres hallazgos
-reales, sin tocar ningun control ni la logica de auditar.py:
-(1) la seccion "Fronteras y desambiguacion" prometia contenido "abajo, en una sola version que
-se mantiene" y el archivo terminaba ahi mismo -- promesa colgada, cero lineas de frontera real
-debajo. Reescrita: apunta a donde la frontera YA vive (la tabla del inicio y "Lo que esta skill
-NO hace") y resume las tres fronteras mas buscadas en tres lineas, sin duplicar la tabla entera.
-(2) la description no nombraba a que skill hermana ir si el pedido es sobre conversaciones del
-dia -- que es la confusion mas facil con esta skill ("revisa mi chatea" sirve para las dos).
-Agregada una frase de 64 caracteres: "No mira conversaciones del dia: eso es
-golden-chatea-operacion." Description queda en 998/1024, con margen.
-(3) references/changelog.md tiene 499 lineas y cero tabla de contenido (regla de la casa: toda
-reference >300 lineas la lleva). Agregado un indice de 12 filas al inicio del archivo; el
-contenido de las entradas no se toco.
-Reportado a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
+- **Token API del espacio de Chatea Pro** · BLOQUEANTE. Se crea en el panel del espacio (*Settings → API Keys*, según el propio código) y va **atado al Bot**; si no, la API responde 404 "Flow not found". Se guarda en `<carpeta del cliente>/.secrets/<espacio>.token`. Cupo: 1.000 llamadas por hora (no está medido si es por token o por espacio; se mira con `golden-chatea-cupo`).
+- **Cupo libre para la auditoría completa** · BLOQUEANTE: `extraer.py` se niega a arrancar si no cabe. Se mira antes con `golden-chatea-cupo`.
+- **`python3` y red hacia `chateapro.app`** · BLOQUEANTES.
+- **Alcance** · opcional: por defecto `config`; los productos solo si se piden.
+- **Plantilla de fábrica de `golden-chatea-pro-config-logistico`**, que lee el control F14 · DEGRADABLE: sin ella, F14 se declara no corrido.
 
-**Versión:** `GCA3.1`  ·  historia completa en `references/changelog.md`
+**Si falta algo BLOQUEANTE: no se hace lo que depende de él** (si es de toda la skill, se PARA antes de tocar nada) y se pide con nombre propio: qué es, dónde se saca y dónde se pone. **Si falta algo DEGRADABLE: se pide y se sigue**, dejando marcado como NO CORRIDO en todo lo que depende de él. Nunca se presenta como completo.
+
+<!-- skill v3.4 (GCA3.4) — 2026-09-28 — LA COMPUERTA DEL REPO PARO LA PUBLICACION, Y EL HUECO
+DE LOS NOMBRES SE CERRO. La compuerta `golden-barrido-publicacion` freno GCA3.3 con 4 hallazgos en
+3 ficheros: el nombre de una empresa usado como prosa de comentario y de changelog ("medido sobre
+X", "el chat de X"). Ninguno era fixture del banco, asi que no habia prueba que romper: salio el
+nombre, se quedo la leccion. Compuerta en CERO probado.
+Lo de fondo: es la SEGUNDA vez que un nombre se cuela, y las dos las cazo la compuerta del repo,
+no el guardia propio -- que decia, literalmente, "NO VERIFICADO por codigo: los NOMBRES. Eso se
+lee". Declarar un hueco es honesto pero no es cerrarlo, y un hueco que depende de que alguien lea
+se cuela otra vez. Ahora `sin_datos_de_cliente.py` DELEGA los nombres en el vigilante de la casa,
+que es quien tiene la lista; la lista NO se copia a la skill a proposito (copiarla seria meter
+aqui justo el dato que no debe estar, y naceria desactualizada). Y si el vigilante no esta, la
+corrida NO da el OK: devuelve 1 y lo declara, la misma regla que P59 impuso para los archivos
+ilegibles. La autoprueba del guardia comprueba las DOS direcciones sin escribir ningun nombre
+real: con el vigilante ausente exige "NO VERIFICADO", con el presente muestra su veredicto.
+Medido al cerrar: compuerta 0 hallazgos, guardia muerde y da 0, autoprueba 34 defectos + 29
+pruebas, simulador 7 de 7, validador sin fallos ni avisos. -->
+<!-- skill v3.3 (GCA3.3) — 2026-09-27 — FILA P59 DEL CENTRO DE MANDO: SEIS DESCARTES
+SILENCIOSOS. Orden de FER via ARSENAL: "que todas las skills esten perfectamente corregidas", con
+la regla de que si se descarta algo, se CUENTA y se NOMBRA en la salida. Los seis casos que
+ARSENAL midio en esta skill, cerrados:
+(1) GRAVE · el guardia de privacidad saltaba en silencio los archivos que no son UTF-8 y devolvia
+"0 datos" -- medido, un .md en latin-1 con un correo adentro daba limpio. Ahora un archivo que no
+se puede leer es un HALLAZGO propio, sale como NO REVISADO y bloquea el OK: un guardia que no
+puede mirar no puede absolver.
+(2) GRAVE · A4 calculaba los canales requeridos por los que estaban en `no_disponibles`, asi que
+un requerido AUSENTE de la respuesta o en null salia PRESENTE (medido: `whatsapp=None` daba
+"requeridos presentes 4 de 4"). Ahora son dos cosas distintas: el que el plan NO incluye sigue en
+🔴 y el que no se pudo COMPROBAR sale en 🔵 con las hojas ilegibles nombradas.
+(3) Control D9 nuevo: una entrada del disparador que no es objeto se sumaba a las entradas
+revisadas de D2/D5/D6 sin revisarse ni nombrarse, y un `keyW` o `idAd` que no es texto se saltaba
+de D5. El denominador crecia sin denominar. Ahora cada una sale con su indice, su tipo y su valor.
+(4) C3 declara cuantas rutas se quedaron sin tope conocido, como ya hacia L5 con los campos fuera
+del esquema.
+(5) L2 acusa la llave de texto cuyo valor es null o numero: antes una cadena vacia SI se acusaba y
+un null no, y al saltarla tampoco entraba en `comparables`, con lo que falseaba la proporcion con
+la que L3 decide si hay espejo.
+Y el acta y el cuerpo volvieron a decir lo mismo: estaban en v3.2 y GCA3.1, y lo caco la propia
+autoprueba. Orden respetado: los cinco casos malos sembrados primero, comprobado que FALLAN (el
+guardia dio "El guardia esta roto"), arreglo despues. Una prueba propia estaba mal escrita -- miraba
+la evidencia cuando el nombre del campo va en el titulo -- y fue el tercer instrumento mio que fallo
+en esta corrida: se corrigio antes de concluir. Medido al cerrar: autoprueba 34 defectos + 29
+pruebas, simulador 7 de 7, guardia de privacidad muerde y da 0, validador sin fallos ni avisos. -->
+**Versión:** `GCA3.4`  ·  historia completa en `references/changelog.md`
 
 Auditar aquí significa **medir el estado real del servidor contra el estándar**, no leer la
 configuración y opinar. Nada se da por bueno sin haberlo contado, y el informe se entrega en
@@ -213,9 +214,15 @@ python3 $S/sin_datos_de_cliente.py --autoprueba # el guardia contra casos malos
 ```
 
 Corre además dentro de `autoprueba.py` (prueba **PRIV**), así que un dato de cliente que entre
-por descuido rompe el banco antes de que la skill se dé por buena. **Lo que el código NO puede
-cazar son los NOMBRES** de personas, marcas o negocios: un nombre propio no tiene forma
-reconocible. Eso queda como lectura humana declarada, no como cobertura.
+por descuido rompe el banco antes de que la skill se dé por buena.
+
+**Los NOMBRES ya no son un hueco declarado: se DELEGAN.** Un nombre propio no tiene forma
+reconocible, pero sí tiene dueño — `~/.golden/bin/golden-barrido-publicacion`, el vigilante de la
+casa, que lleva la lista y la contrasta contra el mapa de proyectos. El guardia lo llama y reporta
+su veredicto. **La lista no se copia aquí a propósito:** copiarla sería meter en la skill justo el
+dato que la skill no debe llevar, y encima nacería desactualizada. **Y si el vigilante no está, la
+corrida NO da el OK** y lo dice — un guardia que no puede mirar no puede absolver, la misma regla
+que se aplicó a los archivos ilegibles.
 
 ## Lo que NO está verificado en esta skill (al 2026-09-08)
 

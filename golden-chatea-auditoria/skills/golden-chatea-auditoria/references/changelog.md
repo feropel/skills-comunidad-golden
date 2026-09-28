@@ -7,6 +7,62 @@ la entrada VIGENTE, que es lo que un editor necesita ver antes de tocar nada.
 
 Las entradas van de la más nueva a la más vieja.
 
+<!-- skill v3.2 (GCA3.2) — 2026-09-27 — CdM: bloque de REQUISITOS al principio (ley de FER del 02-sep). -->
+<!-- skill v3.1 (GCA3.1) — 2026-09-24 — REMARKETING IA FUERA, Y LA BANDERA QUE NADIE LEIA.
+FER saco Remarketing IA del ecosistema el 21-sep y el 24-sep ordeno no configurarlo ni auditarlo.
+El 21 la fila llego al instalador (full-configuracion v1.12) y no a este auditor, que es hermano:
+por eso siguio gritando "Remarketing IA NO esta instalado" en un cliente. Y al medirlo salio lo peor:
+assets/asistentes-esperados.json YA lo marcaba `opcional: true` y auditar.py no leia esa bandera
+(0 usos). Regla escrita donde se lee y no donde se ejecuta. Arreglo: EXCLUIDOS_POR_FER en
+auditar.py aparta sus campos AL CARGAR el inventario (ningun control lo ve: ni B6, ni el pais de
+L4, ni topes, ni el disparador de D3/D5) y los declara contados en el universo; B6 respeta
+`opcional` y lo saca del denominador. Opt-in con --incluir-excluidos. Prueba EXCL nueva en los
+dos sentidos, con dos mutantes que la hacen fallar (vaciar la lista · quitar la lectura de
+`opcional`) y el control negativo (sin Carritos, B6 sigue mordiendo). El sabotaje de D3b que
+vivia en el disparador de Remarketing se mudo a uno de Ventas Wp para no perder su banco.
+NO se toco el remarketing POR PRODUCTO de Ventas WhatsApp (estandar-prompts.md): es otra cosa.
+Aplicado por el Centro de Mando. -->
+
+<!-- skill v3.0 (GCA3.0) — 2026-09-22 — LA COBERTURA DEL ESQUEMA, MEDIDA CONTRA LAS SKILLS
+HERMANAS. Encargo de FER: autoevaluarse sabiendo "cuales son los criterios para auditar un
+espacio segun las skills de los asistentes". Eso no se opina: se mide. Se comparo el esquema de
+referencia del auditor contra la plantilla de configuracion de CADA hermana. Resultado:
+comentarios 15 de 15, ventas WhatsApp 24 de 24 y carritos 38 de 38 cubiertos, cero huecos; y el
+LOGISTICO con 9 campos configurados de los que el esquema conoce 2. Los otros siete caian en un
+`continue` SILENCIOSO dentro del bloque L, y la cobertura solo informaba cuantos campos reviso,
+nunca cuantos se salto. Medido contra el espacio de referencia: 7 campos y 116 llaves que ningun
+control estaba mirando y que nadie declaraba. Eso es cobertura falsa, el pecado que esta skill le
+persigue a las demas. Arreglo: control L5, que los DECLARA por su nombre con su conteo de llaves
+y severidad DUDA (no se sabe si estan sanos: se sabe que nadie los miro). Ademas, el esquema
+conocia Remarketing IA y la lista de asistentes esperados no, asi que B6 era ciego justo para el
+asistente que el esquema mide vacio: anadido como opcional. Y el cuerpo del SKILL.md, que el
+validador marcaba con aviso por pasar de 500 lineas, baja moviendo dos entradas de historia al
+changelog. Tres instrumentos propios fallaron durante la medicion y se corrigieron antes de
+concluir: el primer comparador dio 283 llaves "sin cubrir" que eran metadatos, el segundo 207 por
+comparar rutas crudas contra rutas aplanadas, y el tercero conto 315 llaves en el esquema donde
+hay 156 porque contaba tambien los pares [tipo, largo]. Ninguna de esas tres cifras llego a un
+informe. Orden respetado: caso sembrado primero en autoprueba, comprobado que FALLA, control
+despues. Medido al cerrar: autoprueba 34 defectos + 29 pruebas, simulador 7 de 7, guardia de
+privacidad 0, validador sin fallos ni avisos, L5 disparando en campo. -->
+<!-- skill v2.9 — 2026-09-20 — auditoria golden-skill-auditor (AUDITA+ARREGLA). Tres hallazgos
+reales, sin tocar ningun control ni la logica de auditar.py:
+(1) la seccion "Fronteras y desambiguacion" prometia contenido "abajo, en una sola version que
+se mantiene" y el archivo terminaba ahi mismo -- promesa colgada, cero lineas de frontera real
+debajo. Reescrita: apunta a donde la frontera YA vive (la tabla del inicio y "Lo que esta skill
+NO hace") y resume las tres fronteras mas buscadas en tres lineas, sin duplicar la tabla entera.
+(2) la description no nombraba a que skill hermana ir si el pedido es sobre conversaciones del
+dia -- que es la confusion mas facil con esta skill ("revisa mi chatea" sirve para las dos).
+Agregada una frase de 64 caracteres: "No mira conversaciones del dia: eso es
+golden-chatea-operacion." Description queda en 998/1024, con margen.
+(3) references/changelog.md tiene 499 lineas y cero tabla de contenido (regla de la casa: toda
+reference >300 lineas la lleva). Agregado un indice de 12 filas al inicio del archivo; el
+contenido de las entradas no se toco.
+Reportado a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR. -->
+
+## [sin número · pendiente de la fábrica] · 2026-09-27 · Limpieza de datos internos para el repo público (aplicó el CENTRO DE MANDO)
+
+La compuerta de publicación bloqueaba la skill por nombres internos: el nombre del chat y de la empresa de un espacio ajeno, y el código de un espacio real. Se cambiaron por formulaciones genéricas con el mismo sentido; la excepción operativa que nombraba espacios concretos vive ahora en la memoria del proyecto. Solo prosa y comentarios; ninguna regla cambió.
+
 ## v3.1 — 2026-09-24 — Remarketing IA fuera, y la bandera `opcional` que nadie leía
 
 **Disparador:** en la auditoría de un cliente, B6 reportó "Remarketing IA NO está instalado". FER lo
@@ -667,7 +723,7 @@ hallazgo de configuración es donde se cayeron los dos chats** — y no hacía f
 ### 5 · La regla del asset, CABLEADA (antes existía y no hacía nada)
 
 `campos-de-configuracion.json` nació el 08-sep y **nada lo leía**: los campos huérfanos seguían
-saliendo como una duda B3 genérica *"no pertenecen a ningún asistente"*. Lo señaló el chat de otra empresa del grupo
+saliendo como una duda B3 genérica *"no pertenecen a ningún asistente"*. Lo señaló el chat que lleva un espacio en producción
 sobre su corrida real: 7 campos (`Pedidos_Diarios`, `TODAY_PROV`, `TOKEN DROPI`, `Tipo de
 referencia`, `Today_previo`, `YA PAGUE`, `recordatorio_general`).
 
@@ -678,9 +734,14 @@ nadie lee es documentación, no un guardarraíl.
 
 ### Confirmación en campo del arreglo del filtro
 
-El chat de otra empresa del grupo rehizo la corrida **sobre el mismo DUMP, sin gastar cupo**: de **25 hallazgos a
+Ese mismo chat rehizo la corrida **sobre el mismo DUMP, sin gastar cupo**: de **25 hallazgos a
 36**, y de **12 apartados a 1**. Lo que estaba archivado y era cableado: un **C1** con
 `[Producto Ventas Wp] 2` en **20.163 escapados** contra los 19.895 que matan al asistente, y la
 ranura **registrada y ACTIVA en el disparador**; C2/C4 de tres ranuras al 96%, 97% y 106%; C3 con
 dos `desc` de 3.973 y 4.572 sobre un tope de 500; E3 con una credencial de voz dentro de una
 ranura; F7 con 6 imágenes de otra cuenta. **Todo eso es configuración, y llevaba archivado.**
+
+
+## CENTRO DE MANDO · 2026-09-27 · <!-- skill v3.2 (GCA3.2) — 2026-09-27 —  · LEY DE LOS REQUISITOS DEL USUARIO
+
+Ley de FER del 02-sep: declarar ANTES lo que la skill necesita del usuario y pedirlo AL CORRER si falta. Desde golden-skill-auditor v1.22 la ley tiene casilla en `validar_arsenal.py`. Se agregó al principio el bloque "Requisitos", redactado con lo que esta skill USA de verdad (medido en su cuerpo y en sus scripts), sin agregar requisitos de más, y con qué hacer si falta: parar y pedirlo con nombre propio. A la fábrica se le informa por la bandeja: una fila no bloquea.

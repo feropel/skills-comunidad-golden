@@ -18,6 +18,23 @@ description: >-
 
 # Golden Cinemática — el salto de "página" a "experiencia"
 
+## Antes de empezar — lo que TÚ tienes que tener
+
+Para construir la página **no necesitas cuentas ni llaves**. Lo que sí hace falta es para verificarla, y la vara de calidad no deja entregar sin eso. Por eso esta skill lo pregunta al arrancar y no al final.
+
+| Qué necesitas | Tipo | Para qué | Cómo se consigue |
+|---|---|---|---|
+| **Un navegador que Claude maneje, a la vista** | Bloqueante para entregar | Correr `scripts/barrido_encimes.js` a 390 y a 1280 y mirar la consola. Con la pantalla oculta no corren las animaciones y el barrido se niega (su mensaje acepta emular 390x844) | El navegador de la app, visible, o Claude en Chrome |
+| **Un celular de gama media** | Bloqueante para entregar | Medir los 60 fps del hero, como exige la vara de calidad: se miden en el celular, no en el Mac | El tuyo o uno prestado. Lo mides tú en el celular, con la página publicada o servida en tu red local, y le pasas el resultado a Claude. La skill todavía no fija el método: mientras no haya una cifra de fps, la entrega dice «60 fps NO medidos» (aunque una revisión a ojo no muestre saltos) y la página no se declara terminada |
+| **Los colores de tu marca en hex**, o tu logo | Degradable | Los tokens de la fase 2: no se inventan colores | Se piden una vez al inicio con la plantilla de `references/vocabulario.md`; si no los tienes, se sacan del logo o de la paleta que ya tenga el proyecto |
+| **Conexión a internet** | Degradable | Three.js se carga desde unpkg con la versión fijada en `references/recetas.md`, y el scroll cinemático carga GSAP desde cdn.jsdelivr.net | Si el CDN no responde, se reintenta una vez y se entrega el HTML con el importmap correcto, diciendo el corte |
+| *Opcional:* el **cerebro de marca** (`golden-brand-brain`) | Degradable | La voz de la marca en los textos de la página | Si no existe, se ofrece crearlo; si sigues sin él, la entrega lo declara |
+| *Opcional:* **un render o video para el fondo del hero** | Degradable | El mecanismo 5 | Lo pones tú, o sale de `golden-imagen-arena` o Higgsfield, que gastan créditos. Sin él, se arranca con la escena WebGL sola y queda como pendiente |
+| *Opcional:* **tu hosting** | Degradable | Publicar la página (lo normal es un HTML en Vercel, con `all-deploy`) | Tu cuenta. Sin ella se entrega el HTML listo para publicar |
+| *Opcional:* **Python 3 con Pillow** | Degradable | Solo el globo de puntos (`scripts/puntos_globo.py`) | Compruébalo con `python3 -c "import PIL"`. Si falta: con el Python de python.org, `pip3 install Pillow`; con el de Homebrew, `python3 -m venv ~/venv-cine`, `~/venv-cine/bin/pip install pillow`, y el script se corre con `~/venv-cine/bin/python3`. El mapa `land-110m.json` se descarga de cdn.jsdelivr.net, no viaja en la skill |
+
+**Lo bloqueante para lo que depende de él:** sin el navegador a la vista o sin el celular, la página se puede construir, pero no se entrega como terminada; se dice qué falta medir. **Lo degradable se pide y se sigue** con lo que manda "Cuando algo falla o falta", y lo que quede sin hacer se marca como pendiente. Si no tienes algo, dime y te guío paso a paso.
+
 ## Paso 0 · Cerebro de marca (obligatorio antes de generar)
 
 Si la marca tiene CEREBRO creado por `golden-brand-brain` (marca.md, productos.md, avatares.md,
@@ -27,7 +44,7 @@ antes de continuar; si el usuario pide seguir sin cerebro, se declara en la entr
 se generó sin voz de marca cargada.
 
 
-**Versión:** `GC1.5.1` · Fábrica: chat centro de mando.
+**Versión:** `GC1.6` · Fábrica: chat centro de mando.
 
 Esta skill existe por una razón concreta: las páginas Golden nombraban las librerías
 correctas y aun así salían genéricas. El diagnóstico fue que **conocer el nombre de la
@@ -142,7 +159,7 @@ completa abajo.
   números medidos y las 5 reglas. Es una caja de piezas, no una plantilla: cada página elige las suyas
 - `scripts/barrido_encimes.js` — detecta textos montados, escena por escena (contrato en su cabecera)
 - `scripts/puntos_globo.py` — genera los puntos de tierra del globo desde Natural Earth
-  (requisito: Pillow, `pip install pillow`; el TopoJSON se descarga, no viaja en la skill)
+  (requisito: Pillow; cómo instalarlo según el Python, en la tabla de requisitos; el TopoJSON se descarga, no viaja en la skill)
 - `scripts/referencia/vidrio_templado.js` — entrada de vidrio que se quiebra. Es de REFERENCIA:
   su cabecera trae el contrato completo (11 nombres que la página provee) y la advertencia de que
   un nombre faltante no revienta, se salta la entrada en silencio: tras adaptarla, mirar la consola
@@ -182,6 +199,7 @@ completa abajo.
 
 ## Changelog
 
+- **GC1.6** (2026-09-27) — Ley de los requisitos del usuario: tabla «Antes de empezar» con cada requisito BLOQUEANTE o DEGRADABLE (redactada por 🧰 ARSENAL Y SKILLS, fila P49; aplicada y numerada por el CdM, que es su fábrica). El `pip install pillow` suelto de la línea del globo remite ahora a la tabla (falla con el Python de Homebrew). Queda abierto P53: la vara de 60 fps no tiene método de medida; hasta fijarlo, la entrega dice «60 fps NO medidos».
 - **GC1.5.1** (2026-09-24) — Dos fallas del golden-verificador sobre GC1.5. El barrido buscaba
   textos solo dentro de `<main>`: en una página sin `<main>` daba 0 textos y "sin encimes", un
   verde falso. Ahora barre el body y se niega si no encuentra textos. La referencia del vidrio

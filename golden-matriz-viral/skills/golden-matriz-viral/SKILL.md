@@ -17,9 +17,24 @@ description: >-
 # Golden Matriz Viral — la fórmula de tu contenido
 
 
-**Versión:** `GMV1.8.1` · Fábrica: chat centro de mando.
+**Versión:** `GMV1.9` · Fábrica: chat centro de mando.
 El principio: el algoritmo ya te dijo qué funciona — está en tus métricas y en las de los
 creadores que admiras. Esta skill convierte esa evidencia en una fórmula reutilizable.
+
+## Antes de empezar — lo que TÚ tienes que tener
+
+La matriz se arma con la evidencia real de los videos: métricas, lo que se dice y lo que comenta la gente. Todo esto es **degradable**: si algo falta, se pide y lo que no se pudo traer lo pegas tú.
+
+| Qué necesitas | Tipo | Para qué | Cómo se consigue |
+|---|---|---|---|
+| El conector de **Firecrawl** | Degradable | Traer vistas, likes y título desde el enlace | Una cuenta en firecrawl.dev conectada a Claude |
+| **whisper-cpp** con el modelo `ggml-small.bin`, y **ffmpeg** | Degradable | Transcribir lo que se dice, en local y sin que el archivo salga del equipo | `brew install ffmpeg whisper-cpp`. El modelo: mira si ya está en `~/.cache/hyperframes/whisper/models/`; si no, de huggingface.co/ggerganov/whisper.cpp |
+| O bien **Node.js**, para `npx hyperframes transcribe` | Degradable | La misma transcripción sin instalar whisper, más lenta | En nodejs.org, o `brew install node` |
+| **yt-dlp** | Degradable | Los comentarios con sus votos. **Solo en YouTube**: en TikTok trae cero | `brew install yt-dlp` |
+| La **extensión de Claude en Chrome** | Degradable | Leer los comentarios de TikTok | Se instala en Chrome |
+| *Opcional:* **jq** | Degradable | Leer los comentarios; hay alternativa con `python3` | `brew install jq` |
+
+**Si falta algo, se pide con nombre propio y se sigue con lo que tú pegues.** Sin Firecrawl, pide las métricas de cada enlace. Sin transcriptor ni Node, pide el guion hablado. Sin comentarios (o en TikTok sin la extensión), pide los más votados. Se dice cuando pasa: nunca se presenta como minado lo que no se minó. Si no tienes algo, dime y te guío paso a paso.
 
 ## Paso 0 · Cerebro de marca (obligatorio antes de generar)
 
@@ -225,6 +240,7 @@ para producir.
 
 ## Changelog
 
+- **GMV1.9** (2026-09-27): bloque «Antes de empezar» de la ley de los requisitos del usuario (cada requisito BLOQUEANTE o DEGRADABLE). Redactado por 🧰 ARSENAL Y SKILLS, aplicado y numerado por el CdM, que es su fábrica.
 - **GMV1.8.1** (2026-08-24): bump de las ediciones del 24 (verificador de cierre R2: la version vive en 4 caras — sello, linea Version, Changelog y REGISTRO — y el bump anterior toco solo el sello).
 - **GMV1.8** (2026-08-24) — **Barrido total del arsenal (CdM).** (1) Bloque **Paso 0 · Cerebro de
   marca** instalado bajo el H1 — el estándar de la familia de contenido (adenda CdM 2026-08-23) que

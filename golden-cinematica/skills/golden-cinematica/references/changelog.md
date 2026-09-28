@@ -4,6 +4,10 @@ Acta completa. Se mudó aquí desde el cuerpo del SKILL.md el 2026-09-05 por el 
 
 
 
+## GC1.6 · 2026-09-27 · Ley de los requisitos del usuario (aplicó y numeró el CENTRO DE MANDO, que es su fábrica)
+
+Se añadió el bloque de requisitos del SKILL.md: qué tiene que tener el usuario antes de arrancar, cada requisito marcado BLOQUEANTE o DEGRADABLE y qué pasa si falta (doctrina del CdM del 27-sep). Lo redactó el chat 🧰 ARSENAL Y SKILLS (fila P49, 4 pasadas del golden-verificador adversarial; en la última, ninguna falla nueva grave) y lo aplicó el CdM sin numerar: el número lo pone la fábrica al ratificar. Solo inserción: 0 líneas quitadas.
+
 ## GC1.5.1 · 2026-09-24 · Lo que el verificador encontró en GC1.5
 
 El `golden-verificador` revisó GC1.5 sin ver cómo se construyó y encontró dos fallas reales:

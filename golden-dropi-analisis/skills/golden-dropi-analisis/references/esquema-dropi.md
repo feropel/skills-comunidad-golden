@@ -23,13 +23,26 @@ Nota: el total de la orden se repite en cada línea del mismo pedido; por eso el
 desde "por pedido", no desde aquí, para no doblar montos.
 
 ## Clasificación de ESTATUS
-Dropi maneja decenas de estados. El motor los agrupa así:
-- **entregado**: `ENTREGADO`.
-- **devolucion**: cualquiera que contenga `DEVOLUC` (DEVOLUCION, DEVOLUCION EN BODEGA,
-  EN PROCESO DE DEVOLUCION, TRANSITO A DEVOLUCION…) y `REEXPEDICION`.
-- **cancelado**: `CANCELADO`, `RECHAZADO` (no llegaron a ruta → fuera del % de entrega).
-- **transito**: todo lo demás (EN REPARTO, EN RUTA, NOVEDAD, BODEGA…, PENDIENTE) — resultado
-  aún abierto, fuera del denominador.
+Dropi maneja decenas de estados y agrega más con el tiempo, así que el motor compara **por
+subcadena y sin tildes**, nunca por igualdad exacta. Con igualdad, `SINIESTRO` y `GUIA_ANULADA`
+caían en tránsito e inflaban el % de entrega, y `REEXPEDICIÓN` acentuada no casaba con el patrón.
+
+- **entregado**: `ENTREGADO` exacto, o que contenga `ENTREGADO AL CLIENTE`.
+- **transito** (se mira **antes** que lo anterior): `ENTREGADO A TRANSPORTADORA` — es entrega al
+  COURIER, no al cliente; la plata todavía no ha entrado.
+- **devolucion** (pérdida definitiva): contiene `DEVOLUC`, `REEXPED`, `SINIESTRO`, `PERDID` o
+  `EXTRAVI`. Incluye TRANSITO A DEVOLUCION, EN PROCESO DE DEVOLUCION, DEVOLUCION EN BODEGA.
+- **cancelado**: contiene `CANCELAD`, `RECHAZAD` o `ANULAD` (incluye `GUIA_ANULADA`). No llegaron
+  a ruta → fuera del % de entrega.
+- **transito**: todo lo demás (EN REPARTO, EN RUTA, NOVEDAD, BODEGA, PENDIENTE, INTENTO DE
+  ENTREGA) — resultado aún abierto, fuera del denominador.
+
+**Declarado y pendiente de criterio del dueño:** `INDEMNIZADA`, `EN PROCESO DE INDEMNIZACION` e
+`INDEMNIZACIÓN PAGADA` hoy caen en tránsito — ni entregadas ni perdidas. No se cambia sin su
+decisión.
+
+El orden importa: `ENTREGADO A TRANSPORTADORA` se aparta primero, porque contiene la palabra
+`ENTREGADO` y con un patrón laxo se contaría como venta cobrada.
 
 El **% de entrega = entregado / (entregado + devolucion)**. Cancelados y en tránsito no cuentan
 porque no son un resultado final de entrega.

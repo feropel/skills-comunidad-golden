@@ -45,12 +45,16 @@ SRC  = os.path.join(OUT, "_FUENTES")
 os.makedirs(OUT, exist_ok=True)
 
 CFG = {"test_phones": [], "test_name_keywords": ["PRUEBA", "TEST"], "currency": "$",
-       "gasto_publicidad": None, "negocio": "GOLDEN"}
+       "gasto_publicidad": None, "negocio": ""}
 _cfgp = os.path.join(BASE, "_config_dropi.json")
 if os.path.exists(_cfgp):
     try: CFG.update(json.load(open(_cfgp, encoding="utf-8")))
     except Exception as e: print("Aviso: _config_dropi.json no se pudo leer:", e)
 CUR = CFG.get("currency", "$")
+NEGOCIO = str(CFG.get("negocio") or "").strip()
+def titulo(base, cola):
+    """'RESUMEN EJECUTIVO - <Negocio> - DROPI', o sin el tramo del negocio si no lo pusieron."""
+    return f"{base} \u2014 {NEGOCIO} \u00b7 {cola}" if NEGOCIO else f"{base} \u00b7 {cola}"
 TEST_PHONES = set(re.sub(r"\D", "", str(p))[-10:] for p in CFG.get("test_phones", []))
 TEST_KW = [k.upper() for k in CFG.get("test_name_keywords", ["PRUEBA", "TEST"])]
 
@@ -65,28 +69,72 @@ def parse_date(v):
         try: return datetime.strptime(s[:10], f)
         except: pass
     return None
+MONEY_ILEGIBLES = []   # celdas de dinero que no se pudieron leer: se cuentan, no se callan
 def money(v):
     if v is None: return 0.0
     if isinstance(v, (int, float)): return float(v)
     s = re.sub(r"[^\d\-,\.]", "", str(v))
-    if not s or s in ("-", ".", ","): return 0.0
-    s = s.replace(".", "").replace(",", ".")   # formato LatAm: punto = miles
+    if not s or s in ("-", ".", ","):
+        if str(v).strip(): MONEY_ILEGIBLES.append(str(v)[:30])
+        return 0.0
+    if "," in s:
+        s = s.replace(".", "").replace(",", ".")      # LatAm: punto miles, coma decimal
+    else:
+        # Sin coma, un UNICO punto con 1 o 2 digitos detras es DECIMAL ("20000.00"), no miles.
+        # Quitarlo a ciegas multiplicaba el monto por 100 y con el la ganancia y el veredicto.
+        p = s.split(".")
+        s = (p[0] + "." + p[1]) if (len(p) == 2 and 1 <= len(p[1]) <= 2) else "".join(p)
     try: return float(s)
-    except: return 0.0
+    except:
+        MONEY_ILEGIBLES.append(str(v)[:30]); return 0.0
 def phone_key(v):
     d = re.sub(r"\D", "", str(v or ""))
     if len(d) > 10 and d.startswith("57"): d = d[2:]
     return d[-10:] if len(d) >= 10 else d
+EXCLUIDOS = []      # lo descartado se CUENTA y se NOMBRA en la salida
+_TEST_RX = [None]
+def _test_rx():
+    if _TEST_RX[0] is None:
+        alt = "|".join(re.escape(k) for k in TEST_KW if k)
+        # palabra COMPLETA: por subcadena, "MARIA TESTA" y "JUAN PROTESTA" salian de las
+        # ventas y de la efectividad sin que nadie los contara.
+        _TEST_RX[0] = re.compile(r"(?<![0-9A-ZÁÉÍÓÚÑ])(?:" + alt +
+                                 r")(?![0-9A-ZÁÉÍÓÚÑ])") if alt else False
+    return _TEST_RX[0]
 def es_prueba(nombre, telefono=None):
-    n = up(nombre)
-    if any(k in n for k in TEST_KW): return True
-    if telefono is not None and phone_key(telefono) in TEST_PHONES: return True
+    n = up(nombre); rx = _test_rx()
+    if rx and n and rx.search(n):
+        EXCLUIDOS.append((n[:40], phone_key(telefono), "nombre de prueba")); return True
+    if telefono is not None and phone_key(telefono) in TEST_PHONES:
+        EXCLUIDOS.append((n[:40], phone_key(telefono), "telefono de prueba")); return True
     return False
+def sin_tilde(s):
+    """Quita SOLO tildes de vocales y dieresis, para COMPARAR. La N con virgulilla se respeta:
+    normalizar de mas rompe los valores sanos."""
+    for a, b in (("Á","A"), ("É","E"), ("Í","I"), ("Ó","O"), ("Ú","U"), ("Ü","U")):
+        s = s.replace(a, b)
+    return s
+
 def classify(estatus):
-    e = up(estatus)
-    if e == "ENTREGADO": return "entregado"
-    if "DEVOLUC" in e or "REEXPEDICION" in e: return "devolucion"
-    if e in ("CANCELADO", "RECHAZADO"): return "cancelado"
+    """Clasifica el ESTATUS de Dropi en entregado / devolucion / cancelado / transito.
+
+    El universo son decenas de estados y Dropi agrega mas con el tiempo, asi que se compara
+    SIN TILDES y por subcadena, nunca por igualdad exacta: con igualdad, SINIESTRO y
+    GUIA_ANULADA caian en transito y el porcentaje de entrega salia inflado, y REEXPEDICION
+    acentuada no casaba con el patron sin tilde.
+    Medido contra los 41 estados reales de 19.336 ordenes."""
+    e = sin_tilde(up(estatus))
+    if not e: return "transito"
+    # ENTREGADO A TRANSPORTADORA es entrega al COURIER, no al cliente: la plata NO ha entrado.
+    if "ENTREGADO A TRANSPORTADORA" in e: return "transito"
+    if e == "ENTREGADO" or "ENTREGADO AL CLIENTE" in e: return "entregado"
+    # perdida definitiva: la plata no vuelve
+    if ("DEVOLUC" in e or "REEXPED" in e or "SINIESTRO" in e or "PERDID" in e
+            or "EXTRAVI" in e): return "devolucion"
+    # nunca llego a ruta -> fuera del denominador del % de entrega
+    if "CANCELAD" in e or "RECHAZAD" in e or "ANULAD" in e: return "cancelado"
+    # DECLARADO, pendiente de criterio del dueno: INDEMNIZADA / EN PROCESO DE INDEMNIZACION
+    # quedan en transito (ni entregadas ni perdidas). No se cambia sin decision suya.
     return "transito"
 
 def pipeline(estatus, clase):
@@ -106,8 +154,9 @@ def load_rows(path):
     h = [str(x).strip() if x else "" for x in rows[0]]
     return rows[1:], {c: i for i, c in enumerate(h)}
 
+SALTADOS = []   # (archivo, motivo) — un export que desaparece sin avisar borra ventas enteras
 def discover(base):
-    """Devuelve dos listas de (path, cuenta, headers_idx-kind). Clasifica por columnas."""
+    """Devuelve dos listas de (path, cuenta). Clasifica por columnas, y APUNTA lo que salta."""
     peds, prods = [], []
     for root, dirs, fns in os.walk(base):
         b = os.path.basename(root)
@@ -115,15 +164,26 @@ def discover(base):
         rel = os.path.relpath(root, base)
         cuenta = "General" if rel == "." else rel.split(os.sep)[0]
         for fn in sorted(fns):
-            if not fn.lower().endswith(".xlsx") or fn.startswith("~$") or fn.startswith("_"): continue
+            if fn.startswith("~$") or fn.startswith("_"): continue
             path = os.path.join(root, fn)
+            if not fn.lower().endswith(".xlsx"):
+                if fn.lower().endswith((".xls", ".csv")):
+                    SALTADOS.append((os.path.join(cuenta, fn),
+                        "formato " + fn.rsplit(".", 1)[-1].upper() + ": el motor solo lee .xlsx. "
+                        "Vuelve a exportarlo, o ábrelo y guárdalo como .xlsx"))
+                continue
             try:
                 wb = openpyxl.load_workbook(path, read_only=True, data_only=True); ws = wb[wb.sheetnames[0]]
                 head = [str(x).strip().upper() if x else "" for x in next(ws.iter_rows(values_only=True))]
                 wb.close()
-            except Exception:
+            except Exception as ex:
+                SALTADOS.append((os.path.join(cuenta, fn), "no se pudo abrir: " + str(ex)[:60]))
                 continue
             if "ESTATUS" not in head or "ID" not in head:   # no es export Dropi
+                falta = [c for c in ("ESTATUS", "ID") if c not in head]
+                SALTADOS.append((os.path.join(cuenta, fn),
+                    "no parece export de Dropi: le faltan las columnas " + ", ".join(falta) +
+                    ". Si Dropi renombró columnas, revisa references/esquema-dropi.md"))
                 continue
             (prods if "PRODUCTO" in head else peds).append((path, cuenta))
     return peds, prods
@@ -155,7 +215,9 @@ for path, acc in peds_f:
             ciudad=up(g(r, idx.get("CIUDAD DESTINO"))) or "(SIN DATO)",
             ganancia=money(g(r, idx.get("GANANCIA"))), flete=money(g(r, idx.get("PRECIO FLETE"))),
             costo_dev=money(g(r, idx.get("COSTO DEVOLUCION FLETE"))),
-            valor=money(g(r, idx.get("VALOR FACTURADO"))), novedad=up(g(r, idx.get("NOVEDAD")))))
+            valor=money(g(r, idx.get("VALOR FACTURADO"))), novedad=up(g(r, idx.get("NOVEDAD"))),
+            telefono=phone_key(g(r, idx.get("TELÉFONO")) or g(r, idx.get("TELEFONO"))),
+            nombre=str(g(r, idx.get("NOMBRE CLIENTE")) or "").strip()))
 for path, acc in prods_f:
     rows, idx = load_rows(path)
     fmin = min((parse_date(g(r, idx.get("FECHA"))) for r in rows if parse_date(g(r, idx.get("FECHA")))), default=None)
@@ -169,6 +231,8 @@ for path, acc in prods_f:
             depto=up(g(r, idx.get("DEPARTAMENTO DESTINO"))) or "(SIN DATO)",
             ciudad=up(g(r, idx.get("CIUDAD DESTINO"))) or "(SIN DATO)",
             producto=str(g(r, idx.get("PRODUCTO")) or "(SIN DATO)").strip(),
+            variacion=str(g(r, idx.get("VARIACION")) or "").strip(),
+            sku=str(g(r, idx.get("SKU")) or "").strip(),
             cantidad=money(g(r, idx.get("CANTIDAD"))) or 1,
             telefono=phone_key(g(r, idx.get("TELÉFONO"))),
             nombre=str(g(r, idx.get("NOMBRE CLIENTE")) or "").strip(),
@@ -189,7 +253,7 @@ if len(ped) < _antes:
 _antes = len(prod)
 # En 'por producto' una orden trae una fila por producto: el ID se repite legítimamente.
 # El duplicado real es la MISMA fila (cuenta + orden + producto) otra vez.
-prod = list({(x["cuenta"], x["oid"], x["producto"]): x for x in prod}.values())
+prod = list({(x["cuenta"], x["oid"], x["producto"], x["variacion"], x["sku"]): x for x in prod}.values())
 if len(prod) < _antes:
     print(f"⚠️ Duplicados detectados: {_antes - len(prod)} filas repetidas en los exports "
           f"'por producto'. Las uní — revisa si descargaste un archivo dos veces.")
@@ -210,8 +274,79 @@ if os.path.isdir(SRC):
                 nm = (row.get("saved_name") or row.get("public_name") or "").strip()
                 if nm and k not in wp_name: wp_name[k] = nm
 
-print(f"Cargado: {len(ped)} filas pedido | {len(prod)} filas producto | {len(wp_label)} tel con etiqueta WP")
+# ============================ INVENTARIO DE LA CORRIDA ============================
+# Un informe vale por su denominador. Aqui se declara QUE se leyo, QUE se salto y QUE se
+# excluyo: un export que desaparece en silencio borra ventas enteras sin dar ningun error.
+print("\n" + "=" * 68)
+print("INVENTARIO DE LA CORRIDA")
+print("=" * 68)
+print(f"Archivos LEÍDOS: {len(peds_f) + len(prods_f)}  "
+      f"({len(peds_f)} por pedido, {len(prods_f)} por producto)")
+for _p, _c in peds_f:  print(f"   [por pedido ] {_c}/{os.path.basename(_p)}")
+for _p, _c in prods_f: print(f"   [por producto] {_c}/{os.path.basename(_p)}")
+if SALTADOS:
+    print(f"\n\u26a0\ufe0f  Archivos SALTADOS: {len(SALTADOS)} (no entraron en NINGUNA cifra)")
+    for _f, _m in SALTADOS: print(f"   - {_f}: {_m}")
+else:
+    print("Archivos saltados: 0")
+_EXCL_U = sorted(set(EXCLUIDOS))   # el mismo export bajado dos veces doblaba este conteo
+if _EXCL_U:
+    print(f"\n\u26a0\ufe0f  Registros EXCLUIDOS por ser prueba: {len(_EXCL_U)}")
+    for _n, _t, _m in _EXCL_U[:20]: print(f"   - {_n} ({_t}) por {_m}")
+    if len(_EXCL_U) > 20: print(f"   ... y {len(_EXCL_U) - 20} mas")
+    print("   Si alguno es un CLIENTE REAL, quita esa palabra de 'test_name_keywords'.")
+else:
+    print("Registros excluidos por prueba: 0")
+if MONEY_ILEGIBLES:
+    from collections import Counter as _C
+    print(f"\n\u26a0\ufe0f  Celdas de dinero ILEGIBLES: {len(MONEY_ILEGIBLES)} (contadas como 0)")
+    for _v, _n in _C(MONEY_ILEGIBLES).most_common(10): print(f"   - {_v!r} x{_n}")
+
+print(f"\nCargado: {len(ped)} filas pedido | {len(prod)} filas producto | "
+      f"{len(wp_label)} tel con etiqueta WP")
+if not ped:
+    print("\n\u26a0\ufe0f  NO se cargó ningún informe POR PEDIDO. El dinero, el P&L y el veredicto de "
+          "rentabilidad salen de ese archivo: sin él, todas esas cifras serían $0 y el veredicto "
+          "sería falso. Se generan las hojas que sí tienen respaldo y el P&L queda SIN VEREDICTO.")
 cuentas = sorted(set(x["cuenta"] for x in ped) | set(x["cuenta"] for x in prod))
+if len(cuentas) > 1:
+    print(f"\n\u26a0\ufe0f  Hay {len(cuentas)} cuentas: {', '.join(cuentas)}. El bloque GLOBAL las SUMA.")
+    print("   Eso solo vale si son cuentas del MISMO negocio. Empresas distintas no se suman "
+          "jamás: si lo son, corre el motor una vez por carpeta y lee solo su bloque de cuenta.")
+
+# ---------------------- ORDENES FANTASMA (candidatas, NO veredicto) ----------------------
+# Al EDITAR una orden, Dropi le cambia el ID: la vieja desaparece de su panel pero sobrevive
+# en cualquier export bajado antes, y la MISMA venta se cuenta dos veces. El dedup por ID no
+# la ve, porque los dos IDs son distintos. La huella es (telefono, mismo monto, pocos dias).
+# 🔴 CANDIDATA NO ES FANTASMA: un cliente puede pedir dos veces de verdad. La unica autoridad
+# es el DETALLE de la API de Dropi, que esta skill NO consulta. Por eso se AVISA y NO se borra:
+# declarar fantasmas a ciegas ya produjo una tanda entera de falsos positivos.
+FANTASMA_DIAS = 7
+_term = ("entregado", "devolucion", "cancelado")
+_pares = defaultdict(list)
+for x in ped:
+    if x["telefono"] and x["valor"] > 0: _pares[(x["telefono"], round(x["valor"]))].append(x)
+CAND = []
+for _k, _g in _pares.items():
+    if len(_g) < 2: continue
+    _g = sorted([y for y in _g if y["fecha"]], key=lambda y: y["fecha"])
+    for _a, _b in zip(_g, _g[1:]):
+        if (_b["fecha"] - _a["fecha"]).days <= FANTASMA_DIAS and _a["clase"] not in _term:
+            CAND.append((_a, _b))
+if CAND:
+    print(f"\n\u26a0\ufe0f  Posibles ÓRDENES FANTASMA: {len(CAND)} par(es) con el mismo teléfono y el "
+          f"mismo monto en <= {FANTASMA_DIAS} días, con la más vieja aún sin cerrar.")
+    for _a, _b in CAND[:15]:
+        print((f"   - tel {_a['telefono']} {CUR}" + f"{_a['valor']:,.0f}".replace(",", ".") +
+               f": id {_a['oid']} ({_a['estatus']}, {_a['fecha']:%d-%m-%Y}) vs "
+               f"id {_b['oid']} ({_b['estatus']}, {_b['fecha']:%d-%m-%Y})"))
+    if len(CAND) > 15: print(f"   ... y {len(CAND) - 15} mas")
+    print("   NO se descontaron de ninguna cifra: puede ser un cliente que pidió dos veces.")
+    print("   Para confirmar hay que mirar el detalle de cada orden en Dropi; la que ya no exista")
+    print("   ahí es fantasma y esa venta está contada dos veces.")
+else:
+    print("\nPosibles órdenes fantasma: 0 par(es) con esa huella")
+print("=" * 68 + "\n")
 
 # ------------------------------------------------------------------ estilos
 HDR = Font(bold=True, color="FFFFFF", size=10); HDRF = PatternFill("solid", fgColor="1F2A44")
@@ -280,7 +415,7 @@ ws.append([]); hd = ["Producto", "Líneas activas", "Entregadas", "Devol.", "% E
 ws.append(hd); style_header(ws, 3, len(hd))
 for prd, c in sorted(dP.items(), key=lambda kv: -(kv[1]["entregado"] + kv[1]["devolucion"])):
     ent, dev, act, e = eff(c)
-    if act == 0 and unitsP[prd] < 3: continue
+    if act == 0 and unitsP[prd] == 0: continue
     ws.append([prd[:55], act, ent, dev, pct(e), round(unitsP[prd])])
 ws.column_dimensions["A"].width = 50
 for col in "BCDEF": ws.column_dimensions[col].width = 13
@@ -288,24 +423,24 @@ for col in "BCDEF": ws.column_dimensions[col].width = 13
 dT, eT = agg_status(ped, lambda x: x["trans"])
 ws = wbL.create_sheet("POR TRANSPORTADORA")
 ws["A1"] = "DESEMPEÑO POR TRANSPORTADORA"; ws["A1"].font = TIT
-ws.append([]); hd = ["Transportadora", "Activas", "Entregadas", "Devol.", "% Entrega", "% Devol.", "Costo devol."]
+ws.append([]); hd = ["Transportadora", "Activas", "Entregadas", "Devol.", "% Entrega", "% Devol.", "Costo devol.", "Muestra"]
 ws.append(hd); style_header(ws, 3, len(hd))
 for t, c in sorted(dT.items(), key=lambda kv: -(kv[1]["entregado"] + kv[1]["devolucion"])):
     ent, dev, act, e = eff(c)
-    if act < 5: continue
-    ws.append([t, act, ent, dev, pct(e), pct(dev / act if act else 0), round(eT[t]["costo_dev"])])
+    ws.append([t, act, ent, dev, pct(e), pct(dev / act if act else 0), round(eT[t]["costo_dev"]),
+               "dato flaco" if act < 5 else ""])
 ws.column_dimensions["A"].width = 22
 for col in "BCDEFG": ws.column_dimensions[col].width = 13
 
 dD, _ = agg_status(ped, lambda x: x["depto"])
 ws = wbL.create_sheet("POR DEPARTAMENTO")
 ws["A1"] = "DESEMPEÑO POR DEPARTAMENTO"; ws["A1"].font = TIT
-ws.append([]); hd = ["Departamento", "Activas", "Entregadas", "Devol.", "% Entrega", "% Devol."]
+ws.append([]); hd = ["Departamento", "Activas", "Entregadas", "Devol.", "% Entrega", "% Devol.", "Muestra"]
 ws.append(hd); style_header(ws, 3, len(hd))
 for d, c in sorted(dD.items(), key=lambda kv: -(kv[1]["entregado"] + kv[1]["devolucion"])):
     ent, dev, act, e = eff(c)
-    if act < 3: continue
-    ws.append([d, act, ent, dev, pct(e), pct(dev / act if act else 0)])
+    ws.append([d, act, ent, dev, pct(e), pct(dev / act if act else 0),
+               "dato flaco" if act < 3 else ""])
 ws.column_dimensions["A"].width = 24
 for col in "BCDEF": ws.column_dimensions[col].width = 13
 
@@ -314,12 +449,12 @@ for x in ped: ct[(x["ciudad"], x["trans"])][x["clase"]] += 1
 city_best = {}; city_tot = Counter()
 for (city, tr), c in ct.items():
     ent, dev, act, e = eff(c); city_tot[city] += act
-    if act >= 4 and (city not in city_best or e > city_best[city][2]
+    if act >= 1 and (city not in city_best or e > city_best[city][2]
                      or (e == city_best[city][2] and act > city_best[city][1])):
         city_best[city] = (tr, act, e)
 ws = wbL.create_sheet("MEJOR TRANSP x CIUDAD")
-ws["A1"] = "MEJOR TRANSPORTADORA POR CIUDAD (mín. 4 órdenes activas)"; ws["A1"].font = TIT
-ws.append([]); hd = ["Ciudad", "Total órdenes", "Mejor transportadora", "Órdenes", "% Entrega", "Recomendación"]
+ws["A1"] = "MEJOR TRANSPORTADORA POR CIUDAD (sin umbral: la muestra se muestra)"; ws["A1"].font = TIT
+ws.append([]); hd = ["Ciudad", "Total órdenes", "Mejor transportadora", "Órdenes", "% Entrega", "Recomendación", "Muestra"]
 ws.append(hd); style_header(ws, 3, len(hd))
 def reco(e):
     if e >= 0.85: return "EXCELENTE — enviar sin dudar"
@@ -328,7 +463,7 @@ def reco(e):
     return "MALA — evitar / solo anticipado"
 for city in sorted(city_best, key=lambda c: -city_tot[c]):
     tr, act, e = city_best[city]
-    ws.append([city, city_tot[city], tr, act, pct(e), reco(e)])
+    ws.append([city, city_tot[city], tr, act, pct(e), reco(e), "dato flaco" if act < 4 else ""])
 ws.column_dimensions["A"].width = 24; ws.column_dimensions["C"].width = 20; ws.column_dimensions["F"].width = 30
 for col in "BDE": ws.column_dimensions[col].width = 13
 
@@ -356,12 +491,16 @@ gasto_pub = CFG.get("gasto_publicidad")
 try: gasto_pub = float(gasto_pub) if gasto_pub not in (None, "") else None
 except: gasto_pub = None
 util_final = (util_dropi - gasto_pub) if gasto_pub is not None else None
-if util_final is None:      veredicto, color = "FALTA GASTO DE PUBLICIDAD PARA EL VEREDICTO", "B8860B"
+if not ped:
+    # Sin el informe por pedido no hay dinero que analizar: un "NO RENTABLE" aqui seria falso.
+    veredicto, color = "SIN VEREDICTO: FALTA EL INFORME POR PEDIDO", "B8860B"
+    util_final = None
+elif util_final is None:    veredicto, color = "FALTA GASTO DE PUBLICIDAD PARA EL VEREDICTO", "B8860B"
 elif util_final > 0:        veredicto, color = "RENTABLE", "1E7A34"
 else:                       veredicto, color = "NO RENTABLE", "B00020"
 
 wsE = wbL.create_sheet("RESUMEN EJECUTIVO", 0)
-wsE["B2"] = f"RESUMEN EJECUTIVO — {CFG.get('negocio','')} · DROPI"; wsE["B2"].font = Font(bold=True, size=16, color="1F2A44")
+wsE["B2"] = titulo("RESUMEN EJECUTIVO", "DROPI"); wsE["B2"].font = Font(bold=True, size=16, color="1F2A44")
 wsE["B3"] = (f"Periodo: {min(fechas):%d-%b-%Y} a {max(fechas):%d-%b-%Y}" if fechas else "Periodo: s/d")
 wsE["B3"].font = Font(italic=True, color="666666")
 def _row(ws, r, lab, val, bold=False, col="000000", size=11):
@@ -378,17 +517,36 @@ _row(wsE, r, "🚫 Canceladas/Rechazadas (no cuentan)", n_flujo["cancelado"]); r
 wsE.cell(r, 2, "RENTABILIDAD").font = SUB; r += 1
 _row(wsE, r, "Ganancia realizada (de lo entregado)", cop(gan_realizada), bold=True, col="1E7A34"); r += 1
 _row(wsE, r, "(−) Costo de devoluciones (flete)", f"-{cop(costo_dev)}", col="B00020"); r += 1
-_row(wsE, r, "= Utilidad Dropi (antes de publicidad)", cop(util_dropi), bold=True); r += 1
+_row(wsE, r, "(=) Utilidad Dropi (antes de publicidad)", cop(util_dropi), bold=True); r += 1
 _row(wsE, r, "(−) Gasto de publicidad (Meta)",
      f"-{cop(gasto_pub)}" if gasto_pub is not None else "← FALTA (ponlo en _config_dropi.json o pásalo)",
      col="B00020"); r += 1
-_row(wsE, r, "= UTILIDAD NETA FINAL",
+_row(wsE, r, "(=) UTILIDAD NETA FINAL",
      cop(util_final) if util_final is not None else "—", bold=True, size=13,
      col=("1E7A34" if (util_final or 0) > 0 else "B00020")); r += 1
 _row(wsE, r, "Ganancia potencial en camino (estimada)", cop(gan_en_camino), col="666666"); r += 2
 wsE.cell(r, 2, "VEREDICTO").font = Font(bold=True, size=12)
 vc = wsE.cell(r, 4, veredicto); vc.font = Font(bold=True, size=13, color=color); vc.alignment = Alignment(horizontal="right")
 wsE.column_dimensions["B"].width = 42; wsE.column_dimensions["D"].width = 34
+
+if CAND:
+    wsF = wbL.create_sheet("POSIBLES FANTASMA")
+    wsF["A1"] = "POSIBLES ÓRDENES FANTASMA (candidatas: NO se descontaron de las cifras)"
+    wsF["A1"].font = TIT
+    wsF["A2"] = ("Al editar una orden, Dropi le cambia el ID y la vieja sigue contando en los "
+                 "exports bajados antes. Huella: mismo teléfono, mismo monto, pocos días y la "
+                 "vieja sin cerrar. Un cliente puede pedir dos veces de verdad: confirma cada "
+                 "una en el detalle de Dropi antes de descontarla.")
+    wsF["A2"].font = Font(italic=True, color="666666")
+    wsF.append([]); _hd = ["Teléfono", "Monto", "ID vieja", "Estado vieja", "Fecha vieja",
+                           "ID nueva", "Estado nueva", "Fecha nueva", "Dias"]
+    wsF.append(_hd); style_header(wsF, 4, len(_hd))
+    for _a, _b in CAND:
+        wsF.append([_a["telefono"], round(_a["valor"]), _a["oid"], _a["estatus"],
+                    f"{_a['fecha']:%Y-%m-%d}", _b["oid"], _b["estatus"],
+                    f"{_b['fecha']:%Y-%m-%d}", (_b["fecha"] - _a["fecha"]).days])
+    for _c, _w in zip("ABCDEFGHI", [14, 14, 12, 26, 13, 12, 26, 13, 7]):
+        wsF.column_dimensions[_c].width = _w
 
 pathL = os.path.join(OUT, "MAESTRO_LOGISTICA.xlsx"); wbL.save(pathL)
 print("OK ->", pathL)
@@ -399,7 +557,8 @@ try:
     from reportlab.lib.pagesizes import letter
     from reportlab.lib.units import cm
     from reportlab.lib import colors
-    from reportlab.platypus import SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle
+    from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer, Table, TableStyle,
+                                    KeepTogether)
     from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
     pathPDF = os.path.join(OUT, "RESUMEN_EJECUTIVO.pdf")
     doc = SimpleDocTemplate(pathPDF, pagesize=letter, topMargin=1.6*cm, bottomMargin=1.4*cm,
@@ -410,7 +569,7 @@ try:
     Se = ParagraphStyle("Se", parent=ss["Heading2"], fontSize=12.5, textColor=colors.HexColor("#B8860B"), spaceBefore=12, spaceAfter=4)
     P = ParagraphStyle("P", parent=ss["Normal"], fontSize=10.3, leading=15)
     money_ = cop
-    el = [Paragraph(f"Resumen Ejecutivo — {CFG.get('negocio','')} · Dropi", H),
+    el = [Paragraph(titulo("Resumen Ejecutivo", "Dropi"), H),
           Paragraph((f"Periodo {min(fechas):%d-%b-%Y} a {max(fechas):%d-%b-%Y}  ·  "
                      f"Cuentas: {', '.join(cuentas)}  ·  Generado por golden-dropi-analisis") if fechas else "", Sb),
           Spacer(1, 8)]
@@ -438,9 +597,9 @@ try:
     pl = [["Rentabilidad", ""],
           ["Ganancia realizada (entregado)", money_(gan_realizada)],
           ["(−) Costo de devoluciones (flete)", "-"+money_(costo_dev)],
-          ["= Utilidad Dropi (antes de publicidad)", money_(util_dropi)],
+          ["(=) Utilidad Dropi (antes de publicidad)", money_(util_dropi)],
           ["(−) Gasto de publicidad (Meta)", ("-"+money_(gasto_pub)) if gasto_pub is not None else "FALTA"],
-          ["= UTILIDAD NETA FINAL", money_(util_final) if util_final is not None else "—"],
+          ["(=) UTILIDAD NETA FINAL", money_(util_final) if util_final is not None else "—"],
           ["Ganancia potencial en camino (est.)", money_(gan_en_camino)]]
     t2 = Table(pl, colWidths=[12*cm, 5.4*cm])
     t2.setStyle(TableStyle([("SPAN",(0,0),(1,0)),("BACKGROUND",(0,0),(-1,0),colors.HexColor("#B8860B")),
@@ -455,13 +614,38 @@ try:
     if gasto_pub is None:
         el += [Spacer(1,6), Paragraph("<b>Para cerrar el veredicto falta tu gasto de publicidad</b> del periodo "
             "(Meta). Ponlo en <font face='Courier'>_config_dropi.json</font> (clave "
-            "<font face='Courier'>gasto_publicidad</font>) o pásalo, y el neto y el veredicto se calculan solos. "
-            "Tu dashboard de gasto ya lo tiene: ahí se puede conectar.", P)]
+            "<font face='Courier'>gasto_publicidad</font>) o pásalo, y el neto y el veredicto se calculan solos.", P)]
     cg = Counter(x["clase"] for x in ped); ent, dev, act, ef = eff(cg)
     el += [Paragraph("Contexto de entregas", Se),
            Paragraph(f"Efectividad de entrega: <b>{ef*100:.1f}%</b> ({ent:,} entregadas de {act:,} cerradas). "
                      f"El detalle por producto, transportadora, ciudad y las novedades está en "
                      f"<b>MAESTRO_LOGISTICA.xlsx</b>; la base de clientes en <b>MAESTRO_CONTACTOS.xlsx</b>.", P)]
+
+    # Cobertura: un informe vale por su denominador. Lo que no entro se dice aqui, no se calla.
+    _av = []
+    if SALTADOS:
+        _av.append(f"<b>{len(SALTADOS)} archivo(s) no se pudieron leer</b>, así que no entraron "
+                   f"en ninguna cifra: " +
+                   "; ".join(_f for _f, _m in SALTADOS[:3]) +
+                   (f"; y {len(SALTADOS) - 3} más" if len(SALTADOS) > 3 else "") +
+                   ". El motivo de cada uno sale al correr el motor.")
+    if _EXCL_U:
+        _av.append(f"<b>{len(_EXCL_U)} registro(s) se excluyeron</b> por parecer pruebas. Si "
+                   f"alguno es un cliente real, quita esa palabra de "
+                   f"<font face='Courier'>test_name_keywords</font>.")
+    if CAND:
+        _av.append(f"<b>{len(CAND)} posible(s) orden(es) fantasma</b> (mismo teléfono y monto con "
+                   f"pocos días entre medias, la huella de una orden editada en Dropi). "
+                   f"<b>No se descontaron</b>, porque un cliente puede pedir dos veces de verdad: "
+                   f"están en la hoja POSIBLES FANTASMA para confirmarlas en Dropi.")
+    if not ped:
+        _av.append("<b>No se leyó ningún informe POR PEDIDO</b>, que es de donde sale el dinero: "
+                   "por eso no hay veredicto de rentabilidad.")
+    if _av:
+        # KeepTogether: el bloque entero pasa de pagina junto, en vez de dejar una linea viuda.
+        el += [KeepTogether([Paragraph("Qué quedó fuera de estas cifras", Se)] +
+                            [Paragraph("\u00b7 " + _a, P) for _a in _av])]
+
     doc.build(el)
     print("OK ->", pathPDF); pdf_ok = True
 except ImportError:

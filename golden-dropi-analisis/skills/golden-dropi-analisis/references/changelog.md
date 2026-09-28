@@ -2,6 +2,81 @@
 
 Acta completa. Se mudó aquí desde el cuerpo del SKILL.md el 2026-09-05 por el Centro de Mando: **el cuerpo se paga en CADA activación y el acta no se consulta al trabajar.** Nada se borró, todo está literal.
 
+## v2.0 · 2026-09-27 · La FÁBRICA: el motor daba cifras infladas, medido y corregido
+
+Auditoría de la fábrica con el mandato de autocalificación. **No es un repaso de estilo: seis de
+las cifras que esta skill produce estaban mal**, y todas fallaban en silencio. Medido corriendo el
+motor contra un banco de exports con defectos sembrados y verdad calculada a mano.
+
+**Lo que salía mal, con el número medido (banco de 16 órdenes):**
+
+| Cifra | Verdad | Antes | Después |
+|---|---|---|---|
+| Ganancia realizada | $225.000 | **$2.185.000** | $225.000 |
+| % de entrega global | 64,3% | 72,7% | 64,3% |
+| Canceladas | 1 | 0 | 1 |
+| Órdenes cargadas | 16 | 15 | 16 |
+| Transportadoras en la tabla | 4 | 1 | 4 |
+
+**Las causas, una clase cada una:**
+
+1. **`classify()` comparaba por igualdad exacta.** `SINIESTRO` (paquete perdido) y `GUIA_ANULADA`
+   caían en "tránsito", así que salían del denominador e **inflaban el % de entrega**; y
+   `REEXPEDICIÓN` con tilde no casaba con el patrón `REEXPEDICION` sin tilde — mientras
+   `pipeline()` sí la reconocía con un patrón más corto, o sea que las dos funciones
+   discrepaban. Ahora se compara por subcadena y sin tildes, contra el universo real de estados.
+2. **`money()` multiplicaba por cien.** `"20000.00"` (dinero guardado como texto) se leía como
+   2.000.000, porque el punto se quitaba a ciegas como separador de miles. Una sola celda así
+   infló la ganancia **casi diez veces** y, con gasto de publicidad configurado, habría dado un
+   RENTABLE falso. Ahora un único punto con 1 o 2 dígitos detrás es decimal.
+3. **El filtro de prueba borraba clientes reales.** Buscaba TEST/PRUEBA por subcadena: "Maria
+   Testa" y "Juan Protesta" salían de las ventas y de la efectividad **sin que nadie los
+   contara**. Ahora es palabra completa, y lo excluido se lista con nombre y teléfono.
+4. **Umbrales de muestra que el dueño había derogado** (`act<5` transportadora, `act<3`
+   departamento, `act>=4` ciudad): escondían justo las plazas nuevas. Fuera los cuatro; entra
+   una columna `Muestra` que marca `dato flaco`. La muestra se muestra, no se filtra.
+5. **Las órdenes fantasma eran invisibles.** Al editar una orden Dropi le cambia el ID, así que
+   el dedup por ID nunca las ve y la misma venta se cuenta dos veces. Peor: `ped` ni siquiera
+   guardaba el teléfono, así que la clave (teléfono, ID de orden) era imposible. Ahora se buscan
+   por su huella y se listan en `POSIBLES FANTASMA`. **No se descuenta ninguna**: una candidata
+   no es una fantasma y declararlas a ciegas ya produjo una tanda entera de falsos positivos.
+6. **Los archivos que no se podían leer desaparecían sin una palabra** (`.csv`, `.xls`, columna
+   renombrada, fichero corrupto): esas ventas simplemente no existían para el informe. Ahora el
+   motor abre con un `INVENTARIO DE LA CORRIDA` que lista lo leído y lo saltado con el motivo.
+
+**Además:** el resumen de cualquier cliente salía titulado con la marca de otro negocio, y el PDF
+llevaba dentro una frase de contexto interno. El motor corría sin el informe por pedido y daba
+$0 con un **NO RENTABLE falso**: ahora eso es `SIN VEREDICTO`. Las dos líneas clave del P&L
+(`= Utilidad Dropi` y `= UTILIDAD NETA FINAL`) empezaban por `=`, así que Excel las guardaba como
+**fórmula** y al abrir el archivo **se quedaban sin etiqueta**; ahora usan `(=)`. El dedup por
+producto se comía líneas legítimas del mismo producto con SKU distinto. Y el PDF cierra con
+"Qué quedó fuera de estas cifras".
+
+**Lo que impide que vuelva a pasar:** `scripts/autoprueba_motor.py`, con 12 defectos sembrados y
+31 comprobaciones contra la verdad a mano, controles **en los dos sentidos** (que siga cazando
+pruebas de verdad y duplicados reales; que **no** invente fantasmas donde hay compras legítimas)
+y un modo `--mutar` que rompe el motor a propósito para comprobar que la autoprueba lo caza.
+Se corre obligatoriamente después de tocar el motor.
+
+**Medido en este equipo:** `reportlab` no está en el `python3` de Homebrew, así que hoy la skill
+**no genera su entregable principal** hasta que el usuario monte el entorno aislado que ya
+describe el bloque de requisitos. El PDF se verificó generándolo en un entorno aparte y
+**mirándolo**: acentos correctos en el render, una sola página, sin marca ajena.
+
+## v1.9 · 2026-09-27 · Ley de los requisitos del usuario (redactó ARSENAL, aplicó el CdM)
+
+Se añadió el bloque "Antes de empezar — lo que TÚ tienes que tener": cada requisito marcado
+BLOQUEANTE o DEGRADABLE y qué pasa si falta. Lo redactó el chat ARSENAL Y SKILLS (fila P49, 4
+pasadas del verificador adversarial) y lo aplicó el Centro de Mando sin numerar, a la espera de
+que la fábrica lo ratificara. **La fábrica lo ratifica aquí como v1.9.** Solo inserción: 0 líneas
+quitadas. Dos de los riesgos que ese bloque documentaba (el NO RENTABLE falso sin informe por
+pedido, y reportlab ausente en Homebrew) están ahora además **resueltos en el motor**: la
+documentación advertía, pero el código seguía dando el veredicto falso.
+
+## [ratificada como v1.9] · 2026-09-27 · Ley de los requisitos del usuario (aplicó el CENTRO DE MANDO)
+
+Se añadió el bloque de requisitos del SKILL.md: qué tiene que tener el usuario antes de arrancar, cada requisito marcado BLOQUEANTE o DEGRADABLE y qué pasa si falta (doctrina del CdM del 27-sep). Lo redactó el chat 🧰 ARSENAL Y SKILLS (fila P49, 4 pasadas del golden-verificador adversarial; en la última, ninguna falla nueva grave) y lo aplicó el CdM sin numerar: el número lo pone la fábrica al ratificar. Solo inserción: 0 líneas quitadas.
+
 ## v1.8 · 2026-09-19
 CdM: la ley del flete derogada seguía escrita en dos sitios. SKILL.md (sección Rentabilidad) y un
 comentario del motor decían que una devolución pierde "el flete de ida y vuelta". La ley vigente del

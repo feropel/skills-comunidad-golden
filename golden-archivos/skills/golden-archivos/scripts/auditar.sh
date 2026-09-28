@@ -42,12 +42,26 @@ if [ -z "$jj" ]; then echo "   ✅ ninguna"; else echo "$jj" | sed "s|$R/|   |";
 echo ""
 
 echo "❓ 4. Nombres CRÍPTICOS (hay que mirarlos para saber qué son)"
-find "$R" -type f "${EXCL[@]}" \( -iname 'IMG_*' -o -iname 'DSC*' -o -iname 'Captura*' \
-  -o -iname 'RPReplay*' -o -iname 'ChatGPT Image*' \
+find "$R" -type f "${EXCL[@]}" \( -iname 'IMG_*' -o -iname 'IMG-*' -o -iname '_MG_*' -o -iname 'DSC*' \
+    -o -iname 'PXL_*' -o -iname 'VID_*' -o -iname 'MOV_*' -o -iname 'MVIMG*' \
+    -o -iname 'Captura*' -o -iname 'Screenshot*' -o -iname 'Screen Shot*' \
+  -o -iname 'RPReplay*' -o -iname 'ChatGPT Image*' -o -iname 'Gemini_Generated*' \
+    -o -iname 'WhatsApp Image*' -o -iname 'WhatsApp Video*' \
+    -o -iname 'Untitled*' -o -iname 'Sin titulo*' -o -iname 'descarga*' \
+    -o -iname 'download*' -o -iname 'imagen*' -o -iname 'documento*' \
+    -o -iname 'copia de*' -o -iname 'wetransfer*' -o -iname 'banner-[0-9]*' \
+    -o -iname '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]*' \
   -o -iname '*[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*' \) 2>/dev/null \
   | head -15 | sed "s|$R/|   |"
-c=$(find "$R" -type f "${EXCL[@]}" \( -iname 'IMG_*' -o -iname 'DSC*' -o -iname 'Captura*' \
-  -o -iname 'RPReplay*' -o -iname 'ChatGPT Image*' \
+c=$(find "$R" -type f "${EXCL[@]}" \( -iname 'IMG_*' -o -iname 'IMG-*' -o -iname '_MG_*' -o -iname 'DSC*' \
+    -o -iname 'PXL_*' -o -iname 'VID_*' -o -iname 'MOV_*' -o -iname 'MVIMG*' \
+    -o -iname 'Captura*' -o -iname 'Screenshot*' -o -iname 'Screen Shot*' \
+  -o -iname 'RPReplay*' -o -iname 'ChatGPT Image*' -o -iname 'Gemini_Generated*' \
+    -o -iname 'WhatsApp Image*' -o -iname 'WhatsApp Video*' \
+    -o -iname 'Untitled*' -o -iname 'Sin titulo*' -o -iname 'descarga*' \
+    -o -iname 'download*' -o -iname 'imagen*' -o -iname 'documento*' \
+    -o -iname 'copia de*' -o -iname 'wetransfer*' -o -iname 'banner-[0-9]*' \
+    -o -iname '[0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9][0-9]*' \
   -o -iname '*[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f]-[0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f][0-9a-f]*' \) 2>/dev/null | wc -l | tr -d ' ')
 [ "$c" -eq 0 ] && echo "   ✅ ninguno" || echo "   → total: $c"
 echo ""

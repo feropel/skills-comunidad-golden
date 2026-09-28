@@ -265,6 +265,33 @@ printf '%s' "$sal" | grep -q 'Grupos de duplicados exactos: 1' || vac_ok=0  # y 
 [ "$vac_ok" -eq 1 ] && ok "los archivos de 0 bytes se cuentan, se nombran y no se agrupan como duplicados" \
   || no "duplicados.sh no censa los archivos de 0 bytes, o los esta agrupando como si fueran copias"
 
+echo "== 14. El detector de nombres cripticos cubre las formas REALES =="
+# Medido el 27-09-2026 sobre un archivo real de 689 piezas: el patron viejo
+# reporto 44 cripticos y los habia 361. Se le escapaban las formas que llena un
+# disco de verdad (WhatsApp, Canon `_MG_`, Pixel `PXL_`, ids de Facebook), asi
+# que la LISTA DE TRABAJO salia ocho veces mas corta que el trabajo y quien la
+# seguia creia haber terminado. Cada forma de abajo aparecio de verdad en el
+# disco; ninguna es imaginada por si acaso.
+CR="$T/cripticos"; mkdir -p "$CR"
+for n in "IMG_0377.JPG" "IMG-20140326-WA001.jpg" "_MG_2087.jpg" "DSC_0290.jpg" \
+         "PXL_20240101_120000.jpg" "WhatsApp Image 2017-11-16 at 12.31.52.jpeg" \
+         "Captura de pantalla 2011-10-05.png" "Screenshot 2024-01-01.png" \
+         "10154321098765432.jpg" "Untitled.png" "descarga (1).jpg" \
+         "banner-38746.webp" "wetransfer-f5754d.zip" "Sin titulo.pdf"; do
+  printf 'x' > "$CR/$n"
+done
+# Control NEGATIVO: un nombre bueno. Ensanchar el patron hasta acusar a los
+# nombres sanos vuelve la lista inservible por el otro lado, y ese error ya lo
+# cometi hoy dos veces (asercion 8 y el barrido de "Read").
+printf 'x' > "$CR/TAG RECEDE - demo cuello 01.jpg"
+sal=$(bash "$DIR/auditar.sh" "$CR" 2>&1)
+n_cr=$(printf '%s' "$sal" | sed -n 's/.*total: \([0-9]*\).*/\1/p' | head -1)
+cr_ok=1
+[ "${n_cr:-0}" -eq 14 ] || cr_ok=0
+printf '%s' "$sal" | grep -q 'TAG RECEDE - demo cuello' && cr_ok=0
+[ "$cr_ok" -eq 1 ] && ok "el detector de cripticos encuentra las 14 formas reales y respeta el nombre sano" \
+  || no "el detector de cripticos se deja formas reales (encontro ${n_cr:-0} de 14) o acusa a un nombre bueno"
+
 echo "== 4. El log manda: sin log no se mueve =="
 sembrar "$T/c"
 bash "$DIR/clasificar.sh" "$T/c/PROD" "/ruta/imposible/x.log" >/dev/null 2>&1 \

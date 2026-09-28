@@ -20,6 +20,7 @@ PAGINACION: casi todo pagina de 10 en 10 e ignora per_page. Se agota la paginaci
 guarda el total declarado por el servidor para poder comprobar que no falto nada.
 """
 
+import http.client
 import json
 import re
 import sys
@@ -156,18 +157,110 @@ def informe_cupo():
     return f"{linea} · ~{q // COSTE_MEDIDO} extracciones mas"
 
 
+def _por_curl(token, url, metodo, datos):
+    """curl es la via PRINCIPAL. Medido por el CdM el 2026-09-28: urllib se cayo DOS veces
+    con IncompleteRead a mitad de la paginacion de `/flow/bot-fields` (30 de 89 y 10 de 89)
+    y curl no. Es la clase ya conocida de `urllib CORTA respuestas en el sandbox`.
+
+    La llave va por STDIN, en un fichero de configuracion de curl, NUNCA en la linea de
+    comandos: argv lo ve cualquier `ps` de la maquina. Tampoco por variable de entorno.
+    Devuelve (cuerpo, cabeceras) o None si curl no esta o fallo.
+    """
+    import shutil
+    import subprocess
+    if not shutil.which("curl"):
+        return None
+    cfg = [f'url = "{url}"', f'request = "{metodo}"',
+           f'header = "Authorization: Bearer {token}"',
+           f'header = "User-Agent: {UA}"',
+           'header = "Accept: application/json"',
+           'header = "Content-Type: application/json"',
+           # `include` y NO `dump-header`: volcar la cabecera a /dev/stderr hace fallar a
+           # curl con el codigo 23 dentro del sandbox (medido el 2026-09-28).
+           "silent", "show-error", "include", "max-time = 60"]
+    if datos:
+        cfg.append("data-binary = @-")   # el cuerpo tambien por stdin
+    entrada = "\n".join(cfg) + "\n"
+    try:
+        # --config - lee la configuracion de stdin; con cuerpo se concatena detras.
+        r = subprocess.run(["curl", "--config", "-"], input=entrada + (
+            datos.decode() if isinstance(datos, bytes) else (datos or "")),
+            capture_output=True, text=True, timeout=90)
+    except (OSError, subprocess.SubprocessError):
+        return None
+    if r.returncode != 0 or not r.stdout.strip():
+        return None
+    # El proxy del sandbox añade su propio "HTTP/1.1 200 Connection Established", asi que con
+    # `include` pueden llegar VARIOS bloques de cabeceras. Se pelan mientras el resto siga
+    # empezando por "HTTP/": partir por el primero deja el cuerpo empezando en "HTTP/2 200"
+    # y el JSON no parsea (medido el 2026-09-28).
+    resto, cabeceras = r.stdout, ""
+    while resto.startswith("HTTP/"):
+        for corte in ("\r\n\r\n", "\n\n"):
+            if corte in resto:
+                bloque, resto = resto.split(corte, 1)
+                cabeceras += bloque + "\n"
+                break
+        else:
+            break
+    return resto, cabeceras
+
+
+class _Cabeceras:
+    """Envoltorio minimo para que `_anotar_cupo` lea las cabeceras que devolvio curl."""
+
+    def __init__(self, crudas):
+        self._h = {}
+        for linea in (crudas or "").splitlines():
+            if ":" in linea:
+                k, v = linea.split(":", 1)
+                self._h[k.strip().lower()] = v.strip()
+
+    @property
+    def headers(self):
+        return self
+
+    def get(self, k, d=None):
+        return self._h.get(str(k).lower(), d)
+
+
 def pedir(token, path, metodo="GET", cuerpo=None, **params):
     if params:
         path += "?" + urllib.parse.urlencode(params)
     datos = json.dumps(cuerpo).encode() if cuerpo else None
+    url = BASE + path
+
+    # VIA PRINCIPAL: curl. Si trae un JSON entero, se usa y no se toca urllib.
+    por_curl = _por_curl(token, url, metodo, datos)
+    if por_curl:
+        cuerpo_txt, cabeceras = por_curl
+        try:
+            leido = json.loads(cuerpo_txt)
+            _anotar_cupo(_Cabeceras(cabeceras))
+            return leido
+        except json.JSONDecodeError:
+            # Un JSON a medias es justo el fallo que se persigue: NO se devuelve como dato.
+            # Se cae al respaldo, y si el respaldo tampoco lo trae entero, se declara.
+            pass
+
     req = urllib.request.Request(
-        BASE + path, data=datos, method=metodo,
+        url, data=datos, method=metodo,
         headers={"Authorization": "Bearer " + token, "User-Agent": UA,
                  "Accept": "application/json", "Content-Type": "application/json"})
     try:
-        with urllib.request.urlopen(req, timeout=60) as r:
-            _anotar_cupo(r)
-            return json.load(r)
+        # RESPALDO: urllib, con un reintento por corte. `IncompleteRead` y el
+        # `ChunkedEncodingError` que lo envuelve no son "la API fallo": son la lectura que
+        # se corto, y por eso se reintenta una vez antes de rendirse.
+        ultimo = None
+        for intento in (1, 2):
+            try:
+                with urllib.request.urlopen(req, timeout=60) as r:
+                    _anotar_cupo(r)
+                    return json.load(r)
+            except (http.client.IncompleteRead, json.JSONDecodeError) as e:
+                ultimo = e
+                continue
+        raise ultimo
     except urllib.error.HTTPError as e:
         _anotar_cupo(e)          # el 429 tambien trae la cabecera: es cuando mas importa
         if e.code == 429:
@@ -194,7 +287,11 @@ def todas_las_paginas(token, path):
     while pagina <= 500:
         r = pedir(token, path, page=pagina)
         if "_ERROR" in r or "_ERROR_HTTP" in r:
-            return (r if pagina == 1 else filas), total
+            # P66 · una pagina que no llega NO deja una extraccion "mas corta": deja una
+            # extraccion PARCIAL, y eso cambia lo que se puede hacer con ella. Medido: con
+            # 30 de 89 campos el diff invento 76 cambios.
+            detalle = r.get("_ERROR") or f"HTTP {r.get('_ERROR_HTTP')}"
+            return (r if pagina == 1 else filas), total, f"pagina {pagina}: {detalle}"
         meta = r.get("meta") or {}
         if total is None:
             total = meta.get("total")
@@ -210,10 +307,64 @@ def todas_las_paginas(token, path):
         if ultima and pagina >= ultima:
             break
         pagina += 1
-    return filas, total
+    # Y el otro modo de quedarse corto sin error: el servidor declara mas filas de las que
+    # llegaron. Tambien es PARCIAL, aunque ninguna peticion haya fallado.
+    if isinstance(total, int) and total > len(filas):
+        return filas, total, f"llegaron {len(filas)} de {total} declaradas"
+    return filas, total, None
+
+
+def autoprueba():
+    """Se prueba contra un corte simulado A MITAD de la paginacion, que es como se cayo.
+
+    No toca la red: se sustituye `pedir` por una funcion que entrega dos paginas buenas y
+    revienta en la tercera con IncompleteRead, igual que la corrida real.
+    """
+    import http.client
+    global pedir
+    original = pedir
+    fallos = []
+
+    paginas = {1: [{"id": i} for i in range(10)],
+               2: [{"id": i} for i in range(10, 20)]}
+
+    def pedir_que_se_corta(token, path, metodo="GET", cuerpo=None, **params):
+        p = params.get("page", 1)
+        if p in paginas:
+            return {"data": paginas[p], "meta": {"total": 89, "last_page": 9}}
+        return {"_ERROR": str(http.client.IncompleteRead(b"", 512))}
+
+    try:
+        pedir = pedir_que_se_corta
+        filas, total, parcial = todas_las_paginas("x" * 40, "/flow/bot-fields")
+        if parcial and len(filas) == 20 and total == 89:
+            print("  OK    EXT  una pagina que no llega entera deja la extraccion en PARCIAL")
+        else:
+            print(f"  FALLA EXT  parcial={parcial} filas={len(filas)} total={total}")
+            fallos.append("corte a mitad de la paginacion")
+
+        # control negativo: una paginacion que SI termina no puede quedar parcial
+        paginas[3] = []
+        def pedir_completo(token, path, metodo="GET", cuerpo=None, **params):
+            p = params.get("page", 1)
+            return {"data": paginas.get(p, []), "meta": {"total": 20, "last_page": 2}}
+        pedir = pedir_completo
+        _f, _t, parcial2 = todas_las_paginas("x" * 40, "/flow/bot-fields")
+        if parcial2:
+            print("  FALLA EXT  una paginacion completa salio marcada PARCIAL")
+            fallos.append("falso parcial")
+        else:
+            print("  OK    EXT  una paginacion completa NO se marca parcial")
+    finally:
+        pedir = original
+
+    print("\n" + ("El extractor esta roto." if fallos else "El extractor muerde."))
+    return 1 if fallos else 0
 
 
 def main():
+    if "--autoprueba" in sys.argv:
+        sys.exit(autoprueba())
     # 🔴 COMPROBACION PREVIA. Arrancar una extraccion de ~137 peticiones sin saber si caben
     # es la forma de quedarse bloqueado A MITAD, con el DUMP incompleto. Cuesta 1 peticion
     # saberlo antes; cuesta una hora averiguarlo despues.
@@ -272,7 +423,10 @@ def main():
         print(f"  {p}")
 
     for p in PAGINADOS:
-        filas, total = todas_las_paginas(token, p)
+        filas, total, parcial = todas_las_paginas(token, p)
+        if parcial:
+            dump.setdefault("_PARCIAL", {})[p] = parcial
+            print(f"  🔴 PARCIAL en {p}: {parcial}")
         dump[p] = redactar(filas)
         n = len(filas) if isinstance(filas, list) else None
         dump["_conteos"][p] = {"traidos": n, "declarados_por_servidor": total}

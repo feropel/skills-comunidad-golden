@@ -420,6 +420,26 @@ def main():
             print(f"  FALLA P59  {f}")
         faltan.append("descartes-silenciosos")
 
+    # --- prueba DIFF (fila P66): un DUMP PARCIAL no se compara contra el anterior.
+    # Medido por el CdM el 2026-09-28: la paginacion se corto y el diff sobre 30 de 89
+    # campos habria inventado "76 cambios". Comparar datos a medias no da un diff pobre:
+    # da un diff FALSO, y un cambio inventado manda a alguien a arreglar lo que no esta roto.
+    import copy as _copy
+    dump_parcial = espacio_roto()
+    dump_parcial["_PARCIAL"] = {"/flow/bot-fields": "IncompleteRead en la pagina 3 de 9"}
+    ant = _copy.deepcopy(espacio_roto())
+    ant["/flow/bot-fields"] = [c for c in ant["/flow/bot-fields"]][:3]
+    pa = Auditoria(dump_parcial, alcance="todo")
+    pa.correr()
+    pa.comparar(ant)
+    negado = getattr(pa, "diff_negado", None)
+    if not pa.cambios and negado:
+        print("  OK    DIFF un DUMP parcial NO se compara: el diff se niega y se declara")
+    else:
+        print(f"  FALLA DIFF el diff corrio sobre un DUMP parcial: {len(pa.cambios)} cambios, "
+              f"negado={negado}")
+        faltan.append("diff-sobre-dump-parcial")
+
     # --- prueba ALC: el alcance por defecto es CONFIGURACION (ley de FER, 2026-09-05:
     # "esta skill es exclusivamente para analizar configuracion, no vemos productos").
     # Lo que se aparta NO se pierde: queda declarado y contado, con su severidad, para que

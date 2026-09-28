@@ -33,6 +33,26 @@ description: >-
 
 **Si falta algo BLOQUEANTE: no se hace lo que depende de él** (si es de toda la skill, se PARA antes de tocar nada) y se pide con nombre propio: qué es, dónde se saca y dónde se pone. **Si falta algo DEGRADABLE: se pide y se sigue**, dejando marcado como NO CORRIDO en todo lo que depende de él. Nunca se presenta como completo.
 
+<!-- skill v3.5 (GCA3.5) — 2026-09-28 — FILA P66: LA EXTRACCION SE CORTABA Y EL DIFF
+INVENTABA CAMBIOS. El CdM lo midio en una corrida real: `/flow/bot-fields` se cayo DOS veces con
+IncompleteRead a mitad de la paginacion (30 de 89 campos y 10 de 89). Tal como estaba, esas 30
+filas se guardaban como si fueran el universo y el diff contra la corrida anterior habria
+reportado "76 cambios" -- los 59 que no llegaron, como si alguien los hubiera borrado. Un diff con
+datos a medias no sale pobre: sale FALSO, y un cambio inventado manda a alguien a arreglar lo que
+no esta roto. Clase ya conocida: urllib corta respuestas y curl no.
+Tres arreglos: (1) `pedir()` usa CURL como via principal y urllib solo de respaldo, reintentando
+una vez ante IncompleteRead; la llave viaja por STDIN en un fichero de configuracion de curl,
+nunca en argv -- lo que hay en argv lo ve cualquier `ps` de la maquina. (2) `todas_las_paginas()`
+devuelve si quedo PARCIAL, y detecta los DOS modos: la pagina que falla y la que no falla pero
+deja menos filas de las que el servidor declara. El DUMP lo declara en `_PARCIAL`. (3) `comparar()`
+se NIEGA a comparar un DUMP parcial: J1 sale NO CORRIDO con el motivo, en vez de un diff falso.
+Dos trampas del sandbox, medidas de paso y documentadas en el codigo: `dump-header = /dev/stderr`
+hace fallar a curl con el codigo 23, y el proxy añade su propio bloque de cabeceras, asi que con
+`include` llegan DOS y hay que pelarlos o el JSON no parsea.
+Probado en las dos direcciones y EN VIVO, no solo en el simulador: banco propio del extractor con
+un corte simulado a mitad (y su control negativo, que una paginacion completa no se marque
+parcial), y 3 comprobaciones contra la API real por 2 peticiones del cupo. Medido al cerrar:
+autoprueba 34 defectos + 30 pruebas, extractor 2 de 2, simulador 7 de 7, compuerta 0. -->
 <!-- skill v3.4 (GCA3.4) — 2026-09-28 — LA COMPUERTA DEL REPO PARO LA PUBLICACION, Y EL HUECO
 DE LOS NOMBRES SE CERRO. La compuerta `golden-barrido-publicacion` freno GCA3.3 con 4 hallazgos en
 3 ficheros: el nombre de una empresa usado como prosa de comentario y de changelog ("medido sobre
@@ -75,7 +95,7 @@ guardia dio "El guardia esta roto"), arreglo despues. Una prueba propia estaba m
 la evidencia cuando el nombre del campo va en el titulo -- y fue el tercer instrumento mio que fallo
 en esta corrida: se corrigio antes de concluir. Medido al cerrar: autoprueba 34 defectos + 29
 pruebas, simulador 7 de 7, guardia de privacidad muerde y da 0, validador sin fallos ni avisos. -->
-**Versión:** `GCA3.4`  ·  historia completa en `references/changelog.md`
+**Versión:** `GCA3.5`  ·  historia completa en `references/changelog.md`
 
 Auditar aquí significa **medir el estado real del servidor contra el estándar**, no leer la
 configuración y opinar. Nada se da por bueno sin haberlo contado, y el informe se entrega en

@@ -243,6 +243,7 @@ class Auditoria:
         self._reabiertos = []    # decisiones que caducaron porque la situacion cambio
         self._sin_foto = []      # decisiones sin evidencia_al_decidir: no pueden caducar
         self.cambios = []        # diff contra la corrida anterior
+        self.diff_negado = None  # P66: por que no se comparo, si no se comparo
 
     # ---------------------------------------------------------------- utilidades
     def falla(self, control, sev, titulo, evidencia, consecuencia="", accion="",
@@ -1707,6 +1708,26 @@ class Auditoria:
         dueno deja de leerlos. Con esto se puede preguntar lo unico que importa a diario:
         que se movio.
         """
+        # P66 · un DUMP PARCIAL no se compara. Medido por el CdM el 2026-09-28: la
+        # paginacion se corto en 30 de 89 campos y el diff habria reportado "76 cambios"
+        # -- los 59 que no llegaron, como si alguien los hubiera borrado. Un diff con datos
+        # a medias no sale pobre: sale FALSO, y un cambio inventado manda a alguien a
+        # arreglar lo que no esta roto.
+        parcial = self.d.get("_PARCIAL")
+        if parcial:
+            self.diff_negado = parcial
+            self.cubre("J1", "NO CORRIDO", 0,
+                       f"el DUMP es PARCIAL ({len(parcial)} zona(s)): comparar datos a "
+                       f"medias inventa cambios. Volver a extraer antes de comparar.")
+            self.falla("J1", "DUDA",
+                       "No se comparo contra la corrida anterior: este DUMP es PARCIAL",
+                       " · ".join(f"{k}: {v}" for k, v in parcial.items()),
+                       "Con una zona a medias el diff reporta como BORRADO todo lo que no "
+                       "llego. No es un diff pobre: es un diff falso.",
+                       "Volver a extraer el espacio y comparar entonces.",
+                       objetivo="diff-sobre-dump-parcial")
+            return
+
         # Los dos lados pasan por el MISMO filtro: si solo se filtra el nuevo, cada campo
         # apartado sale como "BORRADO" sin haberse borrado (verificador, 24-sep: 9 falsos).
         viejos = {c["name"]: c for c in (anterior.get("/flow/bot-fields") or [])

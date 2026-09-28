@@ -22,6 +22,16 @@ V="$D/scripts/validar.sh"
 DOC="$D/scripts/validar-doctrina.sh"
 VARA="$D/references/ejemplo-minimo.md"
 T="$(mktemp -d)"; trap 'rm -rf "$T"' EXIT
+# 🔴 EL BANCO TIENE QUE FALLAR RUIDOSAMENTE (medido el 2026-09-27): dentro de un sandbox que no
+# deja escribir en el TMPDIR del sistema, `mktemp -d` falla, T queda VACÍO, todo pasa a operar
+# sobre "/bueno.txt" y la corrida reportó "🔴 12 chequeos muertos"… más un "OK 1" tranquilizador.
+# Un banco roto se lee igual que una herramienta rota, y encima con un verde dentro. Se planta
+# aquí la compuerta: sin carpeta de trabajo no se corre NADA.
+if [ -z "$T" ] || [ ! -d "$T" ] || [ ! -w "$T" ]; then
+  echo "  🔴 EL BANCO NO PUEDE CORRER: no hay carpeta temporal escribible (mktemp falló)."
+  echo "     Lo que sigue serían 20 falsos negativos. Revisa TMPDIR o el sandbox de la sesión."
+  exit 2
+fi
 
 ok=0; total=0; fallos=()
 
@@ -32,6 +42,13 @@ t = open(sys.argv[1], encoding="utf-8").read()
 m = re.search(r"```[a-z]*\n(.*?)```", t, re.S)
 open(sys.argv[2], "w", encoding="utf-8").write(m.group(1) if m else t)
 PY
+# y la vara extraída tampoco puede venir vacía: con un fichero de 0 bytes los 20 sabotajes
+# saldrían "muertos" y el diagnóstico apuntaría al validador en vez de al banco.
+if [ ! -s "$T/bueno.txt" ]; then
+  echo "  🔴 EL BANCO NO PUEDE CORRER: no se pudo extraer el prompt de la vara mínima."
+  echo "     Revisa que $VARA siga teniendo su bloque de código."
+  exit 2
+fi
 
 # check <n> <nombre> <esperado: PASA|BLOQUEA> <fichero> [texto que debe aparecer]
 check() {
@@ -180,6 +197,34 @@ else echo "   🔴  16. NO avisa de una escasez sin confirmar"; fallos+=("16. av
 
 sabotea "$T/s17.txt" "Cuida tu corazón y tu presión arterial; es la reina del hogar quien decide."
 check 17 "NO acusa al idioma: corazón y reina fuera de vocativo PASAN" PASA "$T/s17.txt"
+
+# ---- 18-20 · el CORREDOR CIEGO del validador de doctrina (fila P59, v3.64.0) ----
+#      El arrastre del alcance prohibitivo de v3.54.0 dejaba pasar la escasez inventada si
+#      ARRIBA había una línea de copy cualquiera con la palabra "Evita". Medido: exit 0 y
+#      "ANTIPATRONES: ✅ ninguno detectado" sobre un prompt con "quedan pocas unidades".
+#      El 19 es el contrapeso obligatorio: el encabezado PROHIBIDO con lo prohibido listado
+#      debajo NO puede volver a dar falso positivo (fueron 7 de 8 productos vivos en v3.54.0).
+total=$((total+1))
+cp "$T/bueno.txt" "$T/d18.txt"
+printf '\nEvita la caída del cabello y recupera densidad en semanas.\nquedan pocas unidades, solo por hoy\n' >> "$T/d18.txt"
+bash "$DOC" "$T/d18.txt" >/dev/null 2>&1; _rc=$?
+if [ "$_rc" -eq 3 ]; then
+  ok=$((ok+1)); echo "   OK  18. la escasez TAPADA por una línea de copy ya no pasa"
+else echo "   🔴  18. corredor ciego abierto: escasez tapada pasa (exit=$_rc)"; fallos+=("18. corredor ciego"); fi
+
+total=$((total+1))
+cp "$T/bueno.txt" "$T/d19.txt"
+printf '\nPROHIBIDO\nPrometer crecimiento de cabello, cura de la alopecia o resultados medicos.\n' >> "$T/d19.txt"
+bash "$DOC" "$T/d19.txt" >/dev/null 2>&1; _rc=$?
+if [ "$_rc" -ne 3 ]; then
+  ok=$((ok+1)); echo "   OK  19. el encabezado PROHIBIDO sigue SIN dar falso positivo"
+else echo "   🔴  19. falso positivo sobre un encabezado de prohibición (exit=$_rc)"; fallos+=("19. falso positivo prohibición"); fi
+
+total=$((total+1))
+_sal="$(bash "$DOC" "$T/d19.txt" 2>&1)"
+if printf '%s' "$_sal" | grep -q "excluidas del barrido"; then
+  ok=$((ok+1)); echo "   OK  20. DECLARA cuántas líneas excluyó del barrido (cobertura, no veredicto)"
+else echo "   🔴  20. no declara las líneas excluidas"; fallos+=("20. exclusiones sin declarar"); fi
 
 echo
 if [ "${#fallos[@]}" -eq 0 ]; then

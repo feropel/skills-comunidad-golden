@@ -15,17 +15,21 @@ description: >-
 <!-- Historial completo de esta skill: references/changelog.md (1 actas, mudadas el 2026-09-05). El cuerpo se paga en cada activación; el acta no. -->
 # Golden Video Editor — de grabación cruda a anuncio publicable
 
+<!-- 2026-09-27 · CdM GVE1.12.1: requisitos completados tras el golden-verificador (ley de FER del 02-sep). -->
 <!-- skill versión GVE1.11 · 2026-09-18 · fábrica declarada: chat ✅ SKILL golden-video-editor (antes centro de mando), sin cambios de contenido -->
 <!-- skill versión GVE1.1 · ruta completa a captions.md de hyperframes, transcribe con --model small --language es, dependencias TTS declaradas, estado honesto del stack, manejo de errores por paso, caso borde de producto sin claims -->
 <!-- skill versión GVE1.0 · creación: destilado del tutorial Horizontes IA + stack Golden (Whisper local, claims, checklist) -->
 
-**Versión:** `GVE1.11` · **Fábrica: chat `✅ SKILL golden-video-editor`.** · Blindada con `chflags uchg` (desbloquear con `chflags -R nouchg` antes de editar, volver a blindar con `chflags -R uchg` al cerrar).
+**Versión:** `GVE1.12.1` · **Fábrica: chat `✅ SKILL golden-video-editor`.** · Blindada con `chflags uchg` (desbloquear con `chflags -R nouchg` antes de editar, volver a blindar con `chflags -R uchg` al cerrar).
 
 Graba con el celular sin preocuparte por trabarte, repetir o quedarte callado. Esta skill
 se encarga del resto. Pensada para **anuncios COD y contenido orgánico de Golden**, no para
 video genérico.
 
 ## Qué necesitas (cero API keys)
+
+**Del usuario, antes de editar (Paso 0)** · BLOQUEANTES: el **video crudo**, los **claims permitidos y prohibidos** (jamás se edita a ciegas) y el **guion** como se grabó. El **look** · DEGRADABLE: por defecto, el de Golden. **Del equipo** · BLOQUEANTES: `ffmpeg` (`brew install ffmpeg`), Node con `npx` y Chrome para el render (`hyperframes doctor` lo diagnostica). El modelo de Whisper baja solo en el primer uso. **Higgsfield** (FER aprueba el costo de cada imagen antes) y la **voz TTS** · DEGRADABLES: tienen plan B, así que se dicen y se sigue sin ellos.
+**Si falta algo BLOQUEANTE: no se hace lo que depende de él y se dice cuál y cómo se consigue.** Nunca se entrega un corte sin transcripción ni se inventan subtítulos.
 
 | Pieza | Para qué | Estado |
 |---|---|---|

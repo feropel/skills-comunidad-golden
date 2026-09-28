@@ -27,7 +27,8 @@ ACTA="${TMPDIR:-/tmp}/blindaje_$(basename "$SKILL").md5"
 
 hashes() {
   cd "$SKILL"
-  find . -type f \( -name '*.md' -o -name '*.py' -o -name '*.js' -o -name '*.html' -o -name '*.sh' \) \
+  # P59 (27-sep): antes solo .md/.py/.js/.html/.sh; un .json o .css cambiado no salia en el par.
+  find . -type f ! -name '.DS_Store' ! -path '*/__pycache__/*' \
     | sort | while read -r f; do echo "$(md5 -q "$f")  ${f#./}"; done
 }
 
@@ -49,7 +50,11 @@ if [ "$1" = "--cerrar" ]; then
   # Solo los que cambiaron: un par identico no dice nada.
   awk 'NR==FNR{a[$2]=$1;next} a[$2]!=$1 {printf "  %-30s %s -> %s\n", $2, a[$2], $1}' \
       "$ACTA" "${ACTA}.despues"
-  n=$(awk 'NR==FNR{a[$2]=$1;next} a[$2]!=$1' "$ACTA" "${ACTA}.despues" | wc -l | tr -d ' ')
+  # P59: los BORRADOS no salian (el awk de arriba solo recorre el DESPUES). Se listan y se cuentan.
+  awk 'NR==FNR{b[$2]=1;next} !($2 in b) {printf "  %-30s %s -> (BORRADO)\n", $2, $1}' \
+      "${ACTA}.despues" "$ACTA"
+  n=$(( $(awk 'NR==FNR{a[$2]=$1;next} a[$2]!=$1' "$ACTA" "${ACTA}.despues" | wc -l | tr -d ' ') \
+      + $(awk 'NR==FNR{b[$2]=1;next} !($2 in b)' "${ACTA}.despues" "$ACTA" | wc -l | tr -d ' ') ))
   echo "  ($n artefactos cambiados)"
   [ "$n" = "0" ] && echo "  OJO: cero cambios. Si dices que mejoraste algo, la nota es falsa."
   chflags -R uchg "$SKILL"

@@ -1,5 +1,20 @@
 # Changelog · golden-pdf-check
 
+- **v6.7.1** (2026-09-27, P59 · siete exclusiones silenciosas). Aplicado por el chat 🧰 ARSENAL Y SKILLS por orden directa de FER («que todas las skills estén perfectamente corregidas»), informado al Centro de Mando. No se encontró una sesión viva de esta fábrica. **No se numeró.** La regla es que lo descartado se CUENTA y se NOMBRA, y **no cambia ningún veredicto**. Cuatro arreglos:
+  - `visuales.py`: `kpi`, `comparativa` y `escala` avisan de cada fila descartada y GRITAN si no queda ninguna, el patrón que ya usaba `barras`. Antes, «Pedidos 340» sin `|` desaparecía del KPI, y una comparativa sin filas válidas desaparecía entera sin error. `_pares` devuelve las líneas sin separador.
+  - `verbatim_check.py`: los segmentos de menos de 3 caracteres («Sí», «No», «$9») siguen sin compararse, porque están en cualquier texto, pero ahora se cuentan y se listan en la salida y en el JSON (`cortos_sin_comparar`). Antes la compuerta decía «texto idéntico» sin mencionarlos.
+  - `audit_pdf.py`: si la pasada de color por PÍXELES no corre (sin Pillow, sin pdftoppm o con el render fallido), el informe lo dice con el motivo. Antes caía a la pasada de texto sin avisar y podía dar APROBADO.
+  - `build_pdf.py`: si el auto-fit no termina en 8 s o sus avisos no se leen, lo dice y lo agrega a `fit_warnings`.
+
+  **Probado sobre copia, 20 de 20:**
+  - autoprueba TODO OK (26 pruebas);
+  - cada descarte que antes callaba ahora avisa;
+  - un bloque sano da el MISMO html;
+  - el veredicto del auditor es el mismo antes y después;
+  - sin pdftoppm aparece el aviso, y con pdftoppm no.
+
+  **Límite:** el aviso del auto-fit incompleto solo se comprobó compilando, porque provocarlo exige romper Chromium.
+
 - **v6.7** (2026-09-06, auditoría `golden-skill-auditor`) — `scripts/visuales.py`
   (el motor que `build_pdf.py` importa en la línea 39 para dibujar KPI, barras, escala,
   comparativa, pasos y QR) no aparecía citado en ningún lugar del cuerpo del SKILL.md,
@@ -152,9 +167,9 @@ skill v5.11 · 2026-08-23 (auditoría golden-skill-auditor, segunda pasada del d
 
 skill v5.10 · 2026-08-23 (auditoría golden-skill-auditor v1.16, 919→ORO) · (1) v5.9 quedaba SIN DECLARAR: sus dos cambios vivían solo en comentarios del CSS — se declaran abajo; (2) `::: nombre Título` (bloques con estilo, v5.7) faltaba en references/content-format.md, el archivo que enseña el formato: agregado a la tabla y con sección propia; (3) geometry.card_max_mm de golden-brand.json decía 250 cuando el valor real derivado es 246 (área útil − colchón de 20mm) — corregido y marcado como derivado; (4) `.note-card` era CSS muerto desde v5.7 (nada lo genera; lo reemplazó `.block`) — retirado; (5) el puntero al logo naranja `PROYECTOS/SKOOL/logo-comunidad-golden.svg` estaba MUERTO (esa carpeta ya no existe) en 3 archivos — corregido; (6) selftest 11→13: prueba de bloque con estilo (v5.7) y prueba de que el aviso de líneas largas (v5.8) se dispara — antes esas versiones no tenían red de regresión; (7) ORDEN FER declarado en Verificación: auditar el PDF CANDIDATO y solo instalarlo si dice APROBADO; (8) docstrings al día (selftest 1-4→13 pruebas, audit_pdf --palette). Conexión: los cambios relevantes de esta skill se reportan a 🧠 GOLDEN - CENTRO DE MANDO.
 
-skill v5.9 · 2026-08 (declarada retroactivamente en v5.10; vivía solo en el CSS) · (a) `code.inline` con break-inside:avoid + white-space:nowrap — un span de código en línea que caía en el borde se partía a la mitad de la palabra (medido: informe otra empresa del grupo, pág 12→13, "SIN MOVIMIENTOS" rebanado); (b) rediseño de tablas: el oro pasa de RELLENO de cada th a ACENTO (borde inferior 2px) + filas alternas y más padding — 24 tablas de un informe inundaban la hoja de amarillo y se veía aglomerado (medido por FER sobre el PDF real)
+skill v5.9 · 2026-08 (declarada retroactivamente en v5.10; vivía solo en el CSS) · (a) `code.inline` con break-inside:avoid + white-space:nowrap — un span de código en línea que caía en el borde se partía a la mitad de la palabra (medido: informe de otra empresa del grupo, pág 12→13, "SIN MOVIMIENTOS" rebanado); (b) rediseño de tablas: el oro pasa de RELLENO de cada th a ACENTO (borde inferior 2px) + filas alternas y más padding — 24 tablas de un informe inundaban la hoja de amarillo y se veía aglomerado (medido por FER sobre el PDF real)
 
-skill v5.8 · 2026-08-07 (centro de mando, cosecha del chat ESTUDIO 360 un producto de salud oral de terceros Chile) · LÍNEAS LARGAS EN TARJETAS: dentro de una tarjeta monoespaciada, una línea de más de ~76 caracteres se ENVUELVE al renderizar y la compuerta verbatim la reporta como "espaciado/orden alterado" (pasó con dos prompts de imagen; se resolvió reescribiéndolos a 72-84 chars/línea). Regla de redacción "líneas de tarjeta ≤ 76 caracteres" en content-format.md + build_pdf.py AVISA antes de renderizar con tarjeta y línea exactas (⚠️ LÍNEAS LARGAS EN TARJETAS por stderr)
+skill v5.8 · 2026-08-07 (centro de mando, cosecha del chat del estudio 360 de un producto de cliente) · LÍNEAS LARGAS EN TARJETAS: dentro de una tarjeta monoespaciada, una línea de más de ~76 caracteres se ENVUELVE al renderizar y la compuerta verbatim la reporta como "espaciado/orden alterado" (pasó con dos prompts de imagen; se resolvió reescribiéndolos a 72-84 chars/línea). Regla de redacción "líneas de tarjeta ≤ 76 caracteres" en content-format.md + build_pdf.py AVISA antes de renderizar con tarjeta y línea exactas (⚠️ LÍNEAS LARGAS EN TARJETAS por stderr)
 
 adenda 2026-08-20 (centro de mando, autoevalúo del ecosistema): references/brand.md quedó citada desde el SKILL.md — era el único componente de la skill sin cita (hueco genuino confirmado por el inventario v1.8 del auditor); util, se cita, no se retira.
 
@@ -164,7 +179,7 @@ skill v5.6 · FIGURAS: `![Pie](ruta.svg){60%}` en una línea sola = figura atóm
 
 skill v5.5 · 4 defectos medidos en producción (guía logística 27 págs, 2026-08-03): (1) CRÍTICO ligaduras de JetBrains Mono corrompían el copy-paste (>> salía como <>, // como </) → font-variant-ligatures:none + "liga" 0,"calt" 0 en .prompt-body y code.inline, trampas >> // https:// <<X>> horneadas en selftest-sample; (2) norma FER portada COMPACTA: título+índice en la MISMA hoja (adiós hoja 70% vacía que "da pereza leer"); (3) tablas largas SÍ se parten con thead repetido y filas enteras; (4) colchón de tarjeta 8→20mm (el encabezado precedente comía el margen y el propio auditor tumbaba PDFs del motor); extra: compuertas ignoran selectores de variación de emoji U+FE0F (falso "no idéntico" con ⚠️)
 
-skill v5.4 · norma FER: TODO PDF Golden abre con página de CONTENIDO (índice línea por línea de todo lo que trae el documento + cuántos textos copiables tiene cada parte). Se genera SOLA desde los encabezados en build_pdf.py (outline + build_index, CSS .toc, flag --no-index para la excepción). Origen: PDF un producto de salud oral de terceros 2026-07-25
+skill v5.4 · norma FER: TODO PDF Golden abre con página de CONTENIDO (índice línea por línea de todo lo que trae el documento + cuántos textos copiables tiene cada parte). Se genera SOLA desde los encabezados en build_pdf.py (outline + build_index, CSS .toc, flag --no-index para la excepción). Origen: PDF de un producto de cliente 2026-07-25
 
 skill v5.3 · norma FER: copys/prompts múltiples = tarjetas numeradas separadas (jamás párrafo corrido); marcadores [PENDIENTE] en negrita, no backticks (mono inline cruza páginas). Origen: PDF Libido UP 2026-07-25
 

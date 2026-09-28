@@ -217,10 +217,16 @@ def qr(dato, pie="", tam_mm=28):
 
 
 # ── parser de los bloques en Markdown-Golden ───────────────────────────────────
-def _pares(lineas, sep="|"):
+def _pares(lineas, sep="|", sin_sep=None):
+    # P59 (27-sep): una linea CON contenido y SIN separador se tiraba en silencio ("Pedidos 340"
+    # desaparecia del KPI). Si el llamador pasa `sin_sep`, se la devuelve para que la avise.
     out = []
     for ln in lineas:
-        if not ln.strip() or sep not in ln:
+        if not ln.strip():
+            continue
+        if sep not in ln:
+            if sin_sep is not None:
+                sin_sep.append(ln.strip()[:30])
             continue
         partes = [p.strip() for p in ln.split(sep)]
         out.append(partes)
@@ -250,17 +256,23 @@ def render_bloque(nombre, titulo, cuerpo):
     lineas = cuerpo.split("\n")
 
     if n == "kpi":
-        items = []
-        for p in _pares(lineas):
+        items, sueltas = [], []
+        for p in _pares(lineas, sin_sep=sueltas):
             items.append({"etiqueta": p[0],
                           "valor": p[1] if len(p) > 1 else "",
                           "nota": p[2] if len(p) > 2 else "",
                           "tono": p[3] if len(p) > 3 else ""})
+        if not items:
+            return _grita("kpi", "ninguna linea trae el separador |",
+                          "    ::: kpi\n    Pedidos | 340 | +12% | ok\n    :::")
+        if sueltas:
+            sys.stderr.write("\u26a0\ufe0f  ::: kpi: %d linea(s) sin | fuera del bloque: %s\n"
+                             % (len(sueltas), ", ".join(sueltas)))
         return kpi(items)
 
     if n in ("barras", "grafico", "gráfico"):
         filas, unidad, descartadas = [], "", []
-        for p in _pares(lineas):
+        for p in _pares(lineas, sin_sep=descartadas):
             if p[0].lower() in ("unidad", "unidades") and len(p) > 1:
                 unidad = p[1]; continue
             try:
@@ -277,10 +289,13 @@ def render_bloque(nombre, titulo, cuerpo):
         return barras(filas, unidad, titulo)
 
     if n in ("escala", "medidor", "meta"):
-        d = {}
-        for p in _pares(lineas, ":"):
+        d, sueltas = {}, []
+        for p in _pares(lineas, ":", sin_sep=sueltas):
             if len(p) > 1:
                 d[p[0].lower()] = p[1]
+        if sueltas:
+            sys.stderr.write("\u26a0\ufe0f  ::: escala: %d linea(s) sin «clave: valor» ignoradas: %s\n"
+                             % (len(sueltas), ", ".join(sueltas)))
         faltan = [k for k in ("actual", "meta") if k not in d]
         if faltan:
             return _grita("escala", "falta " + " y ".join(faltan),
@@ -294,15 +309,22 @@ def render_bloque(nombre, titulo, cuerpo):
                           "    actual: 4820\n    meta: 6000")
 
     if n in ("comparativa", "antesdespues", "antes-despues"):
-        filas, unidad = [], ""
-        for p in _pares(lineas):
+        filas, unidad, descartadas = [], "", []
+        for p in _pares(lineas, sin_sep=descartadas):
             if p[0].lower() in ("unidad", "unidades") and len(p) > 1:
                 unidad = p[1]; continue
             try:
                 filas.append((p[0], float(str(p[1]).replace(",", ".")),
                               float(str(p[2]).replace(",", "."))))
             except (ValueError, IndexError):
-                continue
+                descartadas.append(p[0][:30])   # P59: se contaba cero y el bloque desaparecia entero
+        if not filas:
+            return _grita("comparativa", "ninguna fila trae nombre | antes | despues numericos",
+                          "    ::: comparativa Antes y despues\n    unidad | %\n"
+                          "    Entregas | 61 | 74\n    :::")
+        if descartadas:
+            sys.stderr.write("\u26a0\ufe0f  ::: comparativa: %d fila(s) sin tres columnas numericas, fuera: %s\n"
+                             % (len(descartadas), ", ".join(descartadas)))
         return comparativa(filas, unidad, titulo)
 
     if n in ("pasos", "esquema", "flujo"):

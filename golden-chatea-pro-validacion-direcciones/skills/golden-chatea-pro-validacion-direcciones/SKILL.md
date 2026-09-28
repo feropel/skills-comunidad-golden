@@ -13,6 +13,7 @@ description: >-
   genera igual, nunca se rechaza. Úsala cuando el usuario quiera el PROMPT de validación en
   sí, probar cómo se lee una dirección concreta, o llevar la validación a un país nuevo.
 ---
+<!-- skill v2.12.1 · 2026-09-27 · ronda de numeracion del Centro de Mando (orden de FER: «que todas las skills esten perfectamente corregidas y actualizadas»): da numero a los cambios del 27-sep que quedaron sin numero. Detalle en references/changelog.md -->
 <!-- skill v2.12 · 2026-09-22 · chile.md reconstruido sobre el molde canonico (fila de otro chat, proyectos-69, consolidado este dia) · segunda verificacion adversarial: corrigio 8 fallos (numeros quemados en la propia seccion de herramientas, un detector de higiene que no cazaba telefono local ni frase de negocio, el criterio de CP evadible con parrafo opcional/omitir, banco de casos con 7 paises sin cobertura, la tabla de sincronizacion con una copia faltante y una afirmacion falsa sobre el espejo Codex). Acta completa en references/changelog.md. -->
 <!-- Historial completo de esta skill: references/changelog.md. El cuerpo se paga en cada activación; el acta no. -->
 # Golden · Chatea Pro — Validación de Direcciones (hijo del logístico)

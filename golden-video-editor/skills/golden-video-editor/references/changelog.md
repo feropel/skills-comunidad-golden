@@ -41,3 +41,8 @@ porque y el lenguaje de instruccion. -->
 <!-- skill versión GVE1.3 · auditoría golden-skill-auditor 2026-08-21: cierra la inconsistencia de versión (el cuerpo ya traía los cambios de GVE1.2 pero la línea "Versión:" y el Changelog se habían quedado en GVE1.1 — ahora coinciden); documenta el blindaje (chflags uchg) en el propio SKILL.md, no solo en el filesystem; completa el ejemplo de tts con --output -->
 
 <!-- skill versión GVE1.2 · auditoría 2026-07-25: transcribe SIN --output (ese flag es solo para sidecar SRT/VTT; el transcript.json se escribe solo); añadido el andamio real del pipeline (npx hyperframes init --video y npx hyperframes render con quality/fps/format), que era el esqueleto que faltaba; voz em_alex marcada como no verificada; puntero a transcript-guide.md para filtrar tokens basura -->
+
+
+## CENTRO DE MANDO · 2026-09-27 · GVE1.12 · LEY DE LOS REQUISITOS DEL USUARIO
+
+Ley de FER del 02-sep: declarar ANTES lo que la skill necesita del usuario y pedirlo AL CORRER si falta. Desde golden-skill-auditor v1.22 la ley tiene casilla en `validar_arsenal.py`. Se agregó al principio el bloque "Requisitos", redactado con lo que esta skill USA de verdad (medido en su cuerpo y en sus scripts), sin agregar requisitos de más, y con qué hacer si falta: parar y pedirlo con nombre propio. A la fábrica se le informa por la bandeja: una fila no bloquea.

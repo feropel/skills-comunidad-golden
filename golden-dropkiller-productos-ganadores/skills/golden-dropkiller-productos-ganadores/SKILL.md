@@ -18,7 +18,7 @@ description: >-
 # Golden Group — Productos Ganadores
 
 
-**Versión:** `GPG1.25` (ver `references/changelog.md`) ·
+**Versión:** `GPG1.25.1` (ver `references/changelog.md`) ·
 **Fábrica:** chat «✅ SKILL golden-dropkiller-productos-ganadores» (abierto el 2026-09-05 por
 orden de FER, renombrado con la skill el 2026-09-22;
 ejecuta, no manda: la autoridad es FER → Centro de Mando → skill, y el CdM puede cambiarlo).
@@ -33,6 +33,24 @@ Objetivo: pasar de "no sé qué vender" a **productos validados con evidencia**,
 **lista de caza** verificada cuando se buscan candidatos, y una **ficha** cuando se valida uno.
 Herramientas: Meta Ad Library, DropKiller (conector de pago, plan Advance), Firecrawl y el
 navegador.
+
+## Antes de empezar — lo que TÚ tienes que tener
+
+Cada modo usa fuentes distintas. Lo bloqueante para lo que depende de él; lo demás se sigue con lo que haya, y lo que falte se dice en una línea al arrancar.
+
+| Qué necesitas | Tipo | Para qué | Cómo se consigue |
+|---|---|---|---|
+| **DropKiller**, en un plan que incluya su **conector MCP**, conectado a Claude | Bloqueante para CAZA, CREATIVOS y RUTINA · degradable para ESPIAR | Ventas por producto de Dropi y otras plataformas, anuncios y tiendas. En ESPIAR queda la Ad Library por dominio | Tu cuenta en DropKiller. La skill se midió con el plan Advance: revisa el precio vigente en su web. Declaración: el autor de esta skill (FER, de Golden Group) tiene enlace de afiliado de DropKiller (15%) |
+| **La biblioteca de anuncios de Meta**: el MCP de Meta con `ads_library_search`, o la biblioteca abierta en el navegador | Degradable · sin ninguna de las dos vías, bloqueante para la ruta R7 | En VALIDAR da hasta 35 de los 100 puntos (Demanda activa): sin ella quedan 65 y hay que sacar 60 en el resto, y la Regla de oro 1 exige al menos una tendencia clara, declarada. R7 depende entera de ella. En CAZA confirma la competencia que DropKiller ya contó | El MCP, con tu cuenta de Meta conectada a Claude. Si no, la biblioteca es pública y no pide sesión: se abre en el navegador con la URL completa de `references/ad-library-metodo.md` |
+| **Python 3** y conexión a internet | Bloqueante | Las ventas de DropKiller nunca se usan crudas (`scripts/ventas_reales.py`) y el precio se calcula (`scripts/viabilidad_cod.py`). Esos scripts solo usan lo que trae Python; `competencia.py precios` lee las páginas de la competencia por internet | Compruébalo con `python3 --version`; si no está, en python.org |
+| **Firecrawl** conectado y con créditos | Degradable | AliExpress: costo y contador de ventas | Tu cuenta de Firecrawl. Se prueba una llamada antes de contar con él |
+| **El navegador de Claude** | Degradable | Amazon (contador de ventas, precio y rating), que por Firecrawl no sale, y la antigüedad de los anuncios en la Ad Library cuando el total pasa de 50 | Viene con la app; o Claude en Chrome |
+| *Opcional:* **sesión abierta en Temu y en MercadoLibre**, en tu Chrome con Claude en Chrome | Degradable | Esas dos tiendas piden iniciar sesión hasta para buscar | Se te pregunta al arrancar, no se asume |
+| *Opcional:* la skill **`golden-investigacion-mercado`** | Degradable | Su `candado_scraping.py` es la compuerta anti-fantasma antes de puntuar | Entre tus skills. Sin ella se aplican a mano las 4 verificaciones de la Regla Cero y se dice en el informe |
+| *Opcional:* **los informes por producto de Dropi de tu empresa** y **`openpyxl`** | Degradable | La tasa de entrega real de un producto que ya vendiste (`scripts/entrega_golden.py construir`) | El nombre del archivo tiene que contener `por producto`: el nombre con que lo baja Dropi (`ordenes_productos_*.xlsx`) no lo encuentra, así que se renombra. `python3 -c "import openpyxl"`; si falta: con el Python de python.org, `pip3 install openpyxl`; con el de Homebrew, `python3 -m venv ~/venv-caza`, `~/venv-caza/bin/pip install openpyxl`, y `construir` se corre con `~/venv-caza/bin/python3` |
+| **Tu sí explícito**, con hora, país y destino | Bloqueante para RUTINA | La tarea diaria no se crea sin eso, y antes se corre una vez a mano para ver que el conector responde en una sesión programada | Se te pregunta (`assets/tarea-diaria-caza.md`) |
+
+**Lo bloqueante para lo que depende de él:** sin el conector de DropKiller, CAZA, CREATIVOS y RUTINA no corren. En CAZA se dice y se ofrece VALIDAR (Ad Library, AliExpress y Amazon) y la extensión gratuita de DropKiller en Chrome (`references/dropkiller-caza.md`, apartado 8); la rutina se detiene y lo deja escrito en su archivo de salida. Sin la biblioteca de anuncios, ni por MCP ni por navegador, no corre R7, y en VALIDAR la ficha lo declara y exige al menos una tendencia clara. **Lo degradable se pide y se sigue:** la fuente que no responde se declara NO DISPONIBLE en la ficha y jamás se rellena a ojo; sin informes propios, se usa la tasa de entrega general y se dice. Si no tienes algo, dime y te guío paso a paso.
 
 ## Arranque: qué quieres hacer hoy
 Si el usuario no dijo ya el encargo, **muestra el menú de `references/menu-arranque.md` en UN
@@ -417,7 +435,7 @@ python3 ~/.claude/skills/golden-dropkiller-productos-ganadores/scripts/consolida
 python3 ~/.claude/skills/golden-dropkiller-productos-ganadores/scripts/viabilidad_cod.py --autoprueba      # 21 casos
 python3 ~/.claude/skills/golden-dropkiller-productos-ganadores/scripts/competencia.py --autoprueba         # 28 chequeos
 python3 ~/.claude/skills/golden-dropkiller-productos-ganadores/scripts/correr_lote.py --autoprueba         # 29 chequeos
-python3 ~/.claude/skills/golden-dropkiller-productos-ganadores/scripts/entrega_golden.py --autoprueba       # 17 chequeos
+python3 ~/.claude/skills/golden-dropkiller-productos-ganadores/scripts/entrega_golden.py --autoprueba       # 21 chequeos
 python3 ~/.claude/skills/golden-dropkiller-productos-ganadores/scripts/seguimiento.py --autoprueba          # 12 chequeos
 python3 ~/.claude/skills/golden-dropkiller-productos-ganadores/scripts/comun.py --autoprueba                # 21 chequeos
 python3 ~/.claude/skills/golden-dropkiller-productos-ganadores/scripts/brecha_mercados.py --autoprueba     # 11 chequeos

@@ -258,10 +258,13 @@ def auditar(ruta):
     # El check estaba INVERTIDO y bloqueaba la entrega de decks bien escritos.
     # Ahora comprueba lo contrario: que no falte el signo de apertura.
     frases = re.split(r'[\n\r]+', re.sub(r'<[^>]+>', '\n', cuerpo))
-    sin_apertura = []
+    sin_apertura, largas = [], []
     for f in frases:
         f = f.strip()
-        if not f or len(f) > 300:
+        if not f:
+            continue
+        if len(f) > 300:            # P59 (27-sep): antes se saltaban sin decirlo
+            largas.append(f[:40])
             continue
         # Cierra con ? o ! pero en toda la frase no hay signo de apertura
         if re.search(r'[?!]\s*$', f) and not re.search(r'[¿¡]', f):
@@ -271,6 +274,9 @@ def auditar(ruta):
             'Frases que cierran con ? o ! y les falta el signo de apertura: %s. '
             'En una presentacion se escribe con ortografia correcta: "¿Que pasa?", '
             'no "Que pasa?".' % ' · '.join('"%s"' % x for x in sin_apertura[:5]))
+    if largas:
+        a.sin_verificar('%d frase(s) de mas de 300 caracteres fuera del chequeo de signos de apertura' % len(largas),
+                        'revisarlas a mano: ' + ' · '.join('"%s…"' % x for x in largas[:3]))
 
     # ------------------------------------------------------------------
     # 4 · Estructura del motor

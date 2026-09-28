@@ -268,38 +268,22 @@ else
   # se pesca del cuerpo), la description se mide en CARACTERES reales (sin la clave, sin el
   # literal ">-"/"|" y sin indentación — el conteo viejo por bytes daba 1361 donde hay 1290)
   # y C7 cierra también en claves raíz CON dígito (version2:).
-  FM_OUT=$(python3 -X utf8 - "$SKILL_MD" <<'PYEOF'
-import sys, re
-lines = [l.rstrip('\r') for l in open(sys.argv[1], encoding='utf-8', errors='replace').read().split('\n')]
-if not lines or lines[0].strip() != '---':
-    print("SINFM\t\t"); sys.exit()
-fm = []
-cerrado = False
-for l in lines[1:]:
-    if l.strip() == '---':
-        cerrado = True
-        break
-    fm.append(l)
-if not cerrado:
-    print("SINFM\t\t"); sys.exit()
-key = re.compile(r'^([A-Za-z_][A-Za-z0-9_-]*):(.*)$')  # C7: claves raíz con dígito cierran
-vals = {}
-cur = None
-for l in fm:
-    m = key.match(l)  # C7-corte-clave
-    if m:
-        cur = m.group(1)
-        v = m.group(2).strip()
-        vals[cur] = [] if v in ('>-', '>', '|', '|-', '>+', '|+') else [v]
-    elif cur is not None and (l.startswith(' ') or not l.strip()):
-        vals[cur].append(l.strip())
-name = ' '.join(x for x in vals.get('name', []) if x).strip()
-desc = ' '.join(x for x in vals.get('description', []) if x).strip()
-print("OK\t%s\t%d" % (name, len(desc)))
-PYEOF
-)
+  # P61 (27-sep): el python vivia en un heredoc, y bash guarda el heredoc en un TEMPORAL. En una
+  # sesion cuyo sandbox no dejaba escribirlo, FM_OUT salia vacio y aqui se imprimia "SIN FRONTMATTER"
+  # sobre una skill SANA, y el cierre decia "Inventario completo". Ahora va en su propio archivo (sin
+  # temporal) y se distinguen dos fallos que no son lo mismo: el de la SKILL (no tiene frontmatter)
+  # y el del INSTRUMENTO (no se pudo leer). El segundo nunca se reporta como el primero.
+  FM_PY="$(cd "$(dirname "$0")" && pwd -P)/leer_frontmatter.py"
+  FM_ERR=$(mktemp)
+  FM_OUT=$(python3 -X utf8 "$FM_PY" "$SKILL_MD" 2>"$FM_ERR")
+  FM_RC=$?
   FM_ST=$(printf '%s' "$FM_OUT" | cut -f1)
-  if [ "$FM_ST" != "OK" ]; then
+  if [ "$FM_RC" -ne 0 ] || { [ "$FM_ST" != "OK" ] && [ "$FM_ST" != "SINFM" ]; }; then
+    FM_MOTIVO=$(grep -v '^[[:space:]]*$' "$FM_ERR" | tail -1 | trunca 160)   # la ULTIMA linea es el error
+    [ -z "$FM_MOTIVO" ] && FM_MOTIVO="salida vacia o inesperada (codigo $FM_RC)"
+    echo "🟡 NO SE PUDO LEER el frontmatter (fallo del instrumento: $FM_MOTIVO)"
+    FALLO_INSTRUMENTO="${FALLO_INSTRUMENTO:-}frontmatter de SKILL.md: $FM_MOTIVO"$'\n'   # :- por el set -u
+  elif [ "$FM_ST" = "SINFM" ]; then
     echo "🔴 SIN FRONTMATTER: name y description no declarados (no se pescan del cuerpo)"
   else
     NAME_FM=$(printf '%s' "$FM_OUT" | cut -f2)
@@ -307,6 +291,7 @@ PYEOF
     echo "name: '$NAME_FM' $([ "$NAME_FM" != "$SKILL_NAME" ] && echo "⚠️ NO coincide con la carpeta '$SKILL_NAME'")"
     echo "description: ~$DESC_CHARS caracteres (reales: sin clave, sin marcador de bloque, sin indentación)"
   fi
+  rm -f "$FM_ERR"
 fi
 
 # --- Referencias rotas y huérfanas ---
@@ -994,4 +979,11 @@ fi
 rm -f "$NO_LEIDOS_F" "$ERR_RECORRIDO" "$EXTRACT_ERR"
 
 echo ""
-echo "=== Inventario completo. Ahora: Fase 1, leer TODOS los archivos. ==="
+# P61: un fallo del INSTRUMENTO no deja cerrar como "completo" (hermano del mktemp de la v1.23).
+if [ -n "${FALLO_INSTRUMENTO:-}" ]; then
+  echo "🟡 FALLOS DEL INSTRUMENTO (no son de la skill; lo que dependia de ellos NO se evaluo):"
+  printf '%s' "$FALLO_INSTRUMENTO" | sed '/^$/d; s/^/    /'
+  echo "=== Inventario INCOMPLETO: hubo fallos del instrumento. Corregir el entorno y volver a correrlo. ==="
+else
+  echo "=== Inventario completo. Ahora: Fase 1, leer TODOS los archivos. ==="
+fi

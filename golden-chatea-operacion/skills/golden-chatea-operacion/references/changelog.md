@@ -340,3 +340,12 @@ y qué se rompe si el cupo se agota a mitad; un bloque idéntico en diez sitios 
   `prompt-ventas`, `validacion-direcciones`.
 
 **Cobertura: 10 de 10.** Herramienta de casa: `golden-chatea-cupo [token] [--necesito N]`.
+
+
+## CENTRO DE MANDO · 2026-09-27 · <!-- skill v1.13 · 2026-09-27 · CdM: blo · LEY DE LOS REQUISITOS DEL USUARIO
+
+Ley de FER del 02-sep: declarar ANTES lo que la skill necesita del usuario y pedirlo AL CORRER si falta. Desde golden-skill-auditor v1.22 la ley tiene casilla en `validar_arsenal.py`. Se agregó al principio el bloque "Requisitos", redactado con lo que esta skill USA de verdad (medido en su cuerpo y en sus scripts), sin agregar requisitos de más, y con qué hacer si falta: parar y pedirlo con nombre propio. A la fábrica se le informa por la bandeja: una fila no bloquea.
+
+## GCO1.13.1 · 2026-09-27 · ronda de numeracion del Centro de Mando (orden de FER)
+
+Cambios del 27-sep que no tenian acta propia (limpieza de datos privados en origen, bloque de requisitos o sincronizacion). Este numero solo avisa a quien ya la instalo de que la version publicada cambio; el detalle esta en el diff del repo.

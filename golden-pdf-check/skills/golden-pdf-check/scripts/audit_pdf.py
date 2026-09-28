@@ -166,12 +166,14 @@ def audit_colors_pixels(path):
     codificaron los colores. Devuelve el % de área con color fuera de la paleta
     y los tonos foráneos dominantes. Requiere pdftoppm (poppler) + Pillow."""
     import tempfile, subprocess, glob, shutil
+    # P59 (27-sep): antes devolvia None en los tres casos y el informe caia a la pasada de texto SIN
+    # decirlo. Ahora devuelve el motivo, y build_report lo imprime.
     try:
         from PIL import Image
     except ImportError:
-        return None
+        return {"no_corrio": "falta Pillow"}
     if not shutil.which("pdftoppm"):
-        return None
+        return {"no_corrio": "falta pdftoppm (poppler)"}
     allowed_rgb = []
     for h in ALLOWED:
         try:
@@ -203,8 +205,8 @@ def audit_colors_pixels(path):
         top_hex = [{"hex": "#%02x%02x%02x" % k,
                     "pct": round(100.0 * v / max(total, 1), 2)} for k, v in top]
         return {"foreign_pct": pct, "top": top_hex}
-    except Exception:
-        return None
+    except Exception as e:
+        return {"no_corrio": "fallo el render a imagen (%s)" % type(e).__name__}
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
@@ -271,6 +273,11 @@ def build_report(path, f):
 
     # Color: la pasada por píxeles manda (funciona en cualquier PDF).
     cp = f.get("colors_pixel")
+    if cp is None or "no_corrio" in cp:
+        motivo = (cp or {}).get("no_corrio", "este motor no la corre")
+        lines.append("> \u26a0\ufe0f La pasada de color por PIXELES NO corrio (" + motivo + "): imagenes y formas "
+                     "NO se revisaron; el color de abajo sale solo del texto.")
+        cp = None
     if cp is not None:
         if cp["foreign_pct"] >= 2.0:
             lines.append("## Colores fuera de marca")

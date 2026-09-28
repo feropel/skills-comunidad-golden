@@ -5,6 +5,30 @@
 
 Acta completa. Se mudó aquí desde el cuerpo del SKILL.md el 2026-09-05 por el Centro de Mando: **el cuerpo se paga en CADA activación y el acta no se consulta al trabajar.** Nada se borró, todo está literal.
 
+## GPG1.25.1 · 2026-09-27 · P59 · entrega_golden cuenta lo que descarta
+
+Aplicado por el chat 🧰 ARSENAL Y SKILLS (bloque 3 del Centro de Mando, orden de FER), con la fila enviada a esta fábrica.
+
+- **El fallo (`scripts/entrega_golden.py:96`):** los pedidos sin ID o sin PRODUCTO ID se tiraban sin contarse, y un pedido REPETIDO en dos informes con OTRO estatus se quedaba con el primero que aparecía. El verificador midió con 5 filas: tasa de **100%** donde la real era **40%**. Esa tasa entra al PVP mínimo.
+- **El arreglo:**
+  - Los sin-ID y los repetidos se cuentan (`descartados` en el JSON y una línea DESCARTADOS en `construir`).
+  - Un estatus terminal (ENTREGADO o DEVOLUCIÓN) le gana a «otros».
+  - Dos terminales distintos NO se adivinan: se declaran en `conflicto_terminal`.
+  - Los `.xlsx` de la carpeta sin «por producto» en el nombre se NOMBRAN. La selección no cambia.
+- **CIFRA REAL, antes → después**, con los informes de Golden (`⭐️ GOLDEN/COLOMBIA/🟠 INFORMES DROPI`):
+  - Tasa general **72,7% → 72,7%**, y **0 de 103 productos** cambian su tasa.
+  - Ahora se ven 1.396 filas repetidas, ninguna con otro estatus, y 33 `.xlsx` que no se leen (comisiones, cartera…).
+  - El caso del verificador pasa de 100% a 40%.
+- **Autoprueba:** 17 → **21 de 21**. La línea del SKILL.md pasa a «21 chequeos».
+
+## GPG1.25.1 · 2026-09-27 · Limpieza de datos internos para el repo público (aplicó el CENTRO DE MANDO)
+
+La compuerta de publicación bloqueaba la skill por nombres internos: el nombre del chat y de la empresa de un espacio ajeno, y el código de un espacio real. Se cambiaron por formulaciones genéricas con el mismo sentido; la excepción operativa que nombraba espacios concretos vive ahora en la memoria del proyecto. Solo prosa y comentarios; ninguna regla cambió.
+
+## GPG1.25.1 · 2026-09-27 · Ley de los requisitos del usuario (aplicó el CENTRO DE MANDO)
+
+Se añadió el bloque de requisitos del SKILL.md: qué tiene que tener el usuario antes de arrancar, cada requisito marcado BLOQUEANTE o DEGRADABLE y qué pasa si falta (doctrina del CdM del 27-sep). Lo redactó el chat 🧰 ARSENAL Y SKILLS (fila P49, 4 pasadas del golden-verificador adversarial; en la última, ninguna falla nueva grave) y lo aplicó el CdM sin numerar: el número lo pone la fábrica al ratificar. Solo inserción: 0 líneas quitadas.
+
 ## GPG1.25 — 2026-09-23 · LA COMISIÓN DE RECAUDO ERA UN COBRO DUPLICADO: pasa a 0 y MEDIDA
 
 **De dónde viene.** Fila del Centro de Mando con una frase de FER del 23-sep: *"Dropi no cobra

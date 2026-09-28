@@ -2,6 +2,23 @@
 
 Aquí vive el acta. `SKILL.md` es instrucción; esto es memoria.
 
+
+## GP2.1i · 2026-09-27 · P59 · lo que se descartaba sin decirlo
+
+Aplicado por el chat 🧰 ARSENAL Y SKILLS por orden directa de FER («que todas las skills estén perfectamente corregidas»), informado al Centro de Mando. No se encontró una sesión viva de esta fábrica. **No se numeró.**
+
+- `scripts/verificar_deck.py`: las frases de más de 300 caracteres salían del chequeo de signos de apertura sin decirlo. Ahora van por `sin_verificar()`, con su conteo y su comienzo. No cambian el veredicto ni la cuenta de chequeos.
+- `scripts/abrir_blindaje.sh`: el par ANTES → DESPUÉS no mostraba los archivos BORRADOS, porque el awk solo recorría el DESPUÉS. Y la huella solo miraba `.md`, `.py`, `.js`, `.html` y `.sh`, así que un `.json` o un `.css` cambiado no salía. Ahora se listan los borrados, entra todo archivo (salvo `.DS_Store` y `__pycache__`) y el conteo los suma.
+- `SKILL.md:212`: la ruta de las recetas de estilo iba RELATIVA (`references/style-recipes/`) y es de `web-design-engineer`. El validador v1.26, que ya comprueba que la ruta exista en la skill dueña, se la atribuía a golden-cinematica, la skill golden- más cercana en el texto, y daba FALLO. Ahora lleva la ruta completa, como ya la tenía `references/atmosferas.md:63`. Con eso el validador queda sano.
+- **Probado sobre copia, 9 de 9:**
+  - `autoprueba_deck` sale 0.
+  - La frase larga ahora sale en «sin verificar», y el chequeo sigue cazando «Hola?» sin ¿.
+  - Con 5 archivos borrados y un `.json` cambiado, la versión anterior decía «**0** artefactos cambiados», y la nueva dice 6 y los nombra.
+
+## GP2.1i · 2026-09-27 · Ley de los requisitos del usuario (aplicó el CENTRO DE MANDO)
+
+Se añadió el bloque «Antes de empezar» del SKILL.md: qué tiene que tener el usuario antes de arrancar, cada requisito marcado BLOQUEANTE o DEGRADABLE y qué pasa si falta (doctrina del CdM del 27-sep). Lo redactó el chat 🧰 ARSENAL Y SKILLS (4 pasadas del golden-verificador adversarial, 0 fallas nuevas en la última) y lo aplicó el CdM sin numerar: el número lo pone la fábrica al ratificar. Solo inserción: 0 líneas quitadas.
+
 ## GP2.1h · 2026-09-24 · La página por escenas se delega a golden-cinematica
 
 Fila del Centro de Mando, aplicada por el CdM porque la fábrica no tenía sesión abierta (una fila

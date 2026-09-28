@@ -146,16 +146,57 @@ PROHIBICION = re.compile(
 # ARREGLO DE CLASE: el alcance de una prohibición se ARRASTRA hacia abajo hasta que termina la
 # sección (línea en blanco). Es la misma clase que ya me mordió dos veces: el detector acusa al
 # idioma cuando no entiende la ESTRUCTURA del texto, no solo sus palabras.
+# 🔴 REPARACIÓN v3.64.0 — EL ARREGLO DE v3.54.0 ABRIÓ UN CORREDOR CIEGO (fila P59 del CdM).
+# El arrastre de arriba no distinguía un ENCABEZADO que prohíbe de una línea de COPY que
+# casualmente lleva una palabra de prohibición dentro. Medido sobre la vara mínima, que pasa
+# limpia: añadirle "Evita la caída del cabello y recupera densidad en semanas." y debajo
+# "quedan pocas unidades, solo por hoy" daba **exit 0 y ANTIPATRONES: ✅ ninguno detectado**.
+# Sin la línea del "Evita", la misma escasez se cazaba. Una frase de venta cualquiera abría un
+# pasillo por el que entraba la mentira, y el validador certificaba CUMPLE.
+# Es el FALLO SIMÉTRICO de la corrección anterior: arreglar el falso positivo creó el falso
+# negativo, que es el peor de los dos porque un "no hay nada" se cree igual que un hallazgo.
+#
+# ARREGLO: la prohibición SIEMPRE exime su PROPIA línea (eso es lo correcto de v3.46.0), pero
+# solo ARRASTRA el alcance hacia abajo cuando la línea es de verdad un ENCABEZADO:
+#   · queda en ≤3 palabras al quitarle el marcador (el caso vivo "PROHIBIDO"), o
+#   · termina en ":" porque anuncia una lista ("⛔ NUNCA digas:"), o
+#   · abre con un emoji de prohibición, o va toda en MAYÚSCULAS (los títulos de estos prompts).
+# Así el caso vivo de v3.54.0 (L78 "PROHIBIDO" / L79 lo prohibido debajo) sigue sin dar falso
+# positivo, y una frase de copy ya no tapa lo que viene después.
+_EMOJI_PROH = ("⛔", "🚫", "🔴", "❌")
+
+
+def _es_encabezado(l):
+    s = l.strip()
+    if s.endswith(":"):
+        return True
+    if s.startswith(_EMOJI_PROH):
+        return True
+    _letras = [c for c in s if c.isalpha()]
+    if _letras and all(c.isupper() for c in _letras):
+        return True
+    # lo que queda al quitarle el marcador y la puntuación: un título no deja frase detrás
+    _resto = PROHIBICION.sub(" ", s)
+    _resto = re.sub(r"[^0-9A-Za-zÁÉÍÓÚÜÑáéíóúüñ ]+", " ", _resto)
+    return len([p for p in _resto.split() if len(p) > 1]) <= 3
+
+
 lineas_crudas = T.split("\n")
 en_prohibicion = False
 lineas = []
+excluidas = []                           # nada se excluye en silencio
 for l in lineas_crudas:
     if not l.strip():
         en_prohibicion = False           # la línea en blanco cierra la sección
         continue
     if PROHIBICION.search(l):
-        en_prohibicion = True            # abre (o sigue) el alcance prohibitivo
+        # arrastra SOLO si es un encabezado; si es copy, se exime ella y nada más
+        en_prohibicion = _es_encabezado(l)
+        excluidas.append(("encabezado" if en_prohibicion else "prohibe en la linea",
+                          l.strip()[:80]))
         continue
+    if en_prohibicion:
+        excluidas.append(("bajo encabezado", l.strip()[:80]))
     lineas.append(("PROH" if en_prohibicion else "VIVA", l))
 
 for n, ps in anti:
@@ -171,6 +212,18 @@ for n, ps in anti:
         print(f"   ❌ {n}")
         print(f"        └ línea: \"{culpable}\"")
 if not malos: print("   ✅ ninguno detectado")
+# 🔴 EL VEREDICTO VIENE CON SU COBERTURA (fila P59): un "ninguno detectado" sobre un texto del
+# que se excluyeron líneas no es lo mismo que sobre el texto entero. Se declara SIEMPRE, y se
+# nombran, porque una exclusión que no se ve es la que esconde el hallazgo.
+if excluidas:
+    print(f"   ⚠️  {len(excluidas)} líneas excluidas del barrido de antipatrones "
+          f"(de {len(lineas)+len(excluidas)} con contenido):")
+    for _razon, _l in excluidas[:12]:
+        print(f"        · [{_razon}] \"{_l}\"")
+    if len(excluidas) > 12:
+        print(f"        · … y {len(excluidas)-12} más")
+else:
+    print(f"   · cobertura: {len(lineas)} de {len(lineas)} líneas con contenido barridas")
 print("\n"+"-"*52)
 if faltan or malos:
     print(" ❌ BLOQUEADO — este prompt informa pero no cumple la doctrina:")

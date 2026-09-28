@@ -6,6 +6,10 @@
 > skill que ARRANCA una instalación completa, así que ese peso se paga siempre. **El cuerpo se
 > paga siempre, el acta solo cuando se consulta.** No se perdió una palabra: bajaron verbatim.
 
+## v1.13.1 · 2026-09-27 · Limpieza de datos internos para el repo público (aplicó el CENTRO DE MANDO)
+
+La compuerta de publicación bloqueaba la skill por nombres internos: el nombre del chat y de la empresa de un espacio ajeno, y el código de un espacio real. Se cambiaron por formulaciones genéricas con el mismo sentido; la excepción operativa que nombraba espacios concretos vive ahora en la memoria del proyecto. Solo prosa y comentarios; ninguna regla cambió.
+
 ## CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las 
 
 CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
@@ -62,13 +66,13 @@ skill v1.3 · 2026-08-23 (Estándar 9, golden-skill-auditor) · Estándar 9 (Cen
 
 skill v1.2 · 2026-08-21 (auditoría golden-skill-auditor 918/1000 PLATA → reparada) · 🔴 el mapa de hijas declaraba "Dos asistentes tienen skill hija" y omitía por completo `golden-chatea-pro-producto-comentarios` (el hijo de Comentarios, equivalente a prompt-ventas para Ventas: existe, está instalado, y config-comentarios ya lo cita como su propio hijo) — el orquestador dejaba huérfano el paso de cargar la ficha de cada producto en el asistente de Comentarios. Corregido en la tabla de asistentes, en el párrafo de hijas (ahora TRES), en PASO 1 (Comentarios invoca a producto-comentarios por cada producto) y en el mapa de derivación; sumado un chequeo de coherencia de producto entre Ventas/Carritos/Comentarios en PASO 2.
 
-## skill v1.1.1 · 2026-08-08 (centro de mando, chat CHATEA otra empresa del grupo COL 2026-08-08 (2ª ronda: 5ª cate
+## skill v1.1.1 · 2026-08-08 (centro de mando, chat de un espacio de otra empresa, 2026-08-08 (2ª ronda: 5ª cate
 
-skill v1.1.1 · 2026-08-08 (centro de mando, chat CHATEA otra empresa del grupo COL 2026-08-08 (2ª ronda: 5ª categoría + prosa libre)) · QUINTA CATEGORÍA VETADA en la ley: claims y cifras de negocio (años en el mercado, clientes atendidos, porcentajes de entrega, premios) — no rompen nada técnico ni los caza un barrido de llaves, pero el bot termina mintiendo con datos de otra empresa (caso real: "Más de 100.000 clientes atendidos en Colombia" a punto de heredarse). Y regla operativa LA MARCA VIVE TAMBIÉN EN PROSA LIBRE: al barrido se añade grep -i por el nombre de la marca origen sobre todo el texto a escribir (cazó 10 menciones en 3 campos que el mapeo de llaves no vio).
+skill v1.1.1 · 2026-08-08 (centro de mando, chat de un espacio de otra empresa, 2026-08-08 (2ª ronda: 5ª categoría + prosa libre)) · QUINTA CATEGORÍA VETADA en la ley: claims y cifras de negocio (años en el mercado, clientes atendidos, porcentajes de entrega, premios) — no rompen nada técnico ni los caza un barrido de llaves, pero el bot termina mintiendo con datos de otra empresa (caso real: "Más de 100.000 clientes atendidos en Colombia" a punto de heredarse). Y regla operativa LA MARCA VIVE TAMBIÉN EN PROSA LIBRE: al barrido se añade grep -i por el nombre de la marca origen sobre todo el texto a escribir (cazó 10 menciones en 3 campos que el mapeo de llaves no vio).
 
-## skill v1.1 · 2026-08-08 (centro de mando, chat CHATEA otra empresa del grupo COL 2026-08-08) · horneada la LEY "
+## skill v1.1 · 2026-08-08 (centro de mando, chat de un espacio de otra empresa, 2026-08-08) · horneada la LEY "
 
-skill v1.1 · 2026-08-08 (centro de mando, chat CHATEA otra empresa del grupo COL 2026-08-08) · horneada la LEY "NUNCA HEREDAR DATOS ENTRE ESPACIOS": al basarse en una cuenta guía se hereda estructura/prompts/config, JAMÁS datos (APIs, plantillas de WhatsApp, teléfonos, correos, dominios, marca, productos y disparadores); única excepción Le'côterra como producto-ejemplo; método de barrido obligatorio antes y después de escribir en espacio ajeno. Origen: incidente Golden → otra empresa del grupo Incanto 2026-08-08 (se colaron llave ElevenLabs, teléfono, plantilla de notificación y firmas de la marca origen; revertido el mismo día). La ley entra como PREVENCIÓN, no reparación: línea base pre-horneado verificada por verificador externo — 8/8 skills sin credenciales (CRITICA=0); únicos hallazgos 3 teléfonos de relleno legítimos (+57 300 de ejemplo) que se conservan. ADEMÁS (chat CHATEA otra empresa del grupo COL 2026-08-08, retractación pixel): regla CAMPOS [Meta] = VALORES CALIENTES — los eventos de pixel los mueve el flujo en vivo, prohibido diagnosticar con una lectura suelta.
+skill v1.1 · 2026-08-08 (centro de mando, chat de un espacio de otra empresa, 2026-08-08) · horneada la LEY "NUNCA HEREDAR DATOS ENTRE ESPACIOS": al basarse en una cuenta guía se hereda estructura/prompts/config, JAMÁS datos (APIs, plantillas de WhatsApp, teléfonos, correos, dominios, marca, productos y disparadores); única excepción Le'côterra como producto-ejemplo; método de barrido obligatorio antes y después de escribir en espacio ajeno. Origen: incidente entre dos espacios de empresas distintas, 2026-08-08 (se colaron llave ElevenLabs, teléfono, plantilla de notificación y firmas de la marca origen; revertido el mismo día). La ley entra como PREVENCIÓN, no reparación: línea base pre-horneado verificada por verificador externo — 8/8 skills sin credenciales (CRITICA=0); únicos hallazgos 3 teléfonos de relleno legítimos (+57 300 de ejemplo) que se conservan. ADEMÁS (chat de un espacio de otra empresa, 2026-08-08, retractación pixel): regla CAMPOS [Meta] = VALORES CALIENTES — los eventos de pixel los mueve el flujo en vivo, prohibido diagnosticar con una lectura suelta.
 
 ## v1.0 · sin sello previo
 
@@ -345,7 +349,7 @@ tropiece la próxima vez que alguien la use sobre un espacio que aún tiene el r
 2. El campo `Producto Remarketing` del asistente de **Ventas WhatsApp** y sus recordatorios NO
    son esto — se aclaró la frontera para que nadie los confunda ni los toque por error.
 3. **Excepción viva, medida el 2026-09-21 por el CdM:** el asistente retirado sigue instalado en
-   **otra empresa del grupo Incanto** y **Le'côterra**, 9 campos cada uno, por decisión de FER. Si un MODO B de
+   **dos espacios de empresas hermanas** (cuáles: en la memoria del proyecto, no en la skill), 9 campos cada uno, por decisión de FER. Si un MODO B de
    esta skill cae sobre uno de esos dos espacios, esos campos se IGNORAN: no se desinstalan ni se
    configuran. Sin esta línea, un MODO B futuro sobre esos dos espacios habría tratado esos
    campos como basura de plantilla a limpiar o como un asistente a configurar — ninguna de las
@@ -354,7 +358,18 @@ tropiece la próxima vez que alguien la use sobre un espacio que aún tiene el r
 **Compuertas:** `agentskills validate` → exit 0. `validar_arsenal.py` → 1 de 1, cero fallos
 (cuerpo ahora 570 líneas, mismo aviso de peso de siempre). md5 se captura al cerrar blindaje.
 
-**Sin verificar:** no hubo forma de ejecutar esto contra un espacio real de otra empresa del grupo Incanto o
-Le'côterra en esta ronda — la excepción de "se ignoran" queda escrita pero no probada contra un
+**Sin verificar:** no hubo forma de ejecutar esto contra un espacio real de esas empresas
+en esta ronda — la excepción de "se ignoran" queda escrita pero no probada contra un
 MODO B real sobre esos dos espacios. Sigue pendiente también lo de siempre: una conversación real
 contra un bot instalado con esta skill.
+
+
+## CENTRO DE MANDO · 2026-09-27 · v1.13 · LEY DE LOS REQUISITOS DEL USUARIO
+
+Ley de FER del 02-sep: *"Todo lo que necesite intervención del usuario, ponlo dentro de cada skill, y cuando la vayan a
+correr que le diga: ok, aquí va tu API, ponla aquí, dame estos datos."* Desde v1.22 de golden-skill-auditor la ley tiene
+casilla en `validar_arsenal.py`, y esta skill daba FALLO: pedía "el token del workspace" y los siete datos, pero en la
+línea 163, sin decir qué hacer si faltaban. Se agregó el bloque "Requisitos" al principio. Tiene tres piezas medidas en
+su propio texto y en la memoria `feedback_instalacion_chatea_siete_datos_al_cliente`: el token, los siete datos y las 4
+hijas. Además dice qué hacer si falta algo: parar antes de escribir y pedirlo con nombre propio. No se agregó ningún
+requisito que la skill no usara. Fábrica: se le informa por la bandeja (una fila no bloquea).

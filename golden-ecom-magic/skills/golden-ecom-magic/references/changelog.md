@@ -4,6 +4,10 @@ Acta de versiones. Se muda aqui desde SKILL.md para que el cuerpo cargue solo el
 procedimiento vivo (norma del Centro de Mando, 2026-09-05). **Nada se borra: se muda.**
 Mas reciente arriba.
 
+## v2.7.1 · 2026-09-27 · Ley de los requisitos del usuario (aplicó el CENTRO DE MANDO)
+
+Se añadió el bloque «Antes de empezar» del SKILL.md: qué tiene que tener el usuario antes de arrancar, cada requisito marcado BLOQUEANTE o DEGRADABLE y qué pasa si falta (doctrina del CdM del 27-sep). Lo redactó el chat 🧰 ARSENAL Y SKILLS (4 pasadas del golden-verificador adversarial, 0 fallas nuevas en la última) y lo aplicó el CdM sin numerar: el número lo pone la fábrica al ratificar. Solo inserción: 0 líneas quitadas.
+
 <!-- skill v2.7 · 2026-09-13 (auditoria golden-skill-auditor): SKILL.md, seccion "Archivos de
      referencia", citaba el acta como "v2.0 -> v2.5" cuando la ultima entrada real ya era v2.6
      (esta misma tabla, linea de abajo) — desincronizado desde el cierre de la v2.6. Corregido a

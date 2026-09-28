@@ -4,6 +4,10 @@ Acta completa. Se mudó aquí desde el cuerpo del SKILL.md el 2026-09-05 por el 
 
 
 
+## v1.6.1 · 2026-09-27 · Ley de los requisitos del usuario (aplicó el CENTRO DE MANDO)
+
+Se añadió el bloque «Antes de empezar» del SKILL.md: qué tiene que tener el usuario antes de arrancar, cada requisito marcado BLOQUEANTE o DEGRADABLE y qué pasa si falta (doctrina del CdM del 27-sep). Lo redactó el chat 🧰 ARSENAL Y SKILLS (4 pasadas del golden-verificador adversarial, 0 fallas nuevas en la última) y lo aplicó el CdM sin numerar: el número lo pone la fábrica al ratificar. Solo inserción: 0 líneas quitadas.
+
 ## Mudado del cuerpo del SKILL.md el 2026-09-05
 
 <!-- skill v1.6 · 2026-09-06 (auditoría golden-skill-auditor, 965→985/1000) · Único hallazgo real: la línea bajo el H1 apuntaba al historial pero no traía la versión vigente en el patrón de la casa `<!-- skill vX.Y · qué cambió -->`. Se corrige el comentario del H1 para que declare la versión de un vistazo, sin mover contenido de este archivo. Validador oficial: exit 0 antes y después. Blindaje: chflags uchg, restaurado al cierre. -->

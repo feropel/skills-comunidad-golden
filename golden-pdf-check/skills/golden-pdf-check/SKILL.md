@@ -17,6 +17,7 @@ description: >-
 
 # golden-pdf-check · el estándar de PDF de Comunidad Golden
 
+<!-- skill v6.7.1 · 2026-09-27 · ronda de numeracion del Centro de Mando (orden de FER: «que todas las skills esten perfectamente corregidas y actualizadas»): da numero a los cambios del 27-sep que quedaron sin numero. Detalle en references/changelog.md -->
 <!-- skill v6.7 · 2026-09-06 · autoprueba 26/26 · EL ACTA COMPLETA VIVE EN references/changelog.md.
      Auditoría golden-skill-auditor: `scripts/visuales.py` (el motor de los componentes
      visuales — KPI, barras, escala, comparativa, pasos, QR — que `build_pdf.py` importa

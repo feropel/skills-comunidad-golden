@@ -15,13 +15,24 @@ description: >-
 ---
 # Golden · Chatea Pro — Asistente de Carritos Abandonados
 
+## 📋 Requisitos: qué necesita del usuario antes de arrancar
+
+- **Token API del espacio de Chatea Pro** · BLOQUEANTE. Se crea en el panel del espacio (*Settings → API Keys*, según el propio código) y va **atado al Bot**; si no, la API responde 404 "Flow not found". Se guarda en `<carpeta del cliente>/.secrets/<espacio>.token`. Cupo: 1.000 llamadas por hora (no está medido si es por token o por espacio; se mira con `golden-chatea-cupo`).
+- **Plataforma de la tienda** · se pregunta primero. **Shopify** · BLOQUEANTE: la integración conectada en el panel, con Access Token `shpat_` (no `shpss_`) y `origen_datos` en Shopify; instalar la app exige ser **dueño** de la tienda. **Otra plataforma**: hoy "no aplica todavía", y se declara.
+- **Dominio de la tienda** (`--dominio`) · DEGRADABLE: se pregunta; sin él no se revisa el caché de productos contra el catálogo público.
+- **Datos del dueño** (ciudad de despacho, tiempos, transportadoras, descuento, prueba social) · DEGRADABLES: primero se leen de las skills hermanas (`assets/datos-del-espacio.json`, campo `_como_se_llena`) y solo lo que falte se pregunta. Nunca se inventan.
+- **Vía de entrega** · DEGRADABLE: tiene valor por defecto.
+- **Pago anticipado**, solo si el dueño lo quiere: medio, titular, número o llave, y monto · BLOQUEANTE para activarlo: `escribir_config.py` aborta sin la confirmación del dueño.
+
+**Si falta algo BLOQUEANTE: no se hace lo que depende de él** (si es de toda la skill, se PARA antes de tocar nada) y se pide con nombre propio: qué es, dónde se saca y dónde se pone. **Si falta algo DEGRADABLE: se pide y se sigue**, dejando marcado como pendiente en todo lo que depende de él. Nunca se presenta como completo.
+
 <!-- skill v3.2 · 2026-09-20 · auditoría golden-skill-auditor: scripts/chatea_api.py (la librería
      común que importan auditar_carritos.py, escribir_config.py, limpiar_cache_productos.py y
      validar_config.py) no aparecía mencionada en ninguna parte del cuerpo — inventario.sh la
      marcaba "huérfana potencial" (solo vivía citada por nombre en references/changelog.md,
      que es historia y no cuenta como cita viva). Se agregó una línea en la sección de
      validar_config.py explicando qué es y quién la usa. Sin cambios de comportamiento. -->
-**Versión:** v3.5 · 2026-09-22 · blindada (chflags uchg + chmod 0444, estándar de la casa)
+**Versión:** v3.7 · 2026-09-27 · blindada (chflags uchg + chmod 0444, estándar de la casa)
 **Fábrica:** chat ✅ SKILL golden-chatea-pro-config-carritos
 <!-- v3.0: la skill deja de ser "redactora de plantillas" y pasa a CONFIGURAR el espacio, con lo
 aprendido afinando carritos de Golden el 18-sep. Historial completo en references/changelog.md. -->

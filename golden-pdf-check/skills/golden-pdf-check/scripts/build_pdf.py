@@ -534,15 +534,23 @@ def render_with_playwright(html_str, out_path, footer_label="",
         page = browser.new_page(viewport={"width": PRINT_WIDTH_PX, "height": PRINT_HEIGHT_PX})
         page.emulate_media(media="print")
         page.set_content(html_str, wait_until="load")
+        # P59 (27-sep): si el auto-fit no terminaba o sus avisos no se leian, fit_warnings salia vacio
+        # y la salida daba a entender que ningun prompt quedo reducido. Ahora se dice.
+        incompleto = []
         try:
             page.wait_for_function("window.__golden_fit_done === true", timeout=8000)
-        except Exception:
-            pass
+        except Exception as e:
+            incompleto.append("el auto-fit no termino en 8 s (%s)" % type(e).__name__)
         warnings = []
         try:
             warnings = page.evaluate("window.__golden_warnings || []")
-        except Exception:
-            pass
+        except Exception as e:
+            incompleto.append("no se pudieron leer sus avisos (%s)" % type(e).__name__)
+        if incompleto:
+            sys.stderr.write("\u26a0\ufe0f  AUTO-FIT INCOMPLETO: " + " · ".join(incompleto)
+                             + ". Revisa TODOS los prompts a mano antes de entregar.\n")
+            warnings = list(warnings) + [{"index": "-", "title": "AUTO-FIT INCOMPLETO: " + " · ".join(incompleto),
+                                          "scaled": True, "incompleto": True}]
         pdf_kwargs = dict(
             path=out_path, format=PAGE, print_background=True,
             display_header_footer=True, header_template="<div></div>",

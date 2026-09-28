@@ -101,6 +101,28 @@ def _solo_como_variable_css(texto, token):
     return total > 0 and total == css
 
 
+def _dueno_ajeno(dir_skill, skills, nombre, vivo, inicio, fin, r):
+    """Regla 2 del modulo: una ruta calificada con la skill dueña CERCA (antes o DESPUES)
+    es correcta aunque el archivo no exista AQUI — pero solo si de verdad esta ALLA.
+    Devuelve (ajena, confirmada): ajena = lista de dueños candidatos citados cerca (vacia
+    si ninguno); confirmada = True si el archivo r existe de verdad en algun candidato.
+
+    P59 (27-sep, medido: SKILL.md con dos rutas inexistentes junto a "golden-shopify" daba
+    0 fallos y 0 avisos, sin comprobar nada). Nombrar al dueño no basta: se confirma que el
+    archivo EXISTE ahi. El dueño citado puede vivir junto a esta skill (fixtures de prueba,
+    otro arsenal) o ser una skill YA INSTALADA en ~/.claude/skills — universo() resuelve
+    nombres contra los dos sitios, y esta comprobacion mira en los mismos dos."""
+    ventana = vivo[max(0, inicio - 160):fin + 160]
+    duenos = [d for d in RX_NOMBRE.findall(ventana) if d in skills and d != nombre]
+    otras = re.findall(r"`([a-z0-9-]{4,})`", ventana)
+    ajena = duenos or [o for o in otras if o in skills and o != nombre]
+    if not ajena:
+        return [], False
+    raices = {os.path.dirname(dir_skill.rstrip("/")), os.path.expanduser("~/.claude/skills")}
+    confirmada = any(os.path.exists(os.path.join(raiz, d, r)) for raiz in raices for d in ajena)
+    return ajena, confirmada
+
+
 def revisar_conexiones(dir_skill, univ):
     """Devuelve (fallos, avisos) de conexion."""
     skills, agentes, memoria, familias = univ
@@ -117,18 +139,16 @@ def revisar_conexiones(dir_skill, univ):
         r = m.group(1)
         if os.path.exists(os.path.join(dir_skill, r)):
             continue
-        # regla 2: calificada con la skill dueña CERCA — antes o DESPUES.
-        # Medido: una ruta seguida de "de golden-investigacion-mercado" nombra
-        # al dueño DESPUES de la ruta. Mirar solo hacia atras daba falso positivo.
-        # (Sin ruta literal aqui a proposito: un ejemplo con "scripts/" entre
-        # comillas confundia a inventario.sh, que lo leia como cita real de ESTA
-        # skill y la marcaba rota — bug medido 2026-09-05, ver changelog v1.17.)
-        ventana = vivo[max(0, m.start() - 160):m.end() + 160]
-        duenos = [d for d in RX_NOMBRE.findall(ventana) if d in skills and d != nombre]
-        otras = re.findall(r"`([a-z0-9-]{4,})`", ventana)
-        ajena = duenos or [o for o in otras if o in skills and o != nombre]
+        # (Sin ruta literal en el comentario de este bloque a proposito: un ejemplo con
+        # "scripts/" entre comillas confundia a inventario.sh, que lo leia como cita real
+        # de ESTA skill y la marcaba rota — bug medido 2026-09-05, ver changelog v1.17.)
+        ajena, confirmada = _dueno_ajeno(dir_skill, skills, nombre, vivo, m.start(), m.end(), r)
         if ajena:
-            continue  # apunta a archivo de OTRA skill, y lo dice
+            if confirmada:
+                continue  # apunta a archivo de OTRA skill, y el archivo SI esta ahi
+            fallos.append(
+                f"referencia rota: {r} (dice ser de {'/'.join(ajena)} pero el archivo no existe ahi)")
+            continue
         fallos.append(f"referencia rota: {r} (no existe y no dice de quien es)")
 
     # --- nombres de skills/agentes citados ---
@@ -140,6 +160,10 @@ def revisar_conexiones(dir_skill, univ):
     # que medir la description sin compararla con nada.
     prosa = re.sub(r"[A-Za-z0-9_./-]*golden[a-z0-9.-]*\.(?:md|py|sh|json|css|js|html)", " ", vivo)
     prosa = re.sub(r"(?m)^#{1,6}[^\n]*$", " ", prosa)          # titulares
+    # P48 (27-sep): `~/.golden-rembg` es una CARPETA (el venv de rembg), no una cita a una skill
+    # `golden-rembg`. Ninguna skill empieza por punto, asi que una ruta con `/.golden-` es sintaxis de
+    # carpeta. Se decide por la forma y no por si existe en este Mac: en el equipo de otro no existira.
+    prosa = re.sub(r"(?:~|\$HOME)?/\.golden[\w.-]*", " ", prosa)
     prosa = re.sub(r"\(#[^)]*\)", " ", prosa)                   # anclas de indice
     prosa = re.sub(r"\b\d{1,2}-(?=golden)", " ", prosa)         # prefijo de orden 19-golden-...
     for c in {x.rstrip("-") for x in RX_NOMBRE.findall(prosa)}:
@@ -168,7 +192,21 @@ def revisar_conexiones(dir_skill, univ):
 
     # --- scripts declarados que no estan ---
     for m in re.finditer(r"`(scripts/[A-Za-z0-9_.\-]+\.(?:py|sh))`", vivo):
-        if not os.path.exists(os.path.join(dir_skill, m.group(1))):
-            fallos.append(f"script declarado y ausente: {m.group(1)}")
+        r = m.group(1)
+        if os.path.exists(os.path.join(dir_skill, r)):
+            continue
+        # Mismo hueco que las rutas internas y por la misma regla 2 (encontrado probando
+        # el arreglo de arriba, no en el expediente P59): este chequeo nunca aplicaba la
+        # excusa de "calificada con la skill dueña", y un script real de una hermana, citado
+        # con su nombre completo, salia igual como ausente. (Sin ruta literal aqui a
+        # proposito, misma leccion que arriba: un ejemplo entre comillas confunde a
+        # inventario.sh, que lo lee como cita real de ESTA skill.)
+        ajena, confirmada = _dueno_ajeno(dir_skill, skills, nombre, vivo, m.start(), m.end(), r)
+        if ajena:
+            if confirmada:
+                continue
+            fallos.append(f"script declarado y ausente: {r} (dice ser de {'/'.join(ajena)} pero no esta ahi)")
+            continue
+        fallos.append(f"script declarado y ausente: {r}")
 
     return fallos, avisos

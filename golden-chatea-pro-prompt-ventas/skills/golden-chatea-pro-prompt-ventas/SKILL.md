@@ -13,22 +13,9 @@ description: >-
   menos.
 ---
 
-**Versión viva:** v3.63.0 · 2026-09-23 · el acta completa en `references/changelog.md` (no se lee para trabajar).
+**Versión viva:** v3.64.0 · 2026-09-27 · el acta completa en `references/changelog.md` (no se lee para trabajar).
 <!-- CENTRO DE MANDO · 2026-09-03 · PUESTA EN NORMA DEL ARSENAL (mandato de FER: "arregla todas las skill para que queden perfectas y estos errores no pueden volver a pasar nunca mas").
-     QUE SE LE HIZO A ESTA SKILL: (1) FRONTMATTER YAML INVALIDO, arreglado: la description estaba escrita como escalar PLANO en una linea y su texto contenia 'dos puntos + espacio', que YAML lee como una clave nueva. Un parser estricto NO podia leer esta skill. Pasa a bloque '>-', que es inmune. No se cambio una sola palabra: cambio la FORMA de escribirla · (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 1010 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '🔴 **CUPO DE LA API: 1.000 peticiones por HORA, y pasarse BLOQUEA una hora entera.**
-Medido contra la API viva el 2026-09-07: cada respuesta trae **`x-ratelimit-remaining`** (en
-inglés *X-RateLimit-Remaining*, "las que quedan") y `x-ratelimit-limit`. **Se repone cada hora**,
-pero **no viene `x-ratelimit-reset`**: el servidor no dice a qué minuto empezó la ventana, así que
-si te bloqueas se espera una **hora completa** y se comprueba **mirando** el contador
-(`golden-chatea-cupo [--necesito N]`), nunca calculándolo.
-
-**Cuándo te afecta aquí:** esta skill produce TEXTO —el prompt y su paquete— y no toca la red. El
-cupo entra cuando ese prompt **se escribe** en el bot field del producto. Es barato (una escritura
-más su relectura), pero **se suma al de la instalación completa** si estás montando varios
-productos seguidos: diez productos son al menos veinte peticiones, más las del resto de la
-instalación.
-
-## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
+     QUE SE LE HIZO A ESTA SKILL: (1) FRONTMATTER YAML INVALIDO, arreglado: la description estaba escrita como escalar PLANO en una linea y su texto contenia 'dos puntos + espacio', que YAML lee como una clave nueva. Un parser estricto NO podia leer esta skill. Pasa a bloque '>-', que es inmune. No se cambio una sola palabra: cambio la FORMA de escribirla · (2) DESCRIPTION puesta dentro del tope DURO de la especificacion: hoy mide 1010 caracteres (tope 1024). Antes se pasaba, y lo que se pasa se TRUNCA: los disparadores del final son los mas nuevos y son los primeros en perderse · (3) Lo que sobraba NO SE BORRO: la parte de fronteras y desambiguacion BAJO AL CUERPO, a la seccion '## Fronteras y desambiguacion', que no tiene tope duro. Los disparadores se quedaron arriba, que es lo que hace que la skill dispare.
      POR QUE NADIE LO HABIA VISTO: 'golden-skill-auditor/scripts/inventario.sh' MEDIA la longitud de la description y la IMPRIMIA, pero NUNCA la comparaba contra un tope ('1024' aparecia cero veces en sus scripts). Medir no es comparar: un numero sin vara al lado no es un chequeo, es decoracion. Por eso 33 skills de la casa quedaron fuera de norma, varias selladas ORO.
      QUE LO IMPIDE AHORA: 'golden-skill-auditor/scripts/validar_arsenal.py' compara contra los topes REALES de agentskills.io/specification y contra las reglas duras de FER (sin signos de apertura, sin acentos rotos, sin rayas separadoras, lenguaje de EMPRESA), revisa ademas que la skill este BIEN CONECTADA, y tiene su propia autoprueba de 26 casos en las dos direcciones. Compuerta dura en la rubrica: una skill que no lo pase NO puede pasar de 700/1000.
      COMO COMPROBARLO TU MISMO (actualizado v3.46.1): la compuerta que MANDA es el validador OFICIAL de la especificacion, ya instalado:
@@ -42,6 +29,24 @@ instalación.
 <!-- skill v3.53.0 · 2026-09-07 · auditoría golden-skill-auditor (AUDITA+ARREGLA, orden de FER): esta skill tenía DOS validadores y NINGÚN banco — nadie había comprobado nunca que mordieran. Nace scripts/autoprueba.sh (15 de 15, sabotaje por pieza). El validador no miraba la contaminación de la plantilla de fábrica (asesor 'Santiago', biografía '5 años de experiencia') ni tenía canal de AVISOS: era binario, bloquea o pasa. Y le faltaba sk-ant- entre las credenciales. Historial completo en references/changelog.md. -->
 
 **Fábrica: chat ✅ SKILL golden-chatea-pro-prompt-ventas** — solo esa fábrica numera versiones y edita; cualquier otro chat entrega FILA al Centro de Mando (Ley del Cambio Único, FER 2026-08-25).
+
+## 📋 Requisitos: qué necesita del usuario antes de arrancar
+
+- **El producto, el país y el precio de 1 unidad** · BLOQUEANTES: son los tres obligatorios del intake (`references/intake-inteligente.md`). Si falta uno, se pregunta antes de construir.
+- **Combos, variantes, beneficios y modelo de pago** · DEGRADABLES: se deduce lo posible y para lo que falte se propone un valor por defecto, marcado en el borrador como supuesto. La transportadora y los tiempos de entrega no se preguntan: van por defecto según el país.
+- **El nombre del asesor** · DEGRADABLE: se pregunta en cada caso, porque es de tu negocio. Si no lo das, el prompt queda marcado como pendiente de ese nombre: nunca se inventa ni se hereda de otro espacio.
+- **Garantía, regalo o bono, envío discreto, producto original** · DEGRADABLES: se preguntan una vez; si no existen, se omiten y se dice. Jamás se inventan: el bot se los prometería a un cliente real.
+- **Las cuentas del pago anticipado** (titular, entidad, número y tipo de cuenta), si el producto lo usa · DEGRADABLES: se preguntan; si no las tienes a mano, el prompt queda con el marcador `[AQUÍ VAN LOS DATOS DE PAGO ANTICIPADO]` y se avisa que falta. Nunca se inventan ni se heredan de otro espacio (LEY NUNCA HEREDAR).
+- **Un espacio de Chatea PRO con el asistente de ventas ya instalado, y su token de API** · BLOQUEANTES para montar el campo del producto. El token se crea en el panel del espacio, va atado al Bot y se guarda en `<carpeta del cliente>/.secrets/`, como en `golden-chatea-pro-full-configuracion`; jamás va dentro del prompt. Si el asistente no está instalado, eso es `golden-chatea-pro-config-ventas-wp`. Sin espacio con token se entrega el bloque copiable listo para pegar, que se entrega SIEMPRE de todos modos.
+- **bash y Python 3**, que usa `scripts/validar.sh` para medir los techos de cada campo · DEGRADABLES: sin `python3` el script no corre, los caracteres se cuentan a mano y la entrega avisa que esa medición no la verificó el script.
+- **El perfil de WhatsApp del negocio** (foto, descripción, datos de contacto y enlaces) · DEGRADABLE: vive en tu negocio y no en el prompt, pero el cliente lo ve antes de leer una palabra; la skill lo verifica antes de entregar (`references/estructura-disparo.md`, apartado 0). Si no está listo, se dice.
+- **Upsell, envío gratis y revisión del paquete** · DEGRADABLES: si hay upsell y a qué precio, si está activo el módulo de Upsells nativo de Chatea, desde qué cantidad el envío es gratis y si el cliente puede revisar el paquete antes de pagar. Lo del módulo nativo se pregunta siempre: con él activo el bot no hace su propio ofrecimiento (variante A) y sin él sí (variante B). Si no hay respuesta, la entrega dice qué variante se aplicó.
+- **Las URLs de las imágenes del flujo** · DEGRADABLES: se piden; si no las tienes, se generan o se entrega el prompt de imagen, y el prompt se cierra cuando las subas a Chatea PRO (manifiesto de imágenes).
+- **Las plantillas de WhatsApp de los remarketing** · DEGRADABLES: la skill entrega cada plantilla completa para crearla en tu WhatsApp Business, pero la aprueba Meta, no la skill. Mientras no esté aprobada, no se da por montada.
+- **La foto del producto y el cerebro de marca** (`golden-brand-brain`) · DEGRADABLES: sin foto se trabaja con los datos escritos; sin cerebro se ofrece crearlo, y si sigues sin él la entrega lo declara.
+- **Firecrawl, la biblioteca de anuncios de Meta, un generador de imagen y `golden-pdf-check`** · DEGRADABLES: si uno no está, se dice y se sigue a mano (sección "Conexiones"). Sin Firecrawl se piden los datos al vendedor; sin la biblioteca se usa `references/objeciones.md`; sin generador se entrega el prompt de imagen; sin `golden-pdf-check` no hay PDF del paquete.
+
+**Si falta algo BLOQUEANTE: no se hace lo que depende de él** y se pide con nombre propio: qué es, dónde se saca y dónde se pone. **Si falta algo DEGRADABLE: se pide y se sigue**, dejando marcado como pendiente o como supuesto todo lo que depende de él. Nunca se presenta como completo. Si no tienes algo, dime y te guío paso a paso.
 
 ## Paso 0 · Cerebro de marca (obligatorio antes de generar)
 
@@ -122,6 +127,19 @@ palabra clave → SALUDO INICIAL → MULTIMEDIA → PREGUNTA DE ENTRADA → (cli
 ```
 Todo lo que diseñes debe encajar en esa secuencia. Además existen RECORDATORIOS (dentro de la ventana de 24h) y REMARKETING (plantillas que reabren la conversación después de horas).
 
+## 🔴 CUPO DE LA API: 1.000 peticiones por HORA, y pasarse BLOQUEA una hora entera.
+Medido contra la API viva el 2026-09-07: cada respuesta trae **`x-ratelimit-remaining`** (en
+inglés *X-RateLimit-Remaining*, "las que quedan") y `x-ratelimit-limit`. **Se repone cada hora**,
+pero **no viene `x-ratelimit-reset`**: el servidor no dice a qué minuto empezó la ventana, así que
+si te bloqueas se espera una **hora completa** y se comprueba **mirando** el contador
+(`golden-chatea-cupo [--necesito N]`), nunca calculándolo.
+
+**Cuándo te afecta aquí:** esta skill produce TEXTO —el prompt y su paquete— y no toca la red. El
+cupo entra cuando ese prompt **se escribe** en el bot field del producto. Es barato (una escritura
+más su relectura), pero **se suma al de la instalación completa** si estás montando varios
+productos seguidos: diez productos son al menos veinte peticiones, más las del resto de la
+instalación.
+
 ## Fronteras y desambiguación (esto vive AQUÍ y no en la description, que tiene tope duro de 1.024)
 La description lleva **solo lo que dispara**. El alcance, las capacidades y las fronteras van en el cuerpo, que no tiene tope. Si algún día hay que meter un disparador nuevo y no cabe, lo que sale es de aquí arriba — nunca una frase que la gente dice de verdad.
 
@@ -183,9 +201,9 @@ Pregunta TODO lo que mejora el prompt, pero UNA COSA A LA VEZ, esperando cada re
 
 ## PASO 1 — Entrevista (completa lo que falte del intake, antes de construir)
 
-No construyas nada hasta tener estos datos. Esta lista es el INVENTARIO de lo que hay que averiguar, NO un cuestionario para mandar de golpe: se recorre UNA PREGUNTA A LA VEZ (PASO 0), esperando cada respuesta. Si el usuario ya dio algunos en la conversación o en la URL/foto, no los preguntes: dalos por resueltos, confírmalos en el borrador y pregunta solo lo que falte.
+⛔ **Solo los BLOQUEANTES detienen la construcción: producto, país y precio de 1 unidad** (ver "Requisitos" arriba). Todo lo demás de esta lista es **DEGRADABLE**: se deduce lo que se pueda, se propone un default y se marca como supuesto en el borrador. Esta línea decía "no construyas nada hasta tener estos datos" y contradecía la regla de degradables, que es la vigente: con un dato degradable ausente **sí se construye**, declarando el supuesto. Esta lista es el INVENTARIO de lo que hay que averiguar, NO un cuestionario para mandar de golpe: se recorre UNA PREGUNTA A LA VEZ (PASO 0), esperando cada respuesta. Si el usuario ya dio algunos en la conversación o en la URL/foto, no los preguntes: dalos por resueltos, confírmalos en el borrador y pregunta solo lo que falte.
 
-REGLA DE DATOS POR NEGOCIO (CRÍTICA — este skill es genérico y se comparte con otras tiendas/usuarios): el **nombre del asesor/a**, los **tiempos de entrega** y los **datos de pago anticipado** son SIEMPRE específicos del negocio para el que se construye el prompt. Pregúntalos en cada caso; nunca los heredes de otro negocio ni los dejes hardcodeados en el skill. Para el pago: primero confirma si el negocio quiere cobrar **anticipado** (además de o en vez de contra entrega); si dice que sí, pídele los datos (Nequi/Daviplata/banco + titular + número + llave). Excepción: si por contexto o memoria ya conoces estos datos del **dueño de esta copia del skill**, úsalos solo para él; jamás para terceros.
+REGLA DE DATOS POR NEGOCIO (CRÍTICA — este skill es genérico y se comparte con otras tiendas/usuarios): el **nombre del asesor/a** y los **datos de pago anticipado** son SIEMPRE específicos del negocio para el que se construye el prompt. Pregúntalos en cada caso; nunca los heredes de otro negocio ni los dejes hardcodeados en el skill. ⛔ **LOS TIEMPOS DE ENTREGA Y LA TRANSPORTADORA NO SE PREGUNTAN** (regla de FER, y esta línea decía lo contrario hasta el 2026-09-27): van **por defecto según el país** (`references/paises.md`), se muestran en el borrador **marcados como supuesto**, y se ajustan solo si el vendedor los corrige. Son igual de específicos del negocio que los demás —así que tampoco se heredan de otro espacio—, pero la forma de resolverlos es el default por país, no una pregunta más al vendedor. Para el pago: primero confirma si el negocio quiere cobrar **anticipado** (además de o en vez de contra entrega); si dice que sí, pídele los datos (Nequi/Daviplata/banco + titular + número + llave). Excepción: si por contexto o memoria ya conoces estos datos del **dueño de esta copia del skill**, úsalos solo para él; jamás para terceros.
 
 **Sobre el producto:**
 1. Qué producto es? (nombre, qué hace, para quién)
@@ -300,10 +318,13 @@ REGLA DE ENTREGA: la nota /100 es holística (no se suma por ítems), pero el pi
 Después del /100, evalúa también **del 1 al 1000** y di explícitamente **qué le harías para llegar a 1000**. La escala /1000 es más exigente: mide qué tan cerca está del mejor prompt posible para ESE producto (profundidad de objeciones y FAQ, riqueza persuasiva, ángulos de la competencia, prueba social concreta, manejo de todos los escenarios de entrada, unit economics del upsell, etc.). Entrega el número /1000 + la lista concreta de mejoras que lo subirían.
 
 🔴 **ANTES DE CONFIAR EN EL VALIDADOR, COMPRUEBA QUE MUERDE:** `bash scripts/autoprueba.sh`
-(18 de 18). Siembra un sabotaje **por cada pieza** contra la vara mínima de la propia skill y
-exige que cada uno produzca su bloqueo. Y el banco corre en los DOS sentidos: el caso 17 exige
-que el detector de apodos **NO** muerda "cuida tu corazón" ni "la reina del hogar", porque un
-detector que acusa al idioma bloquea trabajo bueno y se termina desactivando entero. Hasta el 2026-09-07 esta skill no tenía banco: dos
+(21 de 21). Siembra un sabotaje **por cada pieza** contra la vara mínima de la propia skill y
+exige que cada uno produzca su bloqueo. Y el banco corre en los DOS sentidos: los casos 17 y 19
+exigen que el detector **NO** muerda —"cuida tu corazón", "la reina del hogar", o un encabezado
+`PROHIBIDO` con lo prohibido listado debajo—, porque un detector que acusa al idioma bloquea
+trabajo bueno y se termina desactivando entero. ⛔ Y el banco **se niega a correr** si no tiene
+carpeta temporal escribible o no pudo extraer la vara: sin esa compuerta, un banco roto imprime
+veinte chequeos muertos y parece que la herramienta es la que falla (medido el 2026-09-27). Hasta el 2026-09-07 esta skill no tenía banco: dos
 validadores, ninguna prueba de que funcionaran. **Si tocas `validar.sh` o
 `validar-doctrina.sh`, el banco corre antes y después, y toda corrección nueva entra con su
 sabotaje** — si no, la suite cubre lo que ya se arregló y nada de lo que se rompa después.
@@ -432,7 +453,12 @@ Esta skill se comparte. NUNCA hornees datos de un negocio real en sus archivos: 
 - `references/referencia-externa-embudo-whatsapp-cod.md` — **REFERENCIA OPCIONAL, NO REGLA** (masterclass de terceros sobre embudo COD por WhatsApp). Consúltala solo para contrastar o enriquecer ángulos; JAMÁS sustituye la estructura obligatoria de esta skill ni el método FER. En conflicto, manda la skill.
 - `scripts/validar.sh` — **Validador-compuerta**: mide crudos, escapados, emojis y BOM con python y BLOQUEA (exit != 0) si algo excede; modo `--activador` exige 0 emojis. Córrelo antes de entregar, también sobre cada activador.
 
-## Fronteras y desambiguacion
+## Anexo · la description anterior, archivada (no es la sección de fronteras)
+
+⚠️ Esta sección se llamaba también "Fronteras y desambiguacion", igual que la de arriba, y **dos
+secciones con el mismo título hacen que la segunda se lea como la vigente**. No lo es: aquí solo
+se guarda el texto viejo de la `description` para no perder matices. La sección que manda es
+**"Fronteras y desambiguación (esto vive AQUÍ…)"**.
 
 Descripcion completa anterior (se conserva para no perder ningun matiz de frontera):
 

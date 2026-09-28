@@ -1,3 +1,7 @@
+## v4.18.1 · 2026-09-27 · Limpieza de datos internos para el repo público (aplicó el CENTRO DE MANDO)
+
+La compuerta de publicación bloqueaba la skill por nombres internos: el nombre del chat y de la empresa de un espacio ajeno, y el código de un espacio real. Se cambiaron por formulaciones genéricas con el mismo sentido; la excepción operativa que nombraba espacios concretos vive ahora en la memoria del proyecto. Solo prosa y comentarios; ninguna regla cambió.
+
 ## skill v4.17 · 2026-09-22 · Centro de Mando reverifico v4.16 EN VIVO, doble negativo aclarado
 
 El CdM releyo del servidor de Golden y del disco (no confio en mi acta): 86 campos, Disparador
@@ -374,13 +378,13 @@ skill v4.1.3 · 2026-08-08 (centro de mando, verificación final, bloqueante F2)
 
 skill v4.1.2 · 2026-08-08 (centro de mando, hallazgo del golden-verificador en la auditoría de la hermana config-comentarios) · FIX PUNTUAL en scripts/valida_producto.py: el regex de placeholders \{\{[A-Z0-9_]+\}\} solo cazaba mayúsculas puras — {{Hueco}}, {{hueco}}, {{ X }}, {{HUECO-2}}, {{HUECO 3}} y los slots de llave SIMPLE sin llenar ({URL_TIENDA}, {ID_DROPI}...) viajaban LITERALES al bot del cliente. Ahora: dobles con \{\{[^{}]*\}\} (cualquier contenido) + llaves simples contra whitelist de las 5 runtime legítimas de Chatea (las de notificacion-venta-realizada.txt: nombre_cliente, nombre_producto, porcentaje_entrega, telefono_cliente, valor_venta) con error ante cualquier otra. Probado: 5 variantes dobles plantadas cazadas, slot simple colado cazado, producto lleno con {valor_venta} runtime sin falso positivo.
 
-## skill v4.1.1 · 2026-08-08 (centro de mando, chat CHATEA otra empresa del grupo COL 2026-08-08 (2ª ronda: 5ª categoría + prosa libre))
+## skill v4.1.1 · 2026-08-08 (centro de mando, chat de un espacio de otra empresa, 2026-08-08 (2ª ronda: 5ª categoría + prosa libre))
 
-skill v4.1.1 · 2026-08-08 (centro de mando, chat CHATEA otra empresa del grupo COL 2026-08-08 (2ª ronda: 5ª categoría + prosa libre)) · QUINTA CATEGORÍA VETADA en la ley: claims y cifras de negocio (años en el mercado, clientes atendidos, porcentajes de entrega, premios) — no rompen nada técnico ni los caza un barrido de llaves, pero el bot termina mintiendo con datos de otra empresa (caso real: "Más de 100.000 clientes atendidos en Colombia" a punto de heredarse). Y regla operativa LA MARCA VIVE TAMBIÉN EN PROSA LIBRE: al barrido se añade grep -i por el nombre de la marca origen sobre todo el texto a escribir (cazó 10 menciones en 3 campos que el mapeo de llaves no vio).
+skill v4.1.1 · 2026-08-08 (centro de mando, chat de un espacio de otra empresa, 2026-08-08 (2ª ronda: 5ª categoría + prosa libre)) · QUINTA CATEGORÍA VETADA en la ley: claims y cifras de negocio (años en el mercado, clientes atendidos, porcentajes de entrega, premios) — no rompen nada técnico ni los caza un barrido de llaves, pero el bot termina mintiendo con datos de otra empresa (caso real: "Más de 100.000 clientes atendidos en Colombia" a punto de heredarse). Y regla operativa LA MARCA VIVE TAMBIÉN EN PROSA LIBRE: al barrido se añade grep -i por el nombre de la marca origen sobre todo el texto a escribir (cazó 10 menciones en 3 campos que el mapeo de llaves no vio).
 
-## skill v4.1 · 2026-08-08 (centro de mando, chat CHATEA otra empresa del grupo COL 2026-08-08)
+## skill v4.1 · 2026-08-08 (centro de mando, chat de un espacio de otra empresa, 2026-08-08)
 
-skill v4.1 · 2026-08-08 (centro de mando, chat CHATEA otra empresa del grupo COL 2026-08-08) · horneada la LEY "NUNCA HEREDAR DATOS ENTRE ESPACIOS": al basarse en una cuenta guía se hereda estructura/prompts/config, JAMÁS datos (APIs, plantillas de WhatsApp, teléfonos, correos, dominios, marca, productos y disparadores); única excepción Le'côterra como producto-ejemplo; método de barrido obligatorio antes y después de escribir en espacio ajeno. Origen: incidente Golden → otra empresa del grupo Incanto 2026-08-08 (se colaron llave ElevenLabs, teléfono, plantilla de notificación y firmas de la marca origen; revertido el mismo día). La ley entra como PREVENCIÓN, no reparación: línea base pre-horneado verificada por verificador externo — 8/8 skills sin credenciales (CRITICA=0); únicos hallazgos 3 teléfonos de relleno legítimos (+57 300 de ejemplo) que se conservan. ADEMÁS (chat CHATEA otra empresa del grupo COL 2026-08-08, retractación pixel): regla CAMPOS [Meta] = VALORES CALIENTES — los eventos de pixel los mueve el flujo en vivo, prohibido diagnosticar con una lectura suelta.
+skill v4.1 · 2026-08-08 (centro de mando, chat de un espacio de otra empresa, 2026-08-08) · horneada la LEY "NUNCA HEREDAR DATOS ENTRE ESPACIOS": al basarse en una cuenta guía se hereda estructura/prompts/config, JAMÁS datos (APIs, plantillas de WhatsApp, teléfonos, correos, dominios, marca, productos y disparadores); única excepción Le'côterra como producto-ejemplo; método de barrido obligatorio antes y después de escribir en espacio ajeno. Origen: incidente entre dos espacios de empresas distintas, 2026-08-08 (se colaron llave ElevenLabs, teléfono, plantilla de notificación y firmas de la marca origen; revertido el mismo día). La ley entra como PREVENCIÓN, no reparación: línea base pre-horneado verificada por verificador externo — 8/8 skills sin credenciales (CRITICA=0); únicos hallazgos 3 teléfonos de relleno legítimos (+57 300 de ejemplo) que se conservan. ADEMÁS (chat de un espacio de otra empresa, 2026-08-08, retractación pixel): regla CAMPOS [Meta] = VALORES CALIENTES — los eventos de pixel los mueve el flujo en vivo, prohibido diagnosticar con una lectura suelta.
 
 ## skill v4.0 · 2026-08-07
 
@@ -503,3 +507,8 @@ bot fields, 6 agentes IA, 45 tareas IA; uno de cliente cuesta más). **Con 1.000
 ⚠️ **Límite declarado:** la respuesta **NO trae `x-ratelimit-reset`**. El servidor **no dice
 cuándo** se repone el cupo. La ventana es de una hora; si es fija o deslizante **no está medido** y
 no se afirma. Lo único seguro es el número que queda AHORA.
+
+
+## CENTRO DE MANDO · 2026-09-27 · <!-- skill v4.18 — 2026-09-27 — CdM: blo · LEY DE LOS REQUISITOS DEL USUARIO
+
+Ley de FER del 02-sep: declarar ANTES lo que la skill necesita del usuario y pedirlo AL CORRER si falta. Desde golden-skill-auditor v1.22 la ley tiene casilla en `validar_arsenal.py`. Se agregó al principio el bloque "Requisitos", redactado con lo que esta skill USA de verdad (medido en su cuerpo y en sus scripts), sin agregar requisitos de más, y con qué hacer si falta: parar y pedirlo con nombre propio. A la fábrica se le informa por la bandeja: una fila no bloquea.

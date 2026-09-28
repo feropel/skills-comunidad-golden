@@ -1,5 +1,9 @@
 # Changelog — GOLDEN 360
 
+## R2.3.1 — 2026-09-27 · Ley de los requisitos del usuario (aplicó el CENTRO DE MANDO)
+
+Se añadió el bloque «Antes de empezar» del SKILL.md: qué tiene que tener el usuario antes de arrancar, cada requisito marcado BLOQUEANTE o DEGRADABLE y qué pasa si falta (doctrina del CdM del 27-sep). Lo redactó el chat 🧰 ARSENAL Y SKILLS (4 pasadas del golden-verificador adversarial, 0 fallas nuevas en la última) y lo aplicó el CdM sin numerar: el número lo pone la fábrica al ratificar. Solo inserción: 0 líneas quitadas.
+
 ## R2.3 — 2026-09-05 — Ciclo del mandato v2: lo tipo A cerrado, lo tipo B declarado
 - **Mi propio barrido de acentos había corrompido 3 palabras POR DENTRO.** El par
   `formula → fórmula` se aplicó como SUBSTRING y se pegó dentro de palabras más largas:

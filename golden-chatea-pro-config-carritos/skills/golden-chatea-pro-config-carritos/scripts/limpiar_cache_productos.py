@@ -16,7 +16,13 @@ Se QUITA una entrada sin fecha, sin id, vacia, solo-URL o "No disponible". Se RE
 que quedo aplanada en la raiz del campo (fecha/id/info sueltas). Lo demas no se toca.
 La busqueda web tiene que quedar APAGADA, o la basura vuelve.
 
-Uso:  python3 limpiar_cache_productos.py --token-file RUTA --tienda "Nombre" --respaldo-dir DIR [--escribir]
+Los campos de cache se DESCUBREN por prefijo (#1, #2, #3...). Antes se recorria una lista fija de
+dos nombres: un cache #3 quedaba invisible y la corrida podia decir "el cache ya esta limpio"
+mientras la auditoria lo marcaba con basura.
+
+Uso:  python3 limpiar_cache_productos.py --token-file RUTA --tienda "Nombre" --respaldo-dir DIR
+          [--quitar id1,id2] [--escribir]
+      python3 limpiar_cache_productos.py --autoprueba   (no toca la red)
       (sin --escribir solo muestra lo que haria)
 """
 import argparse
@@ -28,18 +34,98 @@ import time
 
 AQUI = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, AQUI)
-from chatea_api import Api, CAMPO, CACHE, valor  # noqa: E402
+from chatea_api import Api, CAMPO, valor, campos_cache  # noqa: E402
 from auditar_carritos import motivo_basura  # noqa: E402
+
+
+SUELTAS = ("fecha", "id", "info")
+
+
+def limpiar(v, quitar=()):
+    """(limpio, lineas). Funcion PURA para poder tener banco de pruebas sin red.
+    Las llaves sueltas de la raiz solo se funden en una entrada si estan las TRES; si hay solo
+    una parte, se CONSERVAN y se dice, porque antes se borraban del servidor sin una sola linea."""
+    limpio, lineas = {}, []
+    sueltas = [k for k in SUELTAS if k in v]
+    if len(sueltas) == len(SUELTAS):
+        rid = str(v["id"])
+        lineas.append(f"REPARA entrada aplanada en la raiz -> llave {rid}")
+        limpio[rid] = {"fecha": v["fecha"], "id": rid, "info": v["info"]}
+    elif sueltas:
+        for k in sueltas:
+            limpio[k] = v[k]
+            lineas.append(f"CONSERVA la llave suelta '{k}' de la raiz: esta incompleta para armar "
+                          f"una entrada y NO se borra")
+    for k, e in v.items():
+        if k in SUELTAS:
+            continue
+        m = "revisada a mano: contenido falso" if k in quitar else motivo_basura(e)
+        if m:
+            lineas.append(f"QUITA {k}: {m}")
+        else:
+            limpio[k] = e
+    return limpio, lineas
+
+
+def autoprueba():
+    """Los dos sentidos: que quite la basura y que NO toque lo bueno."""
+    corridas, fallos = [], []
+
+    def check(t, ok, ev=""):
+        corridas.append(t)
+        print(f"  {'OK   ' if ok else 'FALLA'} · {t}")
+        if not ok:
+            fallos.append(t)
+            print("        ", ev)
+
+    bueno = {"1": {"fecha": "2026-09-01T10:00:00-05:00", "id": "1", "info": "Nombre: Producto Uno"}}
+    limpio, lineas = limpiar(bueno)
+    check("0 · cache sano no cambia ni dice nada (control negativo)",
+          limpio == bueno and not lineas, f"{limpio} {lineas}")
+
+    d = dict(bueno, x={"fecha": "", "id": "", "info": ""})
+    limpio, lineas = limpiar(d)
+    check("1 · entrada sin fecha ni id -> QUITA con su linea",
+          "x" not in limpio and any(x.startswith("QUITA x") for x in lineas), f"{limpio} {lineas}")
+
+    limpio, lineas = limpiar(dict(bueno), quitar={"1"})
+    check("2 · --quitar saca la entrada que un humano leyo",
+          limpio == {} and any("contenido falso" in x for x in lineas), f"{limpio} {lineas}")
+
+    d = {"fecha": "2026-09-01T10:00:00-05:00", "id": "7", "info": "Nombre: Siete"}
+    limpio, lineas = limpiar(d)
+    check("3 · las TRES llaves sueltas se funden en una entrada",
+          limpio == {"7": {"fecha": d["fecha"], "id": "7", "info": d["info"]}}, f"{limpio}")
+
+    d = dict(bueno, id="9")
+    limpio, lineas = limpiar(d)
+    check("4 · una llave suelta INCOMPLETA se conserva y se nombra (antes se borraba callada)",
+          limpio.get("id") == "9" and any("CONSERVA la llave suelta 'id'" in x for x in lineas),
+          f"{limpio} {lineas}")
+
+    d = dict(bueno, dos={"fecha": "2026-09-02T10:00:00-05:00", "id": "2", "info": "Fijador"})
+    limpio, lineas = limpiar(d)
+    check("5 · una info de UNA palabra no se toma por URL y no se borra",
+          "dos" in limpio, f"{limpio} {lineas}")
+
+    print(f"\n  COBERTURA: {len(corridas) - len(fallos)} de {len(corridas)} pruebas en verde")
+    return 0 if not fallos else 1
 
 
 def main():
     p = argparse.ArgumentParser()
-    p.add_argument("--token-file", required=True)
-    p.add_argument("--tienda", required=True)
-    p.add_argument("--respaldo-dir", required=True)
+    p.add_argument("--token-file")
+    p.add_argument("--tienda")
+    p.add_argument("--respaldo-dir")
+    p.add_argument("--autoprueba", action="store_true")
     p.add_argument("--escribir", action="store_true")
     p.add_argument("--quitar", default="", help="ids revisados a mano y encontrados falsos, separados por coma")
     a = p.parse_args()
+    if a.autoprueba:
+        sys.exit(autoprueba())
+    for req in ("token_file", "tienda", "respaldo_dir"):
+        if not getattr(a, req):
+            p.error(f"falta --{req.replace('_', '-')}")
 
     api = Api(a.token_file)
     campos = api.campos()
@@ -48,24 +134,17 @@ def main():
         sys.exit(f"ABORTA: el espacio dice tienda={tienda!r}, se esperaba {a.tienda!r}")
 
     quitar = {x.strip() for x in a.quitar.split(",") if x.strip()}
+    cache = campos_cache(campos)
+    print(f"campos de cache descubiertos: {len(cache)} -> {', '.join(x[-2:] for x in cache) or 'ninguno'}")
+    if not cache:
+        print("este espacio no tiene campos de cache de productos: nada que limpiar")
+        return
     nuevos, cambia = {}, False
-    for c in CACHE:
-        if c not in campos:
-            continue
+    for c in cache:
         v = valor(campos[c]) or {}
-        limpio = {}
-        if all(k in v for k in ("fecha", "id", "info")):
-            rid = str(v["id"])
-            print(f"  REPARA {c[-2:]}: entrada aplanada -> llave {rid}")
-            limpio[rid] = {"fecha": v["fecha"], "id": rid, "info": v["info"]}
-        for k, e in v.items():
-            if k in ("fecha", "id", "info"):
-                continue
-            m = "revisada a mano: contenido falso" if k in quitar else motivo_basura(e)
-            if m:
-                print(f"  QUITA  {c[-2:]} {k}: {m}")
-            else:
-                limpio[k] = e
+        limpio, lineas = limpiar(v, quitar)
+        for x in lineas:
+            print(f"  {c[-2:]} {x}")
         print(f"{c}: {len(v)} llaves -> {len(limpio)} entradas")
         cambia |= limpio != v
         nuevos[c] = limpio

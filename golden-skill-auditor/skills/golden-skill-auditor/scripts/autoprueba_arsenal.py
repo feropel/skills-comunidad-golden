@@ -116,12 +116,26 @@ def main():
         casos.append(("caza: script declarado y ausente", d, 1, "script declarado y ausente"))
 
         # ---- CONEXIONES: buenos (aqui vive el ruido si el check es tosco) ----
+        # P59 (27-sep): estos dos casos citaban un archivo INVENTADO ("references/x.md",
+        # "scripts/otro.json") que nunca existio en golden-shopify — la version vieja del
+        # detector exoneraba solo por el NOMBRE cercano, sin comprobar el archivo, y estos
+        # casos pasaban por el hueco. Ahora citan un archivo REAL de golden-shopify: si de
+        # verdad esta ahi, "no dispara" sigue siendo lo correcto.
         d = skill(tmp, "ref-calificada-antes", BUENA,
-                  cuerpo="La receta vive en `golden-shopify` -> `references/x.md`.\n")
-        casos.append(("no dispara: ruta calificada con la skill dueña ANTES", d, 0, None))
+                  cuerpo="La receta vive en `golden-shopify` -> `references/arquetipos.md`.\n")
+        casos.append(("no dispara: ruta calificada con la skill dueña ANTES (archivo real)", d, 0, None))
         d = skill(tmp, "ref-calificada-despues", BUENA,
-                  cuerpo="Usa `scripts/otro.json` de golden-shopify, que lo mantiene.\n")
-        casos.append(("no dispara: dueño nombrado DESPUES de la ruta", d, 0, None))
+                  cuerpo="Usa `scripts/autocheck.py` de golden-shopify, que lo mantiene.\n")
+        casos.append(("no dispara: dueño nombrado DESPUES de la ruta (archivo real)", d, 0, None))
+        # Gemelo real del P59: la MISMA cita calificada, pero el archivo que promete NO existe
+        # en la skill dueña. Esto es exactamente lo que se colaba antes del arreglo (SKILL.md
+        # con dos rutas inexistentes junto a "golden-shopify" -> 0 fallos, 0 avisos).
+        d = skill(tmp, "ref-calificada-pero-falsa", BUENA,
+                  cuerpo="La receta vive en `golden-shopify` -> `references/no-existe-ahi.md`.\n")
+        casos.append(("caza: calificada con dueño real pero el archivo NO esta ahi", d, 1, "referencia rota"))
+        d = skill(tmp, "ref-calificada-despues-pero-falsa", BUENA,
+                  cuerpo="Usa `scripts/tampoco-existe.py` de golden-shopify, que lo mantiene.\n")
+        casos.append(("caza: dueño DESPUES pero el archivo NO esta ahi", d, 1, "referencia rota"))
         d = skill(tmp, "ref-en-historia", BUENA,
                   cuerpo="<!-- v1.0: se renombro references/viejo.md a nuevo.md -->\ncuerpo\n")
         casos.append(("no dispara: referencia dentro de un comentario (historia)", d, 0, None))

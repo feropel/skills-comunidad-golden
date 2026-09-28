@@ -16,11 +16,22 @@ description: >-
 ---
 # Golden Presenta — el deck como activo propio, no como suscripción
 
-**Versión:** `GP2.1h` · **Fábrica: chat `✅ SKILL golden-presenta`.**
+**Versión:** `GP2.1i` · **Fábrica: chat `✅ SKILL golden-presenta`.**
 
 Ahí se construye y se repara esta skill. Los demás chats la USAN y mandan fila a la fábrica;
 no la editan por su cuenta. Si un chat necesita un cambio, lo pide, no lo hace.
 
+
+## Antes de empezar — lo que TÚ tienes que tener
+
+El deck es un solo archivo HTML sin servicios externos: **no necesitas cuentas, suscripciones ni llaves.** Pero no se entrega sin verificarlo (paso 4 y vara de calidad), y eso se comprueba **antes de construir**, no al final:
+
+| Qué necesitas | Tipo | Para qué | Cómo se consigue |
+|---|---|---|---|
+| **Python 3** | Bloqueante | Correr `scripts/verificar_deck.py`. Solo usa librerías que trae Python | Compruébalo con `python3 --version`; si no está, en python.org |
+| **Playwright** conectado a Claude | Bloqueante | Abrir el deck con el ancho fijado en 390 px, 768 px y PC, mirar la consola y, si el deck lleva atmósfera, comprobar que el fondo se mueve. El panel de navegador de la app sirve para leer el DOM, pero pausa el fondo (`references/motor.md`) | Se instala como MCP |
+
+**Si falta algo, se para antes de construir y se pide con nombre propio.** La vara de calidad no deja entregar un deck con el verificador en FALLA ni sin abrirlo en los tres anchos. Si no tienes algo, dime y te guío paso a paso.
 
 ## Atmósferas disponibles
 
@@ -199,7 +210,7 @@ TODOS de abrirla en un navegador**, ninguno del script — la bitácora está en
 - `golden-copywriting` → el texto de las láminas de venta. Un deck comercial sin copy de
   respuesta directa es una presentación bonita que no cierra
 - `web-design-engineer` → **las 26 recetas de estilo** (paleta, tipografía, espaciado,
-  movimiento y prohibiciones) en `references/style-recipes/`. Una por deck, entera
+  movimiento y prohibiciones) en `~/.claude/skills/web-design-engineer/references/style-recipes/`. Una por deck, entera
 - `golden-cinematica` → de donde salen el preloader y el estándar de movimiento; úsala
   cuando el encargo necesite una escena 3D de verdad (objeto cromado, modelo que rota,
   entorno HDRI). Aquí el fondo acompaña; allí la escena ES la página. 🔴 **Si piden la

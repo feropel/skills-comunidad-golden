@@ -18,6 +18,22 @@ description: >-
 **Fábrica:** chat «✅ SKILL golden-chatea-pro-full-configuracion»
 # Golden · Chatea Pro — Full Configuración (orquestador maestro)
 
+## 📋 Requisitos: qué necesita del usuario antes de arrancar
+
+- **Token API del espacio de Chatea Pro** · BLOQUEANTE. Se crea en el panel del espacio (*Settings → API Keys*, según el propio código) y va **atado al Bot**; si no, la API responde 404 "Flow not found". Se guarda en `<carpeta del cliente>/.secrets/<espacio>.token`. Cupo: 1.000 llamadas por hora (no está medido si es por token o por espacio; se mira con `golden-chatea-cupo`).
+- **Los datos del negocio** · BLOQUEANTES: nombre y link de la tienda, país, dropshipping o marca propia o los dos, y nombre del asesor. En MODO B lo que el cliente dejó escrito no se vuelve a preguntar; el nicho se lee de su web.
+- **WhatsApp de la empresa** · DEGRADABLE: va de último; si aún no lo tiene, se monta todo y se conecta después.
+- **Desde qué valor un flete ya es caro** · DEGRADABLE: si no responde, se usa el default del país.
+- **Datos base del PASO 0·B** (tono, tiempos por zona, modelo de pago) · DEGRADABLES: salen del criterio de Golden y de lo que ya tiene el espacio.
+- **Cuentas del pago anticipado**, si aplica · BLOQUEANTES para ese campo: SIEMPRE se preguntan o confirman; nunca se inventan.
+- **Subir a mano, en el panel, la imagen del producto de ejemplo** · acción del dueño, DEGRADABLE: mientras no esté, el producto queda sin imagen y así se declara.
+- **Archivo con el token de un espacio de REFERENCIA** para `verificacion_final.py --referencia` (el script lo abre como archivo) · DEGRADABLE: sin él, la compuerta del PASO 3 no audita los interruptores y así se declara.
+- **Presentar el prompt final ANTES de escribirlo** · BLOQUEANTE para el push. A quién (FER o el cliente) lo aclara la fábrica.
+- **Las 7 hijas**: `config-ventas-wp`, `config-comentarios`, `config-logistico`, `config-carritos`, `prompt-ventas`, `producto-comentarios` y `validacion-direcciones` · DEGRADABLES: si falta una, se monta el resto y se dice cuál quedó sin montar.
+- **Scripts locales** (`golden-chatea-cupo`, `barrido-datos-ajenos.py`, `verificacion_final.py`) · DEGRADABLES: si uno no corre, se dice y se sigue a mano. **El agente `golden-verificador`** · BLOQUEANTE para cerrar: nada se declara terminado sin él.
+
+**Si falta algo BLOQUEANTE: no se hace lo que depende de él** (si es de toda la skill, se PARA antes de tocar nada) y se pide con nombre propio: qué es, dónde se saca y dónde se pone. **Si falta algo DEGRADABLE: se pide y se sigue**, dejando marcado como no corrido o sin montar en todo lo que depende de él. Nunca se presenta como completo.
+
 ## MANDATO: soy la ARQUITECTA de la familia Chatea Pro (FER, 2026-09-08)
 
 Palabras de FER: *"tú eres la última, porque tú eres la que básicamente configuras todo Chatea
@@ -43,7 +59,9 @@ Qué cambia en la práctica:
 6. **La autoridad es FER → Centro de Mando → esta skill.** Ser arquitecta es tener el plano y el
    turno, no el mando: una fila nunca se vuelve bloqueo, y un rechazo mío tiene que ser técnico y
    medido, nunca preferencia.
-<!-- skill v1.12 · 2026-09-22 · FILA del CdM: el remarketing salió del ecosistema (FER 21-sep). Se cae la 5ª hija del mapa (config-remarketing) y su fila en la tabla de la ficha Dropi; se deja doctrina de excepción para los 2 espacios donde FER decidió dejarlo instalado (otra empresa del grupo Incanto, Le'côterra). Producto Remarketing de Ventas WP NO se tocó, es otra cosa. Acta completa en references/changelog.md. -->
+<!-- skill v1.13.1 · 2026-09-27 · ronda de numeracion del Centro de Mando (orden de FER: «que todas las skills esten perfectamente corregidas y actualizadas»): da numero a los cambios del 27-sep que quedaron sin numero. Detalle en references/changelog.md -->
+<!-- skill v1.13 · 2026-09-27 · CdM: bloque de REQUISITOS al principio (ley de FER del 02-sep: declarar antes y pedir al correr). Detalle en references/changelog.md. -->
+<!-- skill v1.12 · 2026-09-22 · FILA del CdM: el remarketing salió del ecosistema (FER 21-sep). Se cae la 5ª hija del mapa (config-remarketing) y su fila en la tabla de la ficha Dropi; se deja doctrina de excepción para los 2 espacios donde FER decidió dejarlo instalado (cuáles: en la memoria del proyecto). Producto Remarketing de Ventas WP NO se tocó, es otra cosa. Acta completa en references/changelog.md. -->
 
 ## LEY: NUNCA HEREDAR DATOS ENTRE ESPACIOS (FER 2026-08-08)
 
@@ -559,7 +577,7 @@ asistente propio, no se inventa ni se busca una skill que no está. **Lo que SÍ
 esto:** el campo `Producto Remarketing` dentro del asistente de **Ventas WhatsApp** y sus
 recordatorios asociados — eso es otra cosa, vive en `config-ventas-wp`, y no se toca por esta
 orden. **Excepción medida el 2026-09-21:** el asistente retirado sigue instalado en los espacios
-de **otra empresa del grupo Incanto** y **Le'côterra** (9 campos cada uno) porque FER decidió dejarlo así. Si un
+de **dos empresas hermanas** (cuáles: en la memoria del proyecto, no aquí) (9 campos cada uno) porque FER decidió dejarlo así. Si un
 MODO B cae sobre uno de esos dos espacios, esos campos se IGNORAN — no se desinstalan ni se
 configuran, no son parte de esta instalación.
 

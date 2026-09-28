@@ -99,10 +99,49 @@ RX_PROSA_CREDENCIAL = re.compile(
     r"\b(?:token|api[ _-]?key|llave|credenciales?)\s+(?:del?|de la)\s+(?:propio\s+)?"
     r"(?:espacio|workspace|cliente|api|chatea|shopify|meta|dropi|heygen|higgsfield|elevenlabs|google|openai|cuenta)\b", re.I)
 RX_HISTORIA = re.compile(r"(changelog|bit[aá]cora|historial)", re.I)
+# Calibracion 8 (27-sep, chat del Arsenal, fila P49 del CdM). Cinco skills que SI piden algo al usuario
+# salian SANAS porque ninguna senal las veia. Tres huecos, cada uno medido sobre las 43 skills propias
+# antes de entrar (ninguna senal manda a FALLO a una skill que no lo merezca):
+#  · el SERVICIO nombrado como conector o MCP en prosa ("Higgsfield MCP", "DropKiller (conector de pago)"),
+#    sin la herramienta tecnica mcp__ escrita. Solo en SKILL.md.
+#  · la credencial de uso condicional: "espacio con token" (la skill escribe en Chatea si hay token).
+#  · la LIBRERIA de Python de terceros que importan sus scripts (openpyxl, reportlab, PIL...). Se excluyen
+#    los scripts de PRUEBA (autoprueba*, test_*): pyyaml solo en la autoprueba de config-comentarios no es
+#    un requisito del usuario. Un import protegido cuenta igual si el except SALE: proteger no es opcionalizar.
+RX_SERVICIO_CONECTOR = re.compile(
+    r"\b(?:MCP|conector)\b[^.\n]{0,40}?\b(?:Higgsfield|DropKiller|Ecom Magic|Firecrawl|Shopify|Stitch|Magic|Supabase|Stripe|Apify)\b"
+    r"|\b(?:Higgsfield|DropKiller|Ecom Magic|Firecrawl|Apify)\b[^.\n]{0,20}?\b(?:MCP|conector)\b", re.I)
+RX_ESPACIO_CON_TOKEN = re.compile(r"\b(?:espacio|workspace)\s+con\s+token\b|\bsi hay token\b", re.I)
+RX_IMPORT = re.compile(r"^\s*(?:from\s+([A-Za-z_]\w*)[\w.]*\s+import|import\s+([A-Za-z_]\w*))", re.M)
+RX_SCRIPT_DE_PRUEBA = re.compile(r"^(?:autoprueba|test_|prueba_)", re.I)
+def _librerias_de_terceros(dir_skill):
+    """Devuelve (libs, ilegibles). P59 (27-sep): un script que no se pudo abrir salia del
+    barrido de librerias de terceros sin aviso, y la skill podia quedar "sin requisitos" en
+    verde por un simple permiso o encoding roto, no porque de verdad no dependiera de nada."""
+    locales = {os.path.splitext(os.path.basename(p))[0]
+               for p in glob.glob(os.path.join(dir_skill, "scripts", "**", "*.py"), recursive=True)}
+    libs = set()
+    ilegibles = []
+    for p in glob.glob(os.path.join(dir_skill, "scripts", "**", "*.py"), recursive=True):
+        if RX_SCRIPT_DE_PRUEBA.match(os.path.basename(p)) or "__pycache__" in p:
+            continue
+        try:
+            t = open(p, encoding="utf-8", errors="replace").read()
+        except OSError as e:
+            ilegibles.append(f"{os.path.relpath(p, dir_skill)} ({e})")
+            continue
+        if "RX_DEP = [" in t:
+            continue
+        for a, b in RX_IMPORT.findall(t):
+            m = a or b
+            if m and m not in sys.stdlib_module_names and m not in locales and m != "__future__":
+                libs.add(m)
+    return sorted(libs), ilegibles
 
 
 def requisitos(dir_skill, cuerpo):
     senales = []
+    ilegibles = []
     skill_md = os.path.join(dir_skill, "SKILL.md")
     for ruta in [skill_md] + glob.glob(os.path.join(dir_skill, "scripts", "**", "*"), recursive=True) \
             + glob.glob(os.path.join(dir_skill, "references", "*.md")):
@@ -110,7 +149,11 @@ def requisitos(dir_skill, cuerpo):
             continue
         try:
             t = open(ruta, encoding="utf-8", errors="replace").read()
-        except OSError:
+        except OSError as e:
+            # P59 (27-sep): un SKILL.md, script o referencia ilegible salia del barrido de
+            # senales sin aviso, y con el SKILL.md mismo ilegible ninguna senal se detectaba
+            # nunca: la ley de requisitos pasaba en verde por no poder leer, no por no aplicar.
+            ilegibles.append(os.path.relpath(ruta, dir_skill))
             continue
         if "RX_DEP = [" in t or "REQUISITOS SIN DECLARAR" in t:
             continue   # el detector y su autoprueba llevan los patrones a proposito
@@ -130,14 +173,28 @@ def requisitos(dir_skill, cuerpo):
             senales.append("cuenta de un servicio")
         if ruta == skill_md and "credencial pedida en prosa" not in senales and RX_PROSA_CREDENCIAL.search(t):
             senales.append("credencial pedida en prosa")
+        if ruta == skill_md and "servicio nombrado como conector" not in senales and RX_SERVICIO_CONECTOR.search(t):
+            senales.append("servicio nombrado como conector")
+        if ruta == skill_md and "credencial de uso condicional" not in senales and RX_ESPACIO_CON_TOKEN.search(t):
+            senales.append("credencial de uso condicional")
+    libs, libs_ilegibles = _librerias_de_terceros(dir_skill)
+    ilegibles += libs_ilegibles
+    if libs:
+        senales.append("libreria de Python de terceros (" + ", ".join(libs) + ")")
+    # P59 (27-sep): con el SKILL.md mismo ilegible ninguna senal se podia detectar nunca, y la
+    # ley de requisitos pasaba en verde por no poder leer, no por no aplicar. Eso ES un fallo.
+    if os.path.relpath(skill_md, dir_skill) in ilegibles:
+        return [f"SKILL.md no se pudo leer: no se puede juzgar la seccion de requisitos"], []
+    aviso_ilegibles = ([f"{len(ilegibles)} archivo(s) no se pudieron leer, quedaron fuera del "
+                        f"barrido de requisitos: {', '.join(ilegibles)}"] if ilegibles else [])
     if not senales:
-        return [], []
+        return [], aviso_ilegibles
     cabecera = "\n".join(cuerpo.split("\n")[:LINEAS_CABECERA])
     m = RX_SECCION.search(cabecera)
     if not m:
         return [f"REQUISITOS SIN DECLARAR: la skill necesita algo del usuario ({', '.join(senales)}) y no tiene "
                 f"seccion de requisitos en sus primeras {LINEAS_CABECERA} lineas (ley de FER del 02-sep: declarar "
-                f"antes y pedir al correr)"], []
+                f"antes y pedir al correr)"], aviso_ilegibles
     # 27-sep, fallo del CdM medido: con `seccion[1:]` un título "## ..." quedaba "# ..." y casaba él mismo como
     # el título SIGUIENTE, así que la sección salía VACÍA y toda skill con "## Requisitos" daba aviso aunque
     # dijera qué hacer si falta. Se busca el siguiente título DESPUÉS de la primera línea.
@@ -146,8 +203,8 @@ def requisitos(dir_skill, cuerpo):
     sig = re.search(r"^#{1,3}\s", resto, re.M)
     seccion = primera + "\n" + (resto[:sig.start()] if sig else resto)
     if not RX_PEDIR.search(seccion):
-        return [], ["la seccion de requisitos no dice que hacer si falta algo (pedir al correr: parar y pedirlo con nombre propio)"]
-    return [], []
+        return [], ["la seccion de requisitos no dice que hacer si falta algo (pedir al correr: parar y pedirlo con nombre propio)"] + aviso_ilegibles
+    return [], aviso_ilegibles
 
 
 def revisar(dir_skill):
@@ -277,10 +334,13 @@ def main():
     print(f"VALIDADOR OFICIAL: {'si, ' + binario if binario else 'NO INSTALADO (se usa el chequeo propio, equivalente pero no oficial)'}")
     print(f"UNIVERSO: {len(dirs)} skills\n")
 
-    con_fallo = con_aviso = 0
+    con_fallo = con_aviso = avisos_bajo_falla = 0
+    casa_total = casa_fallo = 0
     for d in dirs:
         n = os.path.basename(d.rstrip("/"))
         fallos, avisos = revisar(d)
+        es_casa = n.startswith(("golden", "fer-"))
+        casa_total += es_casa
         if oficial_local:
             r = subprocess.run([sys.executable, oficial_local, os.path.abspath(d)],
                                capture_output=True, text=True)
@@ -298,14 +358,28 @@ def main():
                         fallos.append("[oficial] " + l)
         if fallos:
             con_fallo += 1
+            casa_fallo += es_casa
             print(f"FALLA  {n}")
             for f in fallos: print(f"         - {f}")
+            # P48 (27-sep): antes se callaban. Una skill con FALLA mostraba "con aviso 0" aunque tuviera
+            # avisos, y al arreglar la falla el aviso REAPARECIA como si fuera nuevo (golden-shopify:
+            # 505 lineas escondidas bajo la falla de requisitos; engano al verificador adversarial).
+            if avisos:
+                avisos_bajo_falla += 1
+                for a in avisos: print(f"         · {a}")
         elif avisos:
             con_aviso += 1
             print(f"aviso  {n}")
             for a in avisos: print(f"         · {a}")
     sanas = len(dirs) - con_fallo - con_aviso
-    print(f"\nCOBERTURA: {len(dirs)} de {len(dirs)} revisadas · sanas {sanas} · con aviso {con_aviso} · CON FALLO {con_fallo}")
+    print(f"\nCOBERTURA: {len(dirs)} de {len(dirs)} revisadas · sanas {sanas} · con aviso {con_aviso} · CON FALLO {con_fallo}"
+          + (f" · ademas {avisos_bajo_falla} con FALLA tienen avisos" if avisos_bajo_falla else ""))
+    # P48 (27-sep): el universo mezclaba raices. Corrido sin argumentos daba 235 skills y 92 FALLA, con
+    # skills de terceros (gws-*, recipe-*, ads-*) y copias viejas dentro: una cifra que no dice nada de
+    # lo de FER. Se separa sin cambiar la linea de arriba, que otras herramientas leen.
+    if casa_total != len(dirs):
+        print(f"   DE LA CASA (golden-*, fer-*): {casa_total} revisadas · CON FALLO {casa_fallo}")
+        print(f"   DE TERCEROS y copias:         {len(dirs) - casa_total} revisadas · CON FALLO {con_fallo - casa_fallo}")
     return 1 if con_fallo else 0
 
 

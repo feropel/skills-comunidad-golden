@@ -20,7 +20,7 @@ Dos modos:
   python3 entrega_golden.py --autoprueba
 
 Reglas:
-- Una empresa por archivo. Golden, Le'côterra y otra empresa del grupo Incanto JAMÁS se mezclan: el JSON guarda
+- Una empresa por archivo. Cada empresa va en su propio archivo: JAMÁS se mezclan: el JSON guarda
   la carpeta de origen y consultar lo muestra.
 - Tasa de entrega = ENTREGADO / (ENTREGADO + DEVOLUCION). Cancelados y rechazados no cuentan:
   nunca salieron. Es la definición de economia-cod-golden.json (73,5% por PEDIDO el 06-sep); aquí
@@ -84,24 +84,43 @@ def estado(x):
 
 def agregar(filas, origen, excluir=EXCLUIR_DEFECTO, ids_excluir=IDS_EXCLUIR_DEFECTO):
     """filas: iterable de dicts con ID, PRODUCTO ID, PRODUCTO, ESTATUS, FECHA. Devuelve el agregado."""
-    vistos = set()
+    # P59 (27-sep): antes un set; ahora recuerda QUE estatus se conto, para que un repetido con otro estatus
+    # no se quede con el primero que aparezca (el verificador midio 100% de entrega donde habia 40%).
+    vistos = {}
     por = {}
     excluidos = {}
     total = {"ENTREGADO": 0, "DEVOLUCION": 0, "otros": 0}
+    desc = {"sin_id": 0, "repetidos": 0, "repetidos_con_otro_estatus": 0,
+            "terminal_gana_a_otros": 0, "conflicto_terminal": []}
     patron = re.compile(excluir, re.I) if excluir else None
     for f in filas:
         # ident(): un ID numérico 0 es un ID, no un vacío, y ' 123298' o 123298.0 son el mismo
         pid = ident(f.get("PRODUCTO ID"))
         oid = ident(f.get("ID"))
-        if not pid or not oid or (oid, pid) in vistos:
+        if not pid or not oid:
+            desc["sin_id"] += 1
             continue
-        vistos.add((oid, pid))
+        if (oid, pid) in vistos:
+            desc["repetidos"] += 1
+            antes, ahora = vistos[(oid, pid)], estado(f.get("ESTATUS"))
+            if antes is not None and antes != ahora:
+                desc["repetidos_con_otro_estatus"] += 1
+                if antes == "otros":           # el terminal gana: el pedido ya termino
+                    por[pid]["otros"] -= 1; por[pid][ahora] += 1
+                    total["otros"] -= 1; total[ahora] += 1
+                    vistos[(oid, pid)] = ahora
+                    desc["terminal_gana_a_otros"] += 1
+                elif ahora != "otros" and len(desc["conflicto_terminal"]) < 50:
+                    desc["conflicto_terminal"].append([oid, pid, antes, ahora])   # no se adivina: se declara
+            continue
+        vistos[(oid, pid)] = None
         completo = str(f.get("PRODUCTO") or "").strip()
         nombre = completo[:80]
         solo_letras = re.sub(r"[^a-z]", "", sin_tildes(completo).lower())
         if pid in {ident(i) for i in (ids_excluir or ())} or (patron and patron.search(solo_letras)):
             excluidos.setdefault(pid, {"producto": nombre, "filas": 0})["filas"] += 1
             continue
+        vistos[(oid, pid)] = estado(f.get("ESTATUS"))
         p = por.setdefault(pid, {"producto": nombre, "ENTREGADO": 0,
                                  "DEVOLUCION": 0, "otros": 0, "primera": None, "ultima": None})
         clave = estado(f.get("ESTATUS"))
@@ -123,12 +142,19 @@ def agregar(filas, origen, excluir=EXCLUIR_DEFECTO, ids_excluir=IDS_EXCLUIR_DEFE
             "total": dict(total, terminados=tt, tasa_entrega=round(total["ENTREGADO"] / tt, 3) if tt else None),
             "definicion": "ENTREGADO / (ENTREGADO + DEVOLUCION); cancelados y rechazados fuera",
             "excluidos_por_marca": {"patron": excluir, "productos": excluidos},
+            "descartados": desc,
             "productos": por}
 
 
 def leer_xlsx(carpeta):
     import openpyxl  # medido 2026-09-20: 3.1.5 en los tres intérpretes del Mac
     archivos = sorted(glob.glob(os.path.join(carpeta, "**", "*por producto*.xlsx"), recursive=True))
+    # P59: los demas .xlsx de la carpeta se NOMBRAN (antes se ignoraban sin decirlo). La seleccion no cambia.
+    otros = sorted(set(glob.glob(os.path.join(carpeta, "**", "*.xlsx"), recursive=True)) - set(archivos))
+    if otros:
+        print("AVISO: %d .xlsx sin «por producto» en el nombre NO se leen (si es un informe por producto con el "
+              "nombre crudo de Dropi, renombralo): %s" % (len(otros), ", ".join(os.path.basename(x) for x in otros[:8])
+              + (" …" if len(otros) > 8 else "")), file=sys.stderr)
     if not archivos:
         raise ErrorDeEntrada("no hay informes '*por producto*.xlsx' en %s" % carpeta)
     utiles = ("ID", "PRODUCTO ID", "PRODUCTO", "ESTATUS", "FECHA")
@@ -236,9 +262,19 @@ def autoprueba():
         chequeo("archivo que no existe da error controlado", False)
     except ErrorDeEntrada:
         chequeo("archivo que no existe da error controlado", True)
+    # P59 (27-sep): lo que se descarta se cuenta, y un repetido con otro estatus no se queda con el primero
+    e = agregar([{"ID": 1, "PRODUCTO ID": "P", "ESTATUS": "EN TRANSITO"}, {"ID": 1, "PRODUCTO ID": "P", "ESTATUS": "DEVOLUCION"},
+                 {"ID": 2, "PRODUCTO ID": "P", "ESTATUS": "ENTREGADO"}, {"ID": 2, "PRODUCTO ID": "P", "ESTATUS": "ENTREGADO"},
+                 {"ID": 3, "PRODUCTO ID": "P", "ESTATUS": "ENTREGADO"}, {"ID": 3, "PRODUCTO ID": "P", "ESTATUS": "DEVOLUCION"},
+                 {"ID": None, "PRODUCTO ID": "P", "ESTATUS": "ENTREGADO"}, {"ID": 4, "PRODUCTO ID": "", "ESTATUS": "ENTREGADO"}], "x")
+    ds, pp = e["descartados"], e["productos"]["P"]
+    chequeo("sin ID o sin PRODUCTO ID se cuentan (2)", ds["sin_id"] == 2)
+    chequeo("repetidos se cuentan (3)", ds["repetidos"] == 3)
+    chequeo("terminal gana a «otros»: el pedido 1 cuenta como DEVOLUCION", (pp["DEVOLUCION"], pp["otros"]) == (1, 0))
+    chequeo("dos terminales distintos se declaran, no se adivinan", len(ds["conflicto_terminal"]) == 1)
     for f in fallos:
         print("FALLA", f)
-    print("AUTOPRUEBA %d de 17" % (17 - len(fallos)))
+    print("AUTOPRUEBA %d de 21" % (21 - len(fallos)))
     return 1 if fallos else 0
 
 
@@ -273,6 +309,11 @@ def main():
             ex = d["excluidos_por_marca"]["productos"]
             print("OK · %d productos · %d pedido-producto únicos · %d terminados · tasa %.1f%% · %d producto(s) de otra marca excluidos → %s"
                   % (len(d["productos"]), d["pedidos_producto_unicos"], t["terminados"], t["tasa_entrega"] * 100, len(ex), salida))
+            ds = d["descartados"]
+            print("DESCARTADOS · %d fila(s) sin ID o PRODUCTO ID · %d repetida(s) (%d con otro estatus: %d resueltas porque el "
+                  "terminal gana a «otros», %d conflicto(s) entre dos terminales declarados en el JSON)"
+                  % (ds["sin_id"], ds["repetidos"], ds["repetidos_con_otro_estatus"], ds["terminal_gana_a_otros"],
+                     len(ds["conflicto_terminal"])))
         else:
             i = sys.argv.index("--producto-id") if "--producto-id" in sys.argv else -1
             ids = [x for x in sys.argv[i + 1:] if not x.startswith("--")] if i >= 0 else []

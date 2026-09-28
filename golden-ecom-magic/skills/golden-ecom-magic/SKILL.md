@@ -24,6 +24,7 @@ description: >-
      SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # golden-ecom-magic — Fábrica de imágenes con Ecom Magic AI
 
+<!-- skill v2.7.1 · 2026-09-27 · ronda de numeracion del Centro de Mando (orden de FER: «que todas las skills esten perfectamente corregidas y actualizadas»): da numero a los cambios del 27-sep que quedaron sin numero. Detalle en references/changelog.md -->
 <!-- skill v2.7 · sello declarado el 2026-09-21 por el CENTRO DE MANDO en la revision diaria.
      POR QUE: el censo la reportaba "sin version" y era cierto — SKILL.md no llevaba sello en
      ningun formato legible; el numero real solo vivia dentro de references/changelog.md, cuya
@@ -36,6 +37,20 @@ Eres el operador de **Ecom Magic AI** para Golden Group. Tu trabajo es producir 
 visual** de un producto (carrusel + infografías de secciones) con la calidad y el estilo de
 venta de Golden, y entregarlo listo para que **golden-shopify** lo monte en la página o
 **golden-ads** lo use en pauta.
+
+## Antes de empezar — lo que TÚ tienes que poner
+
+Esta skill trabaja con **tu** cuenta de Ecom Magic AI: las imágenes se generan allá y se pagan con tus créditos. Lo bloqueante se comprueba **al arrancar**, junto a `wallet_balance`, antes de gastar un crédito.
+
+| Qué necesitas | Tipo | Para qué | Cómo se consigue |
+|---|---|---|---|
+| Una **cuenta de Ecom Magic AI con créditos** | Bloqueante | Cada imagen cuesta 1 crédito | En ecom-magic.ai; el saldo lo muestra `wallet_balance`, que es gratis |
+| Una **foto real del producto** | Bloqueante | El motor compone sobre ella | Una URL pública (por ejemplo, la del CDN de Shopify) o el archivo |
+| **Python 3 con Pillow** | Bloqueante | Dejar cada pieza a la medida de su destino | Compruébalo con `python3 -c "import PIL"`. Si falta: con el Python de python.org, `pip3 install Pillow`; con el de Homebrew, `brew install pillow` (ahí `pip3` está bloqueado) |
+| El **conector de Ecom Magic** en Claude | Degradable | La vía principal, sin navegador | Claude → Configuración → Conectores → Agregar conector personalizado → URL `https://ecom-magic.ai/mcp/v1`, Client ID y Secreto vacíos → Agregar → Conectar → Autorizar |
+| La **extensión de Claude en Chrome**, con tu sesión de Ecom Magic abierta | Degradable | Solo la vía de respaldo por navegador (`references/ui-navegacion.md`) | Se instala en Chrome |
+
+**Lo bloqueante para y se pide con nombre propio.** Sin foto real no se genera: este motor compone sobre tu foto, y sin ella el trabajo es de `golden-imagen-arena`. **Lo degradable se pide y se sigue:** si el conector no responde a `account_me` / `wallet_balance`, te da los pasos de conexión de arriba y, mientras tanto, sigue por navegador (más lento: ahí tú arrastras la foto). Si tampoco hay navegador conectado, se para y se pide. Si no tienes algo, dime y te guío paso a paso. Nunca pegues una clave en el chat: aquí la autorización va por OAuth.
 
 ## Dos vías — usa la primera
 

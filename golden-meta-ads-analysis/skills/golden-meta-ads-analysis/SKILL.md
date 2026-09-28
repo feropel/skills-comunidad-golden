@@ -20,12 +20,24 @@ description: >-
 
 # Golden Group — Análisis de Meta Ads
 
-**Versión:** `GMA1.3.1` · **Última modificación:** 2026-08-24 (barrido total del arsenal, CdM) · versión declarada el 2026-08-19 por el Centro de Mando para que el censo diario pueda detectar ediciones
+**Versión:** `GMA1.3.2` · **Última modificación:** 2026-08-24 (barrido total del arsenal, CdM) · versión declarada el 2026-08-19 por el Centro de Mando para que el censo diario pueda detectar ediciones
 
 
 Método estándar de Golden Group para analizar informes de Meta Ads de cualquier producto y modelo de negocio. Produce diagnósticos accionables con configuración exacta de campañas nuevas.
 
 ---
+
+## 0. Antes de empezar — lo que TÚ tienes que poner
+
+Lo que hace falta depende de cómo entran los datos (sección 1B). En los dos modos el informe sale en Word, y las librerías se comprueban **al arrancar**.
+
+| Modo | Qué necesitas | Tipo | Cómo se consigue |
+|---|---|---|---|
+| **Los dos** | Python 3 con `pandas`, `openpyxl` y `python-docx` | Bloqueante | Compruébalo con `python3 -c "import pandas, openpyxl, docx"`. Si falta: con el Python de python.org, `pip3 install pandas openpyxl python-docx`. Con el de Homebrew, `pip3` está bloqueado: créalas en un entorno aislado, `python3 -m venv ~/venv-meta` y `~/venv-meta/bin/pip install pandas openpyxl python-docx`, y corre los comandos `python3 scripts/...` de esta skill con `~/venv-meta/bin/python3` |
+| **Archivo** (manda si lo traes) | El **Excel o CSV exportado** del Administrador de anuncios, idealmente con desglose por edad, sexo y plataforma | Bloqueante en este modo | Se exporta desde el Administrador de anuncios de Meta y se sube al chat |
+| **En vivo** (sin archivo) | Un **Access Token de Meta de SOLO LECTURA** (`ads_read` + `business_management`) y el **ID de tu cuenta publicitaria** | Bloqueante en este modo | Paso a paso en `references/extraccion_en_vivo.md`. Van en `.env`: `META_ACCESS_TOKEN=...` y `AD_ACCOUNT_ID=...`. Además, la librería `requests` (compruébala con `python3 -c "import requests"`; se instala igual que las de arriba) |
+
+**Lo bloqueante para y se pide con nombre propio.** En vivo, si falta el token o el ID, el script se detiene y dice qué variable poner; si el token trae permiso de escritura, `check_token.py` aborta antes de bajar un dato y guía a sacar uno de solo lectura: esta skill diagnostica, nunca toca tu pauta. Sin token ni archivo, se pide el export. **Lo degradable se dice y se sigue:** un export sin desglose demográfico se analiza igual, se avisa, y se dan las instrucciones para exportarlo con desglose. Si no tienes algo, dime y te guío paso a paso. El token va en `.env`, nunca en un documento que se comparta, y siempre de solo lectura.
 
 ## 1. CUÁNDO USAR ESTE SKILL
 

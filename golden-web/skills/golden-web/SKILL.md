@@ -18,6 +18,22 @@ description: >-
 
 # Golden Group — Web por Perfil
 
+## Antes de empezar — lo que TÚ tienes que poner
+
+La web termina publicada con una URL o, si falta dónde publicarla, con el código listo. Lo demás depende del stack y de los efectos que lleve.
+
+| Qué necesitas | Tipo | Para qué | Cómo se consigue |
+|---|---|---|---|
+| Una **cuenta de hosting**: Vercel (estático, Next, Vite) o Railway/VPS si hay backend | Degradable | Publicar con URL | Tu cuenta; la skill `all-deploy` elige el hosting y publica. Sin cuenta, se entrega el código listo para publicar |
+| **Node.js** | Bloqueante en la ruta React/Next | Construir el sitio | En nodejs.org, o `brew install node` |
+| Una **cuenta de Higgsfield con créditos** | Degradable | Imágenes o logo que falten (Flujo, paso 3) y los fotogramas del efecto Secuencia | Tu cuenta, conectada a Claude |
+| **ffmpeg** | Degradable | Convertir el video del efecto Secuencia en fotogramas WebP | `brew install ffmpeg`; si no está, Claude lo instala |
+| *Opcional:* un **dominio propio** | Degradable | Que la web viva en tu dirección | Lo compras en tu registrador y se conecta al final |
+| *Opcional:* el MCP **Magic** (21st.dev, pide su llave), el MCP **Stitch** y los conectores de **Vercel** y **Domains** | Degradable | Componentes animados, sistemas de diseño, publicar y verificar el dominio | Se conectan aparte; la llave de Magic nunca va en el chat |
+| *Opcional:* las skills `all-deploy`, `cyber-neo`, `frontend-design` y `ui-ux-pro-max` | Degradable | Publicar, blindar formularios y claves, y diseñar (ver "Stack") | Entre tus skills |
+
+**Lo bloqueante para y se pide:** en la ruta React/Next, sin Node no hay build. **Lo degradable no bloquea el build completo:** se sigue con lo disponible (código a mano, publicación manual, fotogramas por otro método) y se informa qué se saltó y qué falta correr (ver "Si falta una pieza del stack", al final). Nunca se inventa el resultado de una herramienta que no corrió. Si no tienes algo, dime y te guío paso a paso.
+
 ## Paso 0 · Cerebro de marca (obligatorio antes de generar)
 
 Si la marca tiene CEREBRO creado por `golden-brand-brain` (marca.md, productos.md, avatares.md,
@@ -27,7 +43,7 @@ antes de continuar; si el usuario pide seguir sin cerebro, se declara en la entr
 se generó sin voz de marca cargada.
 
 
-**Versión:** `GW2.12` · **Fábrica:** chat «✅ SKILL golden-web» · Blindada con `chflags uchg` (desbloquear con
+**Versión:** `GW2.12.1` · **Fábrica:** chat «✅ SKILL golden-web» · Blindada con `chflags uchg` (desbloquear con
 `chflags -R nouchg`, reponer con `chflags -R uchg` al cerrar cualquier reparación).
 
 _GW2.12 (2026-09-24) — fila del chat FILTRO aprobada por FER: **Uiverse como fuente de

@@ -18,10 +18,21 @@ description: >-
 **Fábrica:** chat «✅ SKILL golden-chatea-operacion»
 # golden-chatea-operacion · qué pasó ayer con el bot
 
+## 📋 Requisitos: qué necesita del usuario antes de arrancar
+
+- **Token API del espacio de Chatea Pro** · BLOQUEANTE. Se crea en el panel del espacio (*Settings → API Keys*, según el propio código) y va **atado al Bot**; si no, la API responde 404 "Flow not found". Se guarda en `<carpeta del cliente>/.secrets/<espacio>.token`. Cupo: 1.000 llamadas por hora (no está medido si es por token o por espacio; se mira con `golden-chatea-cupo`).
+- **La etiqueta del espacio y la fecha a revisar** (AAAA-MM-DD) · BLOQUEANTES: son los argumentos de `extraer.py`.
+- **`--modo cod|prepago`** · DEGRADABLE: sin él los hallazgos bajan a DUDA, así que se pregunta.
+- **`--zona-horas` o `--pais`** fuera de Colombia · DEGRADABLE: por defecto usa la hora de Colombia (-5).
+- Esta skill **no usa Dropi ni Shopify**: la confirmación contra el pedido real es de `golden-logistica-diaria`.
+
+**Si falta algo BLOQUEANTE: no se hace lo que depende de él** (si es de toda la skill, se PARA antes de tocar nada) y se pide con nombre propio: qué es, dónde se saca y dónde se pone. **Si falta algo DEGRADABLE: se pide y se sigue**, dejando marcado como DUDA en todo lo que depende de él. Nunca se presenta como completo.
+
+<!-- skill v1.13 · 2026-09-27 · CdM: bloque de REQUISITOS al principio (ley de FER del 02-sep). -->
 <!-- skill v1.12 · 2026-09-22 · auditoría golden-skill-auditor (AUDITA+ARREGLA): único hallazgo real — este comentario H1 seguía marcado "v1.10" pese a que `references/changelog.md` ya tenía una acta v1.11 (2026-09-13) que corrigió la línea **Versión:** de aquí abajo (GCO1.9 → GCO1.10); el propio comentario que sirve de puntero de versión no se había actualizado tras esa corrección — la misma clase de fallo que esa acta v1.11 ya había corregido una vez, reaparecida en el OTRO marcador de versión del mismo archivo. Corregido: este comentario ahora cita v1.12. Verificado tras el arreglo: inventario.sh sin rotas/huérfanas/dudosos, validar_arsenal.py sano sin aviso, autoprueba.py 67/67 (cambio de solo texto, sin tocar código). Sin blindar — sigue abierto el pendiente de zona horaria con dueño (FER/Golden). Historial completo en references/changelog.md. -->
 <!-- skill v1.10 · 2026-09-07 · auditoría golden-skill-auditor (AUDITA+ARREGLA, orden de FER): retirado el nombre de un orquestador PLANEADO que se citaba como si existiera —el validador de la casa lo marcaba como aviso desde días, y un nombre en el cuerpo se lee como una skill que existe—; el hueco pasa a declararse como hueco, con dueño en el CdM. Y el changelog (6 actas, 21.526 B, el 58% del archivo, el peor caso de la familia) baja a references/changelog.md. Historial completo allí. -->
 
-**Versión:** `GCO1.10` (2026-09-07, auditoría golden-skill-auditor: retira el nombre del
+**Versión:** `GCO1.13.1` (2026-09-07, auditoría golden-skill-auditor: retira el nombre del
 orquestador de diagnóstico PLANEADO —el hueco queda declarado sin bautizar, con dueño en el
 Centro de Mando— y baja el changelog completo a `references/changelog.md`, 21.526 B que se
 pagaban en cada activación) — historial completo de `GCO1.0` a `GCO1.9` en

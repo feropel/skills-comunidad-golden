@@ -17,6 +17,23 @@ description: >-
 
 # GOLDEN 360 — la ruta de producto de Golden Group (`golden360`)
 
+## Antes de empezar — lo que TÚ tienes que poner
+
+Golden 360 lleva un producto de cero a vendiendo llamando a otras skills (lista en **REQUISITOS**, más abajo), así que lo que necesitas es la suma de lo que ellas piden. No hace falta tenerlo todo el primer día: cada pieza entra en su fase. **Cada skill hija debe declarar y pedir lo suyo; donde una hija no lo haga, lo pide este orquestador con nombre propio al llegar a su fase.** Aquí, todo es degradable menos lo que frena una compuerta.
+
+| Qué necesitas | Fase | Tipo aquí | Cómo se consigue |
+|---|---|---|---|
+| El conector de **Firecrawl** | Bloque 1, investigación | Degradable: búsqueda web nativa | Una cuenta en firecrawl.dev conectada a Claude |
+| **yt-dlp**, **ffmpeg** y **whisper-cpp** con el modelo `ggml-small.bin` | Bloque 1, minería de videos | Bloqueante en la Compuerta 1: sin transcriptor se pide el guion hablado de los 3 a 5 videos top, y sin él no se pasa | `brew install yt-dlp ffmpeg whisper-cpp`. El modelo: mira si ya está en `~/.cache/hyperframes/whisper/models/`; si no, de huggingface.co/ggerganov/whisper.cpp |
+| Tus **exports de órdenes de Dropi** | 0.5, pedidos previos | Degradable aquí; la hija decide su propio tipo | Los `ordenes_*.xlsx` que exportas de Dropi |
+| El conector de **DropKiller**, con sesión abierta de Temu y MercadoLibre | C1, validar demanda | Degradable aquí; la hija decide su propio tipo | Es un conector MCP de pago (plan Advance); las sesiones, abiertas en el navegador |
+| Tu **tienda Shopify** | Fase 4, página de producto | Degradable aquí; la hija decide su propio tipo | Tu tienda. Si no se puede escribir en el tema, la ficha se entrega para pegarla a mano |
+| Tu **cuenta de Higgsfield** con créditos | Fase 5, creativos | Degradable: prompts listos, marcados `[PARCIAL]` | Tu cuenta, conectada a Claude |
+| Tus **cuentas de Meta Ads, TikTok Ads y Google Ads** | Fases 6 y 7, pauta | Degradable aquí: sin Meta, plan para copiar y pegar | Tus cuentas publicitarias; cómo se conectan, en `golden-ads` |
+| Tu **espacio de Chatea PRO** y su token | Fase 8, bot del producto | Degradable aquí; la hija decide su propio tipo | El token se crea en el panel del espacio (Settings → API Keys) y va atado al Bot; si no, la API responde 404 "Flow not found" |
+
+**Si falta algo, cada fase lo pide al llegar con nombre propio y el lanzamiento no se detiene entero:** lo degradable se marca `[PARCIAL]` y lo que no corrió se declara en el paquete, nunca se da por hecho. Las 4 compuertas duras siguen igual: frenan por viabilidad, claims, precios o QA. Si no tienes algo, dime y te guío paso a paso.
+
 ## Paso 0 · Cerebro de marca (obligatorio antes de generar)
 
 Si la marca tiene CEREBRO creado por `golden-brand-brain` (marca.md, productos.md, avatares.md,

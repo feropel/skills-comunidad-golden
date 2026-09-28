@@ -15,11 +15,25 @@ description: >-
 ---
 
 **Fábrica:** chat «✅ SKILL golden-video-teardown»
+<!-- skill v1.6.1 · 2026-09-27 · ronda de numeracion del Centro de Mando (orden de FER: «que todas las skills esten perfectamente corregidas y actualizadas»): da numero a los cambios del 27-sep que quedaron sin numero. Detalle en references/changelog.md -->
 <!-- skill v1.6 · 2026-09-06 (auditoría golden-skill-auditor) · inventario.sh marcó "sin línea de versión bajo el H1": el comentario apuntaba al historial pero no seguía el patrón de la casa con la versión vigente visible de un vistazo. Historial completo en references/changelog.md (el cuerpo se paga en cada activación; el acta no). -->
 # Golden Group — Teardown de videos publicitarios
 
 
 Desarma cualquier video de anuncio de punta a punta y lo convierte en (1) un teardown exhaustivo segundo a segundo y (2) una fórmula replicable con brief para producir videos nuevos. Es la capa de INTELIGENCIA CREATIVA entre el rendimiento (`golden-meta-ads-analysis`) y la producción (`golden-ugc-avatar`, `golden-ads`).
+
+## Antes de empezar — lo que TÚ tienes que tener
+
+El teardown sale de los fotogramas reales del video, así que depende de herramientas del equipo.
+
+| Qué necesitas | Tipo | Para qué | Cómo se consigue |
+|---|---|---|---|
+| **ffmpeg** (trae `ffprobe`) | Bloqueante | Sacar los fotogramas del gancho y de todo el video | `brew install ffmpeg` |
+| **yt-dlp** | Degradable | Bajar el video cuando pasas un enlace (Paso 0) | `brew install yt-dlp` |
+| **whisper-cpp** con el modelo `ggml-small.bin` | Degradable | Transcribir la locución | `brew install whisper-cpp`. El modelo: mira si ya está en `~/.cache/hyperframes/whisper/models/`; si no, `ggml-small.bin` de huggingface.co/ggerganov/whisper.cpp |
+| *Opcional:* **jq** | Degradable | Leer los comentarios bajados con yt-dlp | `brew install jq` |
+
+**Lo bloqueante para:** sin ffmpeg, `scripts/extract_frames.sh` se detiene con el comando para instalarlo; sin fotogramas no hay teardown. **Lo degradable se pide y se sigue:** con un enlace y sin yt-dlp no se bloquea (Paso 0): se pide el archivo y, mientras tanto, los metadatos salen por Firecrawl o por la biblioteca de anuncios de Meta, si están conectados. Sin transcriptor, el guion sale del texto en pantalla y se dice que la locución no se transcribió (principio 3). Si no tienes algo, dime y te guío paso a paso.
 
 ## Cuándo se dispara
 - "analiza este video / estos videos", "desglosa este ad", "teardown", "qué dice segundo a segundo", "por qué funciona este creativo", "sácame la fórmula", "analiza mis videos para replicarlos".

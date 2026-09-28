@@ -44,6 +44,9 @@ def norm(s):
     return re.sub(r"\s+", " ", s).strip()
 
 
+CORTOS = []   # P59: segmentos de <3 caracteres, que no se pueden comparar; se cuentan y se listan
+
+
 def segments(text):
     """Trozos con contenido real para comparar (líneas no vacías, sin markup
     de maquetación tipo fences, ::: o front matter).
@@ -71,6 +74,7 @@ def segments(text):
         if s.startswith("|"):
             s = s.strip("|").replace("|", " ")
         if len(norm(s)) < 3:
+            CORTOS.append(s)
             continue
         segs.append(s)
     return segs
@@ -129,6 +133,10 @@ def main():
     print("# Compuerta verbatim")
     print("Original:", os.path.basename(args.old), "· Nuevo:", os.path.basename(args.new))
     print("Segmentos verificados:", checked)
+    if CORTOS:
+        print("Segmentos cortos NO comparados (<3 caracteres: un «No» esta en cualquier texto): %d · %s"
+              % (len(CORTOS), ", ".join(repr(c) for c in CORTOS[:12]) + (" …" if len(CORTOS) > 12 else "")))
+        print("   (revisalos a mano: una cifra o un «Sí/No» cambiado no lo ve esta compuerta)")
     if ok:
         print("Resultado: OK — el texto se conservó idéntico.")
         print("   (idéntico ENTRE LOS DOS PDFs. Si el original venía de otra")
@@ -143,6 +151,7 @@ def main():
     if args.json:
         with open(args.json, "w", encoding="utf-8") as f:
             json.dump({"ok": ok, "checked": checked, "missing": missing,
+                       "cortos_sin_comparar": CORTOS,
                        },
                       f, ensure_ascii=False, indent=2)
 

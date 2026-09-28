@@ -73,17 +73,28 @@ fi
 TMP="$(mktemp "${TMPDIR:-/tmp}/golden-archivos.XXXXXX")" || {
   echo "🔴 No se pudo crear el temporal: no se mueve nada." >&2; exit 1; }
 find "$UNIT" -type f ! -name '.*' 2>/dev/null > "$TMP"   # snapshot antes de mover
-n=0
+n=0; YA_WEB=0; FUERA_RUTA=0; PESADOS=0
+: > "$TMP.fuera"
 while IFS= read -r f; do
   padre="$(basename "$(dirname "$f")")"
-  case "$padre" in "🌐 WEB SHOPIFY") continue;; esac       # ya está separado
-  ruta_solo_generica "$f" || continue                       # ancestro deliberado = no tocar
   b="$(basename "$f")"
   ext="$(printf '%s' "${b##*.}" | tr '[:upper:]' '[:lower:]')"
+  case "$padre" in "🌐 WEB SHOPIFY") YA_WEB=$((YA_WEB+1)); continue;; esac   # ya está separado
+  # Las exclusiones de abajo son CORRECTAS, pero antes se tomaban en SILENCIO:
+  # una pieza web suelta en la raiz de la unidad, o dentro de un set deliberado,
+  # no se movia NI se contaba. Medido el 27-09-2026: con 4 webp presentes el
+  # informe decia "1 piezas se moverian" y de las otras 3 no se sabia nada.
+  # Quien lee ese 1 cree que la unidad ya estaba separada.
+  if ! ruta_solo_generica "$f"; then
+    case "$ext" in
+      webp|mp4) FUERA_RUTA=$((FUERA_RUTA+1)); printf '%s\n' "$f" >> "$TMP.fuera" ;;
+    esac
+    continue                                              # ancestro deliberado = no tocar
+  fi
   case "$ext" in
     webp) : ;;                                            # webp = optimizado para web
     mp4)  sz=$(stat -f%z "$f" 2>/dev/null || echo 0)
-          [ "$sz" -lt "$LIMITE_VIDEO" ] || continue ;;     # mp4 pesado = master
+          [ "$sz" -lt "$LIMITE_VIDEO" ] || { PESADOS=$((PESADOS+1)); continue; } ;;
     *)    continue ;;                                      # png/jpg/mov = master
   esac
   n=$((n+1))
@@ -106,4 +117,36 @@ if [ "$MODE" = "APLICAR" ]; then
   echo "✔ $(basename "$UNIT"): $n piezas movidas a 🌐 WEB SHOPIFY"
 else
   echo "   → $n piezas se moverían. Repite con APLICAR para ejecutar."
+
+# Si NADA entro y todo lo que hay cuelga de subcarpetas que a su vez parecen
+# unidades, lo mas probable es que se haya pasado la carpeta que CONTIENE los
+# productos en vez de un producto. Medido: yo mismo lo hice el 27-09 y la
+# herramienta contesto "0 piezas se moverian" sin una palabra, asi que lei un
+# cero que en realidad significaba "me diste el nivel equivocado".
+# Un cero por no encontrar nada y un cero por estar mirando donde no es se leen
+# igual, y solo uno de los dos es una respuesta.
+if [ "$n" -eq 0 ] && [ "$FUERA_RUTA" -gt 0 ]; then
+  sub_uni=0
+  for d in "$UNIT"/*/; do
+    [ -d "$d" ] || continue
+    for g in "$d"*/; do
+      [ -d "$g" ] || continue
+      es_generica "$(basename "$g")" && { sub_uni=$((sub_uni+1)); break; }
+    done
+  done
+  if [ "$sub_uni" -gt 0 ]; then
+    echo "   🔴 Esto no parece una carpeta de PRODUCTO: $sub_uni de sus subcarpetas si lo parecen."
+    echo "      Seguramente le pasaste la carpeta que CONTIENE los productos. Corre la"
+    echo "      herramienta una vez por producto, no sobre la carpeta madre."
+  fi
+fi
+if [ "$FUERA_RUTA" -gt 0 ]; then
+  echo "   ⚠️  $FUERA_RUTA pieza(s) web NO contadas: estan sueltas en la raiz de la unidad"
+  echo "       o dentro de un set deliberado, donde esta herramienta no entra a proposito."
+  sed "s|$UNIT/|       |" "$TMP.fuera" | head -15
+  [ "$FUERA_RUTA" -gt 15 ] && echo "       ... y $((FUERA_RUTA-15)) mas"
+fi
+[ "$PESADOS" -gt 0 ] && echo "   ⚠️  $PESADOS mp4 por encima del limite: se tratan como master, no se mueven."
+[ "$YA_WEB" -gt 0 ] && echo "   ℹ️  $YA_WEB ya estaban en 🌐 WEB SHOPIFY."
+rm -f "$TMP.fuera"
 fi

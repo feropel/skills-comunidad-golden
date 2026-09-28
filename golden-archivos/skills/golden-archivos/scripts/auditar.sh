@@ -67,8 +67,28 @@ c=$(find "$R" -type f "${EXCL[@]}" \( -iname 'IMG_*' -o -iname 'IMG-*' -o -iname
 echo ""
 
 echo "📑 5. Copias sueltas evidentes"
-cp=$(find "$R" -type f "${EXCL[@]}" \( -name 'Copia de *' -o -name '* copy.*' -o -name '* (1).*' \) 2>/dev/null)
-if [ -z "$cp" ]; then echo "   ✅ ninguna"; else echo "$cp" | sed "s|$R/|   |" | head -15; fi
+# Medido el 28-09-2026 con 7 formas reales sembradas: el patron viejo detectaba
+# 3. Se le escapaban `copia de x` en minuscula (usaba -name, sensible a
+# mayusculas), el sufijo `x copia.jpg`, `x copy 2.jpg` y cualquier `(2)`, `(3)`…
+# porque solo miraba `(1)`. Una lista de copias que ve 3 de 7 no es una lista de
+# trabajo: es una muestra que se lee como el total.
+cp=$(find "$R" -type f "${EXCL[@]}" \( \
+       -iname 'copia de *' -o -iname '* copia.*' -o -iname '* copia [0-9]*' \
+    -o -iname 'copy of *'  -o -iname '* copy.*'  -o -iname '* copy [0-9]*' \
+    -o -iname '* ([0-9]).*' -o -iname '* ([0-9][0-9]).*' \
+  \) 2>/dev/null)
+if [ -z "$cp" ]; then
+  echo "   ✅ ninguna"
+else
+  # La seccion 4 ya daba su total; esta cortaba con head -15 y CALLABA cuantas
+  # faltaban. Medido: con 20 copias mostraba 15 y no decia nada de las otras 5,
+  # asi que la lista de trabajo parecia completa. Una lista truncada sin total es
+  # peor que una larga: no se ve que este truncada.
+  ncp=$(printf '%s\n' "$cp" | grep -c .)
+  printf '%s\n' "$cp" | sed "s|$R/|   |" | head -15
+  [ "$ncp" -gt 15 ] && echo "   ... y $((ncp-15)) mas"
+  echo "   → total: $ncp"
+fi
 echo ""
 
 echo "🌐 6. Mezcla WEB (webp) + MASTER (png/jpg) en la misma carpeta"

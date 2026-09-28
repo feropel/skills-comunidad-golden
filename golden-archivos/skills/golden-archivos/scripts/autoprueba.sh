@@ -58,8 +58,23 @@ sembrar "$T/b"; B=$(bash "$DIR/separar-web.sh" "$T/b/PROD/" 2>/dev/null | grep -
 [ -n "$A" ] && [ "$A" = "$B" ] && ok "separar-web: '$A' con y sin barra" || no "separar-web difiere: sin='$A' con='$B'"
 
 echo "== 2. Sets deliberados intactos =="
-echo "$(bash "$DIR/separar-web.sh" "$T/a/PROD" 2>/dev/null)" | grep -q 'ANTES Y DESPUES' \
-  && no "separar-web se lleva material de ANTES Y DESPUES" || ok "separar-web respeta sets deliberados"
+# Esta asercion comprobaba TEXTO: hacia grep de 'ANTES Y DESPUES' sobre la salida
+# en seco. Se rompio sola el 28-09-2026 cuando `separar-web.sh` empezo a NOMBRAR
+# lo que deja fuera: el archivo seguia en su sitio, pero su ruta aparecia en el
+# censo de exclusiones y el grep lo leyo como si lo estuviera moviendo.
+# Un verde que depende de que algo NO se mencione se rompe en cuanto la
+# herramienta mejora su informe. Ahora se mide el DISCO: se corre en APLICAR
+# sobre una copia y se comprueba que la pieza deliberada sigue donde estaba y
+# que NO aparecio en la carpeta web.
+DEL="$T/deliberado"; rm -rf "$DEL"; mkdir -p "$DEL"
+cp -R "$T/a/PROD" "$DEL/PROD"
+: > "$DEL/mov.log"
+bash "$DIR/separar-web.sh" "$DEL/PROD" "$DEL/mov.log" APLICAR >/dev/null 2>&1
+d_ok=1
+[ -f "$DEL/PROD/ANTES Y DESPUES/VIDEO/deliberado.webp" ] || d_ok=0     # sigue en su sitio
+find "$DEL/PROD" -path '*WEB*' -name 'deliberado.webp' 2>/dev/null | grep -q . && d_ok=0  # y no acabo en web
+[ "$d_ok" -eq 1 ] && ok "separar-web respeta sets deliberados (comprobado en disco tras APLICAR)" \
+  || no "separar-web MOVIO material de ANTES Y DESPUES"
 
 echo "== 3. Listas alineadas (se demuestra con diff, no se declara) =="
 CLAS=$(sed -n '/^  case "\$ext" in/,/esac/p' "$DIR/clasificar.sh" | grep -oE '^[[:space:]]+[a-z0-9|]+\)' | tr -d ' )' | tr '|' '\n' | sort -u | grep -v '^\*$')
@@ -316,6 +331,58 @@ printf '%s' "$sal" | grep -q 'Grupos de duplicados exactos: 1' || md5_ok=0  # 1,
 chmod 644 "$MD/i1.bin" "$MD/i2.bin" 2>/dev/null
 [ "$md5_ok" -eq 1 ] && ok "un md5 ilegible no borra archivos ni inventa grupos de duplicados" \
   || no "un md5 que falla se esta leyendo como coincidencia: eliminar.sh borra, o duplicados.sh agrupa ilegibles"
+
+echo "== 16. Las tres herramientas dicen QUE dejan fuera y por que =="
+# Fila P59: tres exclusiones silenciosas, las tres con la decision CORRECTA y el
+# aviso ausente. No se arreglaron a la primera porque mi banco no reproducia el
+# sembrado: pedi el del revisor y con el salieron las tres a la primera.
+#   a) nombrar.sh en modo REAL no imprimia NADA: renombro 3 de 7 y callo.
+#   b) separar-web.sh decia "1 piezas" con 4 webp presentes.
+#   c) auditar.sh cortaba las copias en 15 sin decir cuantas habia.
+P="$T/p59"; mkdir -p "$P/uni/IMÁGENES" "$P/uni/ADS" "$P/uni/ANTES Y DESPUES" "$P/cop"
+for f in a.jpg b.avif c.opus d.jfif e.mp4 f.pdf g.dng; do printf 'x' > "$P/uni/$f"; done
+printf 'x' > "$P/uni/suelto.webp"; printf 'x' > "$P/uni/ADS/ad1.webp"
+printf 'x' > "$P/uni/IMÁGENES/dentro.webp"; printf 'x' > "$P/uni/ANTES Y DESPUES/delib.webp"
+i=1; while [ $i -le 20 ]; do printf 'x' > "$P/cop/Copia de doc $i.jpg"; i=$((i+1)); done
+: > "$P/uni.log"
+p59_falla=""
+
+sal=$(bash "$DIR/nombrar.sh" "$P/uni" "$P/uni.log" 2>&1)
+printf '%s' "$sal" | grep -q 'Cobertura:'      || p59_falla="$p59_falla · nombrar.sh no imprime resumen en modo real"
+printf '%s' "$sal" | grep -qi 'opus'           || p59_falla="$p59_falla · nombrar.sh no nombra los tipos que deja fuera"
+
+sal=$(bash "$DIR/separar-web.sh" "$P/uni" 2>&1)
+printf '%s' "$sal" | grep -q 'NO contadas'     || p59_falla="$p59_falla · separar-web.sh no dice cuantas piezas deja fuera"
+printf '%s' "$sal" | grep -q 'suelto.webp'     || p59_falla="$p59_falla · separar-web.sh no nombra CUALES deja fuera"
+
+sal=$(bash "$DIR/auditar.sh" "$P/cop" 2>&1)
+printf '%s' "$sal" | grep -q 'total: 20'       || p59_falla="$p59_falla · auditar.sh no da el total real de copias"
+
+# Las SIETE formas reales de copia. El patron viejo veia 3: se le escapaban la
+# minuscula (usaba -name), el sufijo `x copia.jpg`, `x copy 2.jpg` y todo `(2)`,
+# `(3)`... porque solo miraba `(1)`.
+F="$P/formas"; mkdir -p "$F"
+for n in "Copia de bien.jpg" "copia de minuscula.jpg" "X copia.jpg" \
+         "X copy 2.jpg" "X (2).jpg" "Y copy.jpg" "Z (1).jpg"; do
+  printf 'x' > "$F/$n"
+done
+printf 'x' > "$F/TAG RECEDE - pieza buena.jpg"      # control: NO es copia
+sal=$(bash "$DIR/auditar.sh" "$F" 2>&1)
+printf '%s' "$sal" | grep -q 'total: 7'        || p59_falla="$p59_falla · auditar.sh no detecta las 7 formas de copia (minuscula, sufijo, (2)+)"
+printf '%s' "$sal" | grep -q 'pieza buena'     && p59_falla="$p59_falla · auditar.sh acusa a un nombre SANO de ser copia"
+
+# Pasarle la carpeta que CONTIENE los productos daba "0 piezas" sin una palabra.
+# Un cero por no encontrar nada y un cero por mirar donde no es se leen igual.
+NIV="$P/nivel"; mkdir -p "$NIV/PRODUCTO/FOTOS"
+printf 'x' > "$NIV/PRODUCTO/FOTOS/a.webp"
+printf '%s' "$(bash "$DIR/separar-web.sh" "$NIV" 2>&1)" | grep -q 'no parece una carpeta de PRODUCTO' \
+  || p59_falla="$p59_falla · separar-web.sh no avisa cuando le pasan la carpeta MADRE"
+
+# El mensaje rojo NOMBRA la comprobacion que fallo, no la lista de todo lo que
+# podria fallar. Un rojo generico manda a buscar al sitio equivocado en 4 de
+# cada 5 casos, y hoy ya perdi horas leyendo un cero que significaba otra cosa.
+[ -z "${p59_falla// /}" ] && ok "nombrar, separar-web y auditar declaran lo que dejan fuera (5 comprobaciones)" \
+  || no "exclusion silenciosa:${p59_falla}"
 
 echo "== 4. El log manda: sin log no se mueve =="
 sembrar "$T/c"

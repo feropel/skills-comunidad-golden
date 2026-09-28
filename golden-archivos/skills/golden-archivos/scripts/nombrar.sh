@@ -34,20 +34,40 @@ ALLOW="jpg jpeg png webp heic heif gif tiff tif bmp svg psd ai eps mp4 mov webm 
 TMP="$(mktemp "${TMPDIR:-/tmp}/golden-archivos.XXXXXX")" || {
   echo "🔴 No se pudo crear el temporal: no se renombra nada." >&2; exit 1; }
 find "$UNIT" -type f ! -name '.*' 2>/dev/null > "$TMP"   # snapshot PRIMERO (renombrar mientras find recorre salta archivos)
+TOTAL=$(grep -c . "$TMP"); HECHOS=0; OMIT=0; YA=0
+: > "$TMP.omit"
 while IFS= read -r f; do
   [ -f "$f" ] || continue
   b="$(basename "$f")"; dir="$(dirname "$f")"
   ext="$(printf '%s' "${b##*.}" | tr '[:upper:]' '[:lower:]')"
-  case " $ALLOW " in *" $ext "*) : ;; *) continue;; esac
-  case "$b" in "$PREFIX - "*) continue;; esac
+  case " $ALLOW " in
+    *" $ext "*) : ;;
+    *) OMIT=$((OMIT+1)); printf '%s\n' "$ext" >> "$TMP.omit"; continue;;
+  esac
+  case "$b" in "$PREFIX - "*) YA=$((YA+1)); continue;; esac
   dest="$dir/$PREFIX - $b"
   if [ -e "$dest" ]; then
     name="${b%.*}"; e2="${b##*.}"; [ "$name" = "$e2" ] && e2=""
     n=1; while [ -e "$dir/$PREFIX - ${name} (${n})${e2:+.$e2}" ]; do n=$((n+1)); done
     dest="$dir/$PREFIX - ${name} (${n})${e2:+.$e2}"
   fi
-  if [ "$DRY" = "DRY" ]; then echo "$b -> $(basename "$dest")"; else
-    mv "$f" "$dest" && printf 'MV\t%s\t%s\n' "$f" "$dest" >> "$LOG"
+  if [ "$DRY" = "DRY" ]; then
+    echo "$b -> $(basename "$dest")"; HECHOS=$((HECHOS+1))
+  else
+    mv "$f" "$dest" && printf 'MV\t%s\t%s\n' "$f" "$dest" >> "$LOG" && HECHOS=$((HECHOS+1))
   fi
 done < "$TMP"
-rm -f "$TMP"
+echo ""
+# En modo real este script no imprimia NADA: renombraba y callaba. Medido el
+# 27-09-2026 con 7 archivos: renombro 3 y la salida fue una linea en blanco.
+# Una herramienta que MODIFICA archivos y no dice cuantos toco obliga a
+# comprobar a mano lo que acaba de hacer — o peor, a darlo por hecho.
+# Y los tipos fuera de ALLOW se saltaban sin dejar rastro: un `.opus` o un `.dng`
+# desaparecian del trabajo sin que nadie supiera que existian.
+echo "Cobertura: $TOTAL vistos · $HECHOS renombrados · $YA ya tenian prefijo · $OMIT de tipo no cubierto"
+if [ "$OMIT" -gt 0 ]; then
+  echo "Tipos NO tocados (fuera de la lista ALLOW, se dejan como estan):"
+  sort "$TMP.omit" | uniq -c | sort -rn | sed 's/^/   /'
+  echo "   Si alguno deberia llevar prefijo, agregalo a ALLOW en este script."
+fi
+rm -f "$TMP" "$TMP.omit"

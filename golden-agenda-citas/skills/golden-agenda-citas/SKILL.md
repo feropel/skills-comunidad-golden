@@ -18,6 +18,7 @@ description: >-
 **Fábrica:** chat «✅ SKILL golden-agenda-citas»
 # Golden Group — Agenda de Citas
 
+<!-- skill v1.5 — 2026-09-27 — LEY DE LOS REQUISITOS DEL USUARIO (FER, 02-sep): se agrega la seccion "Antes de empezar" arriba de Herramientas. La skill ya comprobaba el calendario al arrancar, pero no le decia al usuario ANTES que tenia que conectarlo, ni como. Hecho por el chat del Arsenal con orden directa de FER, informado al Centro de Mando. -->
 <!-- skill v1.4 — 2026-09-13 — golden-skill-auditor: auditoria fresca encontro un hallazgo real con evidencia (rubrica, dimension Activacion, chequeo "dice cuando NO usarla / a que skill hermana derivar"): la description no declaraba la frontera, solo el cuerpo (seccion "Fronteras y desambiguacion", ya existente). Arreglo: se movio el listado de las 7 tools del MCP (list_calendars...get_event) de la description al cuerpo (seccion Herramientas, que ya las explicaba una por una) para liberar espacio dentro del tope duro, y se agrego al final de la description una frase corta de frontera ("No reemplaza al bot de WhatsApp... ni a golden-cobros/golden-finanzas"). Description: 987 -> 994/1024 caracteres. validar_arsenal.py en exit 0 antes y despues. Resto de la skill sin cambios: 0 referencias rotas, 0 huerfanos, sin secretos, sin signos de apertura, blindaje chflags uchg 4/4 nodos confirmado. -->
 <!-- Historial completo de esta skill: references/changelog.md (2 actas, mudadas el 2026-09-05). El cuerpo se paga en cada activación; el acta no. -->
 
@@ -25,6 +26,17 @@ description: >-
 Convierte solicitudes de cita en eventos confirmados en Google Calendar, con disponibilidad real verificada antes de crear nada. Doble uso: **agenda propia** (asesorías/VIP de Golden) y **servicio vendible** a consultorios/clínicas/salones.
 
 **Reserva de campo:** esta skill no se ha corrido todavía punta a punta contra un calendario real de producción (solo diseñada y auditada). El primer uso real es la prueba — si algo del flujo no encaja con la plataforma real (nombres de campos, franjas, invitados), corrígelo aquí mismo y sube la versión.
+
+## Antes de empezar — lo que TÚ tienes que poner
+
+Esta skill trabaja sobre la agenda real del negocio, así que necesita que conectes el calendario. Sin eso no puede ver horarios libres ni crear citas, y es mejor saberlo ahora que a mitad de una reserva.
+
+| Qué necesitas | Dónde se saca | Dónde se pone |
+|---|---|---|
+| El conector de **Google Calendar** en Claude | En la configuración de conectores de claude.ai, opción Google Calendar | Se conecta una vez y queda disponible en tus sesiones |
+| Una **cuenta de Google con permiso para ver y crear eventos** en la agenda del negocio | La del propio negocio, o una a la que el negocio le haya compartido su calendario con permiso de hacer cambios | Es la cuenta que eliges al conectar |
+
+**Si falta algo, la skill para y lo pide.** Antes del primer paso comprueba con `list_calendars` que el calendario responde (ver Herramientas, abajo). Si no responde, te dice qué falta y **no inventa horarios libres**. Mientras lo conectas, puedes dictarle los horarios disponibles y deja la cita preparada para crearla cuando el calendario esté conectado.
 
 ## Herramientas (MCP Google Calendar)
 

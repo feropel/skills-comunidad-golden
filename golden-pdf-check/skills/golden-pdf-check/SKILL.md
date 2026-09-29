@@ -18,7 +18,7 @@ description: >-
 # golden-pdf-check · el estándar de PDF de Comunidad Golden
 
 <!-- skill v6.7.1 · 2026-09-27 · ronda de numeracion del Centro de Mando (orden de FER: «que todas las skills esten perfectamente corregidas y actualizadas»): da numero a los cambios del 27-sep que quedaron sin numero. Detalle en references/changelog.md -->
-<!-- skill v6.7 · 2026-09-06 · autoprueba 26/26 · EL ACTA COMPLETA VIVE EN references/changelog.md.
+<!-- skill v6.7.2 · 2026-09-28 · autoprueba 27/27 · EL ACTA COMPLETA VIVE EN references/changelog.md.
      Auditoría golden-skill-auditor: `scripts/visuales.py` (el motor de los componentes
      visuales — KPI, barras, escala, comparativa, pasos, QR — que `build_pdf.py` importa
      en la línea 39) no aparecía citado en ningún lugar del cuerpo, así que el inventario
@@ -353,7 +353,7 @@ por buena la skill:
 $PY scripts/autoprueba.py
 ```
 
-Debe imprimir `TODO OK` con **26 de 26**. La muestra que construye es
+Debe imprimir `TODO OK` con **27 de 27**. La muestra que construye es
 `assets/autoprueba-muestra.md`, que trae horneadas las trampas de copy-paste
 (`>>`, `//`, `https://`, `<<X>>`, un emoji y una tarjeta larga): **no edites ese
 texto**, es el fixture de regresión.

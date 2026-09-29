@@ -37,6 +37,22 @@ normas que estaban vigentes cuando ocurrieron. Dos avisos para quien lea hacia a
 
 ---
 
+skill v6.7.2 · 2026-09-28 (la fabrica revisa la entrega del Arsenal, autorizada por el CdM mientras este chat estaba quieto) ·
+
+LO QUE HIZO EL ARSENAL EN P59, REVISADO CONTRA SUS RESPALDOS, LINEA A LINEA: cuatro exclusiones silenciosas cerradas, y las cuatro son correctas. `_pares()` tiraba en silencio cualquier linea sin separador, asi que un "Pedidos 340" mal escrito DESAPARECIA del KPI sin que nadie se enterara; ahora avisa. El verbatim se saltaba los segmentos de menos de tres caracteres —un "Si" esta dentro de cualquier texto y no se puede comparar— y los descartaba sin decirlo; ahora los CUENTA y los LISTA. El auto-fit que no terminaba dejaba `fit_warnings` vacio, que se lee como "ningun prompt quedo reducido"; ahora lo declara. Y la pasada de pixeles dice cuando no corre.
+
+VALE LA PENA DECIRLO CLARO: el segmento corto del verbatim estaba DENTRO DE MI GARANTIA CENTRAL, la que audite entera en v6.3 y de la que escribi que era "la que menos se prueba porque se da por descontada". Segui buscando en como se COMPARA y no en que se EXCLUYE antes de comparar. Un hueco ajeno en la propia joya de la casa.
+
+PERO LOS CUATRO CAMBIOS LLEGARON SIN UNA SOLA PRUEBA DE REGRESION, y es el peor sitio posible para dejarlos sin candado: lo que producen es UN AVISO. Un aviso que deja de sonar NO SE NOTA — la salida queda exactamente igual de verde que cuando todo esta bien. Un fallo que se apaga solo y no cambia el color de nada es el unico que puede vivir años. El primero que ordene ese codigo los apaga sin enterarse.
+
+PRUEBA 22 NUEVA: una linea de KPI sin separador tiene que avisar, y el verbatim tiene que declarar los segmentos que no compara. Con DIRECCION POSITIVA: la muestra oficial, que esta sana, no debe disparar ninguno de los dos. VERIFICADA ROMPIENDO los dos vectores por separado —apagando el aviso del kpi y desactivando el listado de cortos—: 2 de 2 cazados.
+
+DEFECTO MIO QUE DESTAPO SU NUMERACION: mi lector de sello era `skill (v\\d+\\.\\d+)` y TRUNCABA la tercera cifra, asi que leia "v6.7" de un disco que decia "v6.7.1" y reportaba el registro como DESFASADO cuando estaba al dia. Un falso rojo que solo aparece cuando alguien usa tres cifras, que es justo lo que hizo el Arsenal. Arreglado a `v\\d+(?:\\.\\d+)+`. Deja regla: un parser de version que asume DOS cifras miente en cuanto alguien pone tres, y miente en la direccion mas cara, la de acusar a otro.
+
+NOTA DE ENTORNO, no de la skill: dentro del sandbox la autoprueba muere en la primera comprobacion con "failed to copy trust settings of system certificate" y `kill EPERM`, porque Chromium no puede arrancar ahi. No es un fallo del estandar. Se corre fuera del sandbox.
+
+Autoprueba 27/27. Nota sin cambio: 990.
+
 skill v6.6 · 2026-09-05 (correccion urgente del CdM: quitar falsos positivos ES estrechar el criterio, y estrechar el criterio ES el mecanismo que fabrica falsos negativos) · La fila llego justo despues de que yo estrechara uno, asi que fui a mirar.
 
 QUE ESTRECHE EN v6.5: excluir la banda del pie del analisis, incluida la deteccion de bloques monoespaciados. En esta skill un falso positivo hace que alguien reconstruya un PDF que estaba bien; UN FALSO NEGATIVO ENTREGA A LA COMUNIDAD UN PROMPT PARTIDO, que es el unico defecto que esta skill existe para impedir. La asimetria no admite "probablemente esta bien".

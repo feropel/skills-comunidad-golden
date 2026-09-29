@@ -173,7 +173,7 @@
       "name": "golden-pdf-check",
       "source": "./golden-pdf-check",
       "description": "El estándar de PDF de la comunidad: marca, márgenes y bloques que no se parten.",
-      "version": "6.7.1",
+      "version": "6.7.2",
       "category": "education"
     },
     {

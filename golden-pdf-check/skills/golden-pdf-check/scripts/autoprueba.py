@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """
 GOLDEN PDF · autoprueba.py
-Prueba de regresión de la skill: **26 comprobaciones** sobre PDFs construidos
+Prueba de regresión de la skill: **27 comprobaciones** sobre PDFs construidos
 de verdad (nada simulado). Hay una prueba por cada versión que cambió el
 comportamiento, para que una regresión no pase en verde:
 
@@ -22,20 +22,23 @@ comportamiento, para que una regresión no pase en verde:
   lleva NINGUNA marca de Golden — ni pie, ni autor, ni kicker, ni logo.
   Existe porque hasta v6.0 la marca era el valor por defecto y quien usara
   la skill firmaba sus documentos con la marca de FER sin enterarse ·
-  22. CORTE EN PDF AJENO que rebasa la banda del pie (v6.6): candado del
+  22. LOS AVISOS DE EXCLUSION SILENCIOSA (P59) SIGUEN SONANDO (v6.7.2):
+  el Arsenal cerro cuatro exclusiones mudas y llegaron sin prueba; lo que
+  producen es UN AVISO, y un aviso que deja de sonar no se nota ·
+  23. CORTE EN PDF AJENO que rebasa la banda del pie (v6.6): candado del
   estrechamiento de v6.5 — estrechar un criterio es el mecanismo que fabrica
   falsos negativos, y aqui un falso negativo entrega un prompt partido ·
-  23. LA COMPUERTA VERBATIM MUERDE (v6.3): la garantía central de la skill,
+  24. LA COMPUERTA VERBATIM MUERDE (v6.3): la garantía central de la skill,
   probada en sus dos caras (la interna de build_pdf y la del Paso C) y en las
   dos direcciones. Existía porque sus cinco menciones anteriores iban TODAS en
   la dirección buena: se la veía decir OK y nunca fallar ·
-  24. EL CUERPO CONTRA EL CÓDIGO (v6.2): todo flag y todo bloque ::: que el
+  25. EL CUERPO CONTRA EL CÓDIGO (v6.2): todo flag y todo bloque ::: que el
   SKILL.md promete existe en el parser. Las otras 23 miden el MOTOR; esta mide
   el archivo que lee QUIEN EJECUTA, y es la que faltaba cuando el cuerpo se
   quedó dos versiones desfasado sin que nada sonara ·
-  25. Estado del REGISTRO DE FÁBRICAS, la cara que vive fuera del árbol
+  26. Estado del REGISTRO DE FÁBRICAS, la cara que vive fuera del árbol
   (informativo: entre sellar y que el CdM regenere hay desfase legítimo) ·
-  26. COHERENCIA DEL SELLO: las comprobaciones declaradas aquí arriba son
+  27. COHERENCIA DEL SELLO: las comprobaciones declaradas aquí arriba son
   exactamente las que la corrida imprime.
 
 La cifra de arriba es la que imprime una corrida SANA, y es la que va en el
@@ -586,6 +589,50 @@ def main():
                         not _neu, "; ".join(_neu) if _neu else
                         "sin pie, sin autor, sin kicker y sin logo"))
 
+    # v6.7.2 · LOS AVISOS DE P59 SIGUEN SONANDO. El Arsenal cerro cuatro
+    # exclusiones silenciosas el 27-sep (kpi/comparativa/escala descartaban
+    # lineas sin avisar, el verbatim se saltaba los segmentos cortos, el auto-fit
+    # incompleto salia como "sin avisos") y las cerro BIEN, pero llegaron sin una
+    # sola prueba de regresion. Es el peor sitio para dejarlas sin candado: lo
+    # que estos cambios producen es UN AVISO, y un aviso que deja de sonar no se
+    # nota — la salida queda igual de verde que cuando todo esta bien. Sin esta
+    # prueba, el primero que ordene el codigo los apaga sin enterarse.
+    _p59 = []
+    _detp = ""
+    try:
+        # (a) una linea de KPI SIN separador tiene que avisar, no desaparecer
+        kmd = os.path.join(tmp, "p59_kpi.md")
+        with open(kmd, "w", encoding="utf-8") as fh:
+            fh.write("---\ntitle: P59\n---\n\n## S\n\n::: kpi\n"
+                     "Pedidos | 340 | +12% | ok\nEsta linea no trae separador\n:::\n")
+        rk = run([sys.executable, os.path.join(SCRIPTS, "build_pdf.py"),
+                  kmd, os.path.join(tmp, "p59_kpi.pdf"), "--no-verify"])
+        if "sin |" not in rk.stderr:
+            _p59.append("kpi ya NO avisa de la linea sin separador")
+
+        # (b) el verbatim tiene que LISTAR los segmentos que no puede comparar
+        vmd = os.path.join(tmp, "p59_vb.md")
+        with open(vmd, "w", encoding="utf-8") as fh:
+            fh.write("---\ntitle: P59 vb\n---\n\n## S\n\n``` Corto\nSi\n```\n")
+        vpdf = os.path.join(tmp, "p59_vb.pdf")
+        run([sys.executable, os.path.join(SCRIPTS, "build_pdf.py"), vmd, vpdf, "--no-verify"])
+        rv = run([sys.executable, os.path.join(SCRIPTS, "verbatim_check.py"),
+                  "--old", vpdf, "--new", vpdf])
+        if "cortos" not in rv.stdout.lower():
+            _p59.append("el verbatim ya NO declara los segmentos que no compara")
+
+        # (c) DIRECCION POSITIVA: un documento sano no debe disparar ninguno
+        rs = run([sys.executable, os.path.join(SCRIPTS, "build_pdf.py"),
+                  SAMPLE, os.path.join(tmp, "p59_sano.pdf"), "--no-verify"])
+        if "sin |" in rs.stderr or "AUTO-FIT INCOMPLETO" in rs.stderr:
+            _p59.append("falso aviso sobre la muestra oficial, que esta sana")
+        _detp = ("kpi avisa, el verbatim declara lo que no compara, "
+                 "y la muestra sana no dispara ninguno")
+    except Exception as e:
+        _p59 = ["la prueba revento: %s: %s" % (type(e).__name__, e)]
+    results.append(("Los avisos de exclusion silenciosa (P59) siguen sonando",
+                    not _p59, "; ".join(_p59) if _p59 else _detp))
+
     # v6.6 · UN PDF AJENO CUYO BLOQUE MONO REBASA LA BANDA DEL PIE SIGUE
     # DETECTANDOSE COMO CORTE. Es el CANDADO del estrechamiento de v6.5: al
     # excluir la banda del pie del analisis, se estrecho el criterio, y estrechar
@@ -755,7 +802,7 @@ def main():
     _reg = os.path.expanduser("~/Desktop/⭐️ MASTER ⭐️/🤖 IA/🟠 CLAUDE/"
                               "🌐 PROYECTOS/STACK-GOLDEN/REGISTRO-FABRICAS.md")
     _sello = None
-    _msk = _re3.search(r"skill (v\d+\.\d+)", open(os.path.join(SKILL_DIR, "SKILL.md"),
+    _msk = _re3.search(r"skill (v\d+(?:\.\d+)+)", open(os.path.join(SKILL_DIR, "SKILL.md"),
                                                    encoding="utf-8").read())
     _sello = _msk.group(1) if _msk else "?"
     if os.path.exists(_reg):

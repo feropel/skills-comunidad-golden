@@ -248,7 +248,7 @@ Ahorras *$[ahorro]* (equivale a $[precio por unidad] cada uno)
 
 Además, [si el obsequio es de hoy DE VERDAD: "si tomas la decisión de llevarlo hoy,"] te obsequio [obsequio real] 🎁
 
-Y por ser cliente nuevo, también te dejo el *envío gratis* hasta tu casa 🚚
+Y [SOLO si el envío gratis aplica únicamente a clientes nuevos DE VERDAD: "por ser cliente nuevo, "]también te dejo el *envío gratis* hasta tu casa 🚚
 
 Algo muy importante:
 
@@ -262,7 +262,9 @@ POR QUÉ CADA FRASE PUENTE (no las cambies por adorno):
 - **"para que tomes la mejor decisión"** — enmarca el momento como decisión SUYA, no como venta tuya. Es la misma línea del tono asesor: tú enumeras, él elige.
 - **"Algo muy importante:"** — corta el escaneo y prepara atención para el diferenciador. Sin ese corte, el diferenciador se lee como más relleno.
 - **"Estamos tan seguros de X que Y"** — convierte la garantía en PRUEBA de confianza en vez de letra pequeña: el negocio se expone porque sabe lo que vende. Es el remate natural del riesgo cero del COD.
-- **"por ser cliente nuevo"** — el envío gratis deja de ser un default impersonal y pasa a ser una concesión hacia ÉL. Solo úsalo si de verdad aplica a clientes nuevos; si el envío es gratis siempre, dilo sin la condición.
+- **"por ser cliente nuevo"** — el envío gratis deja de ser un default impersonal y pasa a ser una concesión hacia ÉL. **Por qué funciona** (clase de ofertas grand slam, lámina 15): la acotación enciende dos sesgos a la vez — **escasez** ("aprovecha, que esto no es para todos") y **reciprocidad** ("me están dando algo por ser nuevo") — y de paso **elimina la sospecha de "demasiado bueno para ser verdad"**, porque le da una razón lógica a la oferta.
+  🔴 **Y justo por eso la condición no puede ser falsa.** No es una palabra de adorno: está encendiendo dos sesgos sobre una premisa. Si el envío es gratis SIEMPRE, "por ser cliente nuevo" fabrica una exclusividad que no existe, el cliente vuelve a comprar y descubre que era igual para todos — y ahí no perdiste un adorno, perdiste la credibilidad de toda la oferta. **La condición va DENTRO del corchete de la plantilla, no en esta nota**, porque el generador copia la línea literal y se salta el comentario de abajo (ver la ley del claim acotado en `cumplimiento.md`).
+  ⛔ **En Golden la condición NO aplica:** la REGLA DE ENVÍO de este mismo archivo dice que el envío es gratis siempre y nunca se cobra. Así que aquí la línea va sin la condición, plana.
 ⛔ REGLAS DE LA OFERTA (no negociables):
 - El precio "Antes" debe ser un precio REAL anterior, no uno inflado para simular descuento. Un tachado falso es publicidad engañosa igual que un testimonio inventado (SIC / PROFECO).
 - Escribe los asteriscos y las virgulillas TAL CUAL: `*negrita*` y `~tachado~` los renderiza WhatsApp, y el tachado es lo que hace que el precio anterior se lea como ahorro.

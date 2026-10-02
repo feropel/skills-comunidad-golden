@@ -16,7 +16,7 @@ description: >-
 ---
 
 **Fábrica:** chat «✅ SKILL golden-dropi-analisis»
-<!-- skill v2.0 · 2026-09-27 · FÁBRICA (chat «✅ SKILL golden-dropi-analisis»): revisión del motor tras medir seis cifras equivocadas que fallaban en silencio — estados mal clasificados que inflaban el % de entrega, dinero en texto multiplicado por cien, clientes reales excluidos por subcadena, umbrales de muestra ya derogados, órdenes fantasma invisibles y archivos que desaparecían sin aviso. Entra scripts/autoprueba_motor.py (12 defectos sembrados, 31 comprobaciones, modo --mutar), obligatoria después de tocar el motor. Ratificada como v1.9 la entrada de requisitos del 27-sep. Historial completo: references/changelog.md. El cuerpo se paga en cada activación; el acta no. Cambios relevantes se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR (Estándar 9). -->
+<!-- skill v2.2 · 2026-09-29 · FÁBRICA (chat «✅ SKILL golden-dropi-analisis»): un verificador adversarial destapó que LA AUTOPRUEBA MENTÍA (dos roturas reales del estándar pasaban en verde) y diez fallas más: dinero en notación científica, negativo contable y formato US daba cifras falsas; un ID vacío fundía filas y borraba ventas; el dedup decía quedarse con la más reciente y se quedaba con la última por nombre; la base de clientes salía en 0 sin avisar; el PDF sumaba dos empresas sin una palabra; CANTIDAD 0 se volvía 1; una fecha de 2099 entraba en el P&L; y el RESUMEN contradecía al RESUMEN EJECUTIVO sobre la misma plata. Todo lo que queda fuera va ahora a la hoja COBERTURA y al PDF. Autoprueba: 56 comprobaciones y 10 mutaciones, y --mutar trabaja sobre copia. Historial completo: references/changelog.md. El cuerpo se paga en cada activación; el acta no. Cambios relevantes se reportan a 🧠 GOLDEN - CENTRO DE MANDO - NO BORRAR (Estándar 9). -->
 # golden-dropi-analisis
 
 
@@ -58,7 +58,10 @@ El análisis sale de tus propios informes de Dropi descargados en Excel: esta sk
 - **MAESTRO_LOGISTICA.xlsx** — hojas: `RESUMEN EJECUTIVO` (el mismo P&L, primera hoja),
   `RESUMEN` (KPIs globales y por cuenta), `EVOLUCIÓN` (por periodo, cronológico),
   `POR PRODUCTO`, `POR TRANSPORTADORA`, `POR DEPARTAMENTO`, `MEJOR TRANSP x CIUDAD` (la joya: a
-  quién enviar en cada ciudad), `NOVEDADES` (causas de no-entrega) y, **solo si aparecen**,
+  quién enviar en cada ciudad), `NOVEDADES` (causas de no-entrega), **`COBERTURA`** (qué quedó
+  fuera de las cifras de ese archivo: cuentas sumadas, archivos que no se pudieron leer,
+  registros excluidos, filas sin ID, fechas o cantidades raras, celdas de dinero ilegibles) y,
+  **solo si aparecen**,
   `POSIBLES FANTASMA` (órdenes que huelen a duplicado por edición en Dropi; ver "Trampas de
   conteo"). Las tablas de transportadora, departamento y ciudad traen columna **`Muestra`**, que
   marca `dato flaco` cuando la cifra sale de pocos envíos: no se filtra nada, se muestra el n.
@@ -117,8 +120,10 @@ Crea `<carpeta base>/_config_dropi.json` para excluir data de prueba y fijar mon
 { "test_phones": ["3001234567"], "test_name_keywords": ["PRUEBA","TEST"], "currency": "$" }
 ```
 `test_phones` = números del dueño/tester que ensucian (sus pruebas del flujo COD). El motor
-también excluye por defecto cualquier nombre con PRUEBA/TEST. Este archivo es **local del
-cliente**: nunca lo metas en la skill ni pongas datos privados en el código.
+también excluye por defecto los nombres con PRUEBA o TEST **como palabra completa** (a "Maria
+Testa" no la toca), y lista uno por uno los que excluyó para que revises si alguno era un cliente
+real. Este archivo es **local del cliente**: nunca lo metas en la skill ni pongas datos privados
+en el código.
 
 ### 3. Corre el motor
 Usa la ruta absoluta del motor (el cwd en un chat real es la carpeta del cliente, no la de la skill):
@@ -175,8 +180,9 @@ error, (2) **confirmaste si `RESUMEN_EJECUTIVO.pdf` se generó** — si el motor
 'reportlab' no se generó el PDF", instala `reportlab` y vuelve a correr antes de dar por cerrado
 (es el documento que se entrega primero; solo se omite si de verdad no se puede instalar, y en
 ese caso se lo dices al usuario explícitamente), (3) **leíste el `INVENTARIO DE LA CORRIDA`
-entero** y resolviste o reportaste cada archivo saltado, cada exclusión y cada candidata a
-fantasma — ninguna de esas líneas se deja pasar en silencio, (4) abriste el `RESUMEN` de cada
+entero** y resolviste o reportaste cada archivo saltado, cada exclusión, cada fila sin ID,
+cada fecha o cantidad rara y cada candidata a fantasma — ninguna de esas líneas se deja pasar
+en silencio, y todas quedan además en la hoja `COBERTURA` del maestro, (4) abriste el `RESUMEN` de cada
 maestro y confirmaste que el % de entrega y el nº de clientes son coherentes (no 0, no NaN), y
 (5) entregaste los hallazgos + acciones al usuario **diciendo sobre cuántas órdenes** salen
 (el universo, no solo el porcentaje). Si el % global se ve absurdo (p. ej. 100% o 0%), sospecha
@@ -191,6 +197,12 @@ de un teléfono/nombre de prueba sin excluir o de un solo estado presente: revis
   departamento y ciudad salen todos, con una columna `Muestra` que marca `dato flaco` cuando
   son pocos. Filtrar por n escondía justo las plazas nuevas, que es donde hay que decidir;
   transparencia en vez de umbral.
+- **La ganancia que se muestra es solo la COBRADA** (órdenes entregadas). Una orden en ruta
+  todavía no es plata: sumarla y llamarla "neta acumulada" hacía que el `RESUMEN` dijera una
+  cifra y el `RESUMEN EJECUTIVO` del mismo archivo dijera otra.
+- **Un porcentaje sin denominador es `s/d`, no 0%.** Mientras no haya ninguna orden cerrada
+  (todo en ruta), no se puede medir efectividad: decir "0,0%" se lee como "no entregas nada",
+  que es una conclusión falsa. Esas filas salen marcadas `sin cerrar`.
 - El **dinero y el conteo de órdenes** se toman del archivo **por pedido** (una fila = una
   orden) para no doblar montos; el **desempeño por producto y la base de clientes** se toman del
   **por producto** (que sí trae producto, cantidad y se puede agrupar por teléfono).
@@ -227,6 +239,26 @@ Todas están medidas y todas fallaban **en silencio**: el informe salía bonito 
   carpeta y lee solo su bloque de cuenta: sus datos y su contabilidad jamás se mezclan.
 - **Un archivo que no se lee borra ventas sin dar error.** Por eso el motor **lista lo que leyó
   y lo que saltó, con el motivo**. Lo descartado se cuenta y se nombra.
+- **El dinero llega en formatos que mienten.** `8E+04` (lo que Excel escribe al exportar) no
+  es 804 sino 80.000; `(20.000)` es un negativo contable, no un positivo; `20,000.50` es
+  formato US, no veinte con cinco. Cada uno de esos daba una cifra falsa sin avisar. Lo que
+  de verdad no se puede leer se cuenta y se declara, nunca se convierte en un 0 callado.
+- **Una fila sin ID no se puede deduplicar.** Si el ID viene vacío, todas esas filas comparten
+  la misma clave y se funden en una sola: desaparecen ventas y el aviso culpa a un archivo
+  duplicado que no existe. Van con clave propia y se declaran aparte.
+- **Con dos exports del mismo periodo gana el último por NOMBRE, no por fecha.** Si traen
+  estados distintos para la misma orden, borra el viejo o renómbralo para que el bueno quede
+  de último; si no, el veredicto de rentabilidad lo decide el orden alfabético.
+- **`CANTIDAD` en cero no es una unidad.** Convertirla a 1 inventaba inventario que el export
+  no decía. Se respeta y se declara, igual que una cantidad negativa.
+- **Una fecha en el futuro entra igual en el periodo y en el P&L.** No se descarta sola: se
+  declara para que la revises antes de creerle al resumen.
+- **Un aviso que solo sale por consola no existe.** La consola se pierde al cerrar el chat; lo
+  que queda es el PDF y el Excel. Por eso todo lo que quedó fuera va también a la hoja
+  `COBERTURA` y al bloque final del PDF.
+- **Un cero se prueba, no se cree.** Si una cifra sale en 0 —cero devoluciones, cero fantasmas,
+  cero excluidos— comprueba que hay denominador antes de contarlo como buena noticia: el cero de
+  "no pasó" y el de "no se pudo medir" se ven igual en un informe.
 - **Al citar cualquier cifra, di el universo**: "73,2% sobre 17.775 órdenes", no "73,2%".
 
 ## Enriquecimiento opcional (si el cliente lo tiene)
@@ -267,7 +299,7 @@ python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py ~/.clau
 Salida 0 = en norma. Se corre **DESPUÉS** de tocar la `description`, no solo antes.
 
 **Después de tocar el motor, la autoprueba es obligatoria** — siembra exports con 12 defectos
-conocidos, corre el motor y compara cada cifra con la verdad calculada a mano:
+conocidos, corre el motor y compara 56 cifras con la verdad calculada a mano:
 ```bash
 python3 ~/.claude/skills/golden-dropi-analisis/scripts/autoprueba_motor.py --mutar
 ```

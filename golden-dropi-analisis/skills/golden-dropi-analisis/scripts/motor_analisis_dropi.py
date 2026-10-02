@@ -30,6 +30,7 @@ Requiere: openpyxl.
 """
 import glob, os, re, csv, sys, json
 from datetime import datetime
+
 from collections import defaultdict, Counter
 try:
     import openpyxl
@@ -44,6 +45,7 @@ OUT  = os.path.join(BASE, "Analisis")
 SRC  = os.path.join(OUT, "_FUENTES")
 os.makedirs(OUT, exist_ok=True)
 
+HOY = datetime.now()
 CFG = {"test_phones": [], "test_name_keywords": ["PRUEBA", "TEST"], "currency": "$",
        "gasto_publicidad": None, "negocio": ""}
 _cfgp = os.path.join(BASE, "_config_dropi.json")
@@ -71,22 +73,64 @@ def parse_date(v):
     return None
 MONEY_ILEGIBLES = []   # celdas de dinero que no se pudieron leer: se cuentan, no se callan
 def money(v):
+    """Lee una celda de dinero. Cada rama de aqui nacio de un formato que daba una cifra
+    FALSA sin avisar, que es el peor fallo posible en una skill cuyo producto son cifras:
+
+      '8E+04'      Excel escribe asi al exportar     -> daba 804, no 80.000
+      '(20.000)'   negativo contable                 -> daba +20.000, con el signo al reves
+      '20,000.50'  formato US                        -> daba 20,0005, dividido por mil
+      '20000.00'   decimales con punto               -> daba 2.000.000, multiplicado por cien
+
+    Lo que no se puede leer se CUENTA en MONEY_ILEGIBLES y se declara al final de la corrida;
+    nunca se convierte en un 0 silencioso, porque un 0 se lee como un dato."""
     if v is None: return 0.0
     if isinstance(v, (int, float)): return float(v)
-    s = re.sub(r"[^\d\-,\.]", "", str(v))
-    if not s or s in ("-", ".", ","):
-        if str(v).strip(): MONEY_ILEGIBLES.append(str(v)[:30])
-        return 0.0
-    if "," in s:
-        s = s.replace(".", "").replace(",", ".")      # LatAm: punto miles, coma decimal
+    t = str(v).strip()
+    if not t: return 0.0
+    neg = False
+    # negativo contable: (1.234) es -1234. Sin esto el signo se invertia en silencio.
+    nucleo = t.replace(" ", "")
+    if nucleo.startswith("(") and nucleo.endswith(")"):
+        neg = True; t = nucleo[1:-1]
+    # notacion cientifica: Excel exporta 8E+04 y hay que leerlo como 80000, no como 804
+    cient = re.fullmatch(r"\s*-?\$?\s*(\d+(?:[.,]\d+)?[eE][+-]?\d+)\s*", t)
+    if cient:
+        try:
+            r = float(cient.group(1).replace(",", "."))
+            if t.lstrip().lstrip("$").lstrip().startswith("-"): r = -r
+            return -r if neg else r
+        except ValueError:
+            MONEY_ILEGIBLES.append(t[:30]); return 0.0
+    if t.lstrip().startswith("-"): neg = True
+    s = re.sub(r"[^\d,\.]", "", t)
+    if not s or s in (".", ","):
+        MONEY_ILEGIBLES.append(t[:30]); return 0.0
+    if "," in s and "." in s:
+        # Estan los dos separadores: el que aparece MAS A LA DERECHA es el decimal.
+        # Asi '74.900,50' (LatAm) y '20,000.50' (US) se leen bien los dos.
+        dec = "," if s.rfind(",") > s.rfind(".") else "."
+        mil = "." if dec == "," else ","
+        s = s.replace(mil, "").replace(dec, ".")
     else:
-        # Sin coma, un UNICO punto con 1 o 2 digitos detras es DECIMAL ("20000.00"), no miles.
-        # Quitarlo a ciegas multiplicaba el monto por 100 y con el la ganancia y el veredicto.
-        p = s.split(".")
-        s = (p[0] + "." + p[1]) if (len(p) == 2 and 1 <= len(p[1]) <= 2) else "".join(p)
-    try: return float(s)
-    except:
-        MONEY_ILEGIBLES.append(str(v)[:30]); return 0.0
+        sep = "," if "," in s else ("." if "." in s else None)
+        if sep:
+            p = s.split(sep)
+            # Un unico separador con 1 o 2 digitos detras es DECIMAL ('20000.00', '1500,25').
+            # Con 3 digitos es separador de MILES, que es la convencion de Dropi en LatAm.
+            s = (p[0] + "." + p[1]) if (len(p) == 2 and 1 <= len(p[1]) <= 2) else "".join(p)
+    try:
+        r = float(s)
+    except ValueError:
+        MONEY_ILEGIBLES.append(t[:30]); return 0.0
+    return -r if neg else r
+def _cantidad(v, arch=""):
+    """CANTIDAD de una linea de producto. Sin dato se asume 1 (una linea es al menos una
+    unidad); un 0 o un negativo NO se maquillan a 1 — se declaran y se respetan, porque
+    'or 1' convertia en una unidad lo que el export decia que eran cero."""
+    if v is None or str(v).strip() == "": return 1.0
+    c = money(v)
+    if c <= 0: CANT_RARA.append((str(v)[:12], arch))
+    return c
 def phone_key(v):
     d = re.sub(r"\D", "", str(v or ""))
     if len(d) > 10 and d.startswith("57"): d = d[2:]
@@ -155,6 +199,9 @@ def load_rows(path):
     return rows[1:], {c: i for i, c in enumerate(h)}
 
 SALTADOS = []   # (archivo, motivo) — un export que desaparece sin avisar borra ventas enteras
+SIN_ID  = []    # filas sin ID: NO se deduplican entre si, o se fundirian en una sola
+CANT_RARA = []  # CANTIDAD 0 o negativa: se declara, no se maquilla
+FECHA_RARA = [] # fechas ilegibles o futuras: una de 2099 entraba en el P&L sin avisar
 def discover(base):
     """Devuelve dos listas de (path, cuenta). Clasifica por columnas, y APUNTA lo que salta."""
     peds, prods = [], []
@@ -207,7 +254,14 @@ for path, acc in peds_f:
         if es_prueba(g(r, idx.get("NOMBRE CLIENTE")), g(r, idx.get("TELÉFONO"))): continue
         est = g(r, idx.get("ESTATUS"))
         _cl = classify(est)
-        ped.append(dict(cuenta=acc, bimestre=bl, oid=str(g(r, idx.get("ID"))),
+        _oid = g(r, idx.get("ID")); _oid = str(_oid).strip() if _oid is not None else ""
+        if not _oid or _oid.upper() == "NONE": SIN_ID.append(os.path.basename(path)); _oid = ""
+        _f = parse_date(g(r, idx.get("FECHA"))); _fcruda = g(r, idx.get("FECHA"))
+        if _f is None and _fcruda not in (None, ""):
+            FECHA_RARA.append((str(_fcruda)[:14], "no se pudo leer", _oid or "sin ID"))
+        elif _f is not None and _f.year > HOY.year + 1:
+            FECHA_RARA.append((f"{_f:%d-%m-%Y}", "en el futuro", _oid or "sin ID"))
+        ped.append(dict(cuenta=acc, bimestre=bl, oid=_oid,
             fecha=parse_date(g(r, idx.get("FECHA"))), estatus=up(est), clase=_cl,
             flujo=pipeline(est, _cl),
             trans=up(g(r, idx.get("TRANSPORTADORA"))) or "(SIN DATO)",
@@ -225,15 +279,17 @@ for path, acc in prods_f:
     for r in rows:
         if es_prueba(g(r, idx.get("NOMBRE CLIENTE")), g(r, idx.get("TELÉFONO"))): continue
         est = g(r, idx.get("ESTATUS"))
-        prod.append(dict(cuenta=acc, bimestre=bl, oid=str(g(r, idx.get("ID"))),
+        _oid = g(r, idx.get("ID")); _oid = str(_oid).strip() if _oid is not None else ""
+        if not _oid or _oid.upper() == "NONE": SIN_ID.append(os.path.basename(path)); _oid = ""
+        prod.append(dict(cuenta=acc, bimestre=bl, oid=_oid,
             fecha=parse_date(g(r, idx.get("FECHA"))), clase=classify(est),
             trans=up(g(r, idx.get("TRANSPORTADORA"))) or "(SIN DATO)",
             depto=up(g(r, idx.get("DEPARTAMENTO DESTINO"))) or "(SIN DATO)",
             ciudad=up(g(r, idx.get("CIUDAD DESTINO"))) or "(SIN DATO)",
-            producto=str(g(r, idx.get("PRODUCTO")) or "(SIN DATO)").strip(),
+            producto=(str(g(r, idx.get("PRODUCTO")) or "").strip() or "(SIN DATO)"),
             variacion=str(g(r, idx.get("VARIACION")) or "").strip(),
             sku=str(g(r, idx.get("SKU")) or "").strip(),
-            cantidad=money(g(r, idx.get("CANTIDAD"))) or 1,
+            cantidad=_cantidad(g(r, idx.get("CANTIDAD")), os.path.basename(path)),
             telefono=phone_key(g(r, idx.get("TELÉFONO"))),
             nombre=str(g(r, idx.get("NOMBRE CLIENTE")) or "").strip(),
             direccion=str(g(r, idx.get("DIRECCION")) or "").strip(),
@@ -245,17 +301,31 @@ for path, acc in prods_f:
 # quedándose con la ÚLTIMA aparición (el archivo más reciente trae el estatus más actualizado)
 # y se AVISA cuánto se unió, para que el usuario sepa que tenía archivos repetidos.
 _antes = len(ped)
-ped = list({(x["cuenta"], x["oid"]): x for x in ped}.values())
+# Las filas SIN ID no se pueden deduplicar entre si: cada una lleva su propia clave. Antes
+# todas compartian la cadena "None" y se fundian en una, borrando ventas reales en silencio.
+_vistos = {}
+for _i, _x in enumerate(ped):
+    _k = (_x["cuenta"], _x["oid"]) if _x["oid"] else ("__sin_id__", _i)
+    _vistos[_k] = _x
+ped = list(_vistos.values())
 if len(ped) < _antes:
-    print(f"⚠️ Duplicados detectados: {_antes - len(ped)} órdenes repetidas en los exports "
-          f"'por pedido' (mismo ID en la misma cuenta). Las uní quedándome con la más reciente — "
-          f"revisa si descargaste un archivo dos veces.")
+    print(f"⚠️ Duplicados detectados: {_antes - len(ped)} órdenes con el mismo ID en la misma "
+          f"cuenta, en los exports 'por pedido'. Me quedé con la ÚLTIMA que aparece al recorrer "
+          f"los archivos por nombre — ojo, es orden de NOMBRE, no de fecha: si dos exports del "
+          f"mismo periodo traen estados distintos para una orden, borra el viejo o renómbralo "
+          f"para que el bueno quede de último.")
 _antes = len(prod)
 # En 'por producto' una orden trae una fila por producto: el ID se repite legítimamente.
 # El duplicado real es la MISMA fila (cuenta + orden + producto) otra vez.
-prod = list({(x["cuenta"], x["oid"], x["producto"], x["variacion"], x["sku"]): x for x in prod}.values())
+_vistosP = {}
+for _i, _x in enumerate(prod):
+    _k = ((_x["cuenta"], _x["oid"], _x["producto"], _x["variacion"], _x["sku"])
+          if _x["oid"] else ("__sin_id__", _i))
+    _vistosP[_k] = _x
+prod = list(_vistosP.values())
 if len(prod) < _antes:
-    print(f"⚠️ Duplicados detectados: {_antes - len(prod)} filas repetidas en los exports "
+    print(f"⚠️ Duplicados detectados: {_antes - len(prod)} filas con la misma orden, producto, "
+          f"variación y SKU en los exports "
           f"'por producto'. Las uní — revisa si descargaste un archivo dos veces.")
 
 # enriquecimiento WhatsApp (opcional)
@@ -297,6 +367,22 @@ if _EXCL_U:
     print("   Si alguno es un CLIENTE REAL, quita esa palabra de 'test_name_keywords'.")
 else:
     print("Registros excluidos por prueba: 0")
+if SIN_ID:
+    from collections import Counter as _C0
+    print(f"\n\u26a0\ufe0f  Filas SIN columna ID: {len(SIN_ID)}. Se conservan todas (no se pueden "
+          f"deduplicar entre sí), pero revisa el export: una orden sin ID no se puede cruzar "
+          f"con Dropi.")
+    for _f, _n in _C0(SIN_ID).most_common(5): print(f"   - {_f}: {_n} fila(s)")
+if FECHA_RARA:
+    print(f"\n\u26a0\ufe0f  Fechas sospechosas: {len(FECHA_RARA)}. Una fecha futura entra igual en "
+          f"el periodo y en el P&L, asi que revisa el export antes de creerle al resumen.")
+    for _v, _m, _o in FECHA_RARA[:10]: print(f"   - {_v} ({_m}) en la orden {_o}")
+    if len(FECHA_RARA) > 10: print(f"   ... y {len(FECHA_RARA) - 10} mas")
+if CANT_RARA:
+    from collections import Counter as _C1
+    print(f"\n\u26a0\ufe0f  CANTIDAD en cero o negativa: {len(CANT_RARA)} linea(s). Se respetan tal "
+          f"cual (no se maquillan a 1), pero las unidades por producto las reflejan.")
+    for (_v, _a), _n in _C1(CANT_RARA).most_common(5): print(f"   - {_v!r} en {_a}: {_n} vez/veces")
 if MONEY_ILEGIBLES:
     from collections import Counter as _C
     print(f"\n\u26a0\ufe0f  Celdas de dinero ILEGIBLES: {len(MONEY_ILEGIBLES)} (contadas como 0)")
@@ -304,6 +390,11 @@ if MONEY_ILEGIBLES:
 
 print(f"\nCargado: {len(ped)} filas pedido | {len(prod)} filas producto | "
       f"{len(wp_label)} tel con etiqueta WP")
+if not prod:
+    print("\n\u26a0\ufe0f  NO se cargó ningún informe POR PRODUCTO. La base de clientes y la hoja "
+          "POR PRODUCTO salen SOLO de ese archivo: MAESTRO_CONTACTOS va a quedar con 0 clientes, "
+          "y ese 0 significa 'no se pudo medir', no 'no tienes clientes'. Descarga el export "
+          "'por producto' del mismo corte y vuelve a correr el motor.")
 if not ped:
     print("\n\u26a0\ufe0f  NO se cargó ningún informe POR PEDIDO. El dinero, el P&L y el veredicto de "
           "rentabilidad salen de ese archivo: sin él, todas esas cifras serían $0 y el veredicto "
@@ -346,6 +437,50 @@ if CAND:
     print("   ahí es fantasma y esa venta está contada dos veces.")
 else:
     print("\nPosibles órdenes fantasma: 0 par(es) con esa huella")
+# ------------------------- LO QUE QUEDO FUERA, EN UN SOLO SITIO -------------------------
+# Se arma aqui una vez y lo reutilizan la hoja COBERTURA y el PDF. Antes cada aviso vivia
+# suelto en un print y el entregable —que es lo unico que sobrevive— no llevaba ninguno.
+AVISOS = []
+if len(cuentas) > 1:
+    AVISOS.append(("Varias cuentas sumadas en el bloque GLOBAL",
+        "El GLOBAL suma " + ", ".join(cuentas) + ". Eso solo vale si son cuentas del MISMO "
+        "negocio. Si son empresas distintas, sus ventas no se suman jamás: corre el motor una "
+        "vez por carpeta y lee solo el bloque de cada cuenta."))
+if SALTADOS:
+    AVISOS.append((f"{len(SALTADOS)} archivo(s) no se pudieron leer",
+        "No entraron en ninguna cifra: " + "; ".join(f for f, _m in SALTADOS[:4]) +
+        ("; y más" if len(SALTADOS) > 4 else "") + ". Resuélvelos y vuelve a correr."))
+if _EXCL_U:
+    AVISOS.append((f"{len(_EXCL_U)} registro(s) excluidos por parecer prueba",
+        "Si alguno es un cliente real, quita esa palabra de test_name_keywords: " +
+        "; ".join(f"{n} ({t})" for n, t, _m in _EXCL_U[:4]) +
+        ("; y más" if len(_EXCL_U) > 4 else "") + "."))
+if CAND:
+    AVISOS.append((f"{len(CAND)} posible(s) orden(es) fantasma",
+        "Mismo teléfono y mismo monto con pocos días entre medias, la huella de una orden "
+        "editada en Dropi. NO se descontaron de estas cifras, porque un cliente puede pedir dos "
+        "veces de verdad: están en la hoja POSIBLES FANTASMA para confirmarlas una a una."))
+if SIN_ID:
+    AVISOS.append((f"{len(SIN_ID)} fila(s) sin columna ID",
+        "Se conservan todas, pero una orden sin ID no se puede cruzar con Dropi ni deduplicar."))
+if FECHA_RARA:
+    AVISOS.append((f"{len(FECHA_RARA)} fecha(s) sospechosa(s)",
+        "Ilegibles o en el futuro. Una fecha futura entra igual en el periodo y en el P&L: " +
+        "; ".join(f"{v} ({m})" for v, m, _o in FECHA_RARA[:4]) + "."))
+if CANT_RARA:
+    AVISOS.append((f"{len(CANT_RARA)} línea(s) con CANTIDAD cero o negativa",
+        "Se respetan tal cual en las unidades por producto, no se maquillan a 1."))
+if MONEY_ILEGIBLES:
+    AVISOS.append((f"{len(MONEY_ILEGIBLES)} celda(s) de dinero ilegibles",
+        "Contadas como 0, así que el dinero de esas filas NO está en el P&L: " +
+        "; ".join(repr(v) for v in MONEY_ILEGIBLES[:5]) + "."))
+if not prod:
+    AVISOS.append(("No se leyó ningún informe POR PRODUCTO",
+        "La base de clientes sale solo de ahí: el 0 de MAESTRO_CONTACTOS significa 'no se pudo "
+        "medir', no 'no tienes clientes'."))
+if not ped:
+    AVISOS.append(("No se leyó ningún informe POR PEDIDO",
+        "Es de donde sale el dinero: por eso no hay veredicto de rentabilidad."))
 print("=" * 68 + "\n")
 
 # ------------------------------------------------------------------ estilos
@@ -357,6 +492,10 @@ def style_header(ws, row, ncols):
         cell = ws.cell(row=row, column=c); cell.font = HDR; cell.fill = HDRF
         cell.alignment = Alignment(horizontal="center", vertical="center"); cell.border = BORD
 def pct(x): return f"{x*100:.1f}%"
+def pct_c(x, cerradas):
+    """Porcentaje de entrega. Sin ninguna orden cerrada NO es 0%: es que aun no se sabe.
+    Un 0,0% sereno en el resumen se lee como 'no entregas nada', que es falso."""
+    return f"{x*100:.1f}%" if cerradas else "s/d (nada cerrado aún)"
 def cop(v): return f"{CUR}" + f"{v:,.0f}".replace(",", ".")  # separador de miles con punto (Colombia)
 def eff(counter):
     ent = counter["entregado"]; dev = counter["devolucion"]; act = ent + dev
@@ -381,12 +520,16 @@ scopes = [("GLOBAL", ped)] + [(f"Cuenta {c}", [x for x in ped if x["cuenta"] == 
 r = 5
 for scope, recs in scopes:
     c = Counter(x["clase"] for x in recs); ent, dev, act, e = eff(c)
-    gan = sum(x["ganancia"] for x in recs); cdev = sum(x["costo_dev"] for x in recs)
+    # Solo lo ENTREGADO esta cobrado. Antes esta linea sumaba la ganancia de todas las ordenes,
+    # incluidas las que van en ruta, y la llamaba "neta acumulada": la hoja de al lado decia $0
+    # de ganancia realizada para los mismos datos. Dos cifras contradictorias en un mismo archivo.
+    gan = sum(x["ganancia"] for x in recs if x["clase"] == "entregado")
+    cdev = sum(x["costo_dev"] for x in recs)
     ws.cell(r, 2, scope).font = SUB; r += 1
     for lab, val in [("Órdenes totales", len(recs)), ("Activas (entreg+devol)", act),
                      ("Entregadas", ent), ("Devoluciones", dev),
                      ("Canceladas/Rechazadas", c["cancelado"]), ("En tránsito", c["transito"]),
-                     ("% ENTREGA", pct(e)), ("Ganancia neta acumulada", cop(gan)),
+                     ("% ENTREGA", pct_c(e, act)), ("Ganancia cobrada (solo entregadas)", cop(gan)),
                      ("Costo devoluciones (flete)", cop(cdev))]:
         ws.cell(r, 2, lab); ws.cell(r, 4, val)
         if lab == "% ENTREGA":
@@ -397,13 +540,14 @@ ws.column_dimensions["B"].width = 32; ws.column_dimensions["D"].width = 22
 
 ws = wbL.create_sheet("EVOLUCIÓN")
 ws["A1"] = "EVOLUCIÓN POR PERIODO (cronológico)"; ws["A1"].font = TIT
-ws.append([]); hd = ["Periodo", "Cuenta", "Órdenes", "Activas", "Entregadas", "Devol.", "% Entrega", "Ganancia neta"]
+ws.append([]); hd = ["Periodo", "Cuenta", "Órdenes", "Activas", "Entregadas", "Devol.", "% Entrega", "Ganancia cobrada"]
 ws.append(hd); style_header(ws, 3, len(hd))
 by = defaultdict(list)
 for x in ped: by[(x["bimestre"], x["cuenta"])].append(x)
 for k in sorted(by):
     recs = by[k]; c = Counter(x["clase"] for x in recs); ent, dev, act, e = eff(c)
-    ws.append([k[0], k[1], len(recs), act, ent, dev, pct(e), round(sum(x["ganancia"] for x in recs))])
+    ws.append([k[0], k[1], len(recs), act, ent, dev, pct_c(e, act),
+               round(sum(x["ganancia"] for x in recs if x["clase"] == "entregado"))])
 for col, w in zip("ABCDEFGH", [12, 12, 10, 10, 11, 9, 11, 16]): ws.column_dimensions[col].width = w
 
 dP, _ = agg_status(prod, lambda x: x["producto"])
@@ -416,7 +560,7 @@ ws.append(hd); style_header(ws, 3, len(hd))
 for prd, c in sorted(dP.items(), key=lambda kv: -(kv[1]["entregado"] + kv[1]["devolucion"])):
     ent, dev, act, e = eff(c)
     if act == 0 and unitsP[prd] == 0: continue
-    ws.append([prd[:55], act, ent, dev, pct(e), round(unitsP[prd])])
+    ws.append([prd[:55], act, ent, dev, pct_c(e, act), round(unitsP[prd])])
 ws.column_dimensions["A"].width = 50
 for col in "BCDEF": ws.column_dimensions[col].width = 13
 
@@ -427,8 +571,9 @@ ws.append([]); hd = ["Transportadora", "Activas", "Entregadas", "Devol.", "% Ent
 ws.append(hd); style_header(ws, 3, len(hd))
 for t, c in sorted(dT.items(), key=lambda kv: -(kv[1]["entregado"] + kv[1]["devolucion"])):
     ent, dev, act, e = eff(c)
-    ws.append([t, act, ent, dev, pct(e), pct(dev / act if act else 0), round(eT[t]["costo_dev"]),
-               "dato flaco" if act < 5 else ""])
+    ws.append([t, act, ent, dev, pct_c(e, act), pct_c(dev / act if act else 0, act),
+               round(eT[t]["costo_dev"]),
+               "sin cerrar" if act == 0 else ("dato flaco" if act < 5 else "")])
 ws.column_dimensions["A"].width = 22
 for col in "BCDEFG": ws.column_dimensions[col].width = 13
 
@@ -439,8 +584,8 @@ ws.append([]); hd = ["Departamento", "Activas", "Entregadas", "Devol.", "% Entre
 ws.append(hd); style_header(ws, 3, len(hd))
 for d, c in sorted(dD.items(), key=lambda kv: -(kv[1]["entregado"] + kv[1]["devolucion"])):
     ent, dev, act, e = eff(c)
-    ws.append([d, act, ent, dev, pct(e), pct(dev / act if act else 0),
-               "dato flaco" if act < 3 else ""])
+    ws.append([d, act, ent, dev, pct_c(e, act), pct_c(dev / act if act else 0, act),
+               "sin cerrar" if act == 0 else ("dato flaco" if act < 3 else "")])
 ws.column_dimensions["A"].width = 24
 for col in "BCDEF": ws.column_dimensions[col].width = 13
 
@@ -456,14 +601,16 @@ ws = wbL.create_sheet("MEJOR TRANSP x CIUDAD")
 ws["A1"] = "MEJOR TRANSPORTADORA POR CIUDAD (sin umbral: la muestra se muestra)"; ws["A1"].font = TIT
 ws.append([]); hd = ["Ciudad", "Total órdenes", "Mejor transportadora", "Órdenes", "% Entrega", "Recomendación", "Muestra"]
 ws.append(hd); style_header(ws, 3, len(hd))
-def reco(e):
+def reco(e, cerradas=1):
+    if not cerradas: return "sin datos todavía (nada cerrado)"
     if e >= 0.85: return "EXCELENTE — enviar sin dudar"
     if e >= 0.70: return "BUENA — usar"
     if e >= 0.55: return "REGULAR — vigilar"
     return "MALA — evitar / solo anticipado"
 for city in sorted(city_best, key=lambda c: -city_tot[c]):
     tr, act, e = city_best[city]
-    ws.append([city, city_tot[city], tr, act, pct(e), reco(e), "dato flaco" if act < 4 else ""])
+    ws.append([city, city_tot[city], tr, act, pct_c(e, act), reco(e, act),
+               "sin cerrar" if act == 0 else ("dato flaco" if act < 4 else "")])
 ws.column_dimensions["A"].width = 24; ws.column_dimensions["C"].width = 20; ws.column_dimensions["F"].width = 30
 for col in "BDE": ws.column_dimensions[col].width = 13
 
@@ -491,9 +638,16 @@ gasto_pub = CFG.get("gasto_publicidad")
 try: gasto_pub = float(gasto_pub) if gasto_pub not in (None, "") else None
 except: gasto_pub = None
 util_final = (util_dropi - gasto_pub) if gasto_pub is not None else None
+_cerradas = n_flujo["realizado"] + n_flujo["devuelto"]
 if not ped:
     # Sin el informe por pedido no hay dinero que analizar: un "NO RENTABLE" aqui seria falso.
     veredicto, color = "SIN VEREDICTO: FALTA EL INFORME POR PEDIDO", "B8860B"
+    util_final = None
+elif _cerradas == 0:
+    # Todas las ordenes siguen en ruta: no hay ni una venta cobrada ni una perdida. Dictaminar
+    # NO RENTABLE aqui es tratar "no se sabe" como "cero" y decirle al dueno que pierde plata
+    # cuando su resultado aun no existe.
+    veredicto, color = "SIN VEREDICTO: NINGUNA ORDEN CERRADA TODAVÍA", "B8860B"
     util_final = None
 elif util_final is None:    veredicto, color = "FALTA GASTO DE PUBLICIDAD PARA EL VEREDICTO", "B8860B"
 elif util_final > 0:        veredicto, color = "RENTABLE", "1E7A34"
@@ -524,10 +678,29 @@ _row(wsE, r, "(−) Gasto de publicidad (Meta)",
 _row(wsE, r, "(=) UTILIDAD NETA FINAL",
      cop(util_final) if util_final is not None else "—", bold=True, size=13,
      col=("1E7A34" if (util_final or 0) > 0 else "B00020")); r += 1
-_row(wsE, r, "Ganancia potencial en camino (estimada)", cop(gan_en_camino), col="666666"); r += 2
+_row(wsE, r, "Ganancia potencial en camino (estimada)",
+     cop(gan_en_camino) if gan_en_camino else "no estimable (aun no hay entregas)",
+     col="666666"); r += 2
 wsE.cell(r, 2, "VEREDICTO").font = Font(bold=True, size=12)
 vc = wsE.cell(r, 4, veredicto); vc.font = Font(bold=True, size=13, color=color); vc.alignment = Alignment(horizontal="right")
 wsE.column_dimensions["B"].width = 42; wsE.column_dimensions["D"].width = 34
+
+wsC0 = wbL.create_sheet("COBERTURA")
+wsC0["A1"] = "QUÉ QUEDÓ FUERA DE ESTAS CIFRAS"; wsC0["A1"].font = TIT
+wsC0["A2"] = ("Un informe vale por su denominador. Aquí está todo lo que no entró en las cifras "
+              "de este archivo, o entró con una salvedad.")
+wsC0["A2"].font = Font(italic=True, color="666666")
+wsC0.append([]); _hdC = ["Qué", "Qué significa y qué hacer"]
+wsC0.append(_hdC); style_header(wsC0, 4, len(_hdC))
+if AVISOS:
+    for _t, _d in AVISOS: wsC0.append([_t, _d])
+else:
+    wsC0.append(["Sin salvedades", "Todos los archivos se leyeron, no se excluyó ningún "
+                 "registro y no se detectaron órdenes fantasma ni celdas ilegibles."])
+wsC0.column_dimensions["A"].width = 46; wsC0.column_dimensions["B"].width = 104
+for _r in range(5, wsC0.max_row + 1):
+    wsC0.cell(_r, 1).alignment = Alignment(vertical="top", wrap_text=True)
+    wsC0.cell(_r, 2).alignment = Alignment(vertical="top", wrap_text=True)
 
 if CAND:
     wsF = wbL.create_sheet("POSIBLES FANTASMA")
@@ -600,7 +773,8 @@ try:
           ["(=) Utilidad Dropi (antes de publicidad)", money_(util_dropi)],
           ["(−) Gasto de publicidad (Meta)", ("-"+money_(gasto_pub)) if gasto_pub is not None else "FALTA"],
           ["(=) UTILIDAD NETA FINAL", money_(util_final) if util_final is not None else "—"],
-          ["Ganancia potencial en camino (est.)", money_(gan_en_camino)]]
+          ["Ganancia potencial en camino (est.)",
+           money_(gan_en_camino) if gan_en_camino else "no estimable"]]
     t2 = Table(pl, colWidths=[12*cm, 5.4*cm])
     t2.setStyle(TableStyle([("SPAN",(0,0),(1,0)),("BACKGROUND",(0,0),(-1,0),colors.HexColor("#B8860B")),
         ("TEXTCOLOR",(0,0),(-1,0),colors.white),("FONTNAME",(0,0),(-1,0),"Helvetica-Bold"),
@@ -617,30 +791,16 @@ try:
             "<font face='Courier'>gasto_publicidad</font>) o pásalo, y el neto y el veredicto se calculan solos.", P)]
     cg = Counter(x["clase"] for x in ped); ent, dev, act, ef = eff(cg)
     el += [Paragraph("Contexto de entregas", Se),
-           Paragraph(f"Efectividad de entrega: <b>{ef*100:.1f}%</b> ({ent:,} entregadas de {act:,} cerradas). "
-                     f"El detalle por producto, transportadora, ciudad y las novedades está en "
-                     f"<b>MAESTRO_LOGISTICA.xlsx</b>; la base de clientes en <b>MAESTRO_CONTACTOS.xlsx</b>.", P)]
+           Paragraph((f"Efectividad de entrega: <b>{ef*100:.1f}%</b> ({ent:,} entregadas de "
+                      f"{act:,} cerradas). " if act else
+                      "Todavía no hay ninguna orden cerrada, así que aún no se puede medir la "
+                      "efectividad de entrega. ") +
+                     "El detalle por producto, transportadora, ciudad y las novedades está en "
+                     "<b>MAESTRO_LOGISTICA.xlsx</b>; la base de clientes en "
+                     "<b>MAESTRO_CONTACTOS.xlsx</b>.", P)]
 
     # Cobertura: un informe vale por su denominador. Lo que no entro se dice aqui, no se calla.
-    _av = []
-    if SALTADOS:
-        _av.append(f"<b>{len(SALTADOS)} archivo(s) no se pudieron leer</b>, así que no entraron "
-                   f"en ninguna cifra: " +
-                   "; ".join(_f for _f, _m in SALTADOS[:3]) +
-                   (f"; y {len(SALTADOS) - 3} más" if len(SALTADOS) > 3 else "") +
-                   ". El motivo de cada uno sale al correr el motor.")
-    if _EXCL_U:
-        _av.append(f"<b>{len(_EXCL_U)} registro(s) se excluyeron</b> por parecer pruebas. Si "
-                   f"alguno es un cliente real, quita esa palabra de "
-                   f"<font face='Courier'>test_name_keywords</font>.")
-    if CAND:
-        _av.append(f"<b>{len(CAND)} posible(s) orden(es) fantasma</b> (mismo teléfono y monto con "
-                   f"pocos días entre medias, la huella de una orden editada en Dropi). "
-                   f"<b>No se descontaron</b>, porque un cliente puede pedir dos veces de verdad: "
-                   f"están en la hoja POSIBLES FANTASMA para confirmarlas en Dropi.")
-    if not ped:
-        _av.append("<b>No se leyó ningún informe POR PEDIDO</b>, que es de donde sale el dinero: "
-                   "por eso no hay veredicto de rentabilidad.")
+    _av = [f"<b>{_t}.</b> {_d}" for _t, _d in AVISOS]
     if _av:
         # KeepTogether: el bloque entero pasa de pagina junto, en vez de dejar una linea viuda.
         el += [KeepTogether([Paragraph("Qué quedó fuera de estas cifras", Se)] +

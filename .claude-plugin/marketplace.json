@@ -26,7 +26,7 @@
       "name": "golden-chatea-pro-prompt-ventas",
       "source": "./golden-chatea-pro-prompt-ventas",
       "description": "Crea el paquete de venta por producto para Chatea Pro: saludo, multimedia, pregunta de entrada, prompt de venta, recordatorios y remarketing.",
-      "version": "3.64.0",
+      "version": "3.65.0",
       "category": "marketing"
     },
     {
@@ -117,14 +117,14 @@
       "name": "golden-despachos",
       "source": "./golden-despachos",
       "description": "Califica cada pedido ANTES de despachar: duplicados, dirección, huella del cliente y la mejor transportadora por efectividad real.",
-      "version": "1.8.0",
+      "version": "1.9.0",
       "category": "operations"
     },
     {
       "name": "golden-dropi-analisis",
       "source": "./golden-dropi-analisis",
       "description": "Convierte tus informes de Dropi en dos maestros: logística y base de clientes.",
-      "version": "2.0.0",
+      "version": "2.2.0",
       "category": "operations"
     },
     {

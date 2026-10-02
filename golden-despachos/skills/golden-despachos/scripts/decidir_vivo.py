@@ -18,6 +18,8 @@ def N(s):
     s=unicodedata.normalize('NFD',str(s));return ''.join(c for c in s if unicodedata.category(c)!='Mn').upper().strip()
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from efectividad import Efectividad, marca
+import exclusiones
+import retorno as retorno_mod
 EFEC = Efectividad(D)
 for _a in EFEC.avisos:
     print(_a, file=sys.stderr)
@@ -36,33 +38,12 @@ except Exception:
 VET_C={(N(r['transportadora']),N(r['ciudad']),N(r['departamento'])) for r in R if r['alcance']=='CIUDAD'}
 VET_D={(N(r['transportadora']),N(r['departamento'])) for r in R if r['alcance']=='DEPARTAMENTO'}
 VET_N={N(r['transportadora']) for r in R if r['alcance']=='NACIONAL'}
-# Costo del retorno: fraccion medida por transportadora.
-# LEY DE NO-HEREDAR: los parametros son de ESTA empresa, con SU mix de ciudades.
-# Se prefiere el archivo por negocio (COSTO-RETORNO-<NEGOCIO>.json, variable
-# DROPI_NEGOCIO) y solo se cae al generico si no existe, avisando cual se uso.
-# Trampa 5: solo entra la fraccion con confianza alta o media; el resto asume
-# 1.00 (conservador). Un caso suelto en $0 NO es "no cobra retorno": ya produjo
-# cuatro recomendaciones equivocadas.
-RET_DEF=1.00
-_neg=(os.environ.get('DROPI_NEGOCIO') or '').strip().upper()
-_cands=([ 'datos/COSTO-RETORNO-%s.json'%_neg ] if _neg else [])+['datos/COSTO-RETORNO.json']
-RET={}; FUENTE_RETORNO=None
-for _rel in _cands:
-    try:
-        _cr=json.load(open(D(_rel)))
-    except Exception:
-        continue
-    _k=[k for k in _cr if k.startswith('medido')]
-    if not _k: continue
-    _med=_cr[sorted(_k)[-1]]
-    RET={N(k):v['fraccion'] for k,v in _med.items()
-         if isinstance(v,dict) and str(v.get('confianza','')).lower() in ('alta','media')}
-    FUENTE_RETORNO=_rel.split('/')[-1]
-    break
-if FUENTE_RETORNO is None:
-    RET={'INTERRAPIDISIMO':1.00,'ENVIA':0.72}   # ultimo medido conocido, por si falta el archivo
-    FUENTE_RETORNO='(sin archivo: ultimo medido conocido)'
-    print('AVISO: sin COSTO-RETORNO en datos/ — se usa el ultimo medido conocido.', file=sys.stderr)
+# El costo de retorno entra por UNA puerta con banco propio (retorno.py). FILA P59:
+# antes este bloque estaba duplicado aqui y en calificar.py con un
+# `except Exception: continue`, y un archivo del negocio roto caia al generico en
+# silencio. Lo descartado se cuenta y se nombra en AVISOS_RETORNO.
+from retorno import cargar as _cargar_retorno, RET_DEF
+RET, FUENTE_RETORNO, AVISOS_RETORNO, RET_BAJA = _cargar_retorno(D)
 # GD1.1: la bodega manda — TRANSPORTADORAS-OPERATIVAS.json se antepone a todo calculo.
 try:
     _op=json.load(open(D('datos/TRANSPORTADORAS-OPERATIVAS.json')))
@@ -90,15 +71,16 @@ for oid,precios in Q.items():
             for tok in (row['por_transportadora'] or '').split(';'):
                 if ':' in tok:
                     k,v=tok.split(':'); e,d=v.split('/'); cli[N(k)]=(int(e),int(d))
-    cands=[]
+    cands=[]; excluidas=[]
+    _vet=lambda c,ci,de: (c,ci,de) in VET_C or (c,de) in VET_D or c in VET_N
     for car,fl in precios.items():
-        if car not in HABILITADAS: continue          # colombia.md: Servientrega y otras no habilitadas nunca compiten
-        if not bodega_ok(car): continue
+        # FILA P59: la razon se pide SIEMPRE y se guarda. Una exclusion correcta que
+        # no se declara no se distingue de un olvido.
         _e=EFEC.get(car,x['ciu'],x['dep'])
-        if _e is None: continue
+        _r=exclusiones.razon(car,x['ciu'],x['dep'],HABILITADAS,bodega_ok,_vet,x['forzada'],_e)
+        if _r:
+            excluidas.append({'car':car,'razon':_r}); continue
         base=_e['pct']
-        if (car,x['ciu'],x['dep']) in VET_C or (car,x['dep']) in VET_D or car in VET_N: continue
-        if x['forzada'] and car!=x['forzada']: continue
         p=base/100
         if not prepago:
             if x['tot']>0: p=(x['entP']/100*x['tot'] + 10*p)/(x['tot']+10)
@@ -129,30 +111,61 @@ for oid,precios in Q.items():
         else: b=None
     else:
         cands.sort(key=lambda c:-c['ev']); b=cands[0] if cands else None
+    # FILA P59, la peor de las diez: la asignada se buscaba DENTRO de las candidatas.
+    # Si cualquiera de los filtros la habia excluido, ACTUAL salia «—» y GANA decia
+    # «queda igual» sobre un despacho que el fulfillment rechaza o que la bodega no
+    # hace. Ahora se nombra siempre, con su razon, y cuenta como CAMBIO OBLIGADO.
     a=next((c for c in cands if c['car']==x['asig']),None)
-    res.append((x,a,b,cands,prepago))
+    asig_excluida=None
+    if a is None and x['asig']:
+        asig_excluida=next((e['razon'] for e in excluidas if e['car']==x['asig']), None) \
+            or exclusiones.razon(x['asig'],x['ciu'],x['dep'],HABILITADAS,bodega_ok,_vet,
+                                 x['forzada'],EFEC.get(x['asig'],x['ciu'],x['dep']),
+                                 cotizada=x['asig'] in precios) \
+            or 'sin tarifa cotizada'
+    res.append((x,a,b,cands,prepago,excluidas,asig_excluida))
 def _d(a,b,prepago):
     # prepago manda el precio (ahorro de flete, cierto e inmediato); contra entrega manda el valor esperado.
     # criterios-decision.md: "Nunca sumarlos en una sola cifra" — no confundir ahorro con valor esperado.
     if not (a and b): return None
     return (a['fl']-b['fl']) if prepago else (b['ev']-a['ev'])
-res.sort(key=lambda r:-(_d(r[1],r[2],r[4]) or 0))
+# los CAMBIO OBLIGADO van primero: no son una oportunidad de ahorro, son un despacho
+# que no puede salir como esta.
+res.sort(key=lambda r:(0 if r[6] else 1, -(_d(r[1],r[2],r[4]) or 0)))
 tot=0
 print('%-9s %-19s %-15s %-26s %-26s %9s %-12s'%('ORDEN','CLIENTE','CIUDAD','ACTUAL','RECOMENDADA','GANA','EFECTIVIDAD'))
-for x,a,b,c,prepago in res:
+for x,a,b,c,prepago,exc,asig_exc in res:
     d=_d(a,b,prepago)
     if d and d>500: tot+=d
+    # la asignada SIEMPRE con nombre: si esta excluida, con su razon al lado.
+    actual=('%s%s %s [%s]'%(a['car'][:8],'*' if a.get('marg') else '',m(a['fl']),a['hist'])) if a \
+        else ('%s FUERA'%x['asig'][:8] if asig_exc else '—')
+    # FILA P59: nunca «queda igual» cuando la actual esta fuera.
+    gana='CAMBIO OBLIGADO' if asig_exc else (m(d) if d and d>500 else 'queda igual')
     print('%-9s %-19s %-15s %-26s %-26s %9s %-12s'%(x['orden'],x['cli'][:18],x['ciu'][:14],
-      '%s%s %s [%s]'%(a['car'][:8],'*' if a.get('marg') else '',m(a['fl']),a['hist']) if a else '—',
+      actual,
       '%s%s %s [%s]'%(b['car'][:8],'*' if b.get('marg') else '',m(b['fl']),b['hist']) if b else '—',
-      m(d) if d and d>500 else 'queda igual',
+      gana,
       (b or a or {}).get('marca_ef','—')))
+    if asig_exc:
+        print('%-9s   ↳ la asignada %s NO puede despachar: %s'%('',x['asig'],asig_exc))
 print(); print('TOTAL:',m(tot))
-print('fuente de costo de retorno:', FUENTE_RETORNO)
+_obl=[r for r in res if r[6]]
+if _obl:
+    print('CAMBIO OBLIGADO: %d de %d pedidos van por una transportadora que no puede despachar. '
+          'Esos no entran en el TOTAL porque no son ahorro, son un despacho a corregir.'%(len(_obl),len(res)))
+_exc=[e for r in res for e in r[5]]
+if _exc:
+    print('transportadoras descartadas en el lote (%d en total):'%len(_exc))
+    for linea in exclusiones.resumen(_exc):
+        print('   ', linea)
+retorno_mod.imprime_avisos(AVISOS_RETORNO, FUENTE_RETORNO, sys.stdout)
 print('fuente de efectividad — municipio:', EFEC.nivel_disponible()['fuente_municipio'] or 'NO disponible')
 print('                    — departamento:', EFEC.nivel_disponible()['fuente_departamento'] or 'NO disponible')
 print('EFECTIVIDAD: mun/dep/nac = de donde salio el dato · n = envios de esa muestra (sin umbral: 1 envio ya es el dato)')
-if any(b and b.get('marg') for _,_,b,_,_ in res):
+if any(b and b.get('marg') for _,_,b,_,_,_,_ in res):
     print('* = MARGINAL para la bodega: proponer avisando el riesgo y confirmar con la bodega antes de asignar')
-json.dump([{**{'orden':x['orden'],'cli':x['cli'],'ciu':x['ciu'],'prepago':prepago},'actual':a,'mejor':b,'cands':c} for x,a,b,c,prepago in res],
+json.dump([{**{'orden':x['orden'],'cli':x['cli'],'ciu':x['ciu'],'prepago':prepago},'actual':a,'mejor':b,'cands':c,
+            'excluidas':exc,'asigExcluida':asig_exc,'cambioObligado':bool(asig_exc)}
+           for x,a,b,c,prepago,exc,asig_exc in res],
           open(D('salidas/DECISION-VIVO.json'),'w'),ensure_ascii=False,indent=1)

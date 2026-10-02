@@ -112,3 +112,33 @@ debe dejar pasar, estos últimos tomados de datos reales. Y al escribir el caso 
 que **alcance la rama** que dice proteger: uno de los casos de este mismo banco resultó decorativo
 (la dirección traía puerta completa, así que la rama rural nunca se ejecutaba) y solo se descubrió
 saboteando el código a propósito y viendo que el banco seguía en verde.
+
+## 15 · Una exclusión correcta que no se declara no se distingue de un olvido
+
+Diez sitios de esta skill descartaban datos en silencio (FILA P59 del Centro de Mando). El peor:
+la transportadora **asignada** se buscaba DENTRO de las candidatas ya filtradas, así que si alguno
+de los cinco filtros la había excluido, la columna ACTUAL imprimía un guion y la columna GANA decía
+**«queda igual»** — sobre un pedido asignado a una transportadora que el fulfillment rechaza, o que
+la bodega no ha usado nunca. El informe recomendaba no hacer nada justo en los pedidos que había que
+corregir a la fuerza.
+
+Y un `except Exception: continue` hacía que un `COSTO-RETORNO-<NEGOCIO>.json` roto cayera al
+genérico sin una palabra: la LEY DE NO-HEREDAR se rompía en silencio, con el archivo correcto ahí
+mismo en el disco.
+
+→ Toda herramienta que **descarte** un dato del usuario tiene que **contarlo y nombrarlo** en su
+salida, aunque el descarte sea obvio y correcto. Y cuando se descarta por varios motivos a la vez,
+se reporta el que de verdad bloquea: decir «sin efectividad medida» de una transportadora vetada
+esconde el veto.
+
+## 16 · Un chequeo que busca en TODO el documento encuentra su propia respuesta
+
+El verificador de integración de la trampa 15 comprobaba que la razón de la exclusión apareciera
+con `razon in salida`, sobre el texto completo del informe. Pero el informe ya trae un resumen al
+pie que nombra cada motivo, así que **quitar la razón de la fila del pedido no movía el veredicto**:
+dos de los cinco sabotajes pasaron en verde. Es la misma trampa del modal de huellas (trampa 1),
+cometida en el instrumento en vez de en el dato.
+
+→ Un chequeo se acota al **sitio exacto** donde el dato debe aparecer: la fila del pedido y su línea
+de continuación, no el documento entero. Si el sabotaje de lo que el caso dice cuidar no pone el
+banco en rojo, el caso es decoración.

@@ -333,6 +333,29 @@ else:
             f"con el flete ya gastado. CONFIRMA el stock con el dueño; si no lo puede sostener, "
             f"usa la urgencia operativa, que siempre es cierta: \"si confirmas hoy, sale mañana\".")
 
+    # 🔴 BLOQUEO: el prompt se CONTRADICE a sí mismo sobre el envío (2026-09-29).
+    #    Esto no es un juicio sobre el negocio —que el validador no puede hacer—, es una
+    #    contradicción DENTRO del mismo texto, y por eso sí se puede medir y sí se bloquea:
+    #    declara que el envío es gratis SIEMPRE y a la vez se lo ofrece al cliente como una
+    #    concesión por ser nuevo. La acotación enciende escasez y reciprocidad sobre una premisa
+    #    falsa: el cliente vuelve, ve que era igual para todos, y se cae la oferta entera, no
+    #    solo esa frase. Es el caso que la clase de ofertas grand slam (lámina 15) enseña bien
+    #    y que es fácil copiar mal.
+    _SIEMPRE = re.compile(r"(?i)(nunca\s+se\s+cobra\s+env[íi]o|no\s+cobres\s+env[íi]o\s+nunca"
+                          r"|env[íi]o\s+gratis\s+siempre|siempre.{0,20}env[íi]o\s+gratis)")
+    _CONCESION = re.compile(r"(?i)(por\s+ser\s+cliente\s+nuev[oa]|en\s+tu\s+primera\s+compra"
+                            r"|por\s+ser\s+tu\s+primera\s+compra)")
+    _m1, _m2 = _SIEMPRE.search(text), _CONCESION.search(text)
+    if _m1 and _m2:
+        fails.append(
+            f"ENVÍO: EL PROMPT SE CONTRADICE. Dice \"{_m1.group(0).strip()}\" y a la vez lo "
+            f"ofrece como concesión con \"{_m2.group(0).strip()}\". Si el envío es gratis "
+            f"SIEMPRE, esa acotación fabrica una exclusividad que no existe: el cliente vuelve "
+            f"a comprar, ve que era igual para todos, y lo que se cae no es esa frase sino la "
+            f"credibilidad de toda la oferta. Se acota solo donde hay un límite REAL; si el "
+            f"beneficio es permanente, se dice plano. Ver la LEY DEL CLAIM ACOTADO en "
+            f"`cumplimiento.md`.")
+
     # AVISO (no bloqueo): cifras de negocio. Pueden ser ciertas — o heredadas.
     _CIFRAS = re.compile(
         r"(m[áa]s de\s+)?[\d][\d.,]{2,}\s*(clientes|clientas|pedidos|ventas|familias)"

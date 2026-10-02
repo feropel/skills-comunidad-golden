@@ -226,6 +226,35 @@ if printf '%s' "$_sal" | grep -q "excluidas del barrido"; then
   ok=$((ok+1)); echo "   OK  20. DECLARA cuántas líneas excluyó del barrido (cobertura, no veredicto)"
 else echo "   🔴  20. no declara las líneas excluidas"; fallos+=("20. exclusiones sin declarar"); fi
 
+# ---- 21-22 · LA COLA EXENTA (medido en 8 de los 15 prompts vivos, 2026-09-28) ----
+total=$((total+1))
+cp "$T/bueno.txt" "$T/d21.txt"
+printf '\nNUNCA hagas nada de esto:\n- Afirmarle al cliente que tiene una enfermedad.\n' >> "$T/d21.txt"
+_sal="$(bash "$DOC" "$T/d21.txt" 2>&1)"
+if printf '%s' "$_sal" | grep -q "TERMINA DENTRO DE UNA SECCI"; then
+  ok=$((ok+1)); echo "   OK  21. AVISA de la cola exenta (el prompt acaba en una prohibición)"
+else echo "   🔴  21. no avisa de la cola exenta"; fallos+=("21. cola exenta"); fi
+
+total=$((total+1))
+cp "$T/bueno.txt" "$T/d22.txt"
+printf '\nNUNCA hagas nada de esto:\n- Afirmarle al cliente que tiene una enfermedad.\n\n' >> "$T/d22.txt"
+_sal="$(bash "$DOC" "$T/d22.txt" 2>&1)"
+if ! printf '%s' "$_sal" | grep -q "TERMINA DENTRO DE UNA SECCI"; then
+  ok=$((ok+1)); echo "   OK  22. con la sección CERRADA por línea en blanco, no avisa"
+else echo "   🔴  22. avisa de cola exenta con la sección ya cerrada"; fallos+=("22. falso aviso de cola"); fi
+
+# ---- 23-25 · la CONTRADICCIÓN DEL ENVÍO (clase de ofertas grand slam, lámina 15) ----
+#      El 24 y el 25 son el contrapeso: cada mitad POR SEPARADO es legítima y tiene que pasar.
+#      Solo las dos juntas son la mentira, y bloquear una sola sería acusar a un prompt sano.
+sabotea "$T/s23.txt" "REGLA DE ENVÍO: no cobres envío nunca. Y por ser cliente nuevo te dejo el envío gratis."
+check 23 "muerde la CONTRADICCIÓN del envío (gratis siempre + concesión)" BLOQUEA "$T/s23.txt" "SE CONTRADICE"
+
+sabotea "$T/s24.txt" "REGLA DE ENVÍO: no cobres envío nunca, es gratis para todos."
+check 24 "el envío gratis SIEMPRE, solo, PASA" PASA "$T/s24.txt"
+
+sabotea "$T/s25.txt" "Por ser cliente nuevo te dejo el envío gratis en tu primera compra."
+check 25 "la concesión SOLA (sin declarar que es siempre) PASA" PASA "$T/s25.txt"
+
 echo
 if [ "${#fallos[@]}" -eq 0 ]; then
   echo "  $ok de $total · los dos validadores muerden pieza por pieza"

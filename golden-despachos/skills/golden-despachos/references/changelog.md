@@ -2,6 +2,67 @@
 
 Orden cronológico, lo más nuevo arriba.
 
+## GD1.9 — 2026-09-28
+**FILA P59 del Centro de Mando: 10 exclusiones silenciosas.** Una herramienta que descarta datos
+del usuario tiene que contarlos y nombrarlos; una exclusión correcta que no se declara no se
+distingue de un olvido. Las 10 se reducen a **tres clases**, así que se arreglaron en la raíz y no
+con diez parches.
+
+**1 · El costo de retorno sale a `scripts/retorno.py`** (4 de las 10). El bloque vivía duplicado en
+`calificar.py` y `decidir_vivo.py` con un `except Exception: continue`, así que un
+`COSTO-RETORNO-<NEGOCIO>.json` que **existía y estaba roto** caía al genérico sin una palabra y
+rompía la LEY DE NO-HEREDAR en silencio, con el archivo correcto ahí mismo en el disco. Ahora se
+nombra con el error exacto, igual que el archivo sin bloque `medido*`.
+**Un cuarto miembro de la clase que la fila no traía:** si TODAS las fracciones vienen en confianza
+baja, el diccionario quedaba vacío y cada transportadora caía al 1.00 por defecto sin decirlo. Se
+cuentan y se nombran. 17 casos de autoprueba.
+
+**2 · Los cinco motivos de exclusión salen a `scripts/exclusiones.py`** (6 de las 10), con **orden
+deliberado**: lo operativo duro (no habilitada, la bodega no la usa, vetada por el fulfillment)
+manda sobre el hueco de dato (sin tarifa, sin efectividad). Reportar «sin efectividad medida» sobre
+una transportadora vetada esconde lo que de verdad bloquea el despacho. 16 casos, incluidos los que
+SÍ deben competir y los dos que prueban el orden.
+
+**3 · La peor de las diez: la ASIGNADA ya no sale muda.** Se buscaba DENTRO de las candidatas ya
+filtradas (`next(c for c in cands if c['car']==asig)`), así que una asignada vetada por el
+fulfillment, o que la bodega no ha usado nunca, salía con la columna ACTUAL en guion y la columna
+GANA en **«queda igual»**: el informe recomendaba no hacer nada justo en los pedidos que había que
+corregir a la fuerza. Ahora es **CAMBIO OBLIGADO**, va primero en el informe, trae su razón al lado,
+y **no entra al TOTAL** porque no es ahorro sino un despacho a corregir. Con el teléfono junto al ID,
+como manda la skill.
+
+**Sembrado PERMANENTE**, no temporal: `DROPI-LOGISTICA/pruebas/sembrado-p59/` con los cinco motivos,
+un control sano, un archivo de retorno roto a propósito y una transportadora en confianza baja.
+`scripts/prueba_p59.py` corre los scripts REALES de punta a punta contra él: **37 casos**.
+
+**Los cinco sabotajes muerden** — pero dos no mordían al principio, y el defecto era mío: el
+verificador comprobaba `razon in salida` sobre el informe completo, y el resumen del pie ya nombra
+cada motivo, así que quitar la razón de la fila del pedido no movía el veredicto. Se acotó a la fila
+y su línea de continuación. Trampas nuevas **15** (la exclusión muda) y **16** (un chequeo que busca
+en todo el documento encuentra su propia respuesta).
+
+**Cerrado un hueco declarado en GD1.6:** `calificar.py` ya corre de punta a punta, porque el
+sembrado incluye los dos export de Dropi.
+
+**Batería: 110 casos en 6 bancos** (efectividad 6, duplicados 7, direcciones 27, retorno 17,
+exclusiones 16, integración 37) más `validar_arsenal.py` en cero fallos.
+
+**No verificado, y se declara:** `decidir_vivo.py` sigue **sin analizar direcciones** — solo hereda
+`forzada` de lo que calculó `calificar.py`; si se corre solo, no juzga la dirección. Y las cifras del
+sembrado son sintéticas: prueban el comportamiento del informe, no la efectividad real de ninguna
+transportadora.
+
+**Nota de numeración.** Esta entrada nació mal numerada como GD1.7, que ya existía (06-sep) y
+además iba hacia atrás desde GD1.8 (20-sep): este chat estuvo quieto tres semanas y otras dos
+sesiones avanzaron la skill mientras tanto. La causa no fue el descuido de leer, fue de método —
+los cinco anclajes de código llevaban `assert`, pero el reemplazo de la cadena de versión no:
+`s.replace('**Versión** `GD1.6`', ...)` no encontró su ancla, **no hizo nada y no se quejó**. Un
+`replace` sin `assert` es una suposición silenciosa, y es la misma familia que la FILA P59 que esta
+misma entrada vino a cerrar: lo que se descarta sin avisar no se distingue de un olvido. Corregido a
+GD1.9 con `assert` en cada reemplazo y con una comprobación de que ningún número quede duplicado.
+Verificado antes de renumerar que las cuatro guardias de GD1.7 y la description de GD1.8 siguen
+intactas: los parches de la P59 eran anclados y no pisaron trabajo ajeno.
+
 ## GD1.8 — 2026-09-20
 Auditoría con `golden-skill-auditor`.
 

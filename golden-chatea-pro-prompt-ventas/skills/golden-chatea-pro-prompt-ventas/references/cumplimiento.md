@@ -60,7 +60,7 @@ Un sello invocado sin tenerlo es publicidad engañosa ante el regulador SANITARI
 - Si el producto NO tiene registro, no se menciona el tema: se vende por lo que sí es cierto (uso cosmético, pagas al recibir, garantía de cambio). El silencio no es engaño; la insinuación sí.
 
 ## ⛔ LEY DEL CLAIM ACOTADO — el superlativo no se cree, el dato acotado sí (clase M6, 2026-09-05)
-Esta es la ley general de la que ya tenías tres casos sueltos: el envío gratis "por ser cliente nuevo" (`plantilla-prompt.md`), la garantía específica en vez de la genérica (`oferta-irresistible.md`) y la prueba social real (arriba). El principio común:
+Esta es la ley general de la que ya tenías tres casos sueltos: el envío gratis condicionado (`plantilla-prompt.md`, y ojo con él — es el que se pasa de la raya si el envío es gratis siempre), la garantía específica en vez de la genérica (`oferta-irresistible.md`) y la prueba social real (arriba). El principio común:
 
 **Un beneficio que aplica a todos no se percibe como beneficio, y una afirmación absoluta no se percibe como verdad.** Lo que convierte no es el tamaño del claim: es que sea verificable y esté acotado.
 
@@ -68,11 +68,15 @@ Esta es la ley general de la que ya tenías tres casos sueltos: el envío gratis
 |---|---|
 | "Somos la marca #1 de Colombia" | "Fue lo más vendido en Bogotá el mes pasado" |
 | "El mejor producto del mercado" | "De las 6 referencias que manejamos, es la que menos cambios nos pide" |
-| "Envío gratis a todo el país" | "Por ser cliente nuevo te dejo el envío gratis" |
+| "Envío gratis a todo el país" | "Te llega sin costo de envío a [ciudad], en 24 a 48 horas" |
 | "Todos nuestros productos tienen garantía" | "Este es al que le damos garantía, porque es el más probado" |
 | "Miles de clientes satisfechos" | "Van 340 pedidos de este en lo que va del año" |
 
 Por qué el superlativo se descuenta: **lo dice el que vende.** El cliente ya sabe que el dueño va a decir que su producto es el mejor, así que esa frase no le entrega información — le entrega la confirmación de que le están vendiendo, y activa la defensa. El dato acotado (una ciudad, un mes, una referencia, un número) sí entrega información, y además se puede desmentir — y precisamente porque se puede desmentir, se cree.
+
+**Y por qué el acotado sí se cree, dicho desde el otro lado** (clase de ofertas grand slam, lámina 15 de 31): la acotación enciende **dos sesgos** a la vez — **escasez** (*"aprovecha, que esto no es para todos"*) y **reciprocidad** (*"me están dando algo a mí"*) — y además **le da una razón lógica a la oferta, que es lo que elimina la sospecha de "demasiado bueno para ser verdad"**. El cliente pasa de *"algo raro tiene esto"* a *"ah, es una estrategia para atraer clientes nuevos, suena razonable"*.
+
+🔴 **Eso mismo marca el límite, y es el error fácil de cometer: NO SE ACOTA UN BENEFICIO QUE ES PERMANENTE.** Si el envío es gratis siempre y para todos, decir *"por ser cliente nuevo"* es cierto en las palabras y falso en lo que implica: fabrica una exclusividad que no existe. El cliente vuelve a comprar, ve que era igual para todos, y lo que se cae no es esa frase — es la credibilidad de toda la oferta, incluida la parte que sí era verdad. **La acotación solo se pone donde hay un límite REAL** (una ciudad, un mes, una referencia, un número, una fecha de fin cierta). Si el beneficio no tiene límite, se dice plano y se acota otra cosa.
 
 ⛔ **La acotación tiene que ser CIERTA.** Esto no es una técnica para decir lo mismo con otras palabras: "el más vendido en Bogotá el mes pasado" solo se escribe si el vendedor lo midió y lo confirma. Un dato acotado FALSO es peor que un superlativo falso, porque el superlativo nadie se lo cree y el dato sí — y en COD el cliente que descubre el engaño rechaza el pedido con el flete ya gastado. Si no hay número real, se acota por lo que sí consta: *"de lo que manejamos, este es el que más repiten"* solo si es verdad; si no, se vende por el beneficio y ya.
 

@@ -2,6 +2,100 @@
 
 Acta completa. Se mudó aquí desde el cuerpo del SKILL.md el 2026-09-05 por el Centro de Mando: **el cuerpo se paga en CADA activación y el acta no se consulta al trabajar.** Nada se borró, todo está literal.
 
+## v2.2 · 2026-09-29 · La autoprueba MENTÍA, y otras diez fallas que destapó un adversario
+
+La 2.1 se selló con todo en verde. Un verificador adversarial —que solo vio el estado final y el
+estándar, nunca cómo se construyó— corrió 7 exports propios, leyó los entregables celda a celda
+y encontró **once fallas con evidencia ejecutada**. La peor no estaba en el motor:
+
+🔴 **La autoprueba mentía.** Le sembró dos roturas reales y las dos pasaron en verde, 36 de 36:
+clasificar `ENTREGADO A TRANSPORTADORA` como venta cobrada, y descontar automáticamente las
+candidatas a orden fantasma. Las dos violan reglas explícitas del estándar. Las causas, medidas:
+
+- el banco **no tenía ni una fila** con `ENTREGADO A TRANSPORTADORA` (`grep -c` → 0), el estado
+  con la trampa más cara del universo de Dropi;
+- la única comprobación sobre fantasmas miraba que apareciera un **texto** en la salida, y ese
+  texto se imprime **antes** de cualquier descuento: borrar una orden no cambiaba el mensaje;
+- las 6 mutaciones eran las 6 regresiones que ya tenían aserción propia. **Un test de mutación
+  que solo confirma los tests que ya existen no prueba nada.**
+- `--mutar` mutaba el motor de **producción in situ** dentro de `~/.claude/skills` y reventaba
+  con `PermissionError` en el sandbox; un corte a mitad dejaba la skill instalada mutada.
+
+**Las diez del motor y los entregables:**
+
+1. **Dinero con tres formatos que daban cifras falsas y se declaraban legibles.** `8E+04` (lo
+   que Excel escribe al exportar) daba **804** en vez de 80.000; `(20.000)` daba **+20.000**,
+   con el signo invertido; `20,000.50` daba **20,0005**. En su fixture, $80.000,50 reales
+   salían como **$20.824** y el veredicto decía RENTABLE.
+2. **Un ID vacío se volvía la cadena `"None"`** y el dedup fundía todas esas filas en una: dos
+   ventas entregadas desaparecían, y el aviso mandaba a buscar un archivo duplicado inexistente.
+3. **"Me quedo con la más reciente" era falso:** se quedaba con la última en orden **alfabético**
+   de nombre de archivo. Con dos exports del mismo periodo, el veredicto lo decidía el nombre.
+4. **`MAESTRO_CONTACTOS` salía con 0 clientes sin un solo aviso** cuando falta el export por
+   producto — y SKILL.md prometía literalmente que "se dice". No se decía.
+5. **El PDF fusionaba dos empresas sin una palabra.** La consola avisaba; el documento que se
+   entrega, no. `'no se suman' in texto` → False.
+6. **`CANTIDAD` 0 se convertía en 1** por un `or 1`, una negativa se publicaba como unidades, y
+   un nombre de producto en blanco sobrevivía al `or` y salía como celda vacía.
+7. **Una fecha en 2099 entraba completa en el P&L** sin una alerta.
+8. **Contradicción dentro del mismo Excel:** `RESUMEN` decía "Ganancia neta acumulada $60.000"
+   sumando órdenes no cobradas, mientras `RESUMEN EJECUTIVO` decía "$0 realizada".
+9. **El PDF solo se verificaba por existencia**, sin abrir ni comprobar una cifra.
+10. **Los avisos vivían solo en stdout**, que se pierde al cerrar el chat.
+
+**Lo corregido:** `money()` entiende notación científica, negativo contable y formato US, y
+decide el decimal por el separador más a la derecha; las filas sin ID llevan clave propia y se
+declaran; el aviso del dedup dice la verdad y explica qué hacer; falta del export por producto,
+fechas raras, cantidades raras y dinero ilegible se declaran; la ganancia del `RESUMEN` es solo
+la **cobrada**; y **todo lo que quedó fuera va a la hoja `COBERTURA` del Excel y al bloque final
+del PDF**, construido en un solo sitio para que un aviso nuevo no se pueda olvidar en un
+entregable.
+
+**La autoprueba pasa de 36 a 56 comprobaciones y de 6 a 10 mutaciones**, cuatro de ellas
+atacando reglas del estándar que antes no cubría ninguna: `ENTREGADO A TRANSPORTADORA`, el
+no-descuento de fantasmas, el ID vacío y la ganancia no cobrada. La fantasma ya no se comprueba
+por un texto sino **contando las órdenes**. El PDF se verifica por **contenido** (cifra, acentos
+en el render, bloque de cobertura), y si no hay con qué extraer el texto el caso se declara
+OMITIDO, nunca por bueno. `--mutar` trabaja sobre una copia en un temporal y no toca la skill.
+
+**Lo que el adversario dejó sin verificar, y sigue sin verificarse:** no hay ningún export REAL
+de Dropi en este entorno, así que los formatos raros de dinero y de cantidad son plausibles, no
+medidos contra un export de verdad. Tampoco se ejercitó la rama de enriquecimiento opcional
+(etiquetas de WhatsApp, leads del bot, posibles). Y de los ~41 estados reales de Dropi, el banco
+cubre 9: los demás no están probados ni una vez.
+
+## v2.1 · 2026-09-28 · Tratar "no se sabe" como "cero": dos veredictos falsos más
+
+La 2.0 se selló con las cifras cuadrando. Estos dos no salieron de leer el código: salieron de
+**generar el PDF y mirarlo**, que es el paso que se salta siempre.
+
+**Caso: un negocio que acaba de empezar a despachar.** Tres órdenes en ruta, ninguna cerrada
+todavía, $120.000 de publicidad gastados. El resumen decía:
+
+- **`% ENTREGA 0,0%`** — no hay denominador. La verdad es que aún no se puede medir. Un dueño
+  lee "0,0%" como "no entrego nada".
+- **`NO RENTABLE`**, en rojo, en el banner del documento que él lee primero. Sus órdenes siguen
+  vivas: el resultado no existe todavía, no es que esté perdiendo.
+- **`Ganancia potencial en camino: $0`** — con tres órdenes en camino. Era "no hay con qué
+  estimarla", no "cero".
+
+**La clase es una sola: tratar la ausencia de dato como un dato en cero.** Las tres decían algo
+falso con total serenidad, y ninguna daba error. Ahora: `s/d (nada cerrado aún)`, el veredicto
+`SIN VEREDICTO: NINGUNA ORDEN CERRADA TODAVÍA`, `no estimable`, y las filas de transportadora,
+departamento y ciudad marcadas `sin cerrar`. La "Definición de terminado" ya avisaba de que un
+0% es sospechoso, pero lo dejaba en manos del lector en vez de resolverlo en el motor.
+
+**También:** el texto nuevo del PDF salió sin acentos ("Todavia", "asi", "aun") y el banner en
+mayúsculas sin tilde. Se ven en el RENDER, no en el fuente, y ahí es donde se corrigieron.
+
+**Autoprueba:** sube a 36 comprobaciones y 6 mutaciones, con dos nuevas que vigilan justo esto
+(que no vuelva el 0,0% y que no vuelva el NO RENTABLE sin una sola orden cerrada). Las 6 se cazan.
+
+**Cobertura de esta pasada:** autoprueba 36 de 36 en verde con reportlab presente; 7 casos
+extremos ejecutados (carpeta vacía, cero filas, una sola orden, todo en tránsito, fechas y campos
+basura, xlsx corrupto junto a uno bueno, ganancia negativa) y ninguno revienta — el corrupto se
+salta declarando el motivo y la corrida sigue. PDF verificado abriéndolo y mirándolo.
+
 ## v2.0 · 2026-09-27 · La FÁBRICA: el motor daba cifras infladas, medido y corregido
 
 Auditoría de la fábrica con el mandato de autocalificación. **No es un repaso de estilo: seis de
@@ -52,8 +146,15 @@ $0 con un **NO RENTABLE falso**: ahora eso es `SIN VEREDICTO`. Las dos líneas c
 producto se comía líneas legítimas del mismo producto con SKU distinto. Y el PDF cierra con
 "Qué quedó fuera de estas cifras".
 
-**Lo que impide que vuelva a pasar:** `scripts/autoprueba_motor.py`, con 12 defectos sembrados y
-31 comprobaciones contra la verdad a mano, controles **en los dos sentidos** (que siga cazando
+**Un septimo defecto, encontrado DESPUES de instalar, por seguir probando casos extremos:** con
+todas las ordenes aun en ruta y ninguna cerrada, el resumen decia **`% ENTREGA 0,0%`**. No hay
+denominador: la verdad es que todavia no se sabe. Un dueno que abre ese informe lee "no entrego
+nada" y es una conclusion de negocio falsa. Ahora dice `s/d (nada cerrado aun)` y esas filas van
+marcadas `sin cerrar`. La propia "Definicion de terminado" ya avisaba de que un 0% es sospechoso,
+pero lo dejaba en manos del lector en vez de resolverlo en el motor.
+
+**Lo que impide que vuelva a pasar:** `scripts/autoprueba_motor.py`, con 13 defectos sembrados y
+35 comprobaciones contra la verdad a mano, controles **en los dos sentidos** (que siga cazando
 pruebas de verdad y duplicados reales; que **no** invente fantasmas donde hay compras legítimas)
 y un modo `--mutar` que rompe el motor a propósito para comprobar que la autoprueba lo caza.
 Se corre obligatoriamente después de tocar el motor.

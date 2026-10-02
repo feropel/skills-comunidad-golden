@@ -29,6 +29,8 @@ except Exception:
              'Sin ella no hay con qué comparar mientras no haya cotización en vivo.')
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from efectividad import Efectividad, marca
+import exclusiones
+import retorno as retorno_mod
 # La efectividad entra por UNA sola puerta, con procedencia declarada y cascada
 # municipio -> departamento -> nacional SIN umbral (orden de FER 2026-08-16).
 EFEC = Efectividad(D)
@@ -38,33 +40,14 @@ if not EFEC.dep and not EFEC.ciu:
     sys.exit('No hay NINGUNA fuente de efectividad con procedencia declarada en datos/.\n'
              'Se necesita T90-DEPARTAMENTO.json (o EFECTIVIDAD-PLATAFORMA-CIUDAD.json) con _fuente.')
 FACT={1:0.966,2:1.068,3:1.268,4:1.290}
-# Costo del retorno: fraccion medida por transportadora.
-# LEY DE NO-HEREDAR: los parametros son de ESTA empresa, con SU mix de ciudades.
-# Se prefiere el archivo por negocio (COSTO-RETORNO-<NEGOCIO>.json, variable
-# DROPI_NEGOCIO) y solo se cae al generico si no existe, avisando cual se uso.
-# Trampa 5: solo entra la fraccion con confianza alta o media; el resto asume
-# 1.00 (conservador). Un caso suelto en $0 NO es "no cobra retorno": ya produjo
-# cuatro recomendaciones equivocadas.
-RET_DEF=1.00
-_neg=(os.environ.get('DROPI_NEGOCIO') or '').strip().upper()
-_cands=([ 'datos/COSTO-RETORNO-%s.json'%_neg ] if _neg else [])+['datos/COSTO-RETORNO.json']
-RET={}; FUENTE_RETORNO=None
-for _rel in _cands:
-    try:
-        _cr=json.load(open(D(_rel)))
-    except Exception:
-        continue
-    _k=[k for k in _cr if k.startswith('medido')]
-    if not _k: continue
-    _med=_cr[sorted(_k)[-1]]
-    RET={N(k):v['fraccion'] for k,v in _med.items()
-         if isinstance(v,dict) and str(v.get('confianza','')).lower() in ('alta','media')}
-    FUENTE_RETORNO=_rel.split('/')[-1]
-    break
-if FUENTE_RETORNO is None:
-    RET={'INTERRAPIDISIMO':1.00,'ENVIA':0.72}   # ultimo medido conocido, por si falta el archivo
-    FUENTE_RETORNO='(sin archivo: ultimo medido conocido)'
-    print('AVISO: sin COSTO-RETORNO en datos/ — se usa el ultimo medido conocido.', file=sys.stderr)
+# El costo de retorno entra por UNA puerta, con banco propio en los dos sentidos
+# (python3 retorno.py --autoprueba). FILA P59: antes este bloque vivia duplicado
+# aqui y en decidir_vivo.py con un `except Exception: continue`, asi que un
+# COSTO-RETORNO-<NEGOCIO>.json que EXISTIA y estaba roto caia al generico sin
+# decirlo y rompia la LEY DE NO-HEREDAR en silencio. Ahora todo lo que se descarta
+# se cuenta y se nombra en AVISOS_RETORNO, que el informe imprime.
+from retorno import cargar as _cargar_retorno, RET_DEF
+RET, FUENTE_RETORNO, AVISOS_RETORNO, RET_BAJA = _cargar_retorno(D)
 # rechazos reales de la empresa de fulfillment: mandan sobre la cotizacion de Dropi
 try:
     _R=json.load(open(D('datos/RECHAZOS-FULFILLMENT.json')))['rechazos']
@@ -128,6 +111,15 @@ def cargar():
     wb2.close(); return d,H,q
 
 data,H,QTY=cargar()
+def _tel(r):
+    """El telefono de la fila. LEY DE LA SKILL: va junto al ID en todo informe, porque
+    editar una orden en Dropi le cambia el ID y sin el telefono el pedido se pierde.
+    La columna viene con acento en el export (TELEFONO); si no esta, se DICE."""
+    for c in ('TELEFONO', 'TEL\u00c9FONO', 'TELEFONO CLIENTE'):
+        if c in H:
+            return str(r[H[c]] or '').strip() or 'sin telefono'
+    return 'columna de telefono ausente'
+
 hue={m['orden']:m for m in csv.DictReader(open(huellas_recientes()),delimiter='|')}
 out=[]
 for r in data:
@@ -143,14 +135,16 @@ for r in data:
     tot=int(h.get('total') or 0); entP=float(h.get('entP') or 0); devP=float(h.get('devP') or 0)
     fl=FL.get((ciu,dep))
     cands=[]
+    excluidas=[]
     for car,precio in (fl['m'].items() if fl else []):
-        if car not in HABILITADAS: continue
-        if not bodega_ok(car): continue
+        # FILA P59: una exclusion correcta que no se declara no se distingue de un
+        # olvido. La razon se pide SIEMPRE y se guarda, aunque la exclusion sea
+        # obvia; el informe las cuenta y las nombra al final.
         _e=EFEC.get(car,ciu,dep)
-        if _e is None: continue
+        _r=exclusiones.razon(car,ciu,dep,HABILITADAS,bodega_ok,vetada,forzada,_e)
+        if _r:
+            excluidas.append({'car':car,'razon':_r}); continue
         base=_e['pct']
-        if forzada and car!=forzada: continue
-        if vetada(car,ciu,dep): continue
         p=base/100
         e,d=cli.get(car,(0,0))
         if not prepago:
@@ -182,14 +176,37 @@ for r in data:
         else: best=None
     else:
         cands.sort(key=lambda c:-c['ev']); best=cands[0] if cands else None
+    # FILA P59, la peor de las diez: la asignada se buscaba DENTRO de las candidatas,
+    # asi que una asignada excluida (vetada por el fulfillment, que la bodega no usa,
+    # sin efectividad, o distinta de la que exige la direccion) salia del informe como
+    # «—» y «queda igual», sobre un pedido que hay que cambiar OBLIGATORIAMENTE.
     a=next((c for c in cands if c['car']==asig),None)
+    asig_excluida=None
+    if a is None and asig:
+        asig_excluida=next((e['razon'] for e in excluidas if e['car']==asig), None) \
+            or exclusiones.razon(asig,ciu,dep,HABILITADAS,bodega_ok,vetada,forzada,
+                                 EFEC.get(asig,ciu,dep),cotizada=bool(fl and asig in fl['m'])) \
+            or 'sin tarifa cotizada'
     out.append(dict(orden=oid,estatus=r[H['ESTATUS']],cli=r[H['NOMBRE CLIENTE']],dir=r[H['DIRECCION']],ciu=ciu,dep=dep,
         asig=asig,prepago=prepago,q=q,ticket=ticket,costo=costo,freal=freal,
+        tel=_tel(r),
         dirEstado=est,dirDetalle=det,forzada=forzada,
         tot=tot,entP=entP,devP=devP,prob=h.get('prob',''),tipo=h.get('tipo',''),
+        excluidas=excluidas,asigExcluida=asig_excluida,cambioObligado=bool(asig_excluida),
         cands=cands,best=best,asigC=a,delta=(best['ev']-a['ev']) if (best and a and not prepago) else ((a['flete']-best['flete']) if (best and a and prepago) else None)))
 json.dump(out,open(D('salidas/salida-v3.json'),'w'),ensure_ascii=False,indent=1)
 print('analizados:',len(out))
-print('retorno:', FUENTE_RETORNO)
+# FILA P59: el informe declara la fuente Y lo que quedo fuera, nunca solo la fuente.
+retorno_mod.imprime_avisos(AVISOS_RETORNO, FUENTE_RETORNO, sys.stdout)
+_obl=[o for o in out if o['cambioObligado']]
+if _obl:
+    print('CAMBIO OBLIGADO en %d pedido(s): la transportadora asignada no puede despachar.'%len(_obl))
+    for o in _obl:
+        print('   %-9s tel %-13s %-13s %-13s %s'%(o['orden'],o['tel'],o['ciu'][:12],o['asig'][:12],o['asigExcluida']))
+_tot_exc=[e for o in out for e in o['excluidas']]
+if _tot_exc:
+    print('transportadoras descartadas en el lote (%d en total):'%len(_tot_exc))
+    for linea in exclusiones.resumen(_tot_exc):
+        print('   ', linea)
 print('efectividad:', EFEC.nivel_disponible()['fuente_municipio'] or 'sin municipio',
       '|', EFEC.nivel_disponible()['fuente_departamento'] or 'sin departamento')

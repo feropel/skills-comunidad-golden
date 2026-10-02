@@ -224,6 +224,29 @@ if excluidas:
         print(f"        · … y {len(excluidas)-12} más")
 else:
     print(f"   · cobertura: {len(lineas)} de {len(lineas)} líneas con contenido barridas")
+# 🔴 LA COLA EXENTA (medido el 2026-09-28 sobre los 15 prompts vivos del espacio Golden: 8 de 15
+# terminan asi). Si el prompt ACABA dentro de una seccion de prohibicion —una lista de "NUNCA
+# hagas esto" sin linea en blanco despues—, todo lo que se le AÑADA luego cae dentro de esa
+# seccion y nace exento. Y por el panel se edita añadiendo al final, que es justo ahi.
+# No es un fallo del prompt ni se bloquea: es un aviso de forma, y se arregla con una linea en
+# blanco al final o cerrando con una instruccion que no prohíba.
+# ⚠️ Y OJO CON EL \n DE CIERRE DEL FICHERO, que me mordió montando esto: `T.split("\n")` deja un
+# "" final que NO es una línea en blanco del autor, sino el salto que cierra el archivo. Leyendo
+# el flag después del bucle, ese "" cerraba la sección siempre y el aviso no salía nunca (caso 21
+# del banco en rojo, caso 22 en verde: muerto en un solo sentido). Se descuenta UN solo "" final.
+_c = T.split("\n")
+if T.endswith("\n") and _c and _c[-1] == "":
+    _c.pop()
+_en = False
+for _l in _c:
+    if not _l.strip():
+        _en = False
+    elif PROHIBICION.search(_l):
+        _en = _es_encabezado(_l)
+if _en and lineas:
+    print("   ⚠️  EL PROMPT TERMINA DENTRO DE UNA SECCIÓN DE PROHIBICIÓN: todo lo que se le")
+    print("        añada después (y por el panel se añade AL FINAL) nacerá exento del barrido.")
+    print("        Cierra la sección con una línea en blanco antes de entregar.")
 print("\n"+"-"*52)
 if faltan or malos:
     print(" ❌ BLOQUEADO — este prompt informa pero no cumple la doctrina:")

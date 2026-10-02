@@ -22,6 +22,7 @@ description: >-
      SI ALGO DE ESTO CHOCA CON TU DISENO, dilo al Centro de Mando y se revierte: hay respaldo. -->
 # Golden Despachos — calificar antes de que se genere la guía
 
+<!-- skill GD1.9 · FILA P59 del Centro de Mando: 10 exclusiones SILENCIOSAS, arregladas en la RAIZ como TRES clases y no diez parches. (1) El costo de retorno sale a scripts/retorno.py: un COSTO-RETORNO-<NEGOCIO>.json que EXISTIA y estaba roto caia al generico con un 'except Exception: continue' y rompia la LEY DE NO-HEREDAR en silencio; ahora se nombra con el error exacto, igual que el archivo sin bloque medido* y las transportadoras excluidas por confianza baja (esta ultima la encontre yo, no venia en la fila: si TODAS traen confianza baja el diccionario quedaba vacio y todas caian al 1.00 sin decirlo). (2) Los cinco motivos de exclusion salen a scripts/exclusiones.py, con ORDEN deliberado: lo operativo duro manda sobre el hueco de dato, porque reportar 'sin efectividad' sobre una vetada esconde lo que de verdad bloquea el despacho. (3) La peor de las diez: la ASIGNADA se buscaba DENTRO de las candidatas, asi que una asignada vetada por el fulfillment o que la bodega no usa salia con ACTUAL en guion y GANA en 'queda igual' sobre un pedido que hay que cambiar OBLIGATORIAMENTE; ahora es CAMBIO OBLIGADO, va primero en el informe y no entra al TOTAL porque no es ahorro. Sembrado PERMANENTE en DROPI-LOGISTICA/pruebas/sembrado-p59/ con los 5 motivos mas un control sano, y prueba_p59.py corriendo los scripts REALES; los 5 sabotajes muerden. -->
 <!-- skill GD1.8 · auditoría golden-skill-auditor: la description no decía a dónde derivar las
      novedades ya trabadas (rúbrica, dimensión Activación — "dice cuándo NO usarla / a qué skill
      hermana derivar"), aunque el cuerpo ("## Fronteras y desambiguación") sí lo tenía por completo.
@@ -50,7 +51,7 @@ description: >-
 <!-- skill GD1.1 · TRANSPORTADORAS-OPERATIVAS.json se antepone a todo cálculo; el protocolo de rechazo mira el patrón acumulado -->
 <!-- skill GD1.0 · creación: seis criterios en orden, protocolo de rechazo, huella por transportadora, prepago por precio, duplicados, teléfono junto al ID -->
 
-**Versión** `GD1.8` · Fábrica: chat «✅ SKILL golden-despachos» · Historial detallado en
+**Versión** `GD1.9` · Fábrica: chat «✅ SKILL golden-despachos» · Historial detallado en
 `references/changelog.md`.
 
 En contra entrega la plata no se pierde en la venta, se pierde en el despacho. Un pedido mal
@@ -100,6 +101,13 @@ Léela SIEMPRE al empezar y **escríbele al terminar**. Su `README.md` explica c
 **Nunca recomendar ni ejecutar sin haber mirado los seis criterios, y en este orden.** Los tres
 primeros bloquean: si uno se dispara, no importa lo bien que califiquen los otros tres.
 
+🔴 **Y ninguna exclusión es muda** (FILA P59 del Centro de Mando). Toda transportadora que sale del
+cálculo sale con su razón escrita, contada y nombrada en el informe: una exclusión correcta que no
+se declara no se distingue de un olvido. En particular, **si la transportadora ASIGNADA está
+excluida, el pedido es CAMBIO OBLIGADO y nunca «queda igual»** — antes salía con la columna ACTUAL
+en guion y el informe decía que no había nada que hacer sobre un despacho que el fulfillment
+rechaza. Los cinco motivos y su orden viven en `scripts/exclusiones.py`.
+
 1. **Duplicado** — este cliente ya pidió esto mismo?
 2. **Dirección** — un mensajero puede llegar sin llamar?
 3. **Veto de bodega** — la bodega despacha por esa transportadora, y a ese destino?
@@ -125,8 +133,11 @@ Nació de un caso real: `EFECTIVIDAD-PLATAFORMA.json` vivió semanas dentro de l
 al 95,51% cuando la Torre madura da 76-81%, y nadie lo vio porque el número no traía de dónde
 salía. Se prueba sola con `python3 scripts/efectividad.py --autoprueba` (6 casos, guardia incluida).
 
-**El costo de retorno es de ESTA empresa, no se hereda.** Se prefiere `COSTO-RETORNO-<NEGOCIO>.json`
-declarando `DROPI_NEGOCIO=GOLDEN`; sin esa variable cae al genérico y lo dice en el informe.
+**El costo de retorno es de ESTA empresa, no se hereda,** y entra por su propia puerta
+(`scripts/retorno.py`). Se prefiere `COSTO-RETORNO-<NEGOCIO>.json` declarando
+`DROPI_NEGOCIO=GOLDEN`; si el del negocio existe y no se puede leer, **se dice con el error exacto**
+antes de caer al genérico. Una transportadora que queda fuera del costo medido por confianza baja
+también se nombra: asume 1.00, pero no desaparece.
 
 Si el usuario trae un export nuevo de Dropi, **recalcular efectividad propia y costo de retorno con
 él** antes de decidir.
@@ -266,6 +277,11 @@ Los scripts se prueban solos, y un validador que no se ha visto morder no vale:
 python3 scripts/efectividad.py --autoprueba   # 6 casos: guardia, cascada, sin umbral
 python3 scripts/duplicados.py  --autoprueba   # 7 casos: fantasma, duplicado real, falsos positivos
 python3 scripts/direcciones.py --autoprueba   # 27 casos: 14 que muerden y 13 que NO deben morder
+python3 scripts/retorno.py     --autoprueba   # 17 casos: archivo roto, sin medido, confianza baja
+python3 scripts/exclusiones.py --autoprueba   # 16 casos: los 5 motivos, su orden, y las que SI compiten
+python3 scripts/prueba_p59.py                 # 37 casos de INTEGRACION: corre decidir_vivo.py de
+                                              # punta a punta contra el sembrado permanente de
+                                              # DROPI-LOGISTICA/pruebas/sembrado-p59/
 ```
 
 ## Auto-mejora

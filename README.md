@@ -82,6 +82,7 @@ Y ya la puedes usar. Repite el comando con el nombre de cualquier otra.
 | `golden-cinematica` | Web cinematográfica 3D nivel awwwards: escenas reales, preloader con contador y movimiento de cine. |
 | `golden-ecom-magic` | Fábrica de imágenes de alta conversión con Ecom Magic AI, con la foto real del producto y texto de venta compuesto. |
 | `golden-imagen-arena` | La misma imagen generada en varios motores de IA y calificada por conversión. |
+| `golden-anuncios-niveles-de-conciencia` | Anuncios estáticos por nivel de conciencia: de los ángulos del estudio de mercado a una matriz TOFU, MOFU y BOFU con el prompt de imagen de cada pieza. |
 | `golden-web` | Sitios y landings de alta conversión por perfil de cliente. |
 
 ### 🎓 Formación

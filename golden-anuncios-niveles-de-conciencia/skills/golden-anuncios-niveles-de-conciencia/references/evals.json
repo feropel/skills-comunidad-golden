@@ -1,0 +1,73 @@
+{
+  "skill_name": "golden-anuncios-niveles-de-conciencia",
+  "evals": [
+    {
+      "id": 1,
+      "prompt": "Despliegue creativo, módulo 3, para el combo de pulsera Pixiu y anillo de monedas en Guatemala. El estudio está en PROYECTOS/COMBO-PIXIU/.",
+      "expected_output": "Lee el estudio, arma ficha, matriz de referencias, 2 a 3 ángulos con al menos uno de nivel bajo y uno disruptivo, 9 fichas ángulo × etapa, validar_matriz.py con exit 0 y plan de testeo en pausa.",
+      "expectations": [
+        "No promete dinero, protección ni resultados: habla de símbolo, tradición, estética o regalo",
+        "La pieza TOFU no nombra el producto en el titular ni lleva precio ni llamado de compra",
+        "La pieza BOFU lleva {PRECIO_COMBO} como variable y el sello de pago contra entrega con envío a Guatemala",
+        "Cada prompt está completo en su propio bloque de código",
+        "La entrega reporta cobertura N de N y no dice quedó perfecto"
+      ]
+    },
+    {
+      "id": 2,
+      "prompt": "Hazme los estáticos TOFU MOFU BOFU de un sérum facial para Colombia, ya tengo el estudio de mercado.",
+      "expected_output": "Matriz con al menos una pieza con persona usando el producto, sin antes y después, sin hablarle a un atributo de quien mira, con nota de público 18+.",
+      "expectations": [
+        "Al menos una pieza marca persona: true",
+        "Ningún prompt contiene antes y después ni con/sin fabricado",
+        "Ningún titular le habla a un atributo personal (tu piel con arrugas, tienes manchas)",
+        "El plan menciona público de 18 años o más"
+      ]
+    },
+    {
+      "id": 3,
+      "prompt": "Bajemos el nivel de conciencia de este organizador de cocina, tengo el estudio pero no tengo foto limpia del producto.",
+      "expected_output": "La matriz sale completa, con foto_real PENDIENTE y generar false en todas las piezas; no manda nada al motor.",
+      "expectations": [
+        "Todas las piezas sin foto quedan con generar false",
+        "La entrega dice qué foto falta y por qué no se generó"
+      ]
+    },
+    {
+      "id": 4,
+      "prompt": "Quiero anuncios por niveles de conciencia de un producto nuevo que nunca he investigado, solo tengo esta foto.",
+      "expected_output": "No inventa ángulos: lanza golden-investigacion-mercado y explica que la matriz espera el estudio.",
+      "expectations": [
+        "No entrega ángulos ni prompts antes de tener el estudio",
+        "Nombra golden-investigacion-mercado como el paso siguiente"
+      ]
+    },
+    {
+      "id": 5,
+      "prompt": "Dame 5 textos para un anuncio de Meta de mi sérum.",
+      "expected_output": "Frontera: esto es de golden-copywriting; esta skill no debería dispararse.",
+      "expectations": [
+        "No arma matriz de estáticos por nivel",
+        "Deriva a golden-copywriting"
+      ]
+    },
+    {
+      "id": 6,
+      "prompt": "Este estático de la pulsera lleva 12 días con CTR de 2,8% y 9 ventas. Pásalo a guion.",
+      "expected_output": "Módulo 1: arma el paquete de traspaso con ángulo, nivel, pieza y las 4 métricas, y lo entrega a golden-copywriting para el guion.",
+      "expectations": [
+        "No rehace la matriz del módulo 3",
+        "El paquete trae días activo, CTR, CPA y ventas (y pide el CPA si falta)"
+      ]
+    },
+    {
+      "id": 7,
+      "prompt": "Arma la tanda de estáticos por niveles para mi cuenta publicitaria nueva, sin píxel ni públicos.",
+      "expected_output": "MOFU y BOFU salen marcados [PENDIENTE: requiere públicos]; el plan prioriza TOFU y advierte que es el más arriesgado en alcance.",
+      "expectations": [
+        "MOFU y BOFU marcados PENDIENTE por falta de públicos",
+        "Máximo 3 piezas por conjunto en el plan"
+      ]
+    }
+  ]
+}

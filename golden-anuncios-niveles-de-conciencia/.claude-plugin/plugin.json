@@ -1,0 +1,18 @@
+{
+  "name": "golden-anuncios-niveles-de-conciencia",
+  "version": "1.2.0",
+  "description": "Anuncios estáticos por nivel de conciencia: de los ángulos del estudio de mercado a una matriz TOFU, MOFU y BOFU con el prompt de imagen de cada pieza.",
+  "author": {
+    "name": "Comunidad Golden"
+  },
+  "license": "MIT",
+  "keywords": [
+    "anuncios",
+    "estaticos",
+    "niveles de conciencia",
+    "claude-code-skill"
+  ],
+  "skills": [
+    "./skills/golden-anuncios-niveles-de-conciencia/"
+  ]
+}

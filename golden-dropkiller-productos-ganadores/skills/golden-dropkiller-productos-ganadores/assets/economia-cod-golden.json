@@ -27,45 +27,27 @@
    "base": "devoluciones con costo, 99% de las 4.120 · TODAS las transportadoras",
    "referencia_del_curso": 8000,
    "modelo": "UN SOLO cobro, siempre MENOR que el flete de ida: no hay ida y vuelta. Si el pedido se devuelve no hubo recaudo, asi que no se paga el porcentaje de gestion de cobro. Modelo declarado por FER y confirmado transportadora por transportadora.",
-   "razon_contra_flete_de_ida": {
-    "COORDINADORA": 0.73,
-    "ENVIA": 0.8,
-    "JAMV": 0.8,
-    "VELOCES": 0.81,
-    "TCC": 0.86,
-    "INTERRAPIDISIMO": 0.87,
-    "SERVIENTREGA": 1.0
-   },
-   "nota_servientrega": "FER intuyo que habia una que cobra lo mismo y dijo Interrapidisimo. El fenomeno existe y es SERVIENTREGA, razon 1,00 exacta. Le fallaba el nombre, no la regla.",
    "🔴_numero_retirado": {
     "valor": 29182,
     "por_que_estaba_mal": "Salia del informe 'por producto', donde esa columna SOLO la llena ENVIA (1.537 de 4.120 = 37%) y ademas inflada. Los 2.583 'ceros' no eran dato faltante: eran las demas transportadoras. Exigia $6.008 mas de PVP del necesario a CUALQUIER costo — un desplazamiento constante, no proporcional ($6.258 cuando se retiro, que era el mismo error pasado por la comision del 4%). NO se vuelve a usar."
-   }
+   },
+   "_detalle_interno": "El detalle interno (serie mensual, agregado del año, ruta del archivo y razones por transportadora) vive FUERA de la skill: el repo de skills es PÚBLICO. Ver PROYECTOS/CAZA-DIARIA-GANADORES/_economia-cod-golden-detalle.json"
   },
   "cpa_cop": {
    "valor": 21428,
    "es_un_PISO_no_un_punto": true,
    "unidad": "costo de pauta por PEDIDO GENERADO (no por entregado)",
    "base": "pauta Meta mensual por cuenta contra pedidos creados por mes (informe 'por pedido')",
-   "fuente": "_MOTOR/_pauta_mensual.csv · agregado 2026: $97.605.767 / 4.555 pedidos",
-   "mensual_2026": {
-    "ene": 20891,
-    "feb": 21290,
-    "mar": 19679,
-    "abr": 16377,
-    "may": 22616,
-    "jun": 25822,
-    "jul": 14947
-   },
    "🔴_sesgo_declarado": "Va en UNA SOLA direccion, hacia arriba: (1) el denominador son TODOS los pedidos creados, incluidos los que no vinieron de anuncio (organico, WhatsApp, recompra); (2) julio puede estar incompleto. Por las dos razones el CPA real atribuible a pauta es IGUAL O MAYOR. Todo veredicto que salga de aqui es OPTIMISTA, y se dice.",
    "supuesto_anterior": 14000,
-   "cuanto_erraba": "el supuesto se quedaba 53% corto"
+   "cuanto_erraba": "el supuesto se quedaba 53% corto",
+   "_detalle_interno": "El detalle interno (serie mensual, agregado del año, ruta del archivo y razones por transportadora) vive FUERA de la skill: el repo de skills es PÚBLICO. Ver PROYECTOS/CAZA-DIARIA-GANADORES/_economia-cod-golden-detalle.json"
   },
   "comision_recaudo": {
    "valor": 0,
    "unidad": "proporcion del PVP recaudado que se cobra APARTE del flete",
    "n": 11669,
-   "base": "pedidos ENTREGADOS de los 17 informes 'por pedido' de Golden Colombia (Gmail + Hotmail), 18.792 filas",
+   "base": "pedidos ENTREGADOS de los 17 informes 'por pedido' de Golden Colombia, 18.792 filas",
    "fuente": "FER, 2026-09-23: 'Dropi no cobra nada. Las transportadoras cobran un 5% del flete de base, pero eso ya esta incluido cuando hacemos la orden en Dropi, ya lo cobran ahi.'",
    "comprobacion_en_los_datos": "1 pedido entregado de 11.669 (0,0086%) trae comision > 0. Los valores distintos de cero que existen en la columna estan en pedidos CANCELADOS de UN informe de 2024 (Mar-Abr), no en entregas. La columna no estaba 'vacia por falta de dato': esta vacia porque no se cobra aparte.",
    "por_que_NO_es_restar_menos": "La gestion de cobro SI existe: es el 5% del flete base y ya viene cobrada dentro del flete de Dropi. El flete medido ($15.664) sale de lo que Dropi COBRO de verdad, asi que ya la contiene. Restar ademas un porcentaje del PVP era cobrarla DOS VECES, y la segunda sobre una base equivocada: el PVP en vez del flete.",

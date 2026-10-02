@@ -5,7 +5,140 @@
 
 Acta completa. Se mudó aquí desde el cuerpo del SKILL.md el 2026-09-05 por el Centro de Mando: **el cuerpo se paga en CADA activación y el acta no se consulta al trabajar.** Nada se borró, todo está literal.
 
-## GPG1.25.1 · 2026-09-27 · P59 · entrega_golden cuenta lo que descarta
+## GPG1.29 · 2026-10-02 · la contabilidad de Golden sale de una skill PÚBLICA
+
+**Decisión del Centro de Mando** (con autoridad de FER), sobre lo que la fábrica planteó el 23, 28, 29 y
+30 de septiembre: `assets/economia-cod-golden.json` estaba publicado desde el 26-sep (commit 64d97b8)
+con la serie mensual del CPA de 2026, el agregado de pauta del año, la ruta del CSV interno y la razón
+de cobro de siete transportadoras con nombre. Un barrido de secretos no lo marca, porque no tiene
+forma de secreto: es contabilidad.
+
+- **Sale** (se MUEVE, extraído del propio asset, no copiado a mano) a
+  `PROYECTOS/CAZA-DIARIA-GANADORES/_economia-cod-golden-detalle.json`: `cpa_cop.fuente`,
+  `cpa_cop.mensual_2026`, `razon_contra_flete_de_ida`, `nota_servientrega` y el detalle de las dos
+  cuentas de correo. Mismo criterio que `_entrega_golden.json`.
+- **Se queda:** los cinco medidos que lee `viabilidad_cod.py` y que ya estaban en el cuerpo público
+  (entrega 73,5 %, flete $15.664, fallido $12.518, CPA $21.428 como piso, umbral $8.000), con su base.
+- El acta de la GPG1.12-d conserva QUÉ se midió y contra qué, sin el agregado, la serie ni la ruta.
+- **El banco muerde:** `viabilidad_cod.py --autoprueba` falla si el asset vuelve a traer la serie o la ruta.
+- Lo que ya quedó en el HISTORIAL de git público no se reescribe (rompe los clones de quien descargó);
+  queda informado a FER.
+- Parche de la fábrica (`_parche-GPG1.26/limpiar-interno.py`), aplicado por el CdM sobre copia
+  primero; versión y acta puestas por el CdM, como el parche pide.
+
+## GPG1.28 · 2026-10-02 · VALIDAR deja de ignorar a DropKiller
+
+FER: *"una cosa es que me busque los productos sin yo saber cuáles y otra cosa es el estudio de
+mercado de un producto que ya conozco; tiene que ir DropKiller en las dos skills."*
+
+- 🔴 **El modo VALIDAR (un producto concreto) no usaba los datos de producto de DropKiller.** Su
+  flujo iba por Ad Library, AliExpress y Amazon; las ventas reales, la consolidación de espejos y
+  la etapa solo existían en CAZA. `dropkiller-caza.md` §5 ya decía "si da un producto o una foto,
+  saltar a la consolidación", pero el cuerpo no lo llevaba a cabo, y lo que manda al trabajar es el
+  cuerpo. Ahora el paso 1b de VALIDAR corre los pasos 2, 3 y 6 de CAZA sobre el producto, antes del
+  barrido de la Ad Library, y los requisitos dicen que DropKiller es degradable en VALIDAR.
+- **Medido antes de escribir** (02-oct, Colombia, un producto ya conocido): `semantic_search_products`
+  → 40 fichas; `consolidar_mercado.py` → 12 únicas, 22 espejos, 10 proveedores, 20.254 u., QUEMADO,
+  cuadre cerrado; `ventas_reales.py` del líder → 8.570 reportadas, 6.966 reales, tendencia
+  "frenando". Primer intento con `limit` como texto: error de validación, anotado en el paso.
+- **Gemela:** `golden-investigacion-mercado` G6.3 llama a estos mismos scripts (no los copia) para
+  medir las ventas reales del producto que se estudia. Un solo dueño del cálculo: esta skill.
+- Entra como 1b para no renumerar 2, 2b, 2c ni los siguientes; ningún script cambia.
+- 🔴 **Número, y la clase que deja.** El CdM aplicó primero este cambio como GPG1.27 sin haber
+  leído el parte del 30-sep en el que la fábrica selló SU GPG1.27 (trampa 11) como parche sin
+  aplicar, porque la skill estaba blindada. Dos actas con un mismo número. Se deshizo: desde el
+  respaldo de la GPG1.26 se aplicó la GPG1.27 de la fábrica tal cual (huella `527f320c…`, 24
+  archivos, idéntica a la que declaró) y este cambio pasó a GPG1.28 encima. **Antes de numerar se
+  lee la cola de partes de la fábrica, no solo el disco**: un parche sellado y sin aplicar es un
+  número ya tomado aunque el disco no lo muestre.
+
+## GPG1.27 · 2026-09-30 · TRAMPA 11 · ANUNCIO ZOMBI: los días declarados no son días vistos
+
+Fila del Centro de Mando (la midió el chat de Colágeno en su barrido de plataformas): la API de la
+Biblioteca de Anuncios devuelve `ACTIVE` en anuncios que nunca tuvieron impresiones, con casos de
+395 días. Como FER fijó que **30+ días activo es señal de ángulo ganador**, un zombi cumplía la
+señal sin haber gastado un peso.
+
+**Confirmado como defecto propio:** el filtro de antigüedad se alimentaba de `activeDays`, que es
+**exactamente `endDate - startDate`** de la biblioteca. Comprobado dos veces sobre el mismo
+anuncio: 11 días el 18-sep y 16 el 23-sep, porque su `endDate` avanzó solo. La skill ya se
+defendía del `ACTIVE` viejo para **contar competencia** (trampa 5, vía `lastSeenActiveAt`), pero
+**no para contar días**.
+
+**🔴 Corrección al encargo, y vale para todo el ecosistema: el cruce que pedía la fila no se puede
+hacer.** `sourceData.impressions` y `views` vienen **vacíos en 80 de 80** anuncios guardados y
+también en `get_ad`, el endpoint más rico (llamada en vivo el 27-sep). La biblioteca pública
+tampoco publica impresiones de anuncios comerciales en Colombia. **Con este arsenal, "el anuncio
+gastó" no lo puede verificar nadie.** Lo que sí se puede exigir es "lo vieron vivo en varias
+fechas", y eso es lo que ahora se exige.
+
+**Medido, universo completo (80 anuncios distintos, 8 productos, corrida del 18-sep):**
+- **17 de 80 (21%)** declaran más de 7 días por encima de lo observado. El peor: **466 declarados
+  contra 105 vistos**. Caso límite: **81 declarados con una sola observación**.
+- **68 de 80 dicen `ACTIVE` y los 68 tienen `endDate` pasado**; 38 sin verse en más de 7 días.
+- La ventana observada es un **piso**: **74 de 80** empezaron antes de que DropKiller los mirara,
+  así que castigar por ella sin declararlo sería el error simétrico, y por eso van las dos cifras.
+
+**Qué cambió:** `competencia.py canal` entrega `max_dias_declarado`, `max_dias_observado` y
+`anuncios_sin_ventana` por anunciante; **la llave vieja `max_dias_activo` se RETIRA a propósito**
+para que un lector sin actualizar falle fuerte en vez de leer el número viejo con el significado
+nuevo. `correr_lote.py` juega la puerta de antigüedad con los **observados**, avisa cuando
+declarado y observado difieren en más de 7 días, y cuenta los anuncios sin ventana observable, que
+**no aprueban**. Trampa 11 escrita en `dropkiller-caza.md` (las trampas pasan de 10 a 11, con sus
+tres menciones del SKILL.md al día) y la ficha de `entregable.md` pide las dos cifras, nunca una.
+
+**Banco:** tres casos nuevos en `competencia.py` —el zombi real de 466/105, la ausencia de la llave
+vieja y los 81 declarados sin ventana— y el fixture de `correr_lote.py` gana `firstSeenAt`, que es
+lo que la API devuelve de verdad (79 de 80 lo traían).
+
+**Lo que queda abierto, declarado:** nada de esto prueba impresiones, y no se puede con las fuentes
+de hoy; si algún día la biblioteca las publica, este es el sitio donde entra el árbitro de verdad.
+
+## GPG1.26 · 2026-09-28 · AUTOAUDITORÍA: la contradicción del cuerpo, el número que nombraba tres estados, y la mitad que faltaba del P59
+
+Corrida de `golden-skill-auditor` sobre esta skill por orden de FER ("automejórate y autoevalúate").
+Compuertas antes de calificar: la autoprueba del auditor **47 de 47** y se valida a sí mismo;
+`agentskills validate` y `validar_arsenal` limpios; las **9 autopruebas corridas** con los conteos
+que declara el cuerpo (43/52/21/28/29/21/12/21/11). Veredicto de la pasada: **890/1000 · PLATA**
+(base determinista, sin ajuste holístico).
+
+- 🔴 **El cuerpo se contradecía consigo mismo.** `SKILL.md` paso 2c decía que un producto de costo
+  $30.000 a $80.000 "PIERDE $1.860" —cifra con la comisión del 4% retirada el 23-sep, hoy son
+  **+$492**— y que "siempre se declara que el CPA es un supuesto", cuando 35 líneas más abajo la
+  compuerta dice "CPA $21.428 medido como piso · ya no queda ningún supuesto". El paso 2c se lee
+  ANTES de la compuerta, así que un chat limpio le declaraba al usuario un supuesto inexistente y
+  le citaba una pérdida que ya no ocurre. **Culpa de la fábrica:** el 23-sep se corrigió la rama de
+  la compuerta y no su gemela del flujo. Es el fallo simétrico, y por eso ahora la corrección dice
+  de dónde viene cada cifra.
+- 🔴 **Tres actas distintas compartían el número `GPG1.25.1`** (P59, limpieza del repo público y ley
+  de requisitos, las tres del 27-sep, aplicadas por el CdM y por 🧰 ARSENAL Y SKILLS mientras esta
+  fábrica estaba bloqueada). Un número que nombra tres estados no identifica ninguno: nadie podía
+  decir "tengo la 1.25.1" y saber si traía el arreglo P59. Se numeran por orden de aplicación
+  —1.25.1 requisitos, 1.25.2 limpieza, 1.25.3 P59— y esta pasada cierra en 1.26.
+- 🔴 **`consolidar_mercado.py` descartaba en silencio** las filas que no son registros de producto
+  (segunda mitad de la fila P59; la primera, `entrega_golden.py`, la ejecutó ARSENAL el 27-sep).
+  `filas_recibidas` las incluía y ningún campo las contaba. Ahora van en `no_son_registros`, con
+  aviso y con un campo `cuadre` que obliga a que recibidas = no_registros + excluidas + candidatas.
+  Banco: caso nuevo en `assets/banco_consolidacion.json`, 52 → 56 chequeos.
+- 🟡 **Los tres bancos de `assets/` no tenían cita explícita** y el inventario del auditor los
+  marcaba DUDOSOS: quien limpiara "huérfanos" mataba los bancos adversariales. Quedan citados en el
+  cuerpo con el script que lee cada uno.
+- 🟡 Se baja al acta una entrada de changelog del 02-ago que vivía en el cuerpo (que se paga en
+  cada activación) — ver al final de este acta.
+
+**Lo que queda abierto, declarado:** la trampa 11 (ANUNCIO ZOMBI) sigue sin hornear —medido el
+27-sep: `activeDays` es `endDate - startDate` de la biblioteca, 17 de 80 anuncios declaran más de
+7 días por encima de lo observado, el peor 466 contra 105, e `impressions` viene vacío en 80 de 80
+y también en `get_ad` en vivo— así que `correr_lote.py` sigue contando días declarados. Y
+`assets/economia-cod-golden.json` sigue dentro de una skill de repo público con las cifras internas
+de Golden: decisión de FER, ya en la bandeja.
+
+**Entrada bajada del cuerpo al acta (estaba en `SKILL.md`, sección AUTO-MEJORA):**
+2026-08-02 — LOOP DEL ARSENAL (semana 1, skills de negocio): se hornea la sección AUTO-MEJORA
+(mandato global de FER, autorización permanente). Sin esa sección la skill no se auto-calificaba al
+cerrar corrida. Contenido operativo intacto. Backup: `_backups/2026-08-02-loop-arsenal-s1/`.
+
+## GPG1.25.3 · 2026-09-27 · P59 · entrega_golden cuenta lo que descarta
 
 Aplicado por el chat 🧰 ARSENAL Y SKILLS (bloque 3 del Centro de Mando, orden de FER), con la fila enviada a esta fábrica.
 
@@ -21,7 +154,7 @@ Aplicado por el chat 🧰 ARSENAL Y SKILLS (bloque 3 del Centro de Mando, orden 
   - El caso del verificador pasa de 100% a 40%.
 - **Autoprueba:** 17 → **21 de 21**. La línea del SKILL.md pasa a «21 chequeos».
 
-## GPG1.25.1 · 2026-09-27 · Limpieza de datos internos para el repo público (aplicó el CENTRO DE MANDO)
+## GPG1.25.2 · 2026-09-27 · Limpieza de datos internos para el repo público (aplicó el CENTRO DE MANDO)
 
 La compuerta de publicación bloqueaba la skill por nombres internos: el nombre del chat y de la empresa de un espacio ajeno, y el código de un espacio real. Se cambiaron por formulaciones genéricas con el mismo sentido; la excepción operativa que nombraba espacios concretos vive ahora en la memoria del proyecto. Solo prosa y comentarios; ninguna regla cambió.
 
@@ -607,9 +740,11 @@ contar 16 de 32 produjo un número inflado al doble que ya estaba escrito en una
 ### GPG1.12-d — cuarta corrección del día · el CPA se midió: $21.428, no $14.000
 
 El supuesto **se quedaba 53% corto**. Medido sin tocar `cm_gastos`: pauta Meta mensual por cuenta
-contra pedidos creados por mes, `_MOTOR/_pauta_mensual.csv`, agregado 2026 $97.605.767 / 4.555
-pedidos. Mensual: ene $20.891 · feb $21.290 · mar $19.679 · abr $16.377 · may $22.616 · jun
-$25.822 · jul $14.947.
+contra los pedidos creados por mes del informe "por pedido". **El agregado del año, la serie mes a
+mes y la ruta del archivo son internos y viven FUERA de la skill**
+(`PROYECTOS/CAZA-DIARIA-GANADORES/_economia-cod-golden-detalle.json`), por la misma razón que
+`_entrega_golden.json`: el repo de skills es público. Lo que queda aquí es qué se midió y contra
+qué, que es lo que hace falta para entender la cifra.
 
 🔴 **Es un PISO, no un punto**, y así queda escrito: el denominador son TODOS los pedidos creados
 —incluidos orgánico, WhatsApp y recompra— y un mes puede estar incompleto. El sesgo va en una

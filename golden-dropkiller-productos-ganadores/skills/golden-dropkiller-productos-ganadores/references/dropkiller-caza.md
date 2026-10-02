@@ -8,7 +8,7 @@ más el canal oficial y 7 practicantes); lo que aquí se agrega es lo que ellos 
 ## Contenido
 1. Qué es DropKiller y de quién es la fuente
 2. Las 30 herramientas del conector: cuáles se usan y para qué
-3. Las 10 trampas medidas (por qué el top de DropKiller no se puede usar tal cual)
+3. Las 11 trampas medidas (por qué el top de DropKiller no se puede usar tal cual)
 4. Los 3 criterios del catálogo público y las etapas del producto
 5. Las 6 rutas de caza
 6. El embudo de una corrida (qué se llama, en qué orden, qué se descarta)
@@ -47,7 +47,7 @@ Exige plan **Advance** (USD 24,99/mes; el básico de 19,99 solo trae Productos).
 **Lo que el conector NO trae** aunque la interfaz sí lo muestre: el "índice de saturación", el
 "winner score" de producto y cuántos usuarios rastrean un producto. No inventarlos.
 
-## 3 · Las 10 trampas medidas
+## 3 · Las 11 trampas medidas
 
 **Trampa 1 · VENTA FANTASMA (la más cara).** DropKiller calcula las ventas por **caída de stock
 del proveedor**: el probador de inyectores bajó de 500 a 378 y "vendió" 122, exacto. Cuando el
@@ -113,6 +113,30 @@ los espejos, salvo que el espejo alto sea también el más viejo por más de 7 d
 ahí la diferencia es historia acumulada, no error, y se toma el alto (tablero LED de impor house:
 1.981 en DROPI creado en 2025-11, legítimo). Por eso **al guardar la respuesta de la búsqueda
 se conserva `createdAt`**; sin ese campo el script cae en la mediana y lo avisa.
+
+**Trampa 11 · ANUNCIO ZOMBI: los días que declara la biblioteca no son días que alguien vio.**
+`activeDays` es **exactamente `endDate - startDate`**, fechas declaradas. Comprobado dos veces
+sobre el mismo anuncio: declaraba 11 días el 18-sep y 16 el 23-sep, porque su `endDate` avanzó
+solo. Medido sobre los **80 anuncios guardados** de la corrida del 18-sep:
+- **17 de 80 (21%)** declaran más de 7 días por encima de lo que DropKiller llegó a observar
+  (`firstSeenAt`..`lastSeenActiveAt`). El peor: **466 declarados contra 105 vistos**. Uno declara
+  **81 días con UNA sola observación**: esa es la forma del zombi.
+- **68 de 80 dicen `ACTIVE` y los 68 tienen `endDate` ya pasado**; 38 llevaban más de 7 días sin
+  verse. El campo de estado casi no informa (es la trampa 5, aquí en su otra cara).
+- La ventana observada es un **piso, no la verdad**: **74 de 80** anuncios empezaron antes de que
+  DropKiller los mirara, así que castigar por ella sin decirlo sería el error simétrico.
+
+🔴 **Y lo que no se puede arreglar con este arsenal: las impresiones no existen.**
+`sourceData.impressions` y `views` vienen **vacíos en 80 de 80**, y también en `get_ad`, que es el
+endpoint más rico (llamada en vivo el 2026-09-27). La biblioteca pública tampoco publica
+impresiones de anuncios comerciales en Colombia. **"El anuncio gastó" no es verificable por
+nadie**, así que no se afirma: lo verificable es "lo vieron vivo en varias fechas".
+
+→ `competencia.py canal` entrega **`max_dias_declarado`** y **`max_dias_observado`** por
+anunciante, más `anuncios_sin_ventana`; `correr_lote.py` juega la puerta de antigüedad con los
+**observados** y avisa cuando declarado y observado difieren en más de 7 días. La llave vieja
+`max_dias_activo` se retiró a propósito para que un lector sin actualizar falle fuerte. Señal
+extra solo en `get_ad`: **`staleDays`**, días desde que se vio vivo por última vez.
 
 ## 4 · Los 3 criterios del catálogo público y las etapas
 

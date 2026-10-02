@@ -148,7 +148,7 @@ Afiliación: FER tiene enlace de afiliado de DropKiller (15%).
    Mercado consolidado: <total> · avisos del script: <espejos que no cuadran, datos que faltaron | ninguno>
    Plata: costo <$> → PVP mínimo <$> (en pesos, nunca un multiplicador) · competencia vende a <mín a máx, N landings leídas | no visto> → <CIERRA | JUSTA | NO CIERRA>
    Canal: <a> anunciantes activos hoy · <c> en el cementerio (lo soltaron) · <landing | WhatsApp> · medido por imagen + descripción
-   Afuera: <país> corre <N> anuncios, el más viejo <D> días · ángulo: "<cita corta del anuncio>"
+   Afuera: <país> corre <N> anuncios, el más viejo <D_obs> días VISTOS de <D_dec> declarados (trampa 11) · ángulo: "<cita corta del anuncio>"
    Ruta: <R1…R6>  ·  Riesgo: <ninguno | salud: pedir etiqueta y alérgenos | …>
    Ver: <link del producto en DropKiller o id de Dropi, nunca una ruta de archivo temporal> · <link del anuncio más fuerte>
 ```

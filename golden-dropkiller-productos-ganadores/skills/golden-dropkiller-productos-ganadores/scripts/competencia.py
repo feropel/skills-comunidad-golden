@@ -159,14 +159,30 @@ def canal(anuncios, incluir=None, hoy=None, solo_canal=None):
         clave = raiz(primera)
         visto = dia(a.get("lastSeenActiveAt"))
         p = por.setdefault(clave, {"anunciante": a.get("advertiserName") or "(sin nombre)",
-                                   "anuncios": 0, "ultimo_visto": None, "max_dias_activo": 0,
+                                   "anuncios": 0, "ultimo_visto": None, "max_dias_declarado": 0,
+                                   "max_dias_observado": 0, "anuncios_sin_ventana": 0,
                                    "landings": set(), "canal": set()})
         p["anuncios"] += 1
         if visto and (p["ultimo_visto"] is None or visto > p["ultimo_visto"]):
             p["ultimo_visto"] = visto
+        # 🔴 TRAMPA 11 · ANUNCIO ZOMBI. DOS cifras de días, y NO son la misma:
+        #   DECLARADO  = activeDays, que es exactamente endDate - startDate de la biblioteca.
+        #                Es lo que la API dice, y la API dice ACTIVE con endDate pasado en 68 de 80.
+        #   OBSERVADO  = firstSeenAt..lastSeenActiveAt: los días en que DropKiller LO VIO vivo.
+        # 17 de 80 declaraban más de 7 días por encima de lo observado (466 contra 105 el peor) y
+        # uno declaraba 81 con una sola observación. Ninguna de las dos prueba impresiones: ese
+        # campo viene vacío en 80 de 80 y también en get_ad. Se llevan las dos y decide la
+        # observada, porque es la única que alguien vio. La llave vieja `max_dias_activo` se
+        # RETIRA a propósito: un lector sin actualizar tiene que fallar fuerte, no leer el número
+        # viejo con el significado nuevo.
         dias_act = a.get("activeDays")
         dias_act = dias_act if isinstance(dias_act, (int, float)) and not isinstance(dias_act, bool) else 0
-        p["max_dias_activo"] = max(p["max_dias_activo"], dias_act)
+        p["max_dias_declarado"] = max(p["max_dias_declarado"], dias_act)
+        ini = dia(a.get("firstSeenAt"))
+        if ini and visto:
+            p["max_dias_observado"] = max(p["max_dias_observado"], max((visto - ini).days, 0))
+        else:
+            p["anuncios_sin_ventana"] += 1
         if a.get("landingUrl"):
             p["landings"].add(str(a["landingUrl"]).split("?")[0])
         p["canal"].add("WhatsApp" if es_whatsapp(a.get("landingUrl")) or not a.get("landingUrl") else "landing")
@@ -265,6 +281,7 @@ def autoprueba():
     hoy = date(2026, 9, 18)
     def ad(pub, visto, landing=None, titulo="caja montessori", plataformas=None):
         return {"publisherId": pub, "advertiserName": pub, "lastSeenActiveAt": visto + "T00:00:00Z",
+                "firstSeenAt": "2026-09-08T00:00:00Z",
                 "landingUrl": landing or "https://%s.co/products/a" % pub, "title": titulo, "description": "", "activeDays": 10,
                 "platforms": plataformas or ["FACEBOOK"]}
     casos = 0
@@ -307,6 +324,20 @@ def autoprueba():
     chequeo("precio en otra moneda no se compara", "precio_min" not in r and "otra moneda" in r["filas"][0]["motivo"])
     r = canal([dict(ad("q", "2026-09-17"), activeDays="diez")], hoy=hoy)
     chequeo("activeDays en texto no revienta", r["anunciantes_activos"] == 1)
+    # 🔴 TRAMPA 11 · el zombi de verdad: 466 días declarados contra 105 vistos (MARAH STORE, real)
+    z = dict(ad("zombi", "2026-06-04"), firstSeenAt="2026-02-19T00:00:00Z", activeDays=466)
+    r = canal([z], hoy=hoy)
+    a0 = (r["activos"] + r["cementerio"])[0]
+    chequeo("el zombi declara 466 y se le observan 105", (a0["max_dias_declarado"], a0["max_dias_observado"]) == (466, 105))
+    chequeo("la llave vieja max_dias_activo ya NO existe (un lector viejo falla fuerte)",
+            "max_dias_activo" not in a0)
+    # sin ventana observable no se inventa antigüedad: se cuenta y queda en 0
+    sv = dict(ad("sinventana", "2026-09-17"), activeDays=81)
+    sv.pop("firstSeenAt")
+    r = canal([sv], hoy=hoy)
+    a1 = r["activos"][0]
+    chequeo("81 declarados sin ventana observable dan 0 observados y se cuentan",
+            (a1["max_dias_declarado"], a1["max_dias_observado"], a1["anuncios_sin_ventana"]) == (81, 0, 1))
     wa2 = [dict(ad("w%d" % i, "2026-09-17"), landingUrl=u) for i, u in enumerate(
         ["https://web.whatsapp.com/send?phone=1", "https://wa.link/abc", "https://l.facebook.com/x", "wa.me/573001",
          "whatsapp://send?phone=2", "https://chat.whatsapp.com/xyz", "https://walink.co/q", "https://wa.me:443/5", "https://m.me/tienda"])]

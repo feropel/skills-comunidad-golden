@@ -225,6 +225,28 @@ def autoprueba():
                   abs(u(80000, comision=0.04) - base) > 100))
     casos.append(("la comision vigente es 0 y viene de 'medidos', no de un supuesto",
                   par["comision"] == 0))
+    # 🔴 COMPUERTA DE DATOS INTERNOS (GPG1.29). El repo de skills es PÚBLICO y este asset estuvo
+    # publicado con la contabilidad de Golden dentro desde el 2026-09-26 (seis días). La serie
+    # mensual de pauta, el agregado del año, la ruta del CSV y las razones por transportadora con
+    # nombre viven FUERA, igual que _entrega_golden.json. Esto no es higiene: un barrido de
+    # secretos NO lo caza, porque no tiene forma de secreto — es contabilidad. Si alguien la
+    # devuelve al asset, este caso lo caza ANTES de que se vuelva a publicar.
+    #
+    # 🔴 Y se comprueba por ESTRUCTURA, no buscando las cifras: una compuerta que busca
+    # "$97.605.767" tiene que ESCRIBIR $97.605.767, y este script también se publica — protegería
+    # el asset filtrando lo mismo por la puerta de al lado. Se mira qué llaves existen; las cifras
+    # no se nombran en ningún sitio público. (Lo encontró la propia fábrica al verificar, 02-oct.)
+    bruto = json.load(open(ASSET, encoding="utf-8"))["medidos"]
+    permitidas = {
+        "cpa_cop": {"valor", "es_un_PISO_no_un_punto", "unidad", "base", "🔴_sesgo_declarado",
+                    "supuesto_anterior", "cuanto_erraba", "_detalle_interno"},
+        "costo_pedido_fallido_cop": {"valor", "n", "base", "referencia_del_curso", "modelo",
+                                     "🔴_numero_retirado", "_detalle_interno"},
+    }
+    fugas = sorted("%s.%s" % (bloque, k) for bloque, ok in permitidas.items()
+                   for k in set(bruto.get(bloque, {})) - ok)
+    casos.append(("el asset NO trae llaves de contabilidad interna" +
+                  ("" if not fugas else " · 🔴 ENCONTRADO: " + ", ".join(fugas)), not fugas))
 
     # --- con los numeros del CURSO el mismo producto parece viable: esa es la trampa ---
     curso = u(80000, p=0.75, flete=12000, fallido=8000, cpa=0, comision=0)

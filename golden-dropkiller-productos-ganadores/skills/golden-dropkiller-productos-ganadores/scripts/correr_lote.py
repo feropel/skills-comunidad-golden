@@ -182,8 +182,23 @@ def uno(carpeta, f):
         elif activos_tope > f["max_anun"]:
             r["casi"].append("%d anunciantes activos en %s (el canal %s), tope %d" % (
                 activos_tope, canal_usado, "elegido" if f["canal"] else "más libre", f["max_anun"]))
-        if todos and f["antiguedad_min"] and max(a["max_dias_activo"] for a in todos) < f["antiguedad_min"]:
-            r["casi"].append("ningún anuncio corrió %d días o más (menú 7)" % f["antiguedad_min"])
+        # 🔴 TRAMPA 11 · ANUNCIO ZOMBI (medido 2026-09-27). La puerta se juega con los días
+        # OBSERVADOS, no con los declarados por la biblioteca: 17 de 80 anuncios declaraban más
+        # de 7 días por encima de lo visto y uno declaraba 81 con una sola observación. Un dato
+        # que falta no aprueba: sin ventana observable, esos anuncios no cuentan para antigüedad.
+        if todos and f["antiguedad_min"]:
+            obs = max(a["max_dias_observado"] for a in todos)
+            dec = max(a["max_dias_declarado"] for a in todos)
+            sin_ventana = sum(a["anuncios_sin_ventana"] for a in todos)
+            if obs < f["antiguedad_min"]:
+                r["casi"].append("ningún anuncio se VIO activo %d días o más (menú 7): %d observados "
+                                 "contra %d declarados por la biblioteca" % (f["antiguedad_min"], obs, dec))
+            elif dec - obs > 7:
+                r["avisos"].append("días de anuncio: %d observados contra %d declarados; la diferencia "
+                                   "son fechas de la biblioteca, no actividad vista" % (obs, dec))
+            if sin_ventana:
+                r["avisos"].append("%d anuncio(s) sin ventana observable (falta firstSeenAt o "
+                                   "lastSeenActiveAt): no cuentan para la antigüedad" % sin_ventana)
         if f["con_precios"] and r.get("pvp_minimo"):
             pr = co.precios(filas_a, r["pvp_minimo"], None, ficha.get("incluir_anuncios"))
             r["competencia_precio"] = {k2: pr.get(k2) for k2 in ("leidas", "landings", "precio_min", "precio_mediana", "precio_max", "plata")}
@@ -294,6 +309,7 @@ def autoprueba():
                   open(os.path.join(d, "mercado.json"), "w"))
         if anuncios is not None:
             json.dump({"data": [{"advertiserName": "a%d" % i, "lastSeenActiveAt": "2026-09-17T00:00:00Z",
+                                 "firstSeenAt": "2026-09-01T00:00:00Z",
                                  "landingUrl": "https://a%d-%s.co/products/x" % (i, nombre),
                                  "activeDays": 12, "title": "producto"} for i in range(anuncios)]},
                       open(os.path.join(d, "anuncios.json"), "w"))

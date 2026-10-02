@@ -14,11 +14,11 @@ description: >-
   "prográmame ganadores todos los días". También en LOTE con ranking comparativo.
 ---
 <!-- Historial completo de esta skill: references/changelog.md. El cuerpo se paga en cada activación; el acta no. -->
-<!-- skill GPG1.25 · 2026-09-23 · la comisión de recaudo era un cobro DUPLICADO (ya va dentro del flete): pasa a 0 y de supuesta a medida, comprobada en 17 informes (1 entregado de 11.669 con comisión > 0); la tabla de multiplicadores baja a 7,02x/4,01x/3,01x/2,20x; el término sigue vivo tras --comision; banco de 19 a 21 casos. GPG1.24: renombrada a golden-dropkiller-productos-ganadores por orden de FER (antes golden-productos-ganadores). GPG1.23: ruta R7: problema validado afuera contra el de aquí, con el múltiplo corregido por tamaño de mercado y el conteo local depurado por moneda. GPG1.22: openpyxl está en los tres intérpretes (medido); la skill decía que solo en uno. GPG1.21: la declaración de fábrica pasa al literal que el registro sí lee. GPG1.20 (2026-09-18): quinta pasada: entrega_golden sobre comun, tasas con rango, coma de miles, enlaces por parser de URL, status que falta = activo. GPG1.19: cuarta pasada: comun.py unifica identidades, números y fechas; rangos en todas las banderas; canal más libre (9C); exclusión de empresa por ID; la lista del día sale de correr_lote.py y se reproduce. GPG1.18: calibración rehecha con backtest v2 sin sesgo de resultado (piso 10 firme, 31 prudente, techo 120 sin evidencia, frenando = aviso), empresas separadas en la entrega, errores controlados, filtros del menú con bandera. GPG1.17: entrega propia de Golden, lote + registro + seguimiento, canal por imagen+descripción con cementerio, precio de competencia por Shopify JSON, un solo juicio. GPG1.16: 35 fallas del verificador adversarial corregidas (datos que faltan nunca aprueban, menú que el script sí aplica, blindaje real, reglas derogadas fuera). GPG1.15: primera corrida real: trampas 9 (maxTotalSold no existe) y 10 (espejos que no cuadran → mediana salvo el más viejo). Base GPG1.14: MODO CAZA CON DROPKILLER, por orden directa de FER ("una skill poderosa, mucho más que la de Juan, que me pregunte qué quiero hacer hoy con todos los filtros explícitos, y si no sé, que busque todo; 10 ganadores todos los días"). Base: 39 de 40 videos leídos completos (21 del cofundador de DropKiller) y el conector medido herramienta por herramienta. Aporte propio MEDIDO: 9 de los 20 "ganadores" de DropKiller en Colombia eran ventas FANTASMA (ajustes de stock) → scripts/ventas_reales.py; el mismo producto aparece hasta 4 veces por plataformas espejo → scripts/consolidar_mercado.py; conteo de reabastecimientos que DropKiller no da. Además: leyes del caso Candida (ETIQUETA y ALÉRGENOS), economía COD mudada a references/economia-cod.md con la contradicción del CPA corregida, y dos reglas de "costo × 3" que sobrevivían en entregable.md alineadas con viabilidad_cod.py. Detalle en references/changelog.md. -->
+<!-- skill GPG1.29 · 2026-10-02 · la contabilidad interna de Golden sale del asset (repo PÚBLICO): serie mensual del CPA, agregado de pauta del año, ruta del CSV y razón por transportadora pasan a PROYECTOS/CAZA-DIARIA-GANADORES/_economia-cod-golden-detalle.json; el banco de viabilidad_cod muerde si vuelven. GPG1.28 · 2026-10-02 · orden de FER: el modo VALIDAR corre los pasos 2, 3 y 6 de CAZA (ventas reales, mercado consolidado, competencia) sobre el producto conocido, paso 1b; gemela de golden-investigacion-mercado G6.3. GPG1.27 · 2026-09-30 · TRAMPA 11 (ANUNCIO ZOMBI): activeDays es endDate - startDate de la biblioteca, no actividad; 17 de 80 anuncios declaraban más de 7 días por encima de lo observado (466 contra 105 el peor) y las impresiones vienen vacías en 80 de 80, también en get_ad. La puerta de antigüedad pasa a los días OBSERVADOS (firstSeenAt..lastSeenActiveAt), se declara la diferencia y la llave max_dias_activo se retira para que un lector viejo falle fuerte. GPG1.26 · 2026-09-28 · autoauditoría con golden-skill-auditor (890/1000): se mata la contradicción del paso 2c (decía PIERDE $1.860 con la comisión ya retirada, y que el CPA era supuesto cuando está medido como piso), las tres actas del 27-sep que compartían el número GPG1.25.1 se numeran 1.25.1/1.25.2/1.25.3, consolidar_mercado cuenta las filas que no son registros (mitad pendiente de la fila P59) y los tres bancos de assets quedan citados por su script. GPG1.25 · 2026-09-23 · la comisión de recaudo era un cobro DUPLICADO (ya va dentro del flete): pasa a 0 y de supuesta a medida, comprobada en 17 informes (1 entregado de 11.669 con comisión > 0); la tabla de multiplicadores baja a 7,02x/4,01x/3,01x/2,20x; el término sigue vivo tras --comision; banco de 19 a 21 casos. GPG1.24: renombrada a golden-dropkiller-productos-ganadores por orden de FER (antes golden-productos-ganadores). GPG1.23: ruta R7: problema validado afuera contra el de aquí, con el múltiplo corregido por tamaño de mercado y el conteo local depurado por moneda. GPG1.22: openpyxl está en los tres intérpretes (medido); la skill decía que solo en uno. GPG1.21: la declaración de fábrica pasa al literal que el registro sí lee. GPG1.20 (2026-09-18): quinta pasada: entrega_golden sobre comun, tasas con rango, coma de miles, enlaces por parser de URL, status que falta = activo. GPG1.19: cuarta pasada: comun.py unifica identidades, números y fechas; rangos en todas las banderas; canal más libre (9C); exclusión de empresa por ID; la lista del día sale de correr_lote.py y se reproduce. GPG1.18: calibración rehecha con backtest v2 sin sesgo de resultado (piso 10 firme, 31 prudente, techo 120 sin evidencia, frenando = aviso), empresas separadas en la entrega, errores controlados, filtros del menú con bandera. GPG1.17: entrega propia de Golden, lote + registro + seguimiento, canal por imagen+descripción con cementerio, precio de competencia por Shopify JSON, un solo juicio. GPG1.16: 35 fallas del verificador adversarial corregidas (datos que faltan nunca aprueban, menú que el script sí aplica, blindaje real, reglas derogadas fuera). GPG1.15: primera corrida real: trampas 9 (maxTotalSold no existe) y 10 (espejos que no cuadran → mediana salvo el más viejo). Base GPG1.14: MODO CAZA CON DROPKILLER, por orden directa de FER ("una skill poderosa, mucho más que la de Juan, que me pregunte qué quiero hacer hoy con todos los filtros explícitos, y si no sé, que busque todo; 10 ganadores todos los días"). Base: 39 de 40 videos leídos completos (21 del cofundador de DropKiller) y el conector medido herramienta por herramienta. Aporte propio MEDIDO: 9 de los 20 "ganadores" de DropKiller en Colombia eran ventas FANTASMA (ajustes de stock) → scripts/ventas_reales.py; el mismo producto aparece hasta 4 veces por plataformas espejo → scripts/consolidar_mercado.py; conteo de reabastecimientos que DropKiller no da. Además: leyes del caso Candida (ETIQUETA y ALÉRGENOS), economía COD mudada a references/economia-cod.md con la contradicción del CPA corregida, y dos reglas de "costo × 3" que sobrevivían en entregable.md alineadas con viabilidad_cod.py. Detalle en references/changelog.md. -->
 # Golden Group — Productos Ganadores
 
 
-**Versión:** `GPG1.25.1` (ver `references/changelog.md`) ·
+**Versión:** `GPG1.29` (ver `references/changelog.md`) ·
 **Fábrica:** chat «✅ SKILL golden-dropkiller-productos-ganadores» (abierto el 2026-09-05 por
 orden de FER, renombrado con la skill el 2026-09-22;
 ejecuta, no manda: la autoridad es FER → Centro de Mando → skill, y el CdM puede cambiarlo).
@@ -40,7 +40,7 @@ Cada modo usa fuentes distintas. Lo bloqueante para lo que depende de él; lo de
 
 | Qué necesitas | Tipo | Para qué | Cómo se consigue |
 |---|---|---|---|
-| **DropKiller**, en un plan que incluya su **conector MCP**, conectado a Claude | Bloqueante para CAZA, CREATIVOS y RUTINA · degradable para ESPIAR | Ventas por producto de Dropi y otras plataformas, anuncios y tiendas. En ESPIAR queda la Ad Library por dominio | Tu cuenta en DropKiller. La skill se midió con el plan Advance: revisa el precio vigente en su web. Declaración: el autor de esta skill (FER, de Golden Group) tiene enlace de afiliado de DropKiller (15%) |
+| **DropKiller**, en un plan que incluya su **conector MCP**, conectado a Claude | Bloqueante para CAZA, CREATIVOS y RUTINA · degradable para VALIDAR y ESPIAR | Ventas por producto de Dropi y otras plataformas, anuncios y tiendas. En ESPIAR queda la Ad Library por dominio | Tu cuenta en DropKiller. La skill se midió con el plan Advance: revisa el precio vigente en su web. Declaración: el autor de esta skill (FER, de Golden Group) tiene enlace de afiliado de DropKiller (15%) |
 | **La biblioteca de anuncios de Meta**: el MCP de Meta con `ads_library_search`, o la biblioteca abierta en el navegador | Degradable · sin ninguna de las dos vías, bloqueante para la ruta R7 | En VALIDAR da hasta 35 de los 100 puntos (Demanda activa): sin ella quedan 65 y hay que sacar 60 en el resto, y la Regla de oro 1 exige al menos una tendencia clara, declarada. R7 depende entera de ella. En CAZA confirma la competencia que DropKiller ya contó | El MCP, con tu cuenta de Meta conectada a Claude. Si no, la biblioteca es pública y no pide sesión: se abre en el navegador con la URL completa de `references/ad-library-metodo.md` |
 | **Python 3** y conexión a internet | Bloqueante | Las ventas de DropKiller nunca se usan crudas (`scripts/ventas_reales.py`) y el precio se calcula (`scripts/viabilidad_cod.py`). Esos scripts solo usan lo que trae Python; `competencia.py precios` lee las páginas de la competencia por internet | Compruébalo con `python3 --version`; si no está, en python.org |
 | **Firecrawl** conectado y con créditos | Degradable | AliExpress: costo y contador de ventas | Tu cuenta de Firecrawl. Se prueba una llamada antes de contar con él |
@@ -110,7 +110,7 @@ declara en una línea qué supusiste. Los cinco modos:
 ## Fuentes (todas conectadas)
 - **DropKiller** (conector MCP, **beta**, plan Advance) → ventas por producto de Dropi y otras 9
   plataformas en 15 países, anuncios de Meta y TikTok, tiendas Shopify y TikTok Shop. Es la
-  fuente del modo CAZA. **Método completo, las 30 herramientas y las 10 trampas medidas →
+  fuente del modo CAZA. **Método completo, las 30 herramientas y las 11 trampas medidas →
   `references/dropkiller-caza.md`. Lectura obligatoria antes de la primera llamada.**
   - 🔴 Sus "ventas" salen de la **caída de stock** del proveedor: un ajuste de inventario parece
     venta (9 de 20 en su propio top de Colombia). Nunca crudas: `ventas_reales.py`.
@@ -166,7 +166,7 @@ declara en una línea qué supusiste. Los cinco modos:
 
   | Tienda | Estado | Cómo |
   |---|---|---|
-  | **DropKiller** | ✅ **Funciona, con 10 trampas** | **MCP** (medido 2026-09-18, 30 herramientas). Ventas depuradas con `ventas_reales.py` |
+  | **DropKiller** | ✅ **Funciona, con 11 trampas** | **MCP** (medido 2026-09-18, 30 herramientas). Ventas depuradas con `ventas_reales.py` |
   | **AliExpress** | ⚠️ **Sin créditos el 2026-09-18** | **Firecrawl.** Medido antes: 8 productos con "480 sold", "3,000+ sold". El 18-sep `firecrawl_scrape` respondió "Insufficient credits" (1 llamada): probar una antes de contar con él; si falla, AliExpress se declara NO DISPONIBLE en la ficha. Los precios de competencia en Shopify no dependen de Firecrawl (`competencia.py precios`) |
   | **Amazon** | ✅ **Funciona** | **NAVEGADOR** (por Firecrawl no: muro anti-bot). Ver receta abajo |
   | **Temu** | ❌ **No funciona** | Firecrawl: devuelve categorías de ropa. Navegador: **muro de sesión** |
@@ -248,6 +248,19 @@ herramienta por herramienta, en `references/dropkiller-caza.md` §6.
 
 ## Flujo del modo VALIDAR (un producto o un lote)
 1. **Encuadre (pregunta si falta):** país, nicho/categoría o producto semilla, **MODELO (catálogo COD / marca propia anticipado)** — define qué columna de la rúbrica se usa — y presupuesto/ticket objetivo.
+1b. **DropKiller del producto, PRIMERO** (GPG1.28, orden de FER del 02-oct-2026: DropKiller va en
+   VALIDAR igual que en CAZA). Es la única prueba de COMPRA; la Ad Library de abajo prueba GASTO.
+   Se corren sobre este producto los pasos 2, 3 y 6 del modo CAZA, sin repetirlos aquí:
+   `semantic_search_products` con `imageUrl` (o `query` = nombre + función, si no hay URL de
+   imagen) y `countryCode`, guardado en `mercado.json` → `scripts/consolidar_mercado.py mercado.json
+   --pais XX --incluir "<regex del nombre>"` (etapa, proveedores, espejos) → la ficha del que más
+   vende y la del proveedor elegido por `scripts/ventas_reales.py` (fuera FANTASMA) →
+   `semantic_search_ads` con imagen + descripción → `scripts/competencia.py canal|precios`.
+   *Medido el 02-oct en Colombia con un producto conocido:* 40 fichas → 12 únicas, 10 proveedores,
+   20.254 unidades, QUEMADO; el líder reportaba 8.570 en 30 días y eran 6.966 reales, frenando.
+   `limit` va como número. Lo que salga va a la ficha y manda sobre la rúbrica igual que en CAZA:
+   un QUEMADO o un FANTASMA no se rescata con puntos. Si DropKiller no responde, se declara y se
+   sigue con el barrido de abajo.
 2. **Barrido de demanda:**
    - `ads_library_search` por palabra clave/categoría en el país → lista anunciantes activos, cuántos anuncios, desde cuándo.
    - `firecrawl_search` para tendencias y precio de costo (AliExpress) + volumen de reseñas.
@@ -282,8 +295,12 @@ herramienta por herramienta, en `references/dropkiller-caza.md` §6.
    --pvp <pvp>`. Sin `--pvp` devuelve el **PVP mínimo** y su multiplicador, que es lo que se le
    dice al usuario cuando aún no hay precio decidido. **Lo que no pasa el piso no entra a la
    rúbrica**, por bueno que se vea: con los números reales de Golden, un producto de costo
-   $30.000 a $80.000 PIERDE $1.860 por pedido generado. **Siempre se declara que el CPA es un
-   supuesto**, no un dato medido.
+   $30.000 vendido a $80.000 deja **+$492** por pedido generado, **no alcanza el piso de $8.000**
+   y por eso se descarta (medido con el propio script; hasta el 2026-09-28 esta línea decía
+   "PIERDE $1.860", que era la cifra con la comisión del 4% retirada el 23-sep). **Lo que se
+   declara en cada veredicto es que el CPA está MEDIDO y es un PISO** ($21.428; el real es igual
+   o mayor), así que el veredicto es optimista por construcción. Ningún número de esta economía
+   sigue siendo un supuesto: la comisión de recaudo fue el último y cerró en 0 el 23-sep.
 
 3. **Puntuación** — Score Ganador 0–100 (ver rúbrica). Descarta lo que no pase el umbral (≥60).
 4. **Ficha de Producto Ganador** (formato abajo) para los 1–3 mejores.
@@ -383,7 +400,7 @@ falta en cada corrida.
   fuerza (backtest v2 del 2026-09-18: piso de 10 firme, 31 indicio, techo de 120 sin evidencia,
   frenado y reabastecimientos sin medir) y cuáles siguen heredados; el v1 superado y por qué;
   cómo repetirlo. Léela antes de cambiar cualquier umbral.
-- **`references/dropkiller-caza.md`** — las 30 herramientas del conector, las 10 trampas medidas,
+- **`references/dropkiller-caza.md`** — las 30 herramientas del conector, las 11 trampas medidas,
   los 3 criterios del catálogo público con la tabla de etapas por país, las 6 rutas de caza, el
   embudo y lo que se rechaza aunque lo enseñen los videos. **Léela antes de la primera llamada
   a DropKiller.**
@@ -409,8 +426,6 @@ ritual (backup → desbloquear → arreglar → changelog+sello → re-blindar);
 propio, **arréglalo sin esperar que lo pidan** e informa; 4) pasa `golden-skill-auditor`
 periódicamente. Nunca borres conocimiento: reorganiza y añade.
 
-- **2026-08-02** — LOOP DEL ARSENAL (semana 1, skills de negocio): se hornea la sección **AUTO-MEJORA** (mandato global de FER, autorización permanente). Sin esta sección la skill no se auto-calificaba al cerrar corrida. Contenido operativo intacto. Backup: `_backups/2026-08-02-loop-arsenal-s1/`.
-
 ## Fronteras y desambiguacion
 
 NO usar para analizar pauta propia (eso es golden-meta-ads-analysis) ni para construir la página (eso es golden-shopify).
@@ -428,7 +443,11 @@ python3 ~/.claude/skills/golden-skill-auditor/scripts/validar_arsenal.py ~/.clau
 Salida 0 = en norma. Se corre **DESPUÉS** de tocar la `description`, no solo antes.
 
 Nueve de los diez scripts traen su autoprueba (`metricas_saturacion.py` no la tiene: es un cálculo de dos números). `comun.py` es la ÚNICA forma de normalizar IDs, nombres, números y fechas: los demás la importan (solo biblioteca estándar de Python 3). Si una sale con
-fallo, ese script no se usa para juzgar productos hasta arreglarlo:
+fallo, ese script no se usa para juzgar productos hasta arreglarlo. **Tres de esas autopruebas
+leen bancos guardados, y por eso esos archivos NO son huérfanos:** `assets/banco_consolidacion.json`
+lo lee `consolidar_mercado.py`, y `assets/banco_top20_co_2026-09-18.json` y
+`assets/banco_ventas_adversarial.json` los lee `ventas_reales.py`. Son datos reales de la corrida
+del 18-sep: si alguien los borra por "huérfanos", el banco adversarial se queda sin caso que morder.
 ```bash
 python3 ~/.claude/skills/golden-dropkiller-productos-ganadores/scripts/ventas_reales.py --autoprueba       # 43 casos
 python3 ~/.claude/skills/golden-dropkiller-productos-ganadores/scripts/consolidar_mercado.py --autoprueba  # 52 chequeos

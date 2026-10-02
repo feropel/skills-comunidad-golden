@@ -101,14 +101,23 @@ def consolidar(filas, pais, incluir=None, hoy=None, etapa_pedida="VALIDACION", m
     avisos = []
     excluidas = []
     candidatas = []
+    no_registro = 0
     for f in filas:
+        # 🔴 P59, segunda mitad (2026-09-28): lo que se descarta se CUENTA y se NOMBRA. Antes esta
+        # rama tiraba en silencio las filas que no son registros de producto: `filas_recibidas` SÍ
+        # las incluía y ningún campo las contaba, así que el total no cuadraba y nadie tenía con
+        # qué notarlo. Un descarte que no se cuenta no es un filtro, es una fuga.
         if not isinstance(f, dict):
+            no_registro += 1
             continue
         nombre = (f.get("name") or "").strip()
         if patron and not patron.search(nombre):
             excluidas.append(nombre)
             continue
         candidatas.append(f)
+    if no_registro:
+        avisos.append("%d fila(s) de la respuesta no son registros de producto: "
+                      "descartadas y contadas" % no_registro)
 
     # 1) colapsar espejos: mismo externalId = mismo producto de Dropi en otra plataforma.
     #    Una fila SIN externalId ni id no puede ser espejo de nada: va sola.
@@ -230,7 +239,10 @@ def consolidar(filas, pais, incluir=None, hoy=None, etapa_pedida="VALIDACION", m
     return {
         "pais": pais,
         "filas_recibidas": len(filas),
+        "no_son_registros": no_registro,
         "excluidas_por_nombre": len(excluidas),
+        "cuadre": "recibidas %d = no_registros %d + excluidas_por_nombre %d + candidatas %d" % (
+            len(filas), no_registro, len(excluidas), len(candidatas)),
         "espejos_descartados": espejos,
         "fichas_unicas": len(por_ext),
         "proveedores_activos": len(activos),

@@ -975,6 +975,30 @@
    "_esperado": {
     "proveedores_activos": 1
    }
+  },
+  "filas que no son registros (P59, 28-sep)": {
+   "_incluir": "olla",
+   "data": [
+    "esto no es un registro",
+    null,
+    {
+     "id": "z1",
+     "externalId": "9001",
+     "name": "olla de vidrio 5.5l",
+     "providerName": "impor house",
+     "platformType": "DROPI",
+     "totalSoldUnits": 500,
+     "stock": 120,
+     "status": "ACTIVE",
+     "lastSeenAt": "2026-09-18T09:00:00.000Z"
+    }
+   ],
+   "_esperado": {
+    "filas_recibidas": 3,
+    "no_son_registros": 2,
+    "fichas_unicas": 1,
+    "_aviso_contiene": "no son registros de producto"
+   }
   }
  }
 }

@@ -60,6 +60,50 @@ columna con `N+` **no se ordena de mayor a menor**: los abiertos no son comparab
 > **Si una decisión de lanzar o matar necesita comparar dos competidores: se cierran los dos conteos,
 > o no se comparan.** Un `N+` que se compara vale menos que no tener el dato, porque parece que lo hay.
 
+## 3.1.bis · MAPA DE CANALES — tambien los canales donde NOSOTROS NO VENDEMOS
+
+El error que corrige (FER, 28-sep-2026): la 3.1 mapea PAISES y se queda corta, porque el mismo
+producto se vende en **canales** distintos y cada canal deja un rastro distinto. **Un canal no se
+investiga para vender en el, se investiga para ROBARLE lo que ya le funciono** y adaptarlo al
+ecosistema propio (COD por WhatsApp, dropshipping, pago anticipado).
+
+**La razon por la que vale la pena, y es la unica que importa:**
+
+> 🔴 **Hay fuentes que miden GASTO y fuentes que miden COMPRA. No son lo mismo y no se mezclan.**
+> Un anuncio que **declara** 1.111 dias activos NO prueba que alguien lleve anos pagando: `activeDays`
+> es `endDate - startDate` declarado y avanza solo (trampa del zombi, §1.7). Lo que vale es la
+> **ventana observada** `firstSeenAt`..`lastSeenActiveAt`, y es un piso. Se citan los dos: es la
+> decision del VENDEDOR, una inferencia fuerte pero indirecta. Las **unidades vendidas** de un
+> marketplace prueban la decision del COMPRADOR. Cuando las dos apuntan al mismo angulo, el angulo
+> esta doblemente validado; cuando se contradicen (mucho gasto, poca venta), el producto tiene
+> problema de oferta o de producto, no de trafico — y eso cambia el veredicto de viabilidad.
+
+| Canal | Que mide | Que se roba y se adapta | Que NO se transfiere |
+|---|---|---|---|
+| **Plataformas de DROPSHIPPING** (DropKiller productos, §1.3.bis) | **COMPRA**: unidades vendidas depuradas, proveedores activos, stock, etapa | el tamano real del mercado del producto, quien lo surte y si esta quemado | no es "el mercado total": DropKiller indexa plataformas de dropshipping, **no** Shopify propias, MercadoLibre ni tiendas fisicas |
+| **Meta / TikTok Ads** (DropKiller §1.7) | GASTO **declarado** (ojo: `activeDays` no es observado) | angulo, hook, copy, ventana observada | nada del precio local |
+| **TikTok Shop** (US/MX) | **COMPRA**: unidades, rating, resenas, y **el VIDEO atribuido a la venta** | el creativo que CONVIRTIO, la demo, el gancho, la estructura de oferta | precio (otra moneda y mercado) y el volumen como tamano de mercado propio |
+| **Amazon** | COMPRA + voz del cliente | resenas 1★ (que administrar antes de despachar), specs reales | precio y logistica |
+| **AliExpress** | COMPRA en origen | fotos reales, variantes, costo de origen | calidad percibida local |
+| **MercadoLibre** | COMPRA local | precio local real, preguntas del comprador | — |
+
+**Mercados adelantados:** EE.UU. y Mexico suelen ir **meses por delante** de LatAm COD. Lo que alla
+ya vende es senal temprana de lo que aqui se puede montar. Se anota con su fecha (regla 13), porque
+esa ventaja se cierra sola.
+
+**Regla de traduccion — que cruza y que no:**
+- ✅ **Cruza siempre:** el ANGULO, el HOOK, la DEMO, la objecion que resuelven, la ESTRUCTURA de la
+  oferta (escalon, combo, % de descuento, garantia).
+- ❌ **NO cruza nunca:** el PRECIO (moneda, poder adquisitivo y flete distintos) ni el VOLUMEN — el
+  GMV en EE.UU. mide **interes en el producto**, no el tamano del mercado propio. Confundirlos es
+  como leer la demografia de una cuenta de ads como "quien compra" (ver 1.5.bis): el mismo error.
+
+Lo que la casa tiene hoy para este mapa: **DropKiller** cubre las **plataformas de dropshipping**
+(nivel COMPRA, §1.3.bis) y los **ads** de Meta/TikTok (nivel GASTO declarado, §1.7), y trae una capa de
+TikTok Shop *somera* — medido el 2026-09-28: "colageno" devolvio **15 productos, todos de EE.UU.,
+con raspado de hasta dos meses atras**. Si esa capa se queda corta para el estudio, **se declara** y
+se completa por navegador o con una herramienta especializada, sin fingir profundidad que no se tuvo.
+
 ## 3.2 · MATRIZ DE OFERTA Y COMBOS — casi nadie compite en producto, todos compiten en OFERTA
 
 Dos tiendas con el mismo producto y el mismo precio unitario venden distinto por cómo arman la escalera.
@@ -85,6 +129,11 @@ De cada fila se extrae, y esto es lo que se usa después:
 
 ## 3.3 · AUTOPSIA DE PÁGINA — cómo está construida la página del que ya vende
 
+> **Atajo medido (2026-09-28):** `store_tech_report` de DropKiller da **tema, apps instaladas,
+> pixeles y redes** de la tienda por DOMINIO en una sola llamada, y funciona incluso en tiendas no
+> indexadas (las inspecciona en vivo; el campo `source` dice por que via salio). Releasit entre las
+> apps = venta contra entrega confirmada, sin deducirlo del HTML. Receta: `01-investigacion-360.md` §1.7.
+
 No basta el precio del competidor: hay que ver **cómo lo presenta**. Se hace sobre las 2 o 3 páginas
 de los competidores que más llevan anunciando (los que no se apagan, convierten).
 
@@ -102,6 +151,10 @@ de los competidores que más llevan anunciando (los que no se apagan, convierten
 qué tiene solo el que más lleva corriendo (probablemente su ventaja), y **qué no tiene ninguno**.
 
 ## 3.4 · INVENTARIO DE CREATIVOS — las piezas, no solo el texto
+
+> **Atajo:** `list_store_ads` y `get_ad_creatives` de DropKiller entregan las piezas del competidor
+> con URL descargable de imagen y video, mas los **dias activos** de cada una: el creativo que lleva
+> mas tiempo al aire es el que mejor le funciona, y ese se estudia primero.
 
 La skill ya capturaba el copy del anuncio. Faltaban **las imágenes y los videos**, que es lo que
 realmente para el dedo.
@@ -176,6 +229,10 @@ por likes**, no por fecha, y el ángulo cita el número junto a la frase. Un án
 comentarios de cero likes se entrega marcado `(señal débil)`.
 
 ### Las fuentes, todas
+
+> **La primera es DropKiller**: `search_ads` con `broadcastDuration:"evergreen"` + `sort:"duration"`
+> + `maxStaleDays:7` devuelve los angulos que **llevan meses o anos pagados** en ese pais, con el
+> copy verbatim. Es la veta mas barata de angulos validados que existe. Trampa del `ACTIVE`: §1.7.
 
 Facebook · Instagram · YouTube (video y **comentarios**) · TikTok y TikTok Ads (ojo: su Ad Library
 **solo cubre Europa**) · MercadoLibre · Amazon · **Alibaba** · **Temu** · AliExpress · Meta Ad

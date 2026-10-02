@@ -16,13 +16,99 @@ Ejecuta en paralelo donde se pueda. Cada hallazgo se guarda **con su fuente** (R
 
 ## 1.3 Mercado y demanda
 - Tamaño/tendencia (Google Trends, volumen de búsqueda). Estacionalidad.
-- Está validado como ganador? Cruza con `golden-dropkiller-productos-ganadores` (Ad Library + TikTok).
+- Está validado como ganador? Lo dicen sus ventas REALES en DropKiller (§1.3.bis), no su fama.
 - Nivel de saturación del nicho (cuántos anunciantes activos, hace cuánto).
+
+## 1.3.bis 🥇 El producto en DROPKILLER: sus ventas REALES (opción de búsqueda · G6.3)
+Orden de FER (02-oct-2026): DropKiller va en las DOS skills, con dos usos distintos.
+`golden-dropkiller-productos-ganadores` tiene **dos modos**: CAZA (busca productos que todavía no
+conoces) y **VALIDAR** (su paso 1b: toma un producto YA conocido y dice si pasa su rúbrica y cuál es
+su PVP mínimo). **Quién entra con "valida este producto":** si lo que se quiere es el veredicto
+rápido de pasa/no pasa y el PVP mínimo, es la hermana; si lo que se quiere es el ESTUDIO (mercado,
+competidores, voz del cliente, dossier, documento), es esta skill — que para la parte de mercado
+llama a los mismos scripts, sin duplicarlos. Aquí el
+producto **ya está elegido** y DropKiller se usa para medir SU mercado: cuánto vende de verdad,
+cuántos lo venden, en qué etapa está y si sube o baja. Es la evidencia de nivel **COMPRA** de la
+regla 15 (unidades que alguien pagó), por encima del gasto en anuncios y de la opinión.
+
+**Cuándo se usa:** siempre que el producto se venda, o pueda venderse, por dropshipping en un país
+que DropKiller indexa (`list_product_filters` da los países y plataformas). Si es marca propia y no
+tiene ficha en esas plataformas, se busca su FUNCIÓN (el mismo problema resuelto por otro producto)
+y se rotula que son **sustitutos, no el mismo producto**. Si DropKiller no responde o no hay cuenta,
+se declara y la demanda queda sostenida por GASTO u OPINIÓN, rotulada así (regla 15).
+
+**Receta, medida en vivo el 02-oct-2026** (un suplemento de drenaje linfático, Colombia):
+1. **Barrer el mercado — DOS búsquedas, no una.** Ninguna sola es el mercado:
+   - 1a · **PALABRA CLAVE PAGINADA, y esta es la que mide el mercado**: `search_products` con
+     `q` + `countryCode`, siguiendo `nextCursor` **hasta `hasNext:false`**. Solo así el conteo
+     queda **CERRADO**. *(Medido 02-oct-2026, "lymphatic" + CO: 194 filas en 4 páginas de 50.)*
+   - 1b · **SEMÁNTICA, para ENCONTRAR el producto, no para medirlo**: `semantic_search_products`
+     con `query` = nombre + función en el idioma del país, o `imageUrl` si hay foto (trae menos
+     ruido). Sirve cuando no se sabe cómo lo llaman, o para hallarlo por su función.
+   - 🚨 **La semántica devuelve 40 y 40 es su TOPE, no el mercado.** Desde este cliente MCP
+     **no se puede subir `limit`**: el conector lo recibe como TEXTO y lo rechaza por validación
+     (medido dos veces, con 10 y con 100). Se asume 40 y **se declara ABIERTO**. El `cursor` sí
+     pasa, porque es texto: por eso 1a sí puede cerrar.
+   - 🚨 **Las dos apenas se solapan:** en la corrida real, las 40 semánticas y las 194 por palabra
+     clave compartían **UN solo id**. Quedarse con una sola vía es ver un pedazo y creerlo entero.
+   Ambas respuestas se guardan en `PROYECTOS/<PRODUCTO>/dropkiller/` con su fecha (son grandes,
+   ~116 KB las 40): no se leen en el chat.
+2. **Consolidar el mercado** con el script de la skill hermana, que no se duplica aquí:
+   `python3 ~/.claude/skills/golden-dropkiller-productos-ganadores/scripts/consolidar_mercado.py mercado.json --pais XX --incluir "<regex del nombre>"`.
+   Devuelve fichas únicas, espejos descartados, proveedores activos con sus ventas y su stock, ventas
+   totales del mercado y la ETAPA. El regex lo decide quien miró las fotos, no el script, y su
+   `cuadre` tiene que cerrar. Se consolida **la UNIÓN de 1a y 1b**, no una sola.
+   *Medido 02-oct-2026 (drenaje linfático, CO), unión de las dos búsquedas: **234 filas → 81 ids →
+   3 fuera por nombre, 151 espejos, 80 únicas, 30 proveedores, 72.946 unidades, etapa QUEMADO**,
+   cuadre cerrado. El listado que la empresa ya vendía aparece primero (25.758 u.).*
+   🔴 **Por qué importa este dato y no el anterior:** la primera medición usó **solo la semántica**
+   y dio 20.254 u. con 10 proveedores — **el 28 % del mercado**, y el listado propio ni aparecía.
+   El número pequeño no era "otro recorte": era un **PISO presentado como universo**. Sigue ABIERTO
+   para otros términos (p. ej. "drenaje linfatico" por palabra clave no se corrió).
+3. **Ventas reales** del que más vende y del proveedor que se usaría: su ficha trae `history30d`
+   (o `get_product_history` con su id) →
+   `python3 ~/.claude/skills/golden-dropkiller-productos-ganadores/scripts/ventas_reales.py ficha.json`.
+   Da REAL / DUDOSO / FANTASMA, vendidas depuradas contra reportadas, ritmo diario, reabastecimientos
+   y tendencia. *Medido: 8.570 reportadas en 30 días → 6.966 reales (un pico de 1.871 en un día
+   recortado al ritmo base de 267), 3 reabastecimientos, tendencia "frenando".* Sin este paso, un
+   ajuste de inventario se lee como venta.
+4. **Anuncios y precios de quien lo vende:** §1.7 (DropKiller primero). Para canal y precios por
+   producto: `semantic_search_ads` con la imagen + una descripción corta + el país (la imagen sola
+   trae ruido) → `competencia.py canal` y `competencia.py precios` de la misma hermana.
+
+**Qué alimenta:** la sección 3 del documento (Mercado y demanda) y, en el veredicto, tres de los
+cinco datos: **demanda** (unidades reales, nivel COMPRA), **saturación** (etapa + proveedores
+activos + anunciantes) y **proveedor** (`salePrice` = costo, `stock`, `providerVerified`). El PVP
+mínimo y la cuenta COD salen de `viabilidad_cod.py` de la hermana: aquí se citan, no se recalculan.
+
+**Trampas medidas:**
+- **TODO conteo dice si quedó CERRADO o ABIERTO.** Cerrado = se paginó hasta `hasNext:false`.
+  Abierto = tocó un tope (las 40 de la semántica) o quedaron términos sin correr: se escribe `N+`,
+  y **una columna con `N+` no se ordena de mayor a menor**, porque los abiertos no son comparables.
+- La búsqueda trae VECINOS: por eso el `--incluir`, y **la foto la mira una persona**, no el regex.
+  *(El regex de la primera corrida excluía por nombre cosas que sí eran el producto y dejaba dentro
+  gotas de otras marcas: el filtro por texto no sustituye mirar.)*
+- `totalSoldUnits` cuenta ajustes de inventario: nunca se cita crudo, se cita lo depurado.
+- DropKiller mide las plataformas de dropshipping que indexa, **no** Shopify propias, MercadoLibre
+  ni tiendas físicas. Es el mercado de dropshipping, y se rotula así, no "el mercado total".
+- Toda cifra lleva fecha de medición (regla 13): la etapa cambia en semanas.
+- Sin la skill hermana instalada se leen a mano los campos `totalSoldUnits`, `soldUnitsLast7Days`,
+  `soldUnitsLast30Days`, `suspectedSalesAdjustment` y `salesConfidence`, y se declara
+  **"sin depurar ventas fantasma"**.
 
 ## 1.4 Competidores (3–7)
 Para cada uno: nombre + URL · propuesta de valor · **precio** · oferta/promo · diferencial ·
 ángulo de marketing · qué hace bien · **hueco que deja** (oportunidad). Tabla comparativa.
-- Revisa sus anuncios activos (Ad Library) y su contenido orgánico.
+- Revisa sus anuncios activos (**DropKiller primero**, ver 1.7) y su contenido organico.
+- **El STACK del competidor se mide:** `store_tech_report` (tema, apps, pixeles) — dato duro.
+- 🚨 **Los INGRESOS de tienda NO son un dato** (trampa 8, medida): el propio conector **retiro los
+  ordenamientos por ingresos y visitas el 2026-07-02 por fuente desactualizada**, y el canal oficial
+  los llama "estimaciones, no 100 % reales". `get_store`/`get_store_revenue_history` se pueden mirar
+  para **ordenar por tamano aproximado**, jamas para escribir una cifra de facturacion en el estudio.
+  Si se cita, va rotulado `(estimado viejo, no verificable)`. El `billing` de un producto tampoco es
+  facturacion de la tienda: es precio de proveedor x unidades.
+- El tamano REAL del rival se infiere de lo que si se mide: unidades vendidas del producto
+  (§1.3.bis, nivel COMPRA) y anuncios con ventana observada (§1.7, nivel GASTO).
 
 ## 1.5 Voz del cliente (oro para el copy)
 - **Google Maps/Business**: reseñas — top elogios y top quejas, **citas textuales** con fuente.
@@ -136,6 +222,63 @@ whisper-cli -m <ruta>/ggml-small.bin -l es -nt -f audio.wav
 Todo con fuente (URL del video/hilo) y volcado a la voz del cliente (1.5) y al dossier (capas 7–13 y 21).
 
 ## 1.7 Anuncios activos del nicho (inteligencia competitiva)
+### 🥇 DROPKILLER PRIMERO (MCP propio · verificado en vivo 2026-09-28)
+Indexa Meta y TikTok **con historia**, que es lo que la Ad Library publica no da: cuantos dias
+**declara** cada anuncio y, sobre todo, **cuando se le vio** de verdad.
+
+🚨 **TRAMPA DEL ANUNCIO ZOMBI (trampa 11 de la hermana, medida sobre 80 anuncios).** `activeDays`
+es **exactamente `endDate - startDate`: fechas DECLARADAS, no dias observados**, y avanza solo —
+el mismo anuncio declaraba 11 dias el 18-sep y 16 el 23-sep sin que nadie lo viera. 17 de 80 (21 %)
+declaran mas de 7 dias por encima de lo observado; el peor, **466 declarados contra 105 vistos**, y
+uno declara 81 dias **con UNA sola observacion**. Por eso:
+- **Un `activeDays` alto NO prueba gasto sostenido.** La prueba es la **ventana observada**
+  (`firstSeenAt` .. `lastSeenActiveAt`), y se cita asi: *"declara N dias, observado M"*.
+- **El error simetrico tambien cuenta:** 74 de 80 empezaron ANTES de que DropKiller mirara, asi que
+  la ventana observada es un **PISO, no la verdad**. Castigar por ella sin decirlo es el mismo fallo
+  al reves. Se dan los dos numeros y se deja decidir.
+- Nivel de evidencia (regla 15): esto es **GASTO**, nunca COMPRA — y gasto *declarado* hasta que la
+  ventana observada lo respalde.
+
+```
+search_ads  countryCodes:["CO"]  status:"ACTIVE"  maxStaleDays:7
+            broadcastDuration:"evergreen"        # >30 dias corriendo
+            sort:"duration"  distinctAdvertisers:true  q:"<termino del nicho>"
+```
+Devuelve, medido: `activeDays` (DECLARADO — ver la trampa del zombi arriba) ·
+`firstSeenAt`/`lastSeenActiveAt` (**la ventana observada: esto es lo que vale**) ·
+`copyPreview` (copy VERBATIM del competidor) · `cta` ·
+`landingUrl` (revela el embudo: `api.whatsapp.com/send` = COD por WhatsApp; dominio propio =
+landing) · `winnerScore` · `imageUrl`/`videoUrl` descargables · `externalUrl` a la Ad Library.
+*Corrida real 2026-09-28 en Colombia: un anuncio con 1.111 dias activos (desde 2019), staleDays 0.*
+
+🚨 **TRAMPA MEDIDA: `status:"ACTIVE"` MIENTE SOLO.** La propia API lo declara — un anuncio pasa a
+`INACTIVE` **solo tras 60 dias sin verse**. Pedir `ACTIVE` a secas trae anuncios que nadie ve hace
+semanas, y el estudio concluye que un competidor "sigue pautando" cuando ya se apago.
+**`maxStaleDays: 7` SIEMPRE junto a `status:"ACTIVE"`.** Es la diferencia entre *estaba* y *esta*.
+
+⚠️ **`q` es texto libre** sobre titulo, descripcion y anunciante: buscar "colageno" trajo serums y
+centros de estetica. Aplica la Regla Cero — el dato responde a lo que pedi? — y descarta a mano lo
+que no sea del nicho ANTES de citarlo.
+
+| Necesidad del estudio | Llamada | Que aporta |
+|---|---|---|
+| Con que esta construido el competidor | `store_tech_report` (por dominio, sin UUID) | tema, apps (Releasit = COD), pixeles, redes |
+| Tamano APROXIMADO del competidor | `get_store` · `get_store_revenue_history` | ⚠️ **estimacion vieja** (fuente retirada 2026-07-02, trampa 8): sirve para ordenar, NO para citar como cifra |
+| Si el producto sube o baja | `get_product_history` → **depurado con `ventas_reales.py`, nunca crudo** | precio, stock y unidades por dia; crudo mete ajustes de inventario y dias rellenos con cero |
+| Creativos del competidor | `get_ad_creatives` · `list_store_ads` | piezas para el teardown |
+| Ficha comercial de una tienda | `brief_store` | ingresos + ads + top productos en una llamada |
+
+🟢 **Respeta la REGLA 12 sola**: cuando no tiene redes capturadas responde *"NO significa que la
+tienda no las tenga; no las hemos inspeccionado — no reportes su ausencia como hallazgo"*.
+**Un cero suyo tampoco se cree**, se prueba.
+
+**Frontera (G6.4):** aquí DropKiller estudia un producto que YA se eligió: sus ventas reales
+(§1.3.bis), sus anuncios y el stack de quien lo vende. La hermana
+`golden-dropkiller-productos-ganadores` hace dos cosas distintas: **CAZA** (encontrar productos que
+no se conocen) y **VALIDAR** (su paso 1b: rúbrica y PVP mínimo de un producto conocido). El PVP
+mínimo y la cuenta COD **siempre** salen de ella: aquí se citan, no se recalculan.
+
+### Vias de respaldo (si DropKiller no responde, se DECLARA y se baja a estas)
 - **Meta Ad Library**: `https://www.facebook.com/ads/library/?active_status=active&ad_type=all&country=<PAÍS>&q=<producto>`
   → mensajes, ofertas, formatos, **cuánto llevan activos** (los que no se apagan, convierten).
 - **Google · Centro de Transparencia** (la tercera biblioteca, y la que casi nadie mira):

@@ -1,9 +1,196 @@
 # Changelog — GOLDEN INVESTIGACIÓN DE MERCADO
 
 ## Índice (orden cronológico DESCENDENTE — más reciente arriba)
-G5.21.1 · G5.21 · G5.20 · G5.19 · G5.18 · G5.17 · G5.16 · G5.15 · G5.14 · G5.13 · G5.12 · G5.11 · G5.10 · G5.9 · G5.8.1 · G5.8 · G5.7 · G5.6 · G5.5 · G5.4 · G5.3 · G5.2 · G5.1 · G5.0 · G4.3
+G6.4 · G6.3 · G6.2 · G6.1 · G5.21.2 · G5.21.1 · G5.21 · G5.20 · G5.19 · G5.18 · G5.17 · G5.16 · G5.15 · G5.14 · G5.13 · G5.12 · G5.11 · G5.10 · G5.9 · G5.8.1 · G5.8 · G5.7 · G5.6 · G5.5 · G5.4 · G5.3 · G5.2 · G5.1 · G5.0 · G4.3
 · G4.2.1 · G4.2 · G4.1 · G4.0 · G3.10 · G3.9 · G3.8 · G3.7 · G3.6 · G3.5 · G3.4 · G3.3 · G3.2 · G3.1
 · G3.0 · G2.5 · G2.4 · G2.3 · G2.2 · G2.1 · G2.0 · G1.0
+
+## G6.4 — 2026-10-02 — El verificador desmiente dos cosas que esta skill afirmaba
+
+Encargo del Centro de Mando tras correr `golden-verificador` sobre las dos skills de DropKiller
+(informe: `STACK-GOLDEN/AUDITORIAS-SKILLS/2026-10-02-VERIFICADOR-DROPKILLER-EN-DOS-SKILLS.md`).
+Me tocaban los fallos 2, 3, 4, 9, 10, 11 y 12 mas sus mejorables.
+
+### Lo mas importante: dos afirmaciones PROPIAS que eran falsas
+1. **"Un anuncio que lleva anos activo es un angulo validado por gasto real"** — escrito por mi en
+   la G6.1 y repetido en cuatro sitios. **Falso.** `activeDays` es *exactamente* `endDate - startDate`:
+   fechas DECLARADAS, no dias observados, y avanza solo (el mismo anuncio declaraba 11 dias el 18-sep
+   y 16 el 23-sep sin que nadie lo viera). Medido sobre 80 anuncios: 17 declaran mas de 7 dias por
+   encima de lo observado, el peor **466 declarados contra 105 vistos**, y uno declara 81 dias **con
+   una sola observacion**. Ahora manda la **ventana observada** (`firstSeenAt`..`lastSeenActiveAt`) y
+   se citan los dos: *"declara N dias, observado M"*. Con el error simetrico escrito al lado: 74 de
+   80 empezaron antes de que la herramienta mirara, asi que esa ventana es un **PISO**, y castigar
+   por ella sin decirlo seria el mismo fallo al reves.
+2. **"El tamano del competidor se mide con `get_store_revenue_history`"** — tambien mio. Los
+   ordenamientos por ingresos y visitas **fueron retirados del conector el 2026-07-02 por fuente
+   desactualizada**, y el canal oficial los llama "estimaciones, no 100 % reales". Sirven para
+   ORDENAR por tamano aproximado; jamas para escribir una cifra de facturacion. `billing` de producto
+   tampoco es facturacion: es precio de proveedor x unidades. El tamano real se infiere de lo que si
+   se mide: unidades vendidas (§1.3.bis, COMPRA) y anuncios con ventana observada (§1.7, GASTO).
+
+### El ejemplo de la G6.3 no era el universo (fallo 10, del CdM, remedido por el CdM)
+La receta de §1.3.bis usaba **solo `semantic_search_products`** y presentaba sus 40 fichas como el
+mercado. **40 es su TOPE por defecto**, y desde este cliente MCP **no se puede subir `limit`**: el
+conector lo recibe como TEXTO y lo rechaza (medido dos veces, con 10 y con 100). Remedicion real:
+`search_products` por palabra clave paginado hasta `hasNext:false` dio 194 filas en 4 paginas, y
+**las 40 semanticas y las 194 por palabra clave comparten UN solo id**. La union consolidada:
+**234 filas → 81 ids → 3 fuera por nombre, 151 espejos, 80 unicas, 30 proveedores, 72.946 unidades,
+QUEMADO**, cuadre cerrado, con el listado que la empresa ya vendia en primer lugar. La medicion
+vieja (20.254 u., 10 proveedores) veia el **28 %** del mercado.
+→ Paso 1 reescrito a dos busquedas: **1a palabra clave PAGINADA (la que mide) + 1b semantica (la que
+encuentra, por nombre o por imagen)**. Y regla nueva: **todo conteo dice si quedo CERRADO
+(`hasNext:false`) o ABIERTO** (tope o terminos sin correr); los abiertos se escriben `N+` y una
+columna con `N+` **no se ordena**, porque los abiertos no son comparables entre si.
+
+### Lo demas
+- **Fase 3** gana la fila **plataformas de DROPSHIPPING = COMPRA** delante de la de ads, con su
+  limite escrito (DropKiller indexa plataformas de dropshipping: **no** es "el mercado total", no
+  cubre Shopify propias, MercadoLibre ni tiendas fisicas). Linea 98 corregida.
+- **Frontera con la hermana (fallo 9):** `golden-dropkiller-productos-ganadores` tiene **CAZA** y
+  **VALIDAR** (su paso 1b). Con "valida este producto": veredicto rapido y PVP minimo son de ella;
+  el ESTUDIO completo es de esta skill, que para la parte de mercado llama a sus scripts sin
+  duplicarlos. El PVP minimo y la cuenta COD **siempre** se citan de ella, no se recalculan aqui.
+- **`get_product_history` nunca crudo** (fallo 12): siempre depurado con `ventas_reales.py`, porque
+  crudo cuenta ajustes de inventario como ventas y rellena con ceros los dias sin lectura.
+- **Expediente**: bloque `mercado_dropkiller` (fecha, pais, terminos, `conteo_cerrado`, unidades
+  depuradas y reportadas, unicas, proveedores, etapa, confianza, fuente) con su regla 0.bis.
+- Indice del changelog con **G5.21.2** (fallo 11), README-COMUNIDAD con la fila de 1.3.bis, entrega
+  de los 5 datos con **nivel de evidencia y marca de cierre**, lista de archivos y Paso 4 del forense
+  (la existencia en el mercado no se agota con quien lo ANUNCIA: decide quien lo VENDE y cuanto).
+
+### Como se aplico, y un fallo propio del parche
+25 cambios, cada uno con **assert de ancla presente y de ancla unica**, y **escritura atomica**:
+valida las 25 en memoria y solo entonces escribe. Probado sobre copia nombrada igual que la skill,
+en los tres sentidos: aplica 25/25 · al repetirse **revienta** por ancla ausente · rechaza una
+carpeta con otro nombre. En la primera corrida el parche **se nego a escribir** porque yo habia
+declarado `== 20` cambios y eran 25: conte mal los mios. Con una guarda blanda habria aplicado 25
+reportando 20 y nadie lo nota — es el "verde barato" de siempre, cazado por el assert.
+
+**Via de aplicacion:** el CdM pidio construir el parche y aplicarlo el. Su sesion no acepto el
+mensaje (expiro sin aprobacion), y dejar vivas dos afirmaciones medidas como falsas era peor que
+aplicarlo yo, que soy la fabrica de esta skill. El parche queda en el scratchpad de la sesion y el
+aviso, en `STACK-GOLDEN/AUDITORIAS-SKILLS/G6.4-APLICADA-POR-LA-FABRICA.md`. Doble aplicacion es
+segura: el assert revienta en vez de corromper.
+
+**Pendientes declarados (NO verificados por mi):** las "80 unicas" se apoyan en la remedicion del
+CdM, no en una medicion mia; no repeti la corrida con `imageUrl` del listado conocido ni mire las
+fotos de las unicas. El mercado sigue **ABIERTO** para otros terminos.
+
+## G6.3 — 2026-10-02 — DropKiller mide las VENTAS del producto que ya conoces
+
+FER: *"una cosa es que me busque los productos sin yo saber cuáles y otra cosa es el estudio de
+mercado de un producto que ya conozco; tiene que ir DropKiller en las dos skills, y en la
+investigación de mercado tiene que ser una opción de su búsqueda."*
+
+**El hueco, medido antes de tocar nada:** desde la G6.1 DropKiller estaba aquí solo para ANUNCIOS y
+TIENDAS (`search_ads`, `store_tech_report`, `get_store_revenue_history`). Nunca se buscaba el producto
+mismo, y la frontera de §1.7 lo prohibía de forma explícita ("para CAZAR manda la hermana"). Así,
+el dato más fuerte de la regla 15 (COMPRA: unidades vendidas) no entraba al estudio, y la demanda se
+sostenía con anuncios (GASTO).
+
+**Ejecutado antes de escribir:** `semantic_search_products` en Colombia con un producto real ya
+conocido → 40 fichas; `consolidar_mercado.py` de la hermana → 12 únicas, 22 espejos, 10 proveedores,
+20.254 unidades, QUEMADO, cuadre cerrado; `ventas_reales.py` sobre el líder → 8.570 reportadas,
+6.966 reales, pico recortado, tendencia "frenando". Primer intento fallido y anotado: `limit` pasado
+como texto da error de validación.
+
+**Dónde quedó:** §1.3.bis nueva (receta de 4 pasos, cuándo se usa, qué alimenta, trampas) · §1.3
+deja de mandar a "Ad Library + TikTok" para validar · frontera de §1.7 reescrita (estudiar un
+producto elegido es de aquí; buscar los que no se conocen es de la hermana) · documento maestro §3
+con la casilla de ventas reales · tabla de apoyos de `reglas-de-oro.md` · SKILL.md (requisitos,
+herramientas, Fase 1). Los scripts NO se copian: se llaman desde la hermana, para que haya un solo
+dueño del cálculo. Sin la hermana, la receta dice qué leer a mano y qué declarar.
+
+**Gemela en la hermana:** `golden-dropkiller-productos-ganadores` GPG1.28, cuyo modo VALIDAR (un
+producto concreto) tampoco usaba estos datos de DropKiller.
+
+## G6.2 — 2026-09-28 — Canales que no usamos, y la jerarquia COMPRA > GASTO > OPINION
+
+FER, sobre si Kalodata (analitica de TikTok Shop) le sirve: *"No se trata de que yo vaya a vender en
+esos canales. Se trata de que la investigacion de mercado puede traerme informacion de esos canales
+para yo adaptarlos a mi ecosistema."*
+
+**Mi primera respuesta fue floja** y el encuadre de FER la corrigio: yo evalue la herramienta como
+CANAL DE VENTA ("no vendes ahi, no te sirve") cuando la pregunta era por la herramienta como FUENTE
+DE INTELIGENCIA. Son dos preguntas distintas y la segunda tiene otra respuesta.
+
+**El hueco, medido con grep antes de tocar nada:** 0 hits de "mide compra"/"mide gasto"/"GMV" y 0 de
+"canales donde no vendemos"/"TikTok Shop". La Fase 3 mapeaba **paises** (3.1) y daba por visto el
+mercado; no mapeaba **canales**, y cada canal deja un rastro distinto.
+
+### Lo que se hornea
+- **§3.1.bis MAPA DE CANALES** — tabla de 5 canales con que mide cada uno, que se roba y que NO se
+  transfiere, mas la **regla de traduccion**: cruzan el angulo, el hook, la demo, la objecion y la
+  ESTRUCTURA de oferta; **no cruzan nunca el precio ni el volumen** (el GMV de EE.UU. mide interes en
+  el producto, no el tamano del mercado propio — es el mismo error que leer la demografia de una
+  cuenta de ads como "quien compra", 1.5.bis). Mercados adelantados: EE.UU. y Mexico van meses por
+  delante de LatAm COD, y esa ventaja se cierra sola, asi que el dato va con fecha (regla 13).
+- **Regla 15 · COMPRA > GASTO > OPINION.** (1) COMPRA: unidades vendidas, resenas verificadas,
+  pedidos reales — alguien puso su plata. (2) GASTO: anuncios que llevan meses corriendo — fuerte,
+  pero es la decision del VENDEDOR. (3) OPINION: comentarios y foros — sirven para el LENGUAJE y las
+  objeciones, jamas como prueba de demanda. Un angulo con 1 y 2 esta doblemente validado; **mucho
+  gasto con poca venta significa problema de oferta o de producto, no de trafico**, y eso cambia el
+  veredicto de viabilidad.
+- **Documento maestro §10**: cada dato de viabilidad se rotula con su nivel. *Una demanda sostenida
+  solo por "opinion" no es demanda: es interes.*
+
+### Sobre Kalodata, dicho con honestidad
+No se recomienda ni se descarta: **no se ha medido** (no hay cuenta). Lo que si se midio es la
+superposicion — DropKiller trae capa de TikTok Shop pero **somera**: "colageno" devolvio 15
+productos, todos de EE.UU., con raspado de hasta dos meses atras. Lo que ninguna otra fuente de la
+casa da hoy, y por eso el canal entra al mapa: **TikTok Shop atribuye la venta AL VIDEO** — no al
+anuncio que corrio, sino a la pieza que convirtio. Para COD, que vive de creativos, ese es el dato.
+La decision de pagar por profundidad extra queda del dueno, con el dato de superposicion delante.
+
+## G6.1 — 2026-09-28 — DropKiller deja de ser un nombre y pasa a ser una FUENTE
+
+FER: *"estoy muy enfocado con la herramienta DropKiller... incluyela dentro de las herramientas que
+nos van a ayudar a ese estudio profundo de mercado. Ya la tenias presente o esa instruccion es
+nueva?"*
+
+**Respuesta medida antes de contestar:** `grep` dio 6 apariciones de "dropkiller" en la skill —
+**todas eran el NOMBRE de la hermana renombrada** (`golden-dropkiller-productos-ganadores`). El
+nombre habia viajado con el renombre; la HERRAMIENTA no estaba. Instruccion nueva, implementada.
+
+**Ejecutado antes de escribir** (no se documenta lo que no se ha corrido): `whoami` -> cuenta
+ADVANCED con MCP habilitado · `store_tech_report("goldengroupenterprise.co")` -> tema Dawn, Releasit
+COD, pixel Meta y GA reales · `search_ads` en Colombia -> anuncios con `activeDays` de hasta **1.111
+dias** (desde 2019) y `staleDays 0`.
+
+### La trampa que justifica todo lo demas
+La propia API declara que **un anuncio solo pasa a `INACTIVE` tras 60 dias sin verse**. Pedir
+`status:"ACTIVE"` a secas devuelve anuncios que nadie ve hace semanas: el estudio concluiria que un
+competidor "sigue pautando" cuando ya se apago. **`maxStaleDays: 7` es obligatorio junto a
+`status:"ACTIVE"`** — es la diferencia entre *estaba activo* y *esta activo*.
+Segunda trampa medida: **`q` es texto libre** (buscar "colageno" trajo serums y centros de estetica)
+-> se aplica la Regla Cero y se descarta a mano lo que no sea del nicho antes de citarlo.
+
+### Donde quedo cableado
+- **§1.7** — receta completa, trampas y tabla de las 5 vistas (`store_tech_report`, `get_store`,
+  `get_store_revenue_history`, `get_product_history`, `get_ad_creatives`, `brief_store`). La Ad
+  Library publica baja a **via de respaldo**, porque no da dias activos.
+- **§1.4** — el TAMANO del competidor se mide (ingresos, visitas, conversion), no se intuye.
+- **Fase 3**: §3.3 autopsia de pagina (stack por dominio en una llamada; Releasit = COD confirmado),
+  §3.4 inventario de creativos (piezas descargables ordenadas por dias al aire), §3.6 fuentes de
+  angulos (evergreen = angulos pagados durante meses o anos).
+- **Tabla de apoyos** de `reglas-de-oro.md` y **seccion 8** del documento maestro, que ahora exige
+  los **dias activos** de cada anuncio citado y su `landingUrl` (dice si el competidor cierra por
+  WhatsApp o por landing).
+
+**Frontera respetada:** aqui DropKiller sirve para ENTENDER el mercado. Cazar producto y calcular el
+PVP minimo sigue siendo de `golden-dropkiller-productos-ganadores`.
+
+### Fallo propio de esta ronda, anotado porque es una CLASE
+El primer script de integracion uso como guarda de idempotencia *"la primera linea del reemplazo ya
+esta en el archivo"*. En 6 de 8 bloques esa primera linea **era la del ancla**, asi que la guarda
+dijo "ya aplicado" y **no escribio nada** — reportando exito. Es un **verde barato**: fallo hacia el
+si. Se corrigio con un **centinela unico por bloque** (una frase que solo existe en el texto nuevo)
+y con **relectura del disco tras cada escritura**. Sin esa verificacion, esta entrada estaria
+mintiendo. Regla para la casa: *una guarda de idempotencia no se compara contra el ancla; se compara
+contra algo que solo exista si el cambio entro.*
+
+Dato de entorno: el sandbox **deniega escribir en `~/.claude/skills`** (muro distinto del `uchg`);
+la integracion se aplico fuera del sandbox tras el backup.
 
 ## G5.21.2 — 2026-09-27 · Ley de los requisitos del usuario (aplicó el CENTRO DE MANDO)
 

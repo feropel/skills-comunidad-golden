@@ -143,7 +143,9 @@ página web.
 
 - Quién más lo vende en el país y a qué precio
 - Con qué ángulo lo venden (eso marca el hueco por donde diferenciarse)
-- Qué anuncios tiene activos el nicho (Ad Library) y con qué nivel de producción
+- Qué anuncios tiene activos el nicho (Ad Library, y **DropKiller §1.7** con la ventana observada)
+- **Cuánto vende de verdad y cuántos lo surten**: `§1.3.bis` (nivel COMPRA). La existencia en el
+  mercado no se agota con quién lo anuncia: lo que decide es quién lo VENDE y cuánto.
 - Si hay reseñas reales, guardar citas textuales con su URL (insumo de la Fase 1)
 
 ## Paso 5 · Compuerta de realidad

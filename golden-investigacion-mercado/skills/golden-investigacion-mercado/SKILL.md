@@ -19,7 +19,8 @@ description: >-
 
 # Golden Group — Investigación de Mercado PURA (`golden-investigacion-mercado`)
 
-<!-- GIM_VERSION: G5.21.1 — 2026-09-24 — CENTRO DE MANDO: candado_scraping.py CHECK 4 compara sin tildes (antes descartaba "PEPTÉA Sérum" pedido como "PEPTEA serum"); plegado SOLO en la comparación, con --autoprueba dentro del script (5 casos, control negativo) y línea base de 0 cambios en 70 veredictos reales. Los 11 fallos del verificador sobre G5.21 siguen abiertos para la pasada única. Acta en references/changelog.md. -->
+<!-- GIM_VERSION: G6.4 — 2026-10-02 — Parche del verificador (fallos 2,3,4,9,10,11,12 + mejorables). Corrige DOS afirmaciones falsas que esta skill daba por buenas: activeDays NO prueba gasto sostenido (es endDate-startDate DECLARADO, avanza solo; vale la ventana observada, y es un piso) y los INGRESOS de tienda de DropKiller no son dato (fuente retirada 2026-07-02). Ademas: el mercado se mide con busqueda por PALABRA CLAVE PAGINADA hasta hasNext:false unida con la semantica (que topa en 40 y no deja subir limit desde este cliente MCP); todo conteo declara CERRADO o ABIERTO; fase 3 gana la fila de plataformas de dropshipping como COMPRA; frontera con la hermana (CAZA y VALIDAR); expediente con bloque mercado_dropkiller. 25 cambios anclados con assert y escritura atomica. Acta en changelog. -->
+<!-- GIM_VERSION: G6.2 — 2026-09-28 — Hueco destapado por FER: la skill mapeaba PAISES pero no CANALES, y no distinguia fuentes que miden COMPRA de las que miden GASTO (0 hits de ambas). Nuevo §3.1.bis MAPA DE CANALES (incluidos los que no usamos) + regla 15 COMPRA > GASTO > OPINION + el veredicto de viabilidad rotula el nivel de evidencia de cada dato. Acta en references/changelog.md. -->
 <!-- GIM_VERSION: G5.21 — 2026-09-22 — Ampliación de FER horneada por el CENTRO DE MANDO (dueño por ley: esta skill no tiene fábrica declarada). Entra la FASE 3.5 · LOS ÁNGULOS: de 3 a 10 ángulos con 2 creativos cada uno, investigación GLOBAL para replicar el ángulo que vende en otro país, fuentes ampliadas (Alibaba, Temu) y el criterio de LIKES como validación social del comentario, y comparación de motores sin límite de crédito. Detalle operativo en references/03-mercado-en-vivo.md §3.6. Acta en references/changelog.md. -->
 <!-- GIM_VERSION: G5.20 — 2026-09-20 — Auditoría golden-skill-auditor: blindaje PARCIAL (20/21 nodos con uchg, `scripts/fuentes_baseline.json` sin flag) re-blindado a 21/21. Las tres referencias reportadas como rotas (estructura-campanas.md, estructura-reporte.md, copies-cumplimiento.md) NO existen en ninguna cita viva de esta skill hoy — verificado con grep -r sobre el árbol completo, cero coincidencias; el hallazgo era de una corrida anterior a que el pipeline se rearquitecturara (G2.2 en adelante) y ya no aplica. Acta completa en references/changelog.md. -->
 
@@ -44,6 +45,7 @@ El estudio sale de fuentes reales. Casi todo es **degradable** (regla 5: el estu
 | **ffmpeg** | Degradable | Transcribir la locución y ampliar la etiqueta desde el video del cliente | `brew install ffmpeg` |
 | **whisper-cpp** con el modelo `ggml-small.bin` | Degradable | Transcribir la locución de los 3 a 5 videos top | `brew install whisper-cpp`. El modelo: mira si ya está en `~/.cache/hyperframes/whisper/models/`; si no, de huggingface.co/ggerganov/whisper.cpp |
 | **Python 3 con Pillow** | Degradable | Ampliar la etiqueta en los fotogramas (`scripts/etiqueta_desde_video.py`) | `python3 -c "import PIL"`; si falta, `pip3 install Pillow` (python.org) o `brew install pillow` (Homebrew) |
+| *Opcional:* tu cuenta de **DropKiller** con su conector (MCP), y la skill **`golden-dropkiller-productos-ganadores`** | Degradable | Las VENTAS REALES del producto: cuánto vende, cuántos lo venden, en qué etapa está, y los días al aire de cada anuncio | La cuenta en DropKiller conectada a Claude; la skill, entre tus skills. Sin la skill se leen los números a mano y se declara "sin depurar ventas fantasma"; sin la cuenta, la demanda queda en anuncios y opinión, rotulada |
 | *Opcional:* la **conexión de Meta** | Degradable | La biblioteca de anuncios de Meta por MCP | Tu cuenta de Meta conectada a Claude |
 | *Opcional:* tus cuentas de **Ecom Magic** y **Higgsfield** | Degradable | La Fase 3.5, que compara motores de imagen para cada ángulo | Las tuyas, con créditos, conectadas a Claude |
 
@@ -108,8 +110,18 @@ quemados van una palabra por fotograma · **LAS 3 BIBLIOTECAS DE ANUNCIOS** (no 
 **Google · Centro de Transparencia por su RPC interno, gratis y con el país como NÚMERO** (la vía al
 barrido mundial) · TikTok Creative Center — y ojo: la Ad Library de TikTok **solo cubre Europa**, un
 cero ahí es *el dato no existe*. Recetas en `references/scraping-firecrawl.md` ·
+🥇 **MCP `DropKiller`** — dos usos. **(1) El producto:** sus ventas REALES, cuántos lo venden y su
+etapa (`semantic_search_products` → `consolidar_mercado.py` y `ventas_reales.py` de la hermana;
+receta en `references/01-investigacion-360.md` §1.3.bis). **(2) Los anuncios:** `search_ads` da los **dias que lleva corriendo**
+cada anuncio — pero `activeDays` es **DECLARADO** (`endDate - startDate`, avanza solo): la prueba es la
+**ventana observada** `firstSeenAt`..`lastSeenActiveAt`, que ademas es un PISO; se citan los dos,
+*"declara N, observado M"* (trampa del zombi). Tambien copy verbatim, landing y creativos.
+`store_tech_report` da el stack; **los INGRESOS de tienda NO son dato** (fuente retirada por
+desactualizada: estimacion vieja, se rotula o no se usa). 🚨 **`status:"ACTIVE"` miente solo**
+(un anuncio tarda 60 dias en marcarse inactivo): va SIEMPRE con `maxStaleDays:7`. Receta y trampas:
+`references/01-investigacion-360.md` §1.7 ·
 Google Maps/Trends · skill `docx` (Fase 2) · `golden-dropkiller-productos-ganadores`
-(validar demanda) · `golden-meta-ads-analysis` / `golden-dropi-analisis` (si hay pauta/pedidos
+(sus scripts depuran las ventas; para BUSCAR productos que no conoces, se usa esa skill entera) · `golden-meta-ads-analysis` / `golden-dropi-analisis` (si hay pauta/pedidos
 previos) · `golden-archivos` (inventario) · 🔬 **`scripts/etiqueta_desde_video.py`** (fotogramas del video del
 cliente ampliados para LEER la etiqueta — ffmpeg + Pillow, probado). Si falta una: dilo, marca
 `[PARCIAL]` y sigue.
@@ -139,6 +151,9 @@ cuando existe; la demografía de una cuenta de ads está **contaminada por su se
 ## FASE 1 · Investigación 360 → `references/01-investigacion-360.md`
 - **Datos duros**: negocio, producto, mercado/tamaño, **competidores (3–7)** con tabla, **voz del
   cliente** con citas, precios, **anuncios activos** del nicho. Con fuente.
+- **Ventas REALES en DropKiller** (§1.3.bis), opción de búsqueda que se corre siempre que el producto
+  se venda por dropshipping en un país indexado: unidades depuradas, proveedores, etapa y tendencia.
+  Es la prueba de demanda más fuerte (COMPRA, regla 15); si no se pudo medir, se declara.
 - **MINERÍA DE COMENTARIOS multi-idioma** (sección 1.6): **YouTube** del producto exacto/similar y
   sus comentarios (necesidades, quejas, lo bueno/lo malo, preguntas = FAQ real; títulos con más
   vistas = hooks YA validados) · **TikTok** (top + comentarios + creadores) · IG/FB (comentarios de
@@ -200,8 +215,11 @@ Word REAL (skill `docx` / python-docx), accionable y citado; `.md` espejo opcion
 
 ## 🎯 ENTREGA FINAL · Los 5 DATOS DE VIABILIDAD
 Con evidencia, para que el dueño (o `golden360` en su Compuerta 1) decida si el producto VIVE
-o SE MATA antes de gastar: 1) **Demanda** comprobada · 2) **Saturación** (cuántos pautan y con qué
-producción) · 3) **Proveedor** (costo real, stock) · 4) **Margen** vs CPA del nicho · 5) **Riesgo
+o SE MATA antes de gastar: 1) **Demanda** comprobada **con su NIVEL** (COMPRA = unidades vendidas
+depuradas de §1.3.bis · GASTO = anuncios con ventana observada · OPINIÓN = comentarios; regla 15),
+y diciendo si el conteo quedó CERRADO o ABIERTO · 2) **Saturación** (cuántos pautan y con qué
+producción; **con la etapa y los proveedores activos de §1.3.bis**) · 3) **Proveedor** (costo real,
+stock) · 4) **Margen** vs CPA del nicho · 5) **Riesgo
 regulatorio** (INVIMA/ISP/etc.). + Recomendación honesta: lanzar / lanzar con condiciones / matar.
 
 **Paquete de salida:** `PRODUCTO.json` + `00-ESTUDIO-...docx` (+ .md espejo) + dossier + datos de
@@ -232,7 +250,7 @@ a propósito — su propio script lo regraba; si se blinda, la suite de fuentes 
 - `references/reglas-de-oro.md` — anti-invención + fuentes + compliance + nunca-parar. **LEER SIEMPRE.**
 - `references/producto-json.md` — **el expediente** (esta skill es dueña del esquema).
 - `references/00-identificacion-forense.md` — Fase -1: de la foto al INCI y la existencia real.
-- `references/01-investigacion-360.md` — datos duros + minería de comentarios (1.6).
+- `references/01-investigacion-360.md` — datos duros · **mercado real en DropKiller (1.3.bis)** · minería de comentarios (1.6) · anuncios del nicho (1.7).
 - `references/dossier-psicologico.md` — las 30 capas.
 - `references/02-documento-maestro.md` — estructura del Word.
 - `references/03-mercado-en-vivo.md` — **países, oferta y combos, autopsia de página, creativos, LOS HUECOS

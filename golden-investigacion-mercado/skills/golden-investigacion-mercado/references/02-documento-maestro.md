@@ -27,6 +27,9 @@ PORTADA — Producto · País · Fecha · "Golden Group — Estudio de Mercado 3
 
 3. MERCADO Y DEMANDA
    - Tamaño/tendencia, estacionalidad, validación como ganador, saturación. (con fuentes)
+   - **VENTAS REALES EN DROPKILLER** (§1.3.bis, con fecha): unidades depuradas contra reportadas,
+     veredicto REAL/DUDOSO/FANTASMA, tendencia, proveedores activos y ETAPA del mercado. Rotulado
+     "mercado de dropshipping". Si no se pudo medir, se dice y la demanda baja de nivel (regla 15).
 
 4. BUYER PERSONAS (2–3)
    - Demográfico (estimado), antes/después, dolores, deseos, objeciones, frases textuales.
@@ -46,6 +49,12 @@ PORTADA — Producto · País · Fecha · "Golden Group — Estudio de Mercado 3
    - Canales, contenido que resuena, preguntas/objeciones frecuentes, UGC del nicho.
 
 8. INTELIGENCIA DE ANUNCIOS
+   - **DIAS DECLARADOS *y* VENTANA OBSERVADA de cada anuncio citado** (DropKiller), en ese formato:
+     *"declara N dias, observado M"*. `activeDays` solo es `endDate - startDate` declarado y avanza
+     sin que nadie vea el anuncio (trampa del zombi, §1.7); la ventana observada es un PISO porque
+     casi todos empezaron antes de que la herramienta mirara. **Un numero suelto de los dos miente.**
+     Incluir `landingUrl` (dice si el competidor cierra por WhatsApp o por landing) y la fecha de
+     consulta (regla 13). Nivel de evidencia: GASTO declarado, nunca COMPRA.
    - Qué anuncian negocio y competidores (Meta + TikTok), ángulos dominantes, ofertas, formatos.
 
 8.bis MERCADO EN VIVO (Fase 3 — ver `03-mercado-en-vivo.md`)
@@ -62,6 +71,8 @@ PORTADA — Producto · País · Fecha · "Golden Group — Estudio de Mercado 3
    - Mapa de ángulos (5–8), objeciones + rebatidos, diferenciales priorizados, oferta/ancla.
 
 10. VIABILIDAD Y VEREDICTO (el cierre del estudio)
+   - **Cada dato rotulado con su NIVEL de evidencia** (COMPRA / GASTO / OPINION — regla 15). Una
+     demanda sostenida solo por "opinion" no es demanda: es interes.
    - Los 5 datos con evidencia: demanda · saturación · proveedor (costo real, stock) · margen vs
      CPA del nicho · riesgo regulatorio.
    - VEREDICTO honesto: LANZAR / LANZAR CON CONDICIONES (cuáles) / MATAR (por qué).

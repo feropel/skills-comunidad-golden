@@ -11,6 +11,7 @@ Arranca incluso de **una sola foto**. No construye ni pauta — para el lanzamie
 | 0 Intake | 6 campos (país, forma→verbo, pago, vertical) + los 4 números de negocio → **breakeven** |
 | 0.5 Reconocimiento | Qué ya existe: ficha, pauta previa, **pedidos reales** (fuente reina), archivos |
 | 1 Investigación 360 | Competidores, voz del cliente con citas, **minería de comentarios multi-idioma** (YouTube/TikTok/IG/FB/Reddit/Amazon/AliExpress), anuncios activos + **dossier psicológico de 30 capas** |
+| 1.3.bis Mercado real | **DropKiller**: unidades vendidas depuradas, proveedores activos y etapa del producto — evidencia de nivel COMPRA, no de anuncios |
 | 2 Documento | **Word (.docx) real**, citado |
 | 🎯 Entrega | Los **5 datos de viabilidad** (demanda, saturación, proveedor, margen, riesgo) + recomendación honesta: lanzar / condicionar / matar |
 

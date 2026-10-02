@@ -41,7 +41,11 @@ La ejecución — página, creativos, pauta, bot, montaje — vive en `golden360
 ## 3. Apoyos de investigación (leídos EN VIVO, última versión)
 | Necesidad | Apoyo | Si falta |
 |---|---|---|
-| Validar demanda | `golden-dropkiller-productos-ganadores` | Ad Library + TikTok Creative Center a mano |
+| Validar demanda | 🥇 MCP **DropKiller**: ventas REALES del producto y su mercado consolidado, con los scripts `consolidar_mercado.py` y `ventas_reales.py` de `golden-dropkiller-productos-ganadores` (receta en `01-investigacion-360.md` §1.3.bis) | Ad Library + TikTok Creative Center a mano, y se declara que la demanda es GASTO, no COMPRA |
+| **Anuncios del nicho CON HISTORIA** | 🥇 MCP **DropKiller** `search_ads` (dias activos, copy verbatim, landing, creativos) — receta y trampas en `01-investigacion-360.md` §1.7 | Ad Library publica (sin dias activos) |
+| **Stack del competidor** (dato duro) | 🥇 DropKiller `store_tech_report` | leer el HTML a mano |
+| Tamano APROXIMADO del competidor | `get_store` · `get_store_revenue_history` ⚠️ **estimacion vieja, trampa 8**: ordena, no se cita como cifra | inferirlo de unidades vendidas (§1.3.bis) |
+| **Historia de precio y ventas** | 🥇 DropKiller `get_product_history` → **SIEMPRE depurado con `ventas_reales.py`**, nunca crudo: cuenta ajustes de inventario como ventas (venta fantasma) y rellena los dias sin lectura con ceros | pedir capturas al dueno |
 | Pauta previa del dueño | `golden-meta-ads-analysis` | leer el export a mano, marcar `(estimado)` |
 | Pedidos reales (COD) | `golden-dropi-analisis` | pedir el export y leerlo directo |
 | Inventario de archivos | `golden-archivos` | listar la carpeta a mano |
@@ -217,3 +221,17 @@ El `description` del frontmatter es lo ÚNICO que decide si la skill se activa. 
   cuerpo. Verificación: `python3 -c "print(len(open('SKILL.md').read().split('---')[1]))"` o el
   inventario del auditor, que ya reporta el conteo real.
 
+## 15. 🚨 COMPRA > GASTO > OPINION — la jerarquia de la evidencia (FER, 28-sep-2026)
+No toda fuente pesa igual, y mezclarlas sin decirlo infla la confianza del estudio.
+1. **COMPRA** (unidades vendidas, resenas verificadas, pedidos reales del dueno): alguien puso su
+   plata. Es el dato mas fuerte que existe.
+2. **GASTO** (anuncios que llevan meses o anos corriendo): alguien apuesta su presupuesto de forma
+   sostenida. Fuerte, pero es la decision del VENDEDOR, no la del comprador.
+3. **OPINION** (comentarios, foros, encuestas, nuestra inferencia): util para el LENGUAJE y las
+   objeciones; jamas como prueba de demanda.
+- Cada afirmacion del estudio se rotula con su nivel. **Un angulo respaldado por 1 y 2 a la vez esta
+  doblemente validado**; si 2 es alto y 1 es bajo (mucho gasto, poca venta), el problema es de oferta
+  o de producto, no de trafico — y eso cambia el veredicto de viabilidad.
+- **Se investigan tambien los canales donde NO vendemos** (TikTok Shop, Amazon, marketplaces): no
+  para vender ahi, sino porque dejan rastro de COMPRA que ningun canal propio deja. Detalle y regla
+  de traduccion (que cruza y que no) en `03-mercado-en-vivo.md` §3.1.bis.

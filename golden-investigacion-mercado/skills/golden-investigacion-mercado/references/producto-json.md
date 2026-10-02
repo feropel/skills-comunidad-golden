@@ -25,6 +25,12 @@ fuente**, y la incoherencia se vuelve visible en el momento, no al final.
     "registro_sanitario": "", "foto_etiqueta": ""
   },
   "claims": { "permitidos": [], "prohibidos": [], "no_verificables": [] },
+  "mercado_dropkiller": {
+    "fecha_medicion": "", "pais": "", "terminos_buscados": [],
+    "conteo_cerrado": false, "unidades_depuradas": null, "unidades_reportadas": null,
+    "fichas_unicas": null, "proveedores_activos": null, "etapa": "",
+    "confianza_ventas": "", "fuente": "plataformas de dropshipping (no es el mercado total)"
+  },
   "negocio": {
     "modelo_pago": "", "costo_proveedor": null, "proveedor": "", "stock": null,
     "precio_venta": null, "compare_at": null, "combos": [],
@@ -87,6 +93,11 @@ fuente**, y la incoherencia se vuelve visible en el momento, no al final.
 
 ## Reglas del expediente
 
+0.bis **`mercado_dropkiller` solo acepta cifras DEPURADAS y con su marca de cierre.**
+   `unidades_depuradas` sale de `ventas_reales.py`, nunca de `totalSoldUnits` crudo (cuenta ajustes
+   de inventario). `conteo_cerrado: false` significa que la búsqueda tocó un tope o quedaron
+   términos sin correr: esa cifra se escribe `N+` en el documento y **no se compara con otra**.
+   `etapa` y `proveedores_activos` caducan en semanas: sin `fecha_medicion` el bloque no vale.
 0. **`alergenos` se llena de la ETIQUETA o queda `alergenos_verificados: false`.** Lista vacía con
    `verificados: false` significa "no comprobado", NO "no tiene" — y bloquea publicar la ficha.
    `fuente_etiqueta` guarda la ruta de la foto/fotograma del que se leyó (ver
